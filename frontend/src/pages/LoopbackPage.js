@@ -169,6 +169,7 @@ export default defineComponent({
         const path = 'interfaces loopback lo';
         await configStore.setConfig(path, config);
         configStore.markPending();
+        await configStore.checkSessionChanged();
 
         modalVisible.value = false;
         await load();
@@ -177,7 +178,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {t,
 

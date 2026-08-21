@@ -444,6 +444,7 @@ export default defineComponent({
           }
         }
 
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (err) {
@@ -514,7 +515,7 @@ export default defineComponent({
       pendingDeletePeerName.value = '';
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {
       t, loading, wireguards, selected: selectedWG, modalVisible, editingWG, interfaceOptions, activeTab,

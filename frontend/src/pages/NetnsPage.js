@@ -74,6 +74,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
     watch(() => route.path, () => {
       selectedNames.value = [];

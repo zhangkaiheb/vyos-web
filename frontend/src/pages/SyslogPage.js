@@ -133,26 +133,27 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('system syslog');
+        await configStore.deleteConfig('system syslog');
         const c = config.value;
         for (const [fac, level] of Object.entries(c.console)) {
-          await configApi.set(`system syslog console facility ${fac} level`, level);
+          await configStore.setConfig(`system syslog console facility ${fac} level`, level);
         }
         for (const [fac, level] of Object.entries(c.local)) {
-          await configApi.set(`system syslog local facility ${fac} level`, level);
+          await configStore.setConfig(`system syslog local facility ${fac} level`, level);
         }
-        if (c.marker.disable) await configApi.set('system syslog marker disable');
-        await configApi.set('system syslog marker interval', String(c.marker.interval));
-        if (c['preserve-fqdn']) await configApi.set('system syslog preserve-fqdn');
+        if (c.marker.disable) await configStore.setConfig('system syslog marker disable');
+        await configStore.setConfig('system syslog marker interval', String(c.marker.interval));
+        if (c['preserve-fqdn']) await configStore.setConfig('system syslog preserve-fqdn');
         for (const [host, r] of Object.entries(c.remote)) {
-          await configApi.set(`system syslog remote ${host} port`, String(r.port));
-          await configApi.set(`system syslog remote ${host} protocol`, r.protocol);
-          if (r['source-address']) await configApi.set(`system syslog remote ${host} source-address`, r['source-address']);
+          await configStore.setConfig(`system syslog remote ${host} port`, String(r.port));
+          await configStore.setConfig(`system syslog remote ${host} protocol`, r.protocol);
+          if (r['source-address']) await configStore.setConfig(`system syslog remote ${host} source-address`, r['source-address']);
           for (const [fac, level] of Object.entries(r.facilities)) {
-            await configApi.set(`system syslog remote ${host} facility ${fac} level`, level);
+            await configStore.setConfig(`system syslog remote ${host} facility ${fac} level`, level);
           }
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('syslog.saveFailed'));
@@ -161,7 +162,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {t,
       

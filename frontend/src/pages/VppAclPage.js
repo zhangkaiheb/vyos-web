@@ -200,12 +200,13 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('vpp acl');
+        await configStore.deleteConfig('vpp acl');
         const payload = formToAcl(config.value);
         if (Object.keys(payload).length) {
-          await configApi.set('vpp acl', payload);
+          await configStore.setConfig('vpp acl', payload);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('vppAcl.saveFailed'));
@@ -350,6 +351,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

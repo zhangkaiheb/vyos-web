@@ -27,12 +27,6 @@ const SOURCE_VALIDATION_OPTIONS = [
   { value: 'disable', label: 'disable (No source validation)' },
 ];
 
-const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0 (Disable DAD)' },
-  { value: '1', label: '1 (Enable DAD)' },
-  { value: '2', label: '2 (Enable DAD, disable if duplicate MAC found)' },
-];
-
 const ERSPAN_DIRECTION_OPTIONS = [
   { value: 'ingress', label: 'ingress (Mirror ingress traffic)' },
   { value: 'egress', label: 'egress (Mirror egress traffic)' },
@@ -80,11 +74,17 @@ export default defineComponent({
     const selected = ref([]);
     const modalVisible = ref(false);
     const editingTunnel = ref(null);
+    const isEditMode = ref(false);
     const interfaceOptions = ref([]);
     const activeTab = ref('basic');
+    const acceptDadOptions = computed(() => [
+      { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
+      { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
+      { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
+    ]);
 
     const schema = computed(() => [
-      { key: 'name', title: t('interface.tunnel.name'), type: 'text', required: true, placeholder: t('interface.tunnel.name_placeholder'), disabled: !!editingTunnel.value?.name },
+      { key: 'name', title: t('interface.tunnel.name'), type: 'text', required: true, placeholder: t('interface.tunnel.name_placeholder'), disabled: isEditMode.value },
       { key: 'description', title: t('interface.tunnel.description'), type: 'text' },
       { key: 'encapsulation', title: t('interface.tunnel.encapsulation'), type: 'select', options: ENCAPSULATION_OPTIONS, required: true },
       { key: 'remote', title: t('interface.tunnel.remote'), type: 'text', placeholder: t('interface.tunnel.remote_placeholder') },
@@ -116,7 +116,7 @@ export default defineComponent({
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: t('interface.tunnel.ipv6_accept_dad'), type: 'select', options: ACCEPT_DAD_OPTIONS, help: t('interface.tunnel.ipv6_accept_dad_help') },
+      { key: 'ipv6_accept_dad', title: t('interface.tunnel.ipv6_accept_dad'), type: 'select', options: acceptDadOptions.value, help: t('interface.tunnel.ipv6_accept_dad_help') },
       { key: 'ipv6_address_autoconf', title: t('interface.tunnel.ipv6_address_autoconf'), type: 'checkbox', help: t('interface.tunnel.ipv6_address_autoconf_help') },
       { key: 'ipv6_address_eui64', title: t('interface.tunnel.ipv6_address_eui64'), type: 'text', placeholder: t('interface.tunnel.ipv6_address_eui64_placeholder') },
       { key: 'ipv6_no_default_link_local', title: t('interface.tunnel.ipv6_no_default_link_local'), type: 'checkbox' },
@@ -245,6 +245,8 @@ export default defineComponent({
     });
 
     function tunnelToForm(tun) {
+      // API returns underscored keys (key_mangling), but load() also preserves original hyphenated keys via ...config
+      // Use underscored keys as primary source since that's what the API returns
       const addresses = Array.isArray(tun.address) ? tun.address : (tun.address ? [tun.address] : []);
       const ipv6 = tun.ipv6 || {};
       const ipv6Address = Array.isArray(ipv6.address) ? ipv6.address : (ipv6.address ? [ipv6.address] : []);
@@ -257,49 +259,49 @@ export default defineComponent({
         description: tun.description || '',
         encapsulation: tun.encapsulation || '',
         remote: tun.remote || '',
-        source_address: tun['source-address'] || '',
-        source_interface: tun['source-interface'] || '',
+        source_address: tun.source_address || tun['source-address'] || '',
+        source_interface: tun.source_interface || tun['source-interface'] || '',
         address: addresses.join('\n'),
         mtu: tun.mtu || '',
-        '6rd_prefix': tun['6rd-prefix'] || '',
-        '6rd_relay_prefix': tun['6rd-relay-prefix'] || '',
+        '6rd_prefix': tun['6rd_prefix'] || tun['6rd-prefix'] || '',
+        '6rd_relay_prefix': tun['6rd_relay_prefix'] || tun['6rd-relay-prefix'] || '',
         disable: !!tun.disable || tun.disable === '',
-        disable_link_detect: !!tun['disable-link-detect'] || tun['disable-link-detect'] === '',
-        enable_multicast: !!tun['enable-multicast'] || tun['enable-multicast'] === '',
+        disable_link_detect: !!tun.disable_link_detect || !!tun['disable-link-detect'] || tun.disable_link_detect === '',
+        enable_multicast: !!tun.enable_multicast || !!tun['enable-multicast'] || tun.enable_multicast === '',
         redirect: tun.redirect || '',
         vrf: tun.vrf || '',
-        ip_adjust_mss: tun.ip?.['adjust-mss'] || '',
-        ip_arp_cache_timeout: tun.ip?.['arp-cache-timeout'] || '',
-        ip_disable_arp_filter: !!tun.ip?.['disable-arp-filter'],
-        ip_disable_forwarding: !!tun.ip?.['disable-forwarding'],
-        ip_enable_arp_accept: !!tun.ip?.['enable-arp-accept'],
-        ip_enable_arp_announce: !!tun.ip?.['enable-arp-announce'],
-        ip_enable_arp_ignore: !!tun.ip?.['enable-arp-ignore'],
-        ip_enable_directed_broadcast: !!tun.ip?.['enable-directed-broadcast'],
-        ip_enable_proxy_arp: !!tun.ip?.['enable-proxy-arp'],
-        ip_proxy_arp_pvlan: !!tun.ip?.['proxy-arp-pvlan'],
-        ip_source_validation: tun.ip?.['source-validation'] || '',
-        ipv6_accept_dad: ipv6['accept-dad'] !== undefined ? String(ipv6['accept-dad']) : '1',
+        ip_adjust_mss: tun.ip?.adjust_mss || tun.ip?.['adjust-mss'] || '',
+        ip_arp_cache_timeout: tun.ip?.arp_cache_timeout || tun.ip?.['arp-cache-timeout'] || '',
+        ip_disable_arp_filter: !!tun.ip?.disable_arp_filter || !!tun.ip?.['disable-arp-filter'],
+        ip_disable_forwarding: !!tun.ip?.disable_forwarding || !!tun.ip?.['disable-forwarding'],
+        ip_enable_arp_accept: !!tun.ip?.enable_arp_accept || !!tun.ip?.['enable-arp-accept'],
+        ip_enable_arp_announce: !!tun.ip?.enable_arp_announce || !!tun.ip?.['enable-arp-announce'],
+        ip_enable_arp_ignore: !!tun.ip?.enable_arp_ignore || !!tun.ip?.['enable-arp-ignore'],
+        ip_enable_directed_broadcast: !!tun.ip?.enable_directed_broadcast || !!tun.ip?.['enable-directed-broadcast'],
+        ip_enable_proxy_arp: !!tun.ip?.enable_proxy_arp || !!tun.ip?.['enable-proxy-arp'],
+        ip_proxy_arp_pvlan: !!tun.ip?.proxy_arp_pvlan || !!tun.ip?.['proxy-arp-pvlan'],
+        ip_source_validation: tun.ip?.source_validation || tun.ip?.['source-validation'] || '',
+        ipv6_accept_dad: ipv6['accept_dad'] !== undefined ? String(ipv6['accept_dad']) : (ipv6['accept-dad'] !== undefined ? String(ipv6['accept-dad']) : '1'),
         ipv6_address_autoconf: ipv6Address.includes('autoconf'),
         ipv6_address_eui64: ipv6Address.find(a => typeof a === 'object' && a.eui64) || '',
-        ipv6_no_default_link_local: ipv6Address.includes('no-default-link-local'),
-        ipv6_adjust_mss: ipv6['adjust-mss'] || '',
-        ipv6_base_reachable_time: ipv6['base-reachable-time'] || '',
-        ipv6_disable_forwarding: !!ipv6['disable-forwarding'],
-        ipv6_dup_addr_detect_transmits: ipv6['dup-addr-detect-transmits'] !== undefined ? String(ipv6['dup-addr-detect-transmits']) : '1',
-        ipv6_source_validation: ipv6['source-validation'] || '',
+        ipv6_no_default_link_local: ipv6Address.includes('no_default_link_local') || ipv6Address.includes('no-default-link-local'),
+        ipv6_adjust_mss: ipv6['adjust_mss'] || ipv6['adjust-mss'] || '',
+        ipv6_base_reachable_time: ipv6['base_reachable_time'] || ipv6['base-reachable-time'] || '',
+        ipv6_disable_forwarding: !!ipv6['disable_forwarding'] || !!ipv6['disable-forwarding'],
+        ipv6_dup_addr_detect_transmits: ipv6['dup_addr_detect_transmits'] !== undefined ? String(ipv6['dup_addr_detect_transmits']) : (ipv6['dup-addr-detect-transmits'] !== undefined ? String(ipv6['dup-addr-detect-transmits']) : '1'),
+        ipv6_source_validation: ipv6['source_validation'] || ipv6['source-validation'] || '',
         mirror_ingress: tun.mirror?.ingress || '',
         mirror_egress: tun.mirror?.egress || '',
         parameters_erspan: {
           direction: erspan.direction || '',
-          hw_id: erspan['hw-id'] !== undefined ? erspan['hw-id'] : '',
+          hw_id: erspan['hw_id'] !== undefined ? erspan['hw_id'] : (erspan['hw-id'] !== undefined ? erspan['hw-id'] : ''),
           index: erspan.index !== undefined ? erspan.index : '',
           version: erspan.version || '1',
         },
         parameters_ip: {
-          ignore_df: !!ipParams['ignore-df'],
+          ignore_df: !!ipParams['ignore_df'] || !!ipParams['ignore-df'],
           key: ipParams.key !== undefined ? ipParams.key : '',
-          no_pmtu_discovery: !!ipParams['no-pmtu-discovery'],
+          no_pmtu_discovery: !!ipParams['no_pmtu_discovery'] || !!ipParams['no-pmtu-discovery'],
           tos: ipParams.tos || 'inherit',
           ttl: ipParams.ttl !== undefined ? String(ipParams.ttl) : '',
         },
@@ -412,12 +414,13 @@ export default defineComponent({
           name,
           ...config,
           address: Array.isArray(config.address) ? config.address.join(', ') : (config.address || ''),
-          source_address: config['source-address'] || '',
-          source_interface: config['source-interface'] || '',
-          disable_link_detect: !!config['disable-link-detect'],
-          enable_multicast: !!config['enable-multicast'],
-          '6rd_prefix': config['6rd-prefix'] || '',
-          '6rd_relay_prefix': config['6rd-relay-prefix'] || '',
+          // API returns underscored keys (key_mangling), so use underscored keys directly
+          source_address: config.source_address || config['source-address'] || '',
+          source_interface: config.source_interface || config['source-interface'] || '',
+          disable_link_detect: !!config.disable_link_detect || !!config['disable-link-detect'],
+          enable_multicast: !!config.enable_multicast || !!config['enable-multicast'],
+          '6rd_prefix': config['6rd_prefix'] || config['6rd-prefix'] || '',
+          '6rd_relay_prefix': config['6rd_relay_prefix'] || config['6rd-relay-prefix'] || '',
         }));
         const ifaces = ifRes.interfaces || [];
         interfaceOptions.value = ifaces.map(iface => ({
@@ -476,11 +479,13 @@ export default defineComponent({
       };
     }
 
-    function openModal(index = -1) {
-      if (index >= 0) {
-        editingTunnel.value = tunnelToForm(tunnels.value[index]);
+    function openModal(tunnel = null) {
+      if (tunnel && tunnel.name) {
+        editingTunnel.value = tunnelToForm(tunnel);
+        isEditMode.value = true;
       } else {
         editingTunnel.value = getDefaultForm();
+        isEditMode.value = false;
       }
       activeTab.value = 'basic';
       modalVisible.value = true;
@@ -497,8 +502,9 @@ export default defineComponent({
       }
       const config = formToTunnel(editingTunnel.value);
       try {
-        await configApi.set(`interfaces tunnel ${editingTunnel.value.name}`, config);
+        await configStore.setConfig(`interfaces tunnel ${editingTunnel.value.name}`, config);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (e) {
@@ -513,8 +519,9 @@ export default defineComponent({
       }
       const names = selected.value.map(s => s.name);
       try {
-        await Promise.all(names.map(name => configApi.delete(`interfaces tunnel ${name}`)));
+        await Promise.all(names.map(name => configStore.deleteConfig(`interfaces tunnel ${name}`)));
         configStore.markPending();
+        await configStore.checkSessionChanged();
         selected.value = [];
         await load();
       } catch (e) {
@@ -525,11 +532,12 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {t,
       
-      loading, tunnels, selected, modalVisible, editingTunnel, interfaceOptions, activeTab,
+      loading, tunnels, selected, modalVisible, editingTunnel, isEditMode, interfaceOptions, activeTab,
       COLUMNS,
       schema, ipSchema, ipv6Schema, mirrorSchema, parametersSchema, commandText, modalTabs,
       openModal, save, remove, load,
@@ -543,8 +551,8 @@ export default defineComponent({
         :loading="loading"
         :selectable="true"
         :actions="['create', 'edit', 'delete', 'refresh']"
-        @create="openModal(-1)"
-        @edit="openModal(selected[0] ? tunnels.indexOf(selected[0]) : -1)"
+        @create="openModal(null)"
+        @edit="openModal($event)"
         @delete="remove"
         @refresh="load"
         @selection-change="selected = $event"
@@ -557,7 +565,7 @@ export default defineComponent({
             </span>
           </template>
           <template v-if="column.key === 'actions'">
-            <a @click="openModal(tunnels.indexOf(record))">{{ t('common.edit') }}</a>
+            <a @click="openModal(record)">{{ t('common.edit') }}</a>
             <a @click="selected = [record]; remove()" style="color: #ff4d4f; margin-left: 8px;">{{ t('common.delete') }}</a>
           </template>
         </template>
@@ -565,7 +573,7 @@ export default defineComponent({
 
       <DraggableModal
         v-model:visible="modalVisible"
-        :title="editingTunnel?.name ? t('interface.tunnel.editTunnelInterface') : t('interface.tunnel.createTunnelInterface')"
+        :title="isEditMode ? t('interface.tunnel.editTunnelInterface') : t('interface.tunnel.createTunnelInterface')"
         width="800px"
         @confirm="save"
       >

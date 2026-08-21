@@ -890,7 +890,7 @@ export default defineComponent({
       const { name, type, ...config } = editingPolicy.value;
 
       try {
-        await configApi.set(`qos policy ${type}`, name);
+        await configStore.setConfig(`qos policy ${type}`, name);
 
         for (const [key, value] of Object.entries(config)) {
           if (value === undefined || value === null || value === '') continue;
@@ -900,13 +900,13 @@ export default defineComponent({
             for (const [subKey, subValue] of Object.entries(value)) {
               if (subValue === true) {
                 // checkbox valueless
-                await configApi.set(`qos policy ${type} ${name} ${key} ${subKey}`, '');
+                await configStore.setConfig(`qos policy ${type} ${name} ${key} ${subKey}`, '');
               } else if (subValue !== undefined && subValue !== null && subValue !== '') {
-                await configApi.set(`qos policy ${type} ${name} ${key} ${subKey}`, String(subValue));
+                await configStore.setConfig(`qos policy ${type} ${name} ${key} ${subKey}`, String(subValue));
               }
             }
           } else {
-            await configApi.set(`qos policy ${type} ${name} ${key}`, String(value));
+            await configStore.setConfig(`qos policy ${type} ${name} ${key}`, String(value));
           }
         }
 
@@ -917,14 +917,14 @@ export default defineComponent({
           const existingPolicy = policies.value.find(p => p.name === name && p.type === type);
           if (existingPolicy && existingPolicy[classKey]) {
             for (const existingId of Object.keys(existingPolicy[classKey])) {
-              await configApi.delete(`qos policy ${type} ${name} ${classKey} ${existingId}`);
+              await configStore.deleteConfig(`qos policy ${type} ${name} ${classKey} ${existingId}`);
             }
           }
 
           // Save each class
           for (const c of editingClasses.value) {
             if (c.id === null || c.id === undefined) continue;
-            await configApi.set(`qos policy ${type} ${name} ${classKey}`, String(c.id));
+            await configStore.setConfig(`qos policy ${type} ${name} ${classKey}`, String(c.id));
 
             for (const [key, value] of Object.entries(c)) {
               if (key === 'id' || value === undefined || value === null || value === '') continue;
@@ -932,19 +932,20 @@ export default defineComponent({
               if (typeof value === 'object' && !Array.isArray(value)) {
                 for (const [subKey, subValue] of Object.entries(value)) {
                   if (subValue === true) {
-                    await configApi.set(`qos policy ${type} ${name} ${classKey} ${c.id} ${key} ${subKey}`, '');
+                    await configStore.setConfig(`qos policy ${type} ${name} ${classKey} ${c.id} ${key} ${subKey}`, '');
                   } else if (subValue !== undefined && subValue !== null && subValue !== '') {
-                    await configApi.set(`qos policy ${type} ${name} ${classKey} ${c.id} ${key} ${subKey}`, String(subValue));
+                    await configStore.setConfig(`qos policy ${type} ${name} ${classKey} ${c.id} ${key} ${subKey}`, String(subValue));
                   }
                 }
               } else {
-                await configApi.set(`qos policy ${type} ${name} ${classKey} ${c.id} ${key}`, String(value));
+                await configStore.setConfig(`qos policy ${type} ${name} ${classKey} ${c.id} ${key}`, String(value));
               }
             }
           }
         }
 
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (e) {
@@ -976,12 +977,13 @@ export default defineComponent({
       deleteConfirmVisible.value = false;
       for (const target of deleteTargets.value) {
         try {
-          await configApi.delete(`qos policy ${target.type} ${target.name}`);
+          await configStore.deleteConfig(`qos policy ${target.type} ${target.name}`);
         } catch (e) {
           showError(t('qos.error.deleteFailed', { name: target.name }) + ': ' + (e.message || e));
         }
       }
       configStore.markPending();
+        await configStore.checkSessionChanged();
       selected.value = [];
       deleteTargets.value = [];
       await load();
@@ -1310,6 +1312,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

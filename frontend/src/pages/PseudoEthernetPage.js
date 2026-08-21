@@ -4,10 +4,29 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
+import { useI18n } from '/src/i18n/index.js';
+import { buildDhcpv6BaseSchema, dhcpv6ConfigToForm, dhcpv6FormToConfig, dhcpv6ToCommands, DHCPV6_DEFAULTS } from '/src/utils/dhcpv6Common.js';
 import { api, interfaceApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
-import { useI18n } from '/src/i18n/index.js';
+
+function formatJson(obj) {
+  if (!obj || Object.keys(obj).length === 0) return '';
+  try {
+    return JSON.stringify(obj, null, 2);
+  } catch {
+    return '';
+  }
+}
+
+function safeJsonParse(str) {
+  if (!str) return {};
+  try {
+    return JSON.parse(str);
+  } catch {
+    return {};
+  }
+}
 
 export default defineComponent({
   name: 'PseudoEthernetPage',
@@ -112,7 +131,6 @@ export default defineComponent({
       { key: 'dhcpv6_no_request_domain_name', title: t('pseudoEthernet.dhcpv6.noRequestDomainName'), type: 'checkbox', help: t('pseudoEthernet.dhcpv6.noRequestDomainNameHelp') },
       { key: 'dhcpv6_parameters_only', title: t('pseudoEthernet.dhcpv6.parametersOnly'), type: 'checkbox', help: t('pseudoEthernet.dhcpv6.parametersOnlyHelp') },
       { key: 'dhcpv6_pd_instances', title: t('pseudoEthernet.dhcpv6.pdInstances'), type: 'textarea', placeholder: t('pseudoEthernet.dhcpv6.pdInstancesPlaceholder'), help: t('pseudoEthernet.dhcpv6.pdInstancesHelp') },
-      { key: 'dhcpv6_pd_length', title: t('pseudoEthernet.dhcpv6.pdLength'), type: 'number', min: 32, max: 64, placeholder: t('pseudoEthernet.dhcpv6.pdLengthPlaceholder'), help: t('pseudoEthernet.dhcpv6.pdLengthHelp') },
       { key: 'dhcpv6_rapid_commit', title: t('pseudoEthernet.dhcpv6.rapidCommit'), type: 'checkbox', help: t('pseudoEthernet.dhcpv6.rapidCommitHelp') },
       { key: 'dhcpv6_temporary', title: t('pseudoEthernet.dhcpv6.temporary'), type: 'checkbox', help: t('pseudoEthernet.dhcpv6.temporaryHelp') },
     ]);
@@ -191,25 +209,7 @@ export default defineComponent({
       if (m.dhcp_vendor_class_id) lines.push(`set interfaces pseudo-ethernet ${name} dhcp-options vendor-class-id ${m.dhcp_vendor_class_id}`);
 
       // DHCPv6
-      if (m.dhcpv6_duid) lines.push(`set interfaces pseudo-ethernet ${name} dhcpv6-options duid ${m.dhcpv6_duid}`);
-      if (m.dhcpv6_no_release) lines.push(`set interfaces pseudo-ethernet ${name} dhcpv6-options no-release`);
-      if (m.dhcpv6_no_request_dns) lines.push(`set interfaces pseudo-ethernet ${name} dhcpv6-options no-request-dns`);
-      if (m.dhcpv6_no_request_domain_name) lines.push(`set interfaces pseudo-ethernet ${name} dhcpv6-options no-request-domain-name`);
-      if (m.dhcpv6_parameters_only) lines.push(`set interfaces pseudo-ethernet ${name} dhcpv6-options parameters-only`);
-      if (m.dhcpv6_pd_length) lines.push(`set interfaces pseudo-ethernet ${name} dhcpv6-options pd-length ${m.dhcpv6_pd_length}`);
-      if (m.dhcpv6_pd_instances) {
-        m.dhcpv6_pd_instances.split('\n').filter(Boolean).forEach(line => {
-          const parts = line.trim().split(',').map(s => s.trim());
-          if (parts.length >= 2) {
-            const [inst, iface, addr, slaId] = parts;
-            lines.push(`set interfaces pseudo-ethernet ${name} dhcpv6-options pd ${inst} interface ${iface}`);
-            if (addr) lines.push(`set interfaces pseudo-ethernet ${name} dhcpv6-options pd ${inst} interface ${iface} address ${addr}`);
-            if (slaId) lines.push(`set interfaces pseudo-ethernet ${name} dhcpv6-options pd ${inst} interface ${iface} sla-id ${slaId}`);
-          }
-        });
-      }
-      if (m.dhcpv6_rapid_commit) lines.push(`set interfaces pseudo-ethernet ${name} dhcpv6-options rapid-commit`);
-      if (m.dhcpv6_temporary) lines.push(`set interfaces pseudo-ethernet ${name} dhcpv6-options temporary`);
+      lines.push(...dhcpv6ToCommands(m, 'pseudo-ethernet', name));
 
       // VIF
       if (m.vif) {
@@ -278,10 +278,8 @@ export default defineComponent({
         dhcp_client_id: '', dhcp_default_route_distance: '', dhcp_host_name: '',
         dhcp_mtu: false, dhcp_no_default_route: false, dhcp_reject: '',
         dhcp_user_class: '', dhcp_vendor_class_id: '',
-        dhcpv6_duid: '', dhcpv6_no_release: false, dhcpv6_no_request_dns: false,
-        dhcpv6_no_request_domain_name: false, dhcpv6_parameters_only: false,
-        dhcpv6_pd_instances: '', dhcpv6_pd_length: '',
-        dhcpv6_rapid_commit: false, dhcpv6_temporary: false,
+        ...DHCPV6_DEFAULTS,
+        dhcpv6_pd_instances: '',
         vif: '', vif_s: '',
         mirror_egress: '', mirror_ingress: '',
         redirect: '', vrf: '',
@@ -328,20 +326,8 @@ export default defineComponent({
         dhcp_reject: Array.isArray(m['dhcp-options']?.reject) ? m['dhcp-options'].reject.join('\n') : (m['dhcp-options']?.reject || ''),
         dhcp_user_class: m['dhcp-options']?.user_class || '',
         dhcp_vendor_class_id: m['dhcp-options']?.vendor_class_id || '',
-        dhcpv6_duid: m['dhcpv6-options']?.duid || '',
-        dhcpv6_no_release: !!m['dhcpv6-options']?.no_release,
-        dhcpv6_no_request_dns: !!m['dhcpv6-options']?.no_request_dns,
-        dhcpv6_no_request_domain_name: !!m['dhcpv6-options']?.no_request_domain_name,
-        dhcpv6_parameters_only: !!m['dhcpv6-options']?.parameters_only,
-        dhcpv6_pd_instances: m['dhcpv6-options']?.pd
-          ? Object.entries(m['dhcpv6-options'].pd).map(([inst, val]) => {
-              const ifaces = val.interface ? Object.entries(val.interface).map(([ifn, ifv]) => `${ifn},${ifv.address || ''},${ifv.sla_id || ''}`).join(';') : '';
-              return `${inst},${ifaces}`;
-            }).join('\n')
-          : '',
-        dhcpv6_pd_length: m['dhcpv6-options']?.pd_length || '',
-        dhcpv6_rapid_commit: !!m['dhcpv6-options']?.rapid_commit,
-        dhcpv6_temporary: !!m['dhcpv6-options']?.temporary,
+        ...dhcpv6ConfigToForm(m['dhcpv6-options']),
+        dhcpv6_pd_instances: formatJson(m['dhcpv6-options']?.pd || {}),
         vif: m.vif ? JSON.stringify(m.vif, null, 2) : '',
         vif_s: m['vif-s'] ? JSON.stringify(m['vif-s'], null, 2) : '',
         mirror_egress: m.mirror?.egress || '',
@@ -408,31 +394,11 @@ export default defineComponent({
       if (Object.keys(dhcp).length) result['dhcp-options'] = dhcp;
 
       // DHCPv6
-      const dhcpv6 = {};
-      if (form.dhcpv6_duid) dhcpv6.duid = form.dhcpv6_duid;
-      if (form.dhcpv6_no_release) dhcpv6.no_release = true;
-      if (form.dhcpv6_no_request_dns) dhcpv6.no_request_dns = true;
-      if (form.dhcpv6_no_request_domain_name) dhcpv6.no_request_domain_name = true;
-      if (form.dhcpv6_parameters_only) dhcpv6.parameters_only = true;
-      if (form.dhcpv6_pd_length) dhcpv6.pd_length = Number(form.dhcpv6_pd_length);
+      const dhcpv6 = dhcpv6FormToConfig(form) || {};
       if (form.dhcpv6_pd_instances) {
-        const pd = {};
-        form.dhcpv6_pd_instances.split('\n').filter(Boolean).forEach(line => {
-          const parts = line.trim().split(',').map(s => s.trim());
-          if (parts.length >= 2) {
-            const [inst, iface, addr, slaId] = parts;
-            if (!pd[inst]) pd[inst] = {};
-            if (!pd[inst].interface) pd[inst].interface = {};
-            const ifCfg = {};
-            if (addr) ifCfg.address = addr;
-            if (slaId) ifCfg.sla_id = Number(slaId);
-            pd[inst].interface[iface] = ifCfg;
-          }
-        });
+        const pd = safeJsonParse(form.dhcpv6_pd_instances);
         if (Object.keys(pd).length) dhcpv6.pd = pd;
       }
-      if (form.dhcpv6_rapid_commit) dhcpv6.rapid_commit = true;
-      if (form.dhcpv6_temporary) dhcpv6.temporary = true;
       if (Object.keys(dhcpv6).length) result['dhcpv6-options'] = dhcpv6;
 
       // VIF
@@ -514,6 +480,7 @@ export default defineComponent({
         console.log('[PseudoEthernet] save config:', JSON.stringify(config, null, 2));
         await configStore.setConfig(`interfaces pseudo-ethernet ${form.name}`, config);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (err) {
@@ -542,7 +509,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {
       loading, pseudoEthernets, selected: selectedItems, modalVisible, editingItem, interfaceOptions, activeTab,

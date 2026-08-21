@@ -465,9 +465,9 @@ export default defineComponent({
       saving.value = true;
       try {
         const payload = formToSstp(config.value);
-        await configApi.set('vpn sstp', payload);
+        await configStore.setConfig('vpn sstp', payload);
         configStore.markPending();
-        await load();
+        await configStore.checkSessionChanged(); await load();
       } catch (e) {
         showError(e.message || t('sstp.errors.saveFailed'));
       } finally {
@@ -593,6 +593,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       onMenuRefresh(load);
     });
 

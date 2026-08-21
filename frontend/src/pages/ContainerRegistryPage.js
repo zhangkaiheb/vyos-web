@@ -138,12 +138,13 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('container registry');
+        await configStore.deleteConfig('container registry');
         const payload = formToRegistry(registries.value);
         if (Object.keys(payload).length) {
-          await configApi.set('container registry', payload);
+          await configStore.setConfig('container registry', payload);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('containerRegistry.errors.saveFailed'));
@@ -264,6 +265,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

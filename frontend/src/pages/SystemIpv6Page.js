@@ -73,21 +73,22 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('system ipv6');
+        await configStore.deleteConfig('system ipv6');
         const c = config.value;
-        if (c['disable-forwarding']) await configApi.set('system ipv6 disable-forwarding');
-        if (c['strict-dad']) await configApi.set('system ipv6 strict-dad');
-        await configApi.set('system ipv6 neighbor table-size', c.neighbor['table-size']);
+        if (c['disable-forwarding']) await configStore.setConfig('system ipv6 disable-forwarding');
+        if (c['strict-dad']) await configStore.setConfig('system ipv6 strict-dad');
+        await configStore.setConfig('system ipv6 neighbor table-size', c.neighbor['table-size']);
         if (c.multipath['layer4-hashing']) {
-          await configApi.set('system ipv6 multipath layer4-hashing');
+          await configStore.setConfig('system ipv6 multipath layer4-hashing');
         }
         if (c.nht['no-resolve-via-default']) {
-          await configApi.set('system ipv6 nht no-resolve-via-default');
+          await configStore.setConfig('system ipv6 nht no-resolve-via-default');
         }
         for (const [proto, rm] of Object.entries(c.protocol)) {
-          if (rm) await configApi.set(`system ipv6 protocol ${proto} route-map`, rm);
+          if (rm) await configStore.setConfig(`system ipv6 protocol ${proto} route-map`, rm);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('systemIpv6.errors.saveFailed'));
@@ -96,7 +97,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {t,
       

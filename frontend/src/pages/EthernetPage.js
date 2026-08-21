@@ -10,6 +10,7 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import { useI18n } from '/src/i18n/index.js';
+import { buildDhcpv6BaseSchema, dhcpv6ConfigToForm, dhcpv6FormToConfig, dhcpv6ToCommands, DHCPV6_DEFAULTS } from '/src/utils/dhcpv6Common.js';
 
 function isPhysicalEthernet(name) {
   return name && name.indexOf('.') === -1;
@@ -91,14 +92,12 @@ function buildDhcpSchema(_unused, t) {
 }
 
 function buildDhcpv6Schema(_unused, t) {
-  return [
-    { key: 'dhcpv6_duid', title: t('ethernet.dhcpv6.duid') },
-    { key: 'dhcpv6_no_release', title: t('ethernet.dhcpv6.no_release'), type: 'checkbox' },
-    { key: 'dhcpv6_parameters_only', title: t('ethernet.dhcpv6.parameters_only'), type: 'checkbox', help: t('ethernet.dhcpv6.parameters_only_help') },
-    { key: 'dhcpv6_rapid_commit', title: t('ethernet.dhcpv6.rapid_commit'), type: 'checkbox', help: t('ethernet.dhcpv6.rapid_commit_help') },
-    { key: 'dhcpv6_temporary', title: t('ethernet.dhcpv6.temporary'), type: 'checkbox', help: t('ethernet.dhcpv6.temporary_help') },
-    { key: 'dhcpv6_pd', title: t('ethernet.dhcpv6.pd'), type: 'textarea', placeholder: t('ethernet.dhcpv6.pd_placeholder'), help: t('ethernet.dhcpv6.pd_help') },
-  ];
+  return buildDhcpv6BaseSchema('ethernet.dhcpv6', t, {
+    withPd: true,
+    pdTitle: 'ethernet.dhcpv6.pd',
+    pdPlaceholder: 'ethernet.dhcpv6.pd_placeholder',
+    pdHelp: 'ethernet.dhcpv6.pd_help',
+  });
 }
 
 function buildEapolSchema(_unused, t) {
@@ -291,11 +290,7 @@ function configToForm(cfg) {
     dhcp_user_class: extractLeaf(dhcp, ['user-class']),
     dhcp_vendor_class_id: extractLeaf(dhcp, ['vendor-class-id']),
 
-    dhcpv6_duid: extractLeaf(dhcpv6, ['duid']),
-    dhcpv6_no_release: hasLeaf(dhcpv6, ['no-release']),
-    dhcpv6_parameters_only: hasLeaf(dhcpv6, ['parameters-only']),
-    dhcpv6_rapid_commit: hasLeaf(dhcpv6, ['rapid-commit']),
-    dhcpv6_temporary: hasLeaf(dhcpv6, ['temporary']),
+    ...dhcpv6ConfigToForm(dhcpv6),
     dhcpv6_pd: formatJson(dhcpv6.pd),
 
     eapol_ca_certificate: extractLeaf(eapol, ['ca-certificate']),
@@ -395,12 +390,7 @@ function formToConfig(form) {
   if (Object.keys(dhcp).length) value['dhcp-options'] = dhcp;
 
   // DHCPv6 options
-  const dhcpv6 = {};
-  if (form.dhcpv6_duid) dhcpv6.duid = form.dhcpv6_duid;
-  if (form.dhcpv6_no_release) dhcpv6['no-release'] = '';
-  if (form.dhcpv6_parameters_only) dhcpv6['parameters-only'] = '';
-  if (form.dhcpv6_rapid_commit) dhcpv6['rapid-commit'] = '';
-  if (form.dhcpv6_temporary) dhcpv6.temporary = '';
+  const dhcpv6 = dhcpv6FormToConfig(form) || {};
   const pd = safeJsonParse(form.dhcpv6_pd);
   if (Object.keys(pd).length) dhcpv6.pd = pd;
   if (Object.keys(dhcpv6).length) value['dhcpv6-options'] = dhcpv6;
@@ -516,12 +506,7 @@ export default defineComponent({
       const interfaceNames = data.value.map(i => i.name);
       const isPhysical = isPhysicalEthernet(editingItem.value?.name);
       const isL2 = editingItem.value?.mode === 'L2';
-      return TAB_DEFS.filter(tabDef => {
-        if (tabDef.key === 'eapol') {
-          return visibilityStore.isVisible('ethernet-eapol');
-        }
-        return true;
-      }).map(tabDef => {
+      return TAB_DEFS.map(tabDef => {
         const title = t(tabDef.titleKey);
         if (tabDef.schemaBuilder) {
           const schema = tabDef.key === 'basic'

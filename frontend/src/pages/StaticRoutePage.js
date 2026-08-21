@@ -631,10 +631,10 @@ export default defineComponent({
       saving.value = true;
       try {
         const payload = formToConfig(config.value);
-        await configApi.set('protocols static', payload);
+        await configStore.setConfig('protocols static', payload);
         configStore.markPending();
         saved.value = true;
-        await load();
+        await configStore.checkSessionChanged(); await load();
       } catch (e) {
         showError(e);
       } finally {
@@ -868,6 +868,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       loadInterfaces();
       onMenuRefresh(load);
     });

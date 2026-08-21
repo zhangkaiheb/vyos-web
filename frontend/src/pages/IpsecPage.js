@@ -1,6 +1,6 @@
 import { defineComponent, ref, computed, watch, onMounted } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
-import { configApi, firewallApi } from '/src/api/index.js';
+import { configApi, firewallApi, interfaceApi } from '/src/api/index.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { useVisibilityStore } from '/src/stores/visibility.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
@@ -13,10 +13,10 @@ import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { useI18n } from '/src/i18n/index.js';
 
-const KEY_EXCHANGE_OPTIONS = ['', 'ikev1', 'ikev2'];
-const IKE_MODE_OPTIONS = ['', 'main', 'aggressive'];
-const CLOSE_ACTION_OPTIONS = ['', 'none', 'trap', 'start'];
-const DPD_ACTION_OPTIONS = ['', 'trap', 'clear', 'restart'];
+const KEY_EXCHANGE_OPTIONS = ['ikev1', 'ikev2'];
+const IKE_MODE_OPTIONS = ['main', 'aggressive'];
+const CLOSE_ACTION_OPTIONS = ['none', 'trap', 'start'];
+const DPD_ACTION_OPTIONS = ['trap', 'clear', 'restart'];
 const DH_GROUP_OPTIONS = [
   '',
   { value: '1', label: '1 (modp768)' },
@@ -45,7 +45,7 @@ const DH_GROUP_OPTIONS = [
 const ENCRYPTION_OPTIONS = ['', 'null', 'aes128', 'aes192', 'aes256', 'aes128ctr', 'aes192ctr', 'aes256ctr', 'aes128ccm64', 'aes192ccm64', 'aes256ccm64', 'aes128ccm96', 'aes192ccm96', 'aes256ccm96', 'aes128ccm128', 'aes192ccm128', 'aes256ccm128', 'aes128gcm64', 'aes192gcm64', 'aes256gcm64', 'aes128gcm96', 'aes192gcm96', 'aes256gcm96', 'aes128gcm128', 'aes192gcm128', 'aes256gcm128', 'aes128gmac', 'aes192gmac', 'aes256gmac', '3des', 'blowfish128', 'blowfish192', 'blowfish256', 'camellia128', 'camellia192', 'camellia256', 'camellia128ctr', 'camellia192ctr', 'camellia256ctr', 'camellia128ccm64', 'camellia192ccm64', 'camellia256ccm64', 'camellia128ccm96', 'camellia192ccm96', 'camellia256ccm96', 'camellia128ccm128', 'camellia192ccm128', 'camellia256ccm128', 'serpent128', 'serpent192', 'serpent256', 'twofish128', 'twofish192', 'twofish256', 'cast128', 'chacha20poly1305'];
 const HASH_OPTIONS = ['', 'md5', 'md5_128', 'sha1', 'sha1_160', 'sha256', 'sha256_96', 'sha384', 'sha512', 'aesxcbc', 'aescmac', 'aes128gmac', 'aes192gmac', 'aes256gmac'];
 const PRF_OPTIONS = ['', 'prfmd5', 'prfsha1', 'prfaesxcbc', 'prfaescmac', 'prfsha256', 'prfsha384', 'prfsha512'];
-const ESP_MODE_OPTIONS = ['', 'tunnel', 'transport'];
+const ESP_MODE_OPTIONS = ['tunnel', 'transport'];
 const PFS_OPTIONS = ['', 'enable', 'disable', 'dh-group1', 'dh-group2', 'dh-group5', 'dh-group14', 'dh-group15', 'dh-group16', 'dh-group17', 'dh-group18', 'dh-group19', 'dh-group20', 'dh-group21', 'dh-group22', 'dh-group23', 'dh-group24', 'dh-group25', 'dh-group26', 'dh-group27', 'dh-group28', 'dh-group29', 'dh-group30', 'dh-group31', 'dh-group32'];
 const COMPRESSION_OPTIONS = ['', 'enable', 'disable'];
 const AUTH_MODE_OPTIONS = ['', 'pre-shared-secret', 'x509', 'rsa'];
@@ -55,6 +55,7 @@ const CONNECTION_TYPE_OPTIONS = ['', 'initiate', 'respond', 'none'];
 const UNIQUE_OPTIONS = ['', 'never', 'keep', 'replace'];
 const SERVER_MODE_OPTIONS = ['', 'pre-shared-secret', 'x509'];
 const CLIENT_MODE_OPTIONS = ['', 'x509', 'eap-tls', 'eap-mschapv2', 'eap-radius'];
+const SECRET_TYPE_OPTIONS = ['plaintext', 'base64'];
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -130,7 +131,7 @@ function proposalToForm(proposals = {}) {
   return Object.entries(proposals).map(([num, p]) => ({
     _num: num,
     number: num,
-    dh_group: p['dh-group'] || '',
+    dh_group: p.dh_group || p['dh-group'] || '',
     encryption: p.encryption || '',
     hash: p.hash || '',
     prf: p.prf || '',
@@ -155,15 +156,15 @@ function ikeGroupToForm(groups = {}) {
   return Object.entries(groups).map(([name, g]) => ({
     _name: name,
     name,
-    close_action: g['close-action'] || 'none',
-    disable_mobike: g['disable-mobike'] !== undefined,
-    ikev2_reauth: g['ikev2-reauth'] !== undefined,
-    key_exchange: g['key-exchange'] || '',
+    close_action: g.close_action || g['close-action'] || 'none',
+    disable_mobike: g.disable_mobike !== undefined || g['disable-mobike'] !== undefined,
+    ikev2_reauth: g.ikev2_reauth !== undefined || g['ikev2-reauth'] !== undefined,
+    key_exchange: g.key_exchange || g['key-exchange'] || '',
     lifetime: g.lifetime || '28800',
     mode: g.mode || 'main',
-    dpd_action: g['dead-peer-detection']?.action || 'clear',
-    dpd_interval: g['dead-peer-detection']?.interval || '30',
-    dpd_timeout: g['dead-peer-detection']?.timeout || '120',
+    dpd_action: g.dead_peer_detection?.action || g['dead-peer-detection']?.action || '',
+    dpd_interval: g.dead_peer_detection?.interval || g['dead-peer-detection']?.interval || '',
+    dpd_timeout: g.dead_peer_detection?.timeout || g['dead-peer-detection']?.timeout || '',
     proposals: proposalToForm(g.proposal),
   }));
 }
@@ -173,11 +174,11 @@ function espGroupToForm(groups = {}) {
     _name: name,
     name,
     compression: g.compression || '',
-    life_bytes: g['life-bytes'] || '',
-    life_packets: g['life-packets'] || '',
+    life_bytes: g.life_bytes || g['life-bytes'] || '',
+    life_packets: g.life_packets || g['life-packets'] || '',
     lifetime: g.lifetime || '3600',
-    mode: g.mode || 'tunnel',
-    pfs: g.pfs || 'enable',
+    mode: g.mode || '',
+    pfs: g.pfs || '',
     proposals: proposalToForm(g.proposal),
   }));
 }
@@ -186,9 +187,10 @@ function pskToForm(psks = {}) {
   return Object.entries(psks).map(([name, p]) => ({
     _name: name,
     name,
-    dhcp_interface: toArray(p['dhcp-interface']).join(', '),
+    dhcp_interface: toArray(p.dhcp_interface || p['dhcp-interface'])[0] || '',
     ids: toArray(p.id).join('\n'),
     secret: p.secret || '',
+    secret_type: p.secret_type || p['secret-type'] || 'plaintext',
   }));
 }
 
@@ -197,27 +199,33 @@ function profileToForm(profiles = {}) {
     _name: name,
     name,
     authentication_mode: p.authentication?.mode || '',
-    pre_shared_secret: p.authentication?.['pre-shared-secret'] || '',
+    pre_shared_secret: p.authentication?.pre_shared_secret || p.authentication?.['pre-shared-secret'] || '',
     bind_tunnels: toArray(p.bind?.tunnel).join('\n'),
-    esp_group: p['esp-group'] || '',
-    ike_group: p['ike-group'] || '',
+    esp_group: p.esp_group || p['esp-group'] || '',
+    ike_group: p.ike_group || p['ike-group'] || '',
     disable: p.disable !== undefined,
   }));
 }
 
 function optionsToForm(options = {}) {
+  const retransmission = options.retransmission || {};
   return {
-    disable_route_autoinstall: options['disable-route-autoinstall'] !== undefined,
+    disable_route_autoinstall: options.disable_route_autoinstall !== undefined || options['disable-route-autoinstall'] !== undefined,
     flexvpn: options.flexvpn !== undefined,
-    virtual_ip: options['virtual-ip'] !== undefined,
+    virtual_ip: options.virtual_ip !== undefined || options['virtual-ip'] !== undefined,
     interface: options.interface || '',
+    retransmission: {
+      attempts: retransmission.attempts || '',
+      base: retransmission.base || '',
+      timeout: retransmission.timeout || '',
+    },
   };
 }
 
 function logToForm(log = {}) {
   return {
     level: log.level || '',
-    subsystems: toArray(log.subsystem).map(name => ({ name })),
+    subsystems: toArray(log.subsystem).map(name => ({ name, selected: true })),
   };
 }
 
@@ -226,7 +234,7 @@ function tunnelToForm(tunnels = {}) {
     _num: num,
     number: num,
     disable: t.disable !== undefined,
-    esp_group: t['esp-group'] || '',
+    esp_group: t.esp_group || t['esp-group'] || '',
     priority: t.priority || '',
     protocol: t.protocol || '',
     local_prefix: t.local?.prefix?.join('\n') || joinMembers(t.local?.prefix),
@@ -266,29 +274,31 @@ function s2sToForm(peers = {}) {
   return Object.entries(peers).map(([name, p]) => ({
     _name: name,
     name,
-    connection_type: p['connection-type'] || '',
-    default_esp_group: p['default-esp-group'] || '',
+    connection_type: p.connection_type || p['connection-type'] || '',
+    default_esp_group: p.default_esp_group || p['default-esp-group'] || '',
     description: p.description || '',
-    dhcp_interface: toArray(p['dhcp-interface']).join(', '),
+    dhcp_interface: toArray(p.dhcp_interface || p['dhcp-interface']).join(', '),
     disable: p.disable !== undefined,
-    force_udp_encapsulation: p['force-udp-encapsulation'] !== undefined,
-    ike_group: p['ike-group'] || '',
-    ikev2_reauth: p['ikev2-reauth'] !== undefined,
-    local_address: p['local-address'] || '',
-    remote_address: toArray(p['remote-address']).join('\n'),
-    replay_window: p['replay-window'] || '32',
-    virtual_address: toArray(p['virtual-address']).join('\n'),
+    force_udp_encapsulation: p.force_udp_encapsulation !== undefined || p['force-udp-encapsulation'] !== undefined,
+    ike_group: p.ike_group || p['ike-group'] || '',
+    ikev2_reauth: p.ikev2_reauth !== undefined || p['ikev2-reauth'] !== undefined,
+    local_address: p.local_address || p['local-address'] || '',
+    remote_address: toArray(p.remote_address || p['remote-address']).join('\n'),
+    replay_window: p.replay_window || p['replay-window'] || '',
+    virtual_address: toArray(p.virtual_address || p['virtual-address']).join('\n'),
     vti_bind: p.vti?.bind || '',
-    vti_esp_group: p.vti?.['esp-group'] || '',
+    vti_esp_group: p.vti?.esp_group || p.vti?.['esp-group'] || '',
+    vti_local_prefix: joinMembers(p.vti?.traffic_selector?.local?.prefix || p.vti?.['traffic-selector']?.local?.prefix),
+    vti_remote_prefix: joinMembers(p.vti?.traffic_selector?.remote?.prefix || p.vti?.['traffic-selector']?.remote?.prefix),
     auth_mode: p.authentication?.mode || '',
-    auth_local_id: p.authentication?.['local-id'] || '',
-    auth_remote_id: p.authentication?.['remote-id'] || '',
-    auth_use_x509_id: p.authentication?.['use-x509-id'] !== undefined,
-    x509_ca_certs: toArray(p.authentication?.x509?.['ca-certificate']).join('\n'),
+    auth_local_id: p.authentication?.local_id || p.authentication?.['local-id'] || '',
+    auth_remote_id: p.authentication?.remote_id || p.authentication?.['remote-id'] || '',
+    auth_use_x509_id: p.authentication?.use_x509_id !== undefined || p.authentication?.['use-x509-id'] !== undefined,
+    x509_ca_certs: toArray(p.authentication?.x509?.ca_certificate || p.authentication?.x509?.['ca-certificate']).join('\n'),
     x509_cert: p.authentication?.x509?.certificate || '',
     x509_passphrase: p.authentication?.x509?.passphrase || '',
-    rsa_local_key: p.authentication?.rsa?.['local-key'] || '',
-    rsa_remote_key: p.authentication?.rsa?.['remote-key'] || '',
+    rsa_local_key: p.authentication?.rsa?.local_key || p.authentication?.rsa?.['local-key'] || '',
+    rsa_remote_key: p.authentication?.rsa?.remote_key || p.authentication?.rsa?.['remote-key'] || '',
     rsa_passphrase: p.authentication?.rsa?.passphrase || '',
     tunnels: tunnelToForm(p.tunnel),
   }));
@@ -299,23 +309,23 @@ function raToForm(connections = {}) {
     _name: name,
     name,
     description: c.description || '',
-    dhcp_interface: toArray(c['dhcp-interface']).join(', '),
+    dhcp_interface: toArray(c.dhcp_interface || c['dhcp-interface']).join(', '),
     disable: c.disable !== undefined,
-    esp_group: c['esp-group'] || '',
-    ike_group: c['ike-group'] || '',
-    local_address: c['local-address'] || '',
+    esp_group: c.esp_group || c['esp-group'] || '',
+    ike_group: c.ike_group || c['ike-group'] || '',
+    local_address: c.local_address || c['local-address'] || '',
     local_prefix: c.local?.prefix?.join('\n') || joinMembers(c.local?.prefix),
     local_port: c.local?.port || '',
     pool: toArray(c.pool),
-    replay_window: c['replay-window'] || '32',
-    timeout: c.timeout || '28800',
+    replay_window: c.replay_window || c['replay-window'] || '',
+    timeout: c.timeout || '',
     unique: c.unique || '',
-    server_mode: c.authentication?.['server-mode'] || '',
-    client_mode: c.authentication?.['client-mode'] || '',
-    eap_id: c.authentication?.['eap-id'] || '',
-    pre_shared_secret: c.authentication?.['pre-shared-secret'] || '',
-    auth_local_id: c.authentication?.['local-id'] || '',
-    x509_ca_certs: toArray(c.authentication?.x509?.['ca-certificate']).join('\n'),
+    server_mode: c.authentication?.server_mode || c.authentication?.['server-mode'] || '',
+    client_mode: c.authentication?.client_mode || c.authentication?.['client-mode'] || '',
+    eap_id: c.authentication?.eap_id || c.authentication?.['eap-id'] || '',
+    pre_shared_secret: c.authentication?.pre_shared_secret || c.authentication?.['pre-shared-secret'] || '',
+    auth_local_id: c.authentication?.local_id || c.authentication?.['local-id'] || '',
+    x509_ca_certs: toArray(c.authentication?.x509?.ca_certificate || c.authentication?.x509?.['ca-certificate']).join('\n'),
     x509_cert: c.authentication?.x509?.certificate || '',
     x509_passphrase: c.authentication?.x509?.passphrase || '',
   }));
@@ -326,7 +336,7 @@ function raPoolToForm(pools = {}) {
     _name: name,
     name,
     prefix: p.prefix || '',
-    name_servers: toArray(p['name-server']).join('\n'),
+    name_servers: toArray(p.name_server || p['name-server']).join('\n'),
     excludes: toArray(p.exclude).join('\n'),
   }));
 }
@@ -355,7 +365,7 @@ function raDhcpToForm(dhcp = {}) {
 
 function raRadiusToForm(radius = {}) {
   return {
-    nas_identifier: radius['nas-identifier'] || '',
+    nas_identifier: radius.nas_identifier || radius['nas-identifier'] || '',
     timeout: radius.timeout || '2',
     servers: Object.entries(radius.server || {}).map(([ip, s]) => ({
       _ip: ip,
@@ -363,7 +373,7 @@ function raRadiusToForm(radius = {}) {
       key: s.key || '',
       port: s.port || '1812',
       disable: s.disable !== undefined,
-      disable_accounting: s['disable-accounting'] !== undefined,
+      disable_accounting: s.disable_accounting !== undefined || s['disable-accounting'] !== undefined,
     })),
   };
 }
@@ -399,6 +409,7 @@ export default defineComponent({
     const espGroups = ref([]);
     const psks = ref([]);
     const interfaces = ref('');
+    const availableInterfaces = ref([]);
     const disableUniqreqids = ref(false);
     const options = ref(optionsToForm({}));
     const logConfig = ref(logToForm({}));
@@ -420,16 +431,26 @@ export default defineComponent({
     const selectedRaRadiusServer = ref([]);
 
     const ikeModalVisible = ref(false);
+    const ikeModalTitle = ref('');
     const espModalVisible = ref(false);
+    const espModalTitle = ref('');
     const pskModalVisible = ref(false);
+    const pskModalTitle = ref('');
     const profileModalVisible = ref(false);
+    const profileModalTitle = ref('');
     const s2sModalVisible = ref(false);
+    const s2sModalTitle = ref('');
+    const s2sModalTab = ref('peer');
     const raModalVisible = ref(false);
+    const raModalTitle = ref('');
     const raPoolModalVisible = ref(false);
     const raRadiusServerModalVisible = ref(false);
     const ikeProposalModalVisible = ref(false);
+    const ikeProposalModalTitle = ref('');
     const espProposalModalVisible = ref(false);
+    const espProposalModalTitle = ref('');
     const tunnelModalVisible = ref(false);
+    const tunnelModalTitle = ref('');
 
     const editingIke = ref(null);
     const editingEsp = ref(null);
@@ -461,29 +482,53 @@ export default defineComponent({
     const radiusDeleteModalVisible = ref(false);
     const pendingDeleteRadiusNames = ref([]);
 
+    async function loadInterfaces() {
+      try {
+        const [ethernetRes, suggestionRes] = await Promise.all([
+          interfaceApi.ethernet().catch(() => ({ interfaces: [] })),
+          configApi.suggestions('vpn ipsec options', 'interface').catch(() => ({ suggestions: [] })),
+        ]);
+
+        const ethernetList = (ethernetRes.interfaces || []).map(i => i.name).filter(Boolean);
+        const suggestionList = (suggestionRes.suggestions || []).filter(Boolean);
+        const merged = [...new Set([...ethernetList, ...suggestionList])].sort();
+        availableInterfaces.value = merged;
+      } catch (e) {
+        console.error('Failed to load interface list', e);
+        availableInterfaces.value = [];
+      }
+    }
+
     async function load() {
       loading.value = true;
       saved.value = false;
       try {
         const [res, protoRes] = await Promise.all([
-          configApi.get('vpn ipsec', true),
+          configApi.get('vpn ipsec', false),
           firewallApi.protocols().catch(() => ({ protocols: [] })),
         ]);
         const data = res.data || {};
-        ikeGroups.value = ikeGroupToForm(data['ike-group']);
-        espGroups.value = espGroupToForm(data['esp-group']);
-        psks.value = pskToForm(data.authentication?.psk);
+        // Backend returns underscored keys (key_mangling), support both formats
+        const ikeGroupData = data.ike_group || data['ike-group'];
+        const espGroupData = data.esp_group || data['esp-group'];
+        const authData = data.authentication || {};
+        const siteToSiteData = data.site_to_site || data['site-to-site'];
+        const remoteAccessData = data.remote_access || data['remote-access'];
+        ikeGroups.value = ikeGroupToForm(ikeGroupData);
+        espGroups.value = espGroupToForm(espGroupData);
+        psks.value = pskToForm(authData.psk);
         interfaces.value = joinMembers(data.interface);
-        disableUniqreqids.value = data['disable-uniqreqids'] !== undefined;
+        disableUniqreqids.value = data.disable_uniqreqids !== undefined || data['disable-uniqreqids'] !== undefined;
         options.value = optionsToForm(data.options);
         logConfig.value = logToForm(data.log);
         profiles.value = profileToForm(data.profile);
-        siteToSitePeers.value = s2sToForm(data['site-to-site']?.peer);
-        remoteAccessConns.value = raToForm(data['remote-access']?.connection);
-        remoteAccessPools.value = raPoolToForm(data['remote-access']?.pool);
-        remoteAccessDhcp.value = raDhcpToForm(data['remote-access']?.dhcp);
-        remoteAccessRadius.value = raRadiusToForm(data['remote-access']?.radius);
+        siteToSitePeers.value = s2sToForm(siteToSiteData?.peer);
+        remoteAccessConns.value = raToForm(remoteAccessData?.connection);
+        remoteAccessPools.value = raPoolToForm(remoteAccessData?.pool);
+        remoteAccessDhcp.value = raDhcpToForm(remoteAccessData?.dhcp);
+        remoteAccessRadius.value = raRadiusToForm(remoteAccessData?.radius);
         protocols.value = protoRes.protocols || [];
+        await loadInterfaces();
       } catch (e) {
         showError(e);
       } finally {
@@ -494,6 +539,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     const visibilityStore = useVisibilityStore();
@@ -518,12 +564,21 @@ export default defineComponent({
       { key: 'radius', title: t('ipsec.raTabs.radius') },
     ];
 
+    const s2sModalTabs = computed(() => [
+      { key: 'peer', title: t('ipsec.tabs.basic') },
+      { key: 'authentication', title: t('ipsec.form.authentication') },
+      { key: 'vti', title: 'VTI' },
+      { key: 'tunnel', title: t('ipsec.form.tunnel') },
+    ]);
+
     const ikeColumns = [
       { key: 'name', title: t('ipsec.columns.name') },
       { key: 'key_exchange', title: t('ipsec.columns.keyExchange') },
       { key: 'mode', title: t('ipsec.columns.mode') },
       { key: 'lifetime', title: t('ipsec.columns.lifetime') },
       { key: 'close_action', title: t('ipsec.columns.closeAction') },
+      { key: 'disable_mobike', title: t('ipsec.form.disableMobike') },
+      { key: 'ikev2_reauth', title: t('ipsec.form.ikev2Reauth') },
       { key: 'proposals', title: t('ipsec.columns.proposals') },
     ];
 
@@ -540,6 +595,7 @@ export default defineComponent({
       { key: 'name', title: t('ipsec.columns.name') },
       { key: 'ids', title: t('ipsec.columns.id') },
       { key: 'dhcp_interface', title: t('ipsec.columns.dhcpInterface') },
+      { key: 'secret_type', title: t('ipsec.columns.secretType') },
       { key: 'secret', title: t('ipsec.columns.secret') },
     ];
 
@@ -597,6 +653,10 @@ export default defineComponent({
       return ['', ...protocols.value.map(p => p.name).filter(Boolean)];
     });
 
+    const interfaceOptions = computed(() => {
+      return availableInterfaces.value;
+    });
+
     const commandPath = computed(() => {
       const base = 'vpn ipsec';
       switch (activeTab.value) {
@@ -622,17 +682,18 @@ export default defineComponent({
 
     function createIke() {
       editingIke.value = {
-        key_exchange: 'ikev2',
+        key_exchange: 'ikev1',
         mode: 'main',
         lifetime: '28800',
         close_action: 'none',
         disable_mobike: false,
         ikev2_reauth: false,
-        dpd_action: 'clear',
-        dpd_interval: '30',
-        dpd_timeout: '120',
-        proposals: [{ number: '1', dh_group: '2', encryption: 'aes128', hash: 'sha1', prf: 'prfsha1' }],
+        dpd_action: '',
+        dpd_interval: '',
+        dpd_timeout: '',
+        proposals: [],
       };
+      ikeModalTitle.value = t('ipsec.modals.createIkeGroup');
       ikeModalVisible.value = true;
     }
 
@@ -640,6 +701,7 @@ export default defineComponent({
       if (!selectedIke.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = ikeGroups.value.find(r => r.name === selectedIke.value[0]);
       editingIke.value = JSON.parse(JSON.stringify(row));
+      ikeModalTitle.value = t('ipsec.modals.editIkeGroup');
       ikeModalVisible.value = true;
     }
 
@@ -652,7 +714,7 @@ export default defineComponent({
     async function confirmRemoveIke() {
       ikeDeleteModalVisible.value = false;
       for (const name of pendingDeleteIkeNames.value) {
-        await configApi.delete(`vpn ipsec ike-group ${name}`);
+        await configStore.deleteConfig(`vpn ipsec ike-group ${name}`);
       }
       selectedIke.value = [];
       pendingDeleteIkeNames.value = [];
@@ -662,13 +724,14 @@ export default defineComponent({
     function createEsp() {
       editingEsp.value = {
         mode: 'tunnel',
-        lifetime: '3600',
-        pfs: 'enable',
+        lifetime: '',
+        pfs: '',
         compression: '',
         life_bytes: '',
         life_packets: '',
-        proposals: [{ number: '1', encryption: 'aes128', hash: 'sha1' }],
+        proposals: [],
       };
+      espModalTitle.value = t('ipsec.modals.createEspGroup');
       espModalVisible.value = true;
     }
 
@@ -676,6 +739,7 @@ export default defineComponent({
       if (!selectedEsp.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = espGroups.value.find(r => r.name === selectedEsp.value[0]);
       editingEsp.value = JSON.parse(JSON.stringify(row));
+      espModalTitle.value = t('ipsec.modals.editEspGroup');
       espModalVisible.value = true;
     }
 
@@ -688,7 +752,7 @@ export default defineComponent({
     async function confirmRemoveEsp() {
       espDeleteModalVisible.value = false;
       for (const name of pendingDeleteEspNames.value) {
-        await configApi.delete(`vpn ipsec esp-group ${name}`);
+        await configStore.deleteConfig(`vpn ipsec esp-group ${name}`);
       }
       selectedEsp.value = [];
       pendingDeleteEspNames.value = [];
@@ -696,7 +760,11 @@ export default defineComponent({
     }
 
     function createPsk() {
-      editingPsk.value = {};
+      editingPsk.value = {
+        secret_type: 'plaintext',
+        dhcp_interface: '',
+      };
+      pskModalTitle.value = t('ipsec.modals.createPsk');
       pskModalVisible.value = true;
     }
 
@@ -704,6 +772,9 @@ export default defineComponent({
       if (!selectedPsk.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = psks.value.find(r => r.name === selectedPsk.value[0]);
       editingPsk.value = JSON.parse(JSON.stringify(row));
+      if (!editingPsk.value.secret_type) editingPsk.value.secret_type = 'plaintext';
+      if (!editingPsk.value.dhcp_interface) editingPsk.value.dhcp_interface = '';
+      pskModalTitle.value = t('ipsec.modals.editPsk');
       pskModalVisible.value = true;
     }
 
@@ -716,7 +787,7 @@ export default defineComponent({
     async function confirmRemovePsk() {
       pskDeleteModalVisible.value = false;
       for (const name of pendingDeletePskNames.value) {
-        await configApi.delete(`vpn ipsec authentication psk ${name}`);
+        await configStore.deleteConfig(`vpn ipsec authentication psk ${name}`);
       }
       selectedPsk.value = [];
       pendingDeletePskNames.value = [];
@@ -725,6 +796,7 @@ export default defineComponent({
 
     function createProfile() {
       editingProfile.value = {};
+      profileModalTitle.value = t('ipsec.modals.createProfile');
       profileModalVisible.value = true;
     }
 
@@ -732,6 +804,7 @@ export default defineComponent({
       if (!selectedProfile.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = profiles.value.find(r => r.name === selectedProfile.value[0]);
       editingProfile.value = JSON.parse(JSON.stringify(row));
+      profileModalTitle.value = t('ipsec.modals.editProfile');
       profileModalVisible.value = true;
     }
 
@@ -744,7 +817,7 @@ export default defineComponent({
     async function confirmRemoveProfile() {
       profileDeleteModalVisible.value = false;
       for (const name of pendingDeleteProfileNames.value) {
-        await configApi.delete(`vpn ipsec profile ${name}`);
+        await configStore.deleteConfig(`vpn ipsec profile ${name}`);
       }
       selectedProfile.value = [];
       pendingDeleteProfileNames.value = [];
@@ -753,10 +826,14 @@ export default defineComponent({
 
     function createS2s() {
       editingS2s.value = {
-        connection_type: 'initiate',
-        replay_window: '32',
+        connection_type: '',
+        replay_window: '',
+        vti_local_prefix: '',
+        vti_remote_prefix: '',
         tunnels: [],
       };
+      s2sModalTab.value = 'peer';
+      s2sModalTitle.value = t('ipsec.modals.createS2sPeer');
       s2sModalVisible.value = true;
     }
 
@@ -764,6 +841,8 @@ export default defineComponent({
       if (!selectedS2s.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = siteToSitePeers.value.find(r => r.name === selectedS2s.value[0]);
       editingS2s.value = JSON.parse(JSON.stringify(row));
+      s2sModalTab.value = 'peer';
+      s2sModalTitle.value = t('ipsec.modals.editS2sPeer');
       s2sModalVisible.value = true;
     }
 
@@ -776,7 +855,7 @@ export default defineComponent({
     async function confirmRemoveS2s() {
       s2sDeleteModalVisible.value = false;
       for (const name of pendingDeleteS2sNames.value) {
-        await configApi.delete(`vpn ipsec site-to-site peer ${name}`);
+        await configStore.deleteConfig(`vpn ipsec site-to-site peer ${name}`);
       }
       selectedS2s.value = [];
       pendingDeleteS2sNames.value = [];
@@ -785,13 +864,14 @@ export default defineComponent({
 
     function createRa() {
       editingRa.value = {
-        replay_window: '32',
-        timeout: '28800',
+        replay_window: '',
+        timeout: '',
         unique: '',
-        server_mode: 'x509',
-        client_mode: 'eap-mschapv2',
+        server_mode: '',
+        client_mode: '',
         pool: [],
       };
+      raModalTitle.value = t('ipsec.modals.createRaConnection');
       raModalVisible.value = true;
     }
 
@@ -799,6 +879,7 @@ export default defineComponent({
       if (!selectedRa.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = remoteAccessConns.value.find(r => r.name === selectedRa.value[0]);
       editingRa.value = JSON.parse(JSON.stringify(row));
+      raModalTitle.value = t('ipsec.modals.editRaConnection');
       raModalVisible.value = true;
     }
 
@@ -811,7 +892,7 @@ export default defineComponent({
     async function confirmRemoveRa() {
       raDeleteModalVisible.value = false;
       for (const name of pendingDeleteRaNames.value) {
-        await configApi.delete(`vpn ipsec remote-access connection ${name}`);
+        await configStore.deleteConfig(`vpn ipsec remote-access connection ${name}`);
       }
       selectedRa.value = [];
       pendingDeleteRaNames.value = [];
@@ -839,7 +920,7 @@ export default defineComponent({
     async function confirmRemoveRaPool() {
       poolDeleteModalVisible.value = false;
       for (const name of pendingDeletePoolNames.value) {
-        await configApi.delete(`vpn ipsec remote-access pool ${name}`);
+        await configStore.deleteConfig(`vpn ipsec remote-access pool ${name}`);
       }
       selectedRaPool.value = [];
       pendingDeletePoolNames.value = [];
@@ -867,7 +948,7 @@ export default defineComponent({
         if (exErr) return showError({ message: t('ipsec.validation.excludePrefix') + ex + t('ipsec.validation.colon') + exErr });
       }
       if (excludes.length) value.exclude = excludes;
-      await configApi.set(`vpn ipsec remote-access pool ${item.name}`, value);
+      await configStore.setConfig(`vpn ipsec remote-access pool ${item.name}`, value);
       raPoolModalVisible.value = false;
       await save();
     }
@@ -886,9 +967,9 @@ export default defineComponent({
         value.interface = String(item.interface).trim();
       }
       if (Object.keys(value).length) {
-        await configApi.set('vpn ipsec remote-access dhcp', value);
+        await configStore.setConfig('vpn ipsec remote-access dhcp', value);
       } else {
-        try { await configApi.delete('vpn ipsec remote-access dhcp'); } catch (_) {}
+        try { await configStore.deleteConfig('vpn ipsec remote-access dhcp'); } catch (_) {}
       }
       await save();
     }
@@ -914,7 +995,7 @@ export default defineComponent({
     async function confirmRemoveRaRadiusServer() {
       radiusDeleteModalVisible.value = false;
       for (const ip of pendingDeleteRadiusNames.value) {
-        await configApi.delete(`vpn ipsec remote-access radius server ${ip}`);
+        await configStore.deleteConfig(`vpn ipsec remote-access radius server ${ip}`);
       }
       selectedRaRadiusServer.value = [];
       pendingDeleteRadiusNames.value = [];
@@ -932,7 +1013,7 @@ export default defineComponent({
       if (isPresent(item.port)) value.port = String(item.port);
       if (item.disable) value.disable = '';
       if (item.disable_accounting) value['disable-accounting'] = '';
-      await configApi.set(`vpn ipsec remote-access radius server ${item.ip}`, value);
+      await configStore.setConfig(`vpn ipsec remote-access radius server ${item.ip}`, value);
       raRadiusServerModalVisible.value = false;
       await save();
     }
@@ -946,9 +1027,9 @@ export default defineComponent({
       const servers = raRadiusServerToConfig(item.servers || []);
       if (Object.keys(servers).length) value.server = servers;
       if (Object.keys(value).length) {
-        await configApi.set('vpn ipsec remote-access radius', value);
+        await configStore.setConfig('vpn ipsec remote-access radius', value);
       } else {
-        try { await configApi.delete('vpn ipsec remote-access radius'); } catch (_) {}
+        try { await configStore.deleteConfig('vpn ipsec remote-access radius'); } catch (_) {}
       }
       await save();
     }
@@ -974,7 +1055,7 @@ export default defineComponent({
       if (isPresent(item.dpd_interval)) dpd.interval = String(item.dpd_interval);
       if (isPresent(item.dpd_timeout)) dpd.timeout = String(item.dpd_timeout);
       if (Object.keys(dpd).length) value['dead-peer-detection'] = dpd;
-      await configApi.set(`vpn ipsec ike-group ${item.name}`, value);
+      await configStore.setConfig(`vpn ipsec ike-group ${item.name}`, value);
       ikeModalVisible.value = false;
       await save();
     }
@@ -987,7 +1068,7 @@ export default defineComponent({
       if (isPresent(item.life_bytes) && !inRange(item.life_bytes, 1024, 26843545600000)) return showError({ message: t('ipsec.validation.espLifeBytesRange') });
       if (isPresent(item.life_packets) && !inRange(item.life_packets, 1000, 26843545600000)) return showError({ message: t('ipsec.validation.espLifePacketsRange') });
       const value = {};
-      if (isPresent(item.compression)) value.compression = String(item.compression);
+      if (item.compression === 'enable') value.compression = '';
       if (isPresent(item.life_bytes)) value['life-bytes'] = String(item.life_bytes);
       if (isPresent(item.life_packets)) value['life-packets'] = String(item.life_packets);
       if (isPresent(item.lifetime)) value.lifetime = String(item.lifetime);
@@ -995,7 +1076,7 @@ export default defineComponent({
       if (isPresent(item.pfs)) value.pfs = String(item.pfs);
       const proposals = proposalToConfig(item.proposals || []);
       if (Object.keys(proposals).length) value.proposal = proposals;
-      await configApi.set(`vpn ipsec esp-group ${item.name}`, value);
+      await configStore.setConfig(`vpn ipsec esp-group ${item.name}`, value);
       espModalVisible.value = false;
       await save();
     }
@@ -1009,13 +1090,14 @@ export default defineComponent({
       const ids = splitMembers(item.ids);
       if (ids.length) value.id = ids;
       if (isPresent(item.secret)) value.secret = String(item.secret);
-      const dhcp = String(item.dhcp_interface || '').split(',').map(s => s.trim()).filter(Boolean);
-      for (const d of dhcp) {
-        const dhcpErr = validateInterface(d, t);
-        if (dhcpErr) return showError({ message: t('ipsec.validation.dhcpInterface') + d + t('ipsec.validation.colon') + dhcpErr });
+      if (isPresent(item.secret_type)) value['secret-type'] = String(item.secret_type);
+      if (isPresent(item.dhcp_interface)) {
+        const dhcp = String(item.dhcp_interface).trim();
+        const dhcpErr = validateInterface(dhcp, t);
+        if (dhcpErr) return showError({ message: t('ipsec.validation.dhcpInterface') + dhcp + t('ipsec.validation.colon') + dhcpErr });
+        value['dhcp-interface'] = [dhcp];
       }
-      if (dhcp.length) value['dhcp-interface'] = dhcp;
-      await configApi.set(`vpn ipsec authentication psk ${item.name}`, value);
+      await configStore.setConfig(`vpn ipsec authentication psk ${item.name}`, value);
       pskModalVisible.value = false;
       await save();
     }
@@ -1034,7 +1116,7 @@ export default defineComponent({
       if (Object.keys(auth).length) value.authentication = auth;
       const tunnels = splitMembers(item.bind_tunnels);
       if (tunnels.length) value.bind = { tunnel: tunnels };
-      await configApi.set(`vpn ipsec profile ${item.name}`, value);
+      await configStore.setConfig(`vpn ipsec profile ${item.name}`, value);
       profileModalVisible.value = false;
       await save();
     }
@@ -1082,6 +1164,13 @@ export default defineComponent({
         vti.bind = String(item.vti_bind);
       }
       if (isPresent(item.vti_esp_group)) vti['esp-group'] = String(item.vti_esp_group);
+      const vtiLocalPrefix = splitMembers(item.vti_local_prefix);
+      const vtiRemotePrefix = splitMembers(item.vti_remote_prefix);
+      if (vtiLocalPrefix.length || vtiRemotePrefix.length) {
+        vti['traffic-selector'] = {};
+        if (vtiLocalPrefix.length) vti['traffic-selector'].local = { prefix: vtiLocalPrefix };
+        if (vtiRemotePrefix.length) vti['traffic-selector'].remote = { prefix: vtiRemotePrefix };
+      }
       if (Object.keys(vti).length) value.vti = vti;
       const auth = {};
       if (isPresent(item.auth_mode)) auth.mode = String(item.auth_mode);
@@ -1139,7 +1228,7 @@ export default defineComponent({
         }
         value.tunnel = tunnels;
       }
-      await configApi.set(`vpn ipsec site-to-site peer ${item.name}`, value);
+      await configStore.setConfig(`vpn ipsec site-to-site peer ${item.name}`, value);
       s2sModalVisible.value = false;
       await save();
     }
@@ -1208,7 +1297,7 @@ export default defineComponent({
         auth.x509.passphrase = String(item.x509_passphrase);
       }
       if (Object.keys(auth).length) value.authentication = auth;
-      await configApi.set(`vpn ipsec remote-access connection ${item.name}`, value);
+      await configStore.setConfig(`vpn ipsec remote-access connection ${item.name}`, value);
       raModalVisible.value = false;
       await save();
     }
@@ -1223,18 +1312,18 @@ export default defineComponent({
           if (ifErr) return showError({ message: t('ipsec.validation.interface') + iface + t('ipsec.validation.colon') + ifErr });
         }
         if (ifaceList.length) {
-          await configApi.set('vpn ipsec interface', ifaceList);
+          await configStore.setConfig('vpn ipsec interface', ifaceList);
         } else {
-          try { await configApi.delete('vpn ipsec interface'); } catch (_) {}
+          try { await configStore.deleteConfig('vpn ipsec interface'); } catch (_) {}
         }
 
         const optIfErr = validateInterface(options.value.interface, t);
         if (optIfErr) return showError({ message: t('ipsec.validation.optionsInterface') + optIfErr });
 
         if (disableUniqreqids.value) {
-          await configApi.set('vpn ipsec disable-uniqreqids', '');
+          await configStore.setConfig('vpn ipsec disable-uniqreqids', '');
         } else {
-          try { await configApi.delete('vpn ipsec disable-uniqreqids'); } catch (_) {}
+          try { await configStore.deleteConfig('vpn ipsec disable-uniqreqids'); } catch (_) {}
         }
 
         const optValue = {};
@@ -1242,23 +1331,43 @@ export default defineComponent({
         if (options.value.flexvpn) optValue.flexvpn = '';
         if (options.value.virtual_ip) optValue['virtual-ip'] = '';
         if (isPresent(options.value.interface)) optValue.interface = String(options.value.interface);
+
+        const retransmissionValue = {};
+        if (isPresent(options.value.retransmission?.attempts)) {
+          const attempts = Number(options.value.retransmission.attempts);
+          if (Number.isNaN(attempts) || attempts < 1 || attempts > 65535) return showError({ message: t('ipsec.validation.retransmissionAttemptsRange') });
+          retransmissionValue.attempts = String(attempts);
+        }
+        if (isPresent(options.value.retransmission?.base)) {
+          const base = Number(options.value.retransmission.base);
+          if (Number.isNaN(base) || base < 1.0 || base > 5.0) return showError({ message: t('ipsec.validation.retransmissionBaseRange') });
+          retransmissionValue.base = String(base);
+        }
+        if (isPresent(options.value.retransmission?.timeout)) {
+          const timeout = Number(options.value.retransmission.timeout);
+          if (Number.isNaN(timeout) || timeout < 1 || timeout > 1000) return showError({ message: t('ipsec.validation.retransmissionTimeoutRange') });
+          retransmissionValue.timeout = String(timeout);
+        }
+        if (Object.keys(retransmissionValue).length) optValue.retransmission = retransmissionValue;
+
         if (Object.keys(optValue).length) {
-          await configApi.set('vpn ipsec options', optValue);
+          await configStore.setConfig('vpn ipsec options', optValue);
         } else {
-          try { await configApi.delete('vpn ipsec options'); } catch (_) {}
+          try { await configStore.deleteConfig('vpn ipsec options'); } catch (_) {}
         }
 
         const logValue = {};
         if (isPresent(logConfig.value.level)) logValue.level = String(logConfig.value.level);
-        const subs = (logConfig.value.subsystems || []).map(s => s.name).filter(Boolean);
+        const subs = (logConfig.value.subsystems || []).filter(s => s && s.name).map(s => s.name);
         if (subs.length) logValue.subsystem = subs;
         if (Object.keys(logValue).length) {
-          await configApi.set('vpn ipsec log', logValue);
+          await configStore.setConfig('vpn ipsec log', logValue);
         } else {
-          try { await configApi.delete('vpn ipsec log'); } catch (_) {}
+          try { await configStore.deleteConfig('vpn ipsec log'); } catch (_) {}
         }
 
         configStore.markPending();
+        await configStore.checkSessionChanged();
         saved.value = true;
         await load();
       } catch (e) {
@@ -1286,9 +1395,11 @@ export default defineComponent({
     function openIkeProposalModal(index) {
       if (index === null) {
         editingIkeProposal.value = { number: '', dh_group: '', encryption: '', hash: '', prf: '', _new: true };
+        ikeProposalModalTitle.value = t('ipsec.modals.createIkeProposal');
       } else {
         const p = editingIke.value.proposals[index];
         editingIkeProposal.value = { ...p, _index: index, _new: false };
+        ikeProposalModalTitle.value = t('ipsec.modals.editIkeProposal');
       }
       ikeProposalModalVisible.value = true;
     }
@@ -1308,9 +1419,11 @@ export default defineComponent({
     function openEspProposalModal(index) {
       if (index === null) {
         editingEspProposal.value = { number: '', encryption: '', hash: '', _new: true };
+        espProposalModalTitle.value = t('ipsec.modals.createEspProposal');
       } else {
         const p = editingEsp.value.proposals[index];
         editingEspProposal.value = { ...p, _index: index, _new: false };
+        espProposalModalTitle.value = t('ipsec.modals.editEspProposal');
       }
       espProposalModalVisible.value = true;
     }
@@ -1350,9 +1463,11 @@ export default defineComponent({
           local_port: '', remote_port: '', local_prefix: '', remote_prefix: '', disable: false,
           _new: true
         };
+        tunnelModalTitle.value = t('ipsec.modals.createTunnel');
       } else {
-        const t = editingS2s.value.tunnels[index];
-        editingTunnel.value = { ...t, _index: index, _new: false };
+        const tunnelRow = editingS2s.value.tunnels[index];
+        editingTunnel.value = { ...tunnelRow, _index: index, _new: false };
+        tunnelModalTitle.value = t('ipsec.modals.editTunnel');
       }
       tunnelModalVisible.value = true;
     }
@@ -1391,13 +1506,18 @@ export default defineComponent({
       editingEsp.value.proposals.splice(index, 1);
     }
 
-    function addLogSubsystem() {
-      if (!logConfig.value.subsystems) logConfig.value.subsystems = [];
-      logConfig.value.subsystems.push({ name: '' });
+    function isSubsystemSelected(name) {
+      return (logConfig.value.subsystems || []).some(s => s && s.name === name);
     }
 
-    function removeLogSubsystem(index) {
-      logConfig.value.subsystems.splice(index, 1);
+    function toggleLogSubsystem(name, checked) {
+      if (!logConfig.value.subsystems) logConfig.value.subsystems = [];
+      const existing = logConfig.value.subsystems.find(s => s && s.name === name);
+      if (checked) {
+        if (!existing) logConfig.value.subsystems.push({ name, selected: true });
+      } else if (existing) {
+        logConfig.value.subsystems = logConfig.value.subsystems.filter(s => s && s.name !== name);
+      }
     }
 
     function addS2sTunnel() {
@@ -1413,13 +1533,14 @@ export default defineComponent({
       
       loading, saving, saved, activeTab, tabs, writeDisabled,
       raActiveTab, raTabs,
-      ikeGroups, espGroups, psks, interfaces, disableUniqreqids, options, logConfig, profiles,
-      siteToSitePeers, protocols, protocolOptions, commandPath, remoteAccessConns, remoteAccessPools, remoteAccessDhcp, remoteAccessRadius,
+      ikeGroups, espGroups, psks, interfaces, availableInterfaces, disableUniqreqids, options, logConfig, profiles,
+      siteToSitePeers, protocols, protocolOptions, interfaceOptions, commandPath, remoteAccessConns, remoteAccessPools, remoteAccessDhcp, remoteAccessRadius,
       selectedIke, selectedEsp, selectedPsk, selectedProfile, selectedS2s, selectedRa,
       selectedRaPool, selectedRaRadiusServer,
-      ikeModalVisible, espModalVisible, pskModalVisible, profileModalVisible,
-      s2sModalVisible, raModalVisible, raPoolModalVisible, raRadiusServerModalVisible,
-      ikeProposalModalVisible, espProposalModalVisible, tunnelModalVisible,
+      ikeModalVisible, ikeModalTitle, espModalVisible, espModalTitle,
+      pskModalVisible, pskModalTitle, profileModalVisible, profileModalTitle,
+      s2sModalVisible, s2sModalTitle, s2sModalTab, raModalVisible, raModalTitle, raPoolModalVisible, raRadiusServerModalVisible,
+      ikeProposalModalVisible, ikeProposalModalTitle, espProposalModalVisible, espProposalModalTitle, tunnelModalVisible, tunnelModalTitle,
       ikeDeleteModalVisible, pendingDeleteIkeNames,
       espDeleteModalVisible, pendingDeleteEspNames,
       pskDeleteModalVisible, pendingDeletePskNames,
@@ -1447,13 +1568,15 @@ export default defineComponent({
       openIkeProposalModal, saveIkeProposal, openEspProposalModal, saveEspProposal,
       deleteIkeProposals, deleteEspProposals, getDhGroupLabel,
       openTunnelModal, saveTunnel, deleteTunnels,
-      addLogSubsystem, removeLogSubsystem, addS2sTunnel, removeS2sTunnel,
+      isSubsystemSelected, toggleLogSubsystem, addS2sTunnel, removeS2sTunnel,
       formatProposals, formatLines, optionValue, optionLabel,
       KEY_EXCHANGE_OPTIONS, IKE_MODE_OPTIONS, CLOSE_ACTION_OPTIONS,
       DPD_ACTION_OPTIONS, DH_GROUP_OPTIONS, ENCRYPTION_OPTIONS, HASH_OPTIONS,
       PRF_OPTIONS, ESP_MODE_OPTIONS, PFS_OPTIONS, COMPRESSION_OPTIONS,
       AUTH_MODE_OPTIONS, LOG_LEVEL_OPTIONS, LOG_SUBSYSTEM_OPTIONS,
       CONNECTION_TYPE_OPTIONS, UNIQUE_OPTIONS, SERVER_MODE_OPTIONS, CLIENT_MODE_OPTIONS,
+      SECRET_TYPE_OPTIONS,
+      s2sModalTabs,
     };
   },
   template: `
@@ -1469,6 +1592,8 @@ export default defineComponent({
             </div>
           </div>
           <DataTable :columns="ikeColumns" :data="ikeGroups" row-key="name" :externalToolbar="true" @selection-change="selectedIke = $event" :selectable="true">
+            <template #disable_mobike="{ row }">{{ row.disable_mobike ? t('common.yes') : t('common.no') }}</template>
+            <template #ikev2_reauth="{ row }">{{ row.ikev2_reauth ? t('common.yes') : t('common.no') }}</template>
             <template #proposals="{ row }">{{ formatProposals(row) }}</template>
           </DataTable>
         </template>
@@ -1501,7 +1626,10 @@ export default defineComponent({
           </div>
           <div class="form-row">
             <label class="form-label" :title="t('ipsec.form.interfaceTitle')">{{ t('ipsec.form.interface') }}</label>
-            <textarea class="form-control" v-model="interfaces" :placeholder="t('ipsec.form.interfacePlaceholder')" :disabled="writeDisabled" :title="t('ipsec.form.interfaceTitle')" />
+            <select class="form-control" v-model="interfaces" :disabled="writeDisabled" :title="t('ipsec.form.interfaceTitle')">
+              <option value="">{{ t('ipsec.form.interfacePlaceholder') }}</option>
+              <option v-for="iface in availableInterfaces" :key="iface" :value="iface">{{ iface }}</option>
+            </select>
           </div>
         </template>
         <template #options>
@@ -1519,7 +1647,35 @@ export default defineComponent({
           </div>
           <div class="form-row">
             <label class="form-label" :title="t('ipsec.form.optionsInterfaceTitle')">{{ t('ipsec.form.optionsInterface') }}</label>
-            <input class="form-control" v-model="options.interface" :placeholder="t('ipsec.form.optionsInterfacePlaceholder')" :disabled="writeDisabled" :title="t('ipsec.form.optionsInterfaceTitle')" />
+            <select class="form-control" v-model="options.interface" :disabled="writeDisabled" :title="t('ipsec.form.optionsInterfaceTitle')">
+              <option v-for="iface in interfaceOptions" :key="iface" :value="iface">{{ iface }}</option>
+            </select>
+          </div>
+          <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden; margin-bottom:16px;">
+            <div style="background:#f5f5f5; padding:8px 16px; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ipsec.form.retransmission') }}</div>
+            <div style="padding:12px 16px 12px 0; display:grid; gap:8px;">
+              <div style="display:flex; align-items:flex-start; gap:12px; min-height:52px;">
+                <label style="width:150px; min-width:150px; margin:0; font-weight:normal; color:#333; text-align:right; padding-top:6px;">{{ t('ipsec.form.retransmissionAttempts') }}</label>
+                <div style="flex:1; min-width:0;">
+                  <input class="form-control" type="number" min="1" max="65535" style="width:100%;" v-model="options.retransmission.attempts" :disabled="writeDisabled" :title="t('ipsec.form.retransmissionAttemptsTitle')" />
+                  <div class="form-hint">{{ t('ipsec.form.retransmissionAttemptsHint') }}</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:flex-start; gap:12px; min-height:52px;">
+                <label style="width:150px; min-width:150px; margin:0; font-weight:normal; color:#333; text-align:right; padding-top:6px;">{{ t('ipsec.form.retransmissionBase') }}</label>
+                <div style="flex:1; min-width:0;">
+                  <input class="form-control" type="number" min="1" max="5" step="0.1" style="width:100%;" v-model="options.retransmission.base" :disabled="writeDisabled" :title="t('ipsec.form.retransmissionBaseTitle')" />
+                  <div class="form-hint">{{ t('ipsec.form.retransmissionBaseHint') }}</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:flex-start; gap:12px; min-height:52px;">
+                <label style="width:150px; min-width:150px; margin:0; font-weight:normal; color:#333; text-align:right; padding-top:6px;">{{ t('ipsec.form.retransmissionTimeout') }}</label>
+                <div style="flex:1; min-width:0;">
+                  <input class="form-control" type="number" min="1" max="1000" style="width:100%;" v-model="options.retransmission.timeout" :disabled="writeDisabled" :title="t('ipsec.form.retransmissionTimeoutTitle')" />
+                  <div class="form-hint">{{ t('ipsec.form.retransmissionTimeoutHint') }}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </template>
         <template #log>
@@ -1529,15 +1685,14 @@ export default defineComponent({
               <option v-for="o in LOG_LEVEL_OPTIONS" :key="o" :value="o">{{ o }}</option>
             </select>
           </div>
-          <div style="margin:12px 0;">
-            <ToolbarButton icon="create" @click="addLogSubsystem" :disabled="writeDisabled">{{ t('ipsec.buttons.addSubsystem') }}</ToolbarButton>
-          </div>
-          <div v-for="(s, i) in logConfig.subsystems" :key="i" class="form-row">
+          <div class="form-row">
             <label class="form-label" :title="t('ipsec.form.subsystemTitle')">{{ t('ipsec.form.subsystem') }}</label>
-            <select class="form-control" v-model="s.name" :disabled="writeDisabled" :title="t('ipsec.form.subsystemTitle')">
-              <option v-for="o in LOG_SUBSYSTEM_OPTIONS" :key="o" :value="o">{{ o }}</option>
-            </select>
-            <ToolbarButton icon="delete" @click="removeLogSubsystem(i)" :disabled="writeDisabled">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
+            <div style="display:flex; flex-wrap:wrap; gap:12px 18px; flex:1; padding:8px 0;">
+              <label v-for="opt in LOG_SUBSYSTEM_OPTIONS.filter(Boolean)" :key="opt" style="display:flex; align-items:center; gap:6px; min-width:120px;">
+                <input type="checkbox" :checked="isSubsystemSelected(opt)" :disabled="writeDisabled" @change="toggleLogSubsystem(opt, $event.target.checked)" :title="t('ipsec.form.subsystemTitle')" />
+                {{ opt }}
+              </label>
+            </div>
           </div>
         </template>
         <template #profile>
@@ -1623,20 +1778,23 @@ export default defineComponent({
           </TabGroup>
         </template>
       </TabGroup>
-
-
-      <DraggableModal v-model:visible="ikeModalVisible" :title="t('ipsec.modals.ikeGroup')" width="920px" @confirm="saveIke">
+      <div v-if="['interface', 'options', 'log'].includes(activeTab)" style="text-align:right;padding:16px 0;">
+        <ToolbarButton icon="save" primary :disabled="writeDisabled || saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+      <DraggableModal v-model:visible="ikeModalVisible" :title="ikeModalTitle" width="920px" @confirm="saveIke">
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingIke.name" :disabled="editingIke._name" :title="t('ipsec.form.nameTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.keyExchangeTitle')">{{ t('ipsec.form.keyExchange') }}</label><select class="form-control" v-model="editingIke.key_exchange" :title="t('ipsec.form.keyExchangeTitle')"><option v-for="o in KEY_EXCHANGE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.modeTitle')">{{ t('ipsec.form.mode') }}</label><select class="form-control" v-model="editingIke.mode" :title="t('ipsec.form.modeTitle')"><option v-for="o in IKE_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.keyExchangeTitle')">{{ t('ipsec.form.keyExchange') }}</label><select class="form-control" v-model="editingIke.key_exchange" :title="t('ipsec.form.keyExchangeTitle')"><option value=""></option><option v-for="o in KEY_EXCHANGE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.modeTitle')">{{ t('ipsec.form.mode') }}</label><select class="form-control" v-model="editingIke.mode" :title="t('ipsec.form.modeTitle')"><option value=""></option><option v-for="o in IKE_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.lifetimeTitle')">{{ t('ipsec.form.lifetime') }}</label><div style="flex:1;"><input class="form-control" type="number" min="0" max="86400" v-model="editingIke.lifetime" :placeholder="t('ipsec.form.lifetimePlaceholder')" :title="t('ipsec.form.lifetimeTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.lifetimeHint') }}</div></div></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.closeActionTitle')">{{ t('ipsec.form.closeAction') }}</label><select class="form-control" v-model="editingIke.close_action" :title="t('ipsec.form.closeActionTitle')"><option v-for="o in CLOSE_ACTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.closeActionTitle')">{{ t('ipsec.form.closeAction') }}</label><select class="form-control" v-model="editingIke.close_action" :title="t('ipsec.form.closeActionTitle')"><option value=""></option><option v-for="o in CLOSE_ACTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.disableMobikeTitle')">{{ t('ipsec.form.disableMobike') }}</label><input type="checkbox" v-model="editingIke.disable_mobike" :title="t('ipsec.form.disableMobikeTitle')" /></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikev2ReauthTitle')">{{ t('ipsec.form.ikev2Reauth') }}</label><input type="checkbox" v-model="editingIke.ikev2_reauth" :title="t('ipsec.form.ikev2ReauthTitle')" /></div>
         <div class="form-group">
           <div class="form-group-title">{{ t('ipsec.form.dpd') }}</div>
           <div class="form-group-content">
-            <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdActionTitle')">{{ t('ipsec.form.dpdAction') }}</label><select class="form-control" v-model="editingIke.dpd_action" :title="t('ipsec.form.dpdActionTitle')"><option v-for="o in DPD_ACTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdActionTitle')">{{ t('ipsec.form.dpdAction') }}</label><select class="form-control" v-model="editingIke.dpd_action" :title="t('ipsec.form.dpdActionTitle')"><option value=""></option><option v-for="o in DPD_ACTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
             <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdIntervalTitle')">{{ t('ipsec.form.dpdInterval') }}</label><div style="flex:1;"><input class="form-control" type="number" min="2" max="86400" v-model="editingIke.dpd_interval" :placeholder="t('ipsec.form.dpdIntervalPlaceholder')" :title="t('ipsec.form.dpdIntervalTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.dpdIntervalHint') }}</div></div></div>
             <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdTimeoutTitle')">{{ t('ipsec.form.dpdTimeout') }}</label><div style="flex:1;"><input class="form-control" type="number" min="2" max="86400" v-model="editingIke.dpd_timeout" :placeholder="t('ipsec.form.dpdTimeoutPlaceholder')" :title="t('ipsec.form.dpdTimeoutTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.dpdTimeoutHint') }}</div></div></div>
           </div>
@@ -1668,15 +1826,15 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- IKE Proposal Modal -->
-      <DraggableModal v-model:visible="ikeProposalModalVisible" :title="t('ipsec.modals.ikeProposal')" width="600px" @confirm="saveIkeProposal">
-        <div class="form-row"><label class="form-label">{{ t('ipsec.form.proposalNumber') }}</label><input class="form-control" v-model="editingIkeProposal.number" :placeholder="t('ipsec.form.proposalNumberPlaceholder')" /></div>
+      <DraggableModal v-model:visible="ikeProposalModalVisible" :title="ikeProposalModalTitle" width="600px" @confirm="saveIkeProposal">
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.proposalNumber') }}</label><div style="flex:1;"><input class="form-control" v-model="editingIkeProposal.number" :disabled="!editingIkeProposal._new" :placeholder="t('ipsec.form.proposalNumberPlaceholder')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.proposalNumberHint') }}</div></div></div>
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.encryption') }}</label><select class="form-control" v-model="editingIkeProposal.encryption"><option v-for="o in ENCRYPTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.hash') }}</label><select class="form-control" v-model="editingIkeProposal.hash"><option v-for="o in HASH_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.dhGroup') }}</label><select class="form-control" v-model="editingIkeProposal.dh_group"><option v-for="o in DH_GROUP_OPTIONS" :key="optionValue(o)" :value="optionValue(o)">{{ optionLabel(o) }}</option></select></div>
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.prf') }}</label><select class="form-control" v-model="editingIkeProposal.prf"><option v-for="o in PRF_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="espModalVisible" :title="t('ipsec.modals.espGroup')" width="700px" @confirm="saveEsp">
+      <DraggableModal v-model:visible="espModalVisible" :title="espModalTitle" width="700px" @confirm="saveEsp">
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingEsp.name" :disabled="editingEsp._name" :title="t('ipsec.form.nameTitle')" /></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.espModeTitle')">{{ t('ipsec.form.espMode') }}</label><select class="form-control" v-model="editingEsp.mode" :title="t('ipsec.form.espModeTitle')"><option v-for="o in ESP_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.espLifetimeTitle')">{{ t('ipsec.form.espLifetime') }}</label><div style="flex:1;"><input class="form-control" type="number" min="30" max="86400" v-model="editingEsp.lifetime" :placeholder="t('ipsec.form.espLifetimePlaceholder')" :title="t('ipsec.form.espLifetimeTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.espLifetimeHint') }}</div></div></div>
@@ -1707,15 +1865,15 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- ESP Proposal Modal -->
-      <DraggableModal v-model:visible="espProposalModalVisible" :title="t('ipsec.modals.espProposal')" width="600px" @confirm="saveEspProposal">
-        <div class="form-row"><label class="form-label">{{ t('ipsec.form.proposalNumber') }}</label><input class="form-control" v-model="editingEspProposal.number" :placeholder="t('ipsec.form.proposalNumberPlaceholder')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('ipsec.form.encryption') }}</label><select class="form-control" v-model="editingEspProposal.encryption"><option v-for="o in ENCRYPTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label">{{ t('ipsec.form.hash') }}</label><select class="form-control" v-model="editingEspProposal.hash"><option v-for="o in HASH_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+      <DraggableModal v-model:visible="espProposalModalVisible" :title="espProposalModalTitle" width="600px" @confirm="saveEspProposal">
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.proposalNumber') }}</label><div style="flex:1;"><input class="form-control" v-model="editingEspProposal.number" :disabled="!editingEspProposal._new" :placeholder="t('ipsec.form.proposalNumberPlaceholder')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.espProposalNumberHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.encryption') }}</label><div style="flex:1;"><select class="form-control" v-model="editingEspProposal.encryption" style="width:100%;"><option v-for="o in ENCRYPTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select><div class="form-hint">{{ t('ipsec.form.espProposalEncryptionHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.hash') }}</label><div style="flex:1;"><select class="form-control" v-model="editingEspProposal.hash" style="width:100%;"><option v-for="o in HASH_OPTIONS" :key="o" :value="o">{{ o }}</option></select><div class="form-hint">{{ t('ipsec.form.espProposalHashHint') }}</div></div></div>
       </DraggableModal>
 
       <!-- Tunnel Modal -->
-      <DraggableModal v-model:visible="tunnelModalVisible" :title="t('ipsec.modals.tunnel')" width="800px" :z-index="2001" @confirm="saveTunnel">
-        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelNumber') }}</label><input class="form-control" type="number" min="0" max="4294967295" v-model="editingTunnel.number" :placeholder="t('ipsec.form.tunnelNumberPlaceholder')" /></div>
+      <DraggableModal v-model:visible="tunnelModalVisible" :title="tunnelModalTitle" width="800px" :z-index="2001" @confirm="saveTunnel">
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelNumber') }}</label><input class="form-control" type="number" min="0" max="4294967295" v-model="editingTunnel.number" :disabled="!editingTunnel._new" :placeholder="t('ipsec.form.tunnelNumberPlaceholder')" /></div>
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelEspGroup') }}</label><select class="form-control" v-model="editingTunnel.esp_group"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelPriority') }}</label><input class="form-control" type="number" min="1" max="100" v-model="editingTunnel.priority" :placeholder="t('ipsec.form.tunnelPriorityPlaceholder')" /></div>
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelProtocol') }}</label><select class="form-control" v-model="editingTunnel.protocol"><option v-for="o in protocolOptions" :key="o" :value="o">{{ o }}</option></select></div>
@@ -1726,14 +1884,15 @@ export default defineComponent({
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelDisable') }}</label><input type="checkbox" v-model="editingTunnel.disable" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="pskModalVisible" :title="t('ipsec.modals.pskAuth')" width="600px" @confirm="savePsk">
+      <DraggableModal v-model:visible="pskModalVisible" :title="pskModalTitle" width="600px" @confirm="savePsk">
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingPsk.name" :disabled="editingPsk._name" :title="t('ipsec.form.nameTitle')" /></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.idsTitle')">{{ t('ipsec.form.ids') }}</label><textarea class="form-control" v-model="editingPsk.ids" :title="t('ipsec.form.idsTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.secretTypeTitle')">{{ t('ipsec.form.secretType') }}</label><select class="form-control" v-model="editingPsk.secret_type" :title="t('ipsec.form.secretTypeTitle')"><option v-for="o in SECRET_TYPE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.secretTitle')">{{ t('ipsec.form.secret') }}</label><input class="form-control" type="password" v-model="editingPsk.secret" :title="t('ipsec.form.secretTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dhcpInterfaceFieldTitle')">{{ t('ipsec.form.dhcpInterfaceField') }}</label><input class="form-control" v-model="editingPsk.dhcp_interface" :placeholder="t('ipsec.form.dhcpInterfaceFieldPlaceholder')" :title="t('ipsec.form.dhcpInterfaceFieldTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dhcpInterfaceFieldTitle')">{{ t('ipsec.form.dhcpInterfaceField') }}</label><select class="form-control" v-model="editingPsk.dhcp_interface" :title="t('ipsec.form.dhcpInterfaceFieldTitle')"><option value=""></option><option v-for="o in interfaceOptions" :key="o" :value="o">{{ o }}</option></select></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="profileModalVisible" :title="t('ipsec.modals.profile')" width="600px" @confirm="saveProfile">
+      <DraggableModal v-model:visible="profileModalVisible" :title="profileModalTitle" width="600px" @confirm="saveProfile">
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingProfile.name" :disabled="editingProfile._name" :title="t('ipsec.form.nameTitle')" /></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikeGroupFieldTitle')">{{ t('ipsec.form.ikeGroupField') }}</label><select class="form-control" v-model="editingProfile.ike_group" :title="t('ipsec.form.ikeGroupFieldTitle')"><option value=""></option><option v-for="g in ikeGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.espGroupFieldTitle')">{{ t('ipsec.form.espGroupField') }}</label><select class="form-control" v-model="editingProfile.esp_group" :title="t('ipsec.form.espGroupFieldTitle')"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
@@ -1743,29 +1902,42 @@ export default defineComponent({
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.disableFieldTitle')">{{ t('ipsec.form.disableField') }}</label><input type="checkbox" v-model="editingProfile.disable" :title="t('ipsec.form.disableFieldTitle')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="s2sModalVisible" :title="t('ipsec.modals.s2sPeer')" width="900px" @confirm="saveS2s">
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingS2s.name" :disabled="editingS2s._name" :title="t('ipsec.form.nameTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.remoteAddressTitle')">{{ t('ipsec.form.remoteAddress') }}</label><textarea class="form-control" v-model="editingS2s.remote_address" :placeholder="t('ipsec.form.remoteAddressPlaceholder')" :title="t('ipsec.form.remoteAddressTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.localAddressTitle')">{{ t('ipsec.form.localAddress') }}</label><input class="form-control" v-model="editingS2s.local_address" :placeholder="t('ipsec.form.localAddressPlaceholder')" :title="t('ipsec.form.localAddressTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.connectionTypeTitle')">{{ t('ipsec.form.connectionType') }}</label><select class="form-control" v-model="editingS2s.connection_type" :title="t('ipsec.form.connectionTypeTitle')"><option v-for="o in CONNECTION_TYPE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikeGroupFieldTitle')">{{ t('ipsec.form.ikeGroupField') }}</label><select class="form-control" v-model="editingS2s.ike_group" :title="t('ipsec.form.ikeGroupFieldTitle')"><option value=""></option><option v-for="g in ikeGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.defaultEspGroupTitle')">{{ t('ipsec.form.defaultEspGroup') }}</label><select class="form-control" v-model="editingS2s.default_esp_group" :title="t('ipsec.form.defaultEspGroupTitle')"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.descriptionTitle')">{{ t('ipsec.form.description') }}</label><input class="form-control" v-model="editingS2s.description" :title="t('ipsec.form.descriptionTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dhcpInterfaceField2Title')">{{ t('ipsec.form.dhcpInterfaceField2') }}</label><input class="form-control" v-model="editingS2s.dhcp_interface" :placeholder="t('ipsec.form.dhcpInterfaceField2Placeholder')" :title="t('ipsec.form.dhcpInterfaceField2Title')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.replayWindowTitle')">{{ t('ipsec.form.replayWindow') }}</label><div style="flex:1;"><input class="form-control" type="number" min="0" max="1024" v-model="editingS2s.replay_window" :placeholder="t('ipsec.form.replayWindowPlaceholder')" :title="t('ipsec.form.replayWindowTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.replayWindowHint') }}</div></div></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.virtualAddressTitle')">{{ t('ipsec.form.virtualAddress') }}</label><textarea class="form-control" v-model="editingS2s.virtual_address" :title="t('ipsec.form.virtualAddressTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiBindTitle')">{{ t('ipsec.form.vtiBind') }}</label><input class="form-control" v-model="editingS2s.vti_bind" :title="t('ipsec.form.vtiBindTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiEspGroupTitle')">{{ t('ipsec.form.vtiEspGroup') }}</label><select class="form-control" v-model="editingS2s.vti_esp_group" :title="t('ipsec.form.vtiEspGroupTitle')"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.authModeFieldTitle')">{{ t('ipsec.form.authModeField') }}</label><select class="form-control" v-model="editingS2s.auth_mode" :title="t('ipsec.form.authModeFieldTitle')"><option v-for="o in AUTH_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.localIdTitle')">{{ t('ipsec.form.localId') }}</label><input class="form-control" v-model="editingS2s.auth_local_id" :title="t('ipsec.form.localIdTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.remoteIdTitle')">{{ t('ipsec.form.remoteId') }}</label><input class="form-control" v-model="editingS2s.auth_remote_id" :title="t('ipsec.form.remoteIdTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.useX509IdTitle')">{{ t('ipsec.form.useX509Id') }}</label><input type="checkbox" v-model="editingS2s.auth_use_x509_id" :title="t('ipsec.form.useX509IdTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.forceUdpEncapTitle')">{{ t('ipsec.form.forceUdpEncap') }}</label><input type="checkbox" v-model="editingS2s.force_udp_encapsulation" :title="t('ipsec.form.forceUdpEncapTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.disableFieldTitle')">{{ t('ipsec.form.disableField') }}</label><input type="checkbox" v-model="editingS2s.disable" :title="t('ipsec.form.disableFieldTitle')" /></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikev2ReauthTitle')">{{ t('ipsec.form.ikev2Reauth') }}</label><input type="checkbox" v-model="editingS2s.ikev2_reauth" :title="t('ipsec.form.ikev2ReauthTitle')" /></div>
-        <div class="form-group">
-          <div class="form-group-title">{{ t('ipsec.form.tunnel') }}</div>
-          <div class="form-group-content">
+      <DraggableModal v-model:visible="s2sModalVisible" :title="s2sModalTitle" width="900px" @confirm="saveS2s">
+        <TabGroup v-model="s2sModalTab" :tabs="s2sModalTabs">
+          <template #peer>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingS2s.name" :disabled="editingS2s._name" :title="t('ipsec.form.nameTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.descriptionTitle')">{{ t('ipsec.form.description') }}</label><input class="form-control" v-model="editingS2s.description" :title="t('ipsec.form.descriptionTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.remoteAddressTitle')">{{ t('ipsec.form.remoteAddress') }}</label><textarea class="form-control" v-model="editingS2s.remote_address" :placeholder="t('ipsec.form.remoteAddressPlaceholder')" :title="t('ipsec.form.remoteAddressTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.localAddressTitle')">{{ t('ipsec.form.localAddress') }}</label><input class="form-control" v-model="editingS2s.local_address" :placeholder="t('ipsec.form.localAddressPlaceholder')" :title="t('ipsec.form.localAddressTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.connectionTypeTitle')">{{ t('ipsec.form.connectionType') }}</label><select class="form-control" v-model="editingS2s.connection_type" :title="t('ipsec.form.connectionTypeTitle')"><option v-for="o in CONNECTION_TYPE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikeGroupFieldTitle')">{{ t('ipsec.form.ikeGroupField') }}</label><select class="form-control" v-model="editingS2s.ike_group" :title="t('ipsec.form.ikeGroupFieldTitle')"><option value=""></option><option v-for="g in ikeGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.defaultEspGroupTitle')">{{ t('ipsec.form.defaultEspGroup') }}</label><select class="form-control" v-model="editingS2s.default_esp_group" :title="t('ipsec.form.defaultEspGroupTitle')"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.dhcpInterfaceField2Title')">{{ t('ipsec.form.dhcpInterfaceField2') }}</label><select class="form-control" v-model="editingS2s.dhcp_interface" :title="t('ipsec.form.dhcpInterfaceField2Title')"><option value=""></option><option v-for="o in interfaceOptions" :key="o" :value="o">{{ o }}</option></select></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.replayWindowTitle')">{{ t('ipsec.form.replayWindow') }}</label><div style="flex:1;"><input class="form-control" type="number" min="0" max="1024" v-model="editingS2s.replay_window" :placeholder="t('ipsec.form.replayWindowPlaceholder')" :title="t('ipsec.form.replayWindowTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.replayWindowHint') }}</div></div></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.virtualAddressTitle')">{{ t('ipsec.form.virtualAddress') }}</label><textarea class="form-control" v-model="editingS2s.virtual_address" :title="t('ipsec.form.virtualAddressTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.forceUdpEncapTitle')">{{ t('ipsec.form.forceUdpEncap') }}</label><input type="checkbox" v-model="editingS2s.force_udp_encapsulation" :title="t('ipsec.form.forceUdpEncapTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.disableFieldTitle')">{{ t('ipsec.form.disableField') }}</label><input type="checkbox" v-model="editingS2s.disable" :title="t('ipsec.form.disableFieldTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikev2ReauthTitle')">{{ t('ipsec.form.ikev2Reauth') }}</label><input type="checkbox" v-model="editingS2s.ikev2_reauth" :title="t('ipsec.form.ikev2ReauthTitle')" /></div>
+          </template>
+          <template #authentication>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.authModeFieldTitle')">{{ t('ipsec.form.authModeField') }}</label><select class="form-control" v-model="editingS2s.auth_mode" :title="t('ipsec.form.authModeFieldTitle')"><option v-for="o in AUTH_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.localIdTitle')">{{ t('ipsec.form.localId') }}</label><input class="form-control" v-model="editingS2s.auth_local_id" :title="t('ipsec.form.localIdTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.remoteIdTitle')">{{ t('ipsec.form.remoteId') }}</label><input class="form-control" v-model="editingS2s.auth_remote_id" :title="t('ipsec.form.remoteIdTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.useX509IdTitle')">{{ t('ipsec.form.useX509Id') }}</label><input type="checkbox" v-model="editingS2s.auth_use_x509_id" :title="t('ipsec.form.useX509IdTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.x509CaCertsTitle')">{{ t('ipsec.form.x509CaCerts') }}</label><textarea class="form-control" v-model="editingS2s.x509_ca_certs" :title="t('ipsec.form.x509CaCertsTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.x509CertTitle')">{{ t('ipsec.form.x509Cert') }}</label><input class="form-control" v-model="editingS2s.x509_cert" :title="t('ipsec.form.x509CertTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.x509PassphraseTitle')">{{ t('ipsec.form.x509Passphrase') }}</label><input class="form-control" type="password" v-model="editingS2s.x509_passphrase" :title="t('ipsec.form.x509PassphraseTitle')" /></div>
+            <div class="form-row"><label class="form-label" title="RSA 本地密钥名称">RSA 本地密钥</label><input class="form-control" v-model="editingS2s.rsa_local_key" title="RSA 本地密钥名称" /></div>
+            <div class="form-row"><label class="form-label" title="RSA 远端密钥名称">RSA 远端密钥</label><input class="form-control" v-model="editingS2s.rsa_remote_key" title="RSA 远端密钥名称" /></div>
+            <div class="form-row"><label class="form-label" title="RSA 私钥密码">RSA 密码</label><input class="form-control" type="password" v-model="editingS2s.rsa_passphrase" title="RSA 私钥密码" /></div>
+          </template>
+          <template #vti>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiBindTitle')">{{ t('ipsec.form.vtiBind') }}</label><input class="form-control" v-model="editingS2s.vti_bind" :title="t('ipsec.form.vtiBindTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiEspGroupTitle')">{{ t('ipsec.form.vtiEspGroup') }}</label><select class="form-control" v-model="editingS2s.vti_esp_group" :title="t('ipsec.form.vtiEspGroupTitle')"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiTsLocalPrefixTitle')">{{ t('ipsec.form.vtiTsLocalPrefix') }}</label><textarea class="form-control" v-model="editingS2s.vti_local_prefix" :placeholder="t('ipsec.form.vtiTsLocalPrefixPlaceholder')" :title="t('ipsec.form.vtiTsLocalPrefixTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiTsRemotePrefixTitle')">{{ t('ipsec.form.vtiTsRemotePrefix') }}</label><textarea class="form-control" v-model="editingS2s.vti_remote_prefix" :placeholder="t('ipsec.form.vtiTsRemotePrefixPlaceholder')" :title="t('ipsec.form.vtiTsRemotePrefixTitle')" /></div>
+          </template>
+          <template #tunnel>
             <DataTable rowKey="actions" :columns="[
               { key: 'number', title: t('ipsec.form.tunnelNumber'), width: 80 },
               { key: 'esp_group', title: t('ipsec.form.tunnelEspGroup'), width: 100 },
@@ -1793,8 +1965,8 @@ export default defineComponent({
             @edit="openTunnelModal($event.actions)"
             @delete="deleteTunnels($event)">
             </DataTable>
-          </div>
-        </div>
+          </template>
+        </TabGroup>
       </DraggableModal>
 
       <DraggableModal v-model:visible="raModalVisible" :title="t('ipsec.modals.raConnection')" width="650px" @confirm="saveRa">

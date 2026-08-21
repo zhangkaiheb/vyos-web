@@ -146,12 +146,13 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('vpp ipfix');
+        await configStore.deleteConfig('vpp ipfix');
         const payload = formToIpfix(config.value);
         if (Object.keys(payload).length) {
-          await configApi.set('vpp ipfix', payload);
+          await configStore.setConfig('vpp ipfix', payload);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('vppIpfix.messages.saveFailed'));
@@ -221,6 +222,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

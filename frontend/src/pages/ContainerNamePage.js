@@ -340,16 +340,17 @@ export default defineComponent({
     async function saveConfig() {
       saving.value = true;
       try {
-        await configApi.delete('container name');
+        await configStore.deleteConfig('container name');
         const payload = {};
         for (const c of containerList.value) {
           if (!c.name) continue;
           payload[c.name] = formToContainer(c);
         }
         if (Object.keys(payload).length) {
-          await configApi.set('container name', payload);
+          await configStore.setConfig('container name', payload);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('container.saveFailed'));
@@ -445,6 +446,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {t,

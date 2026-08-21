@@ -97,30 +97,31 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('system ip');
+        await configStore.deleteConfig('system ip');
         const c = config.value;
-        if (c['disable-forwarding']) await configApi.set('system ip disable-forwarding');
-        await configApi.set('system ip arp table-size', c.arp['table-size']);
+        if (c['disable-forwarding']) await configStore.setConfig('system ip disable-forwarding');
+        await configStore.setConfig('system ip arp table-size', c.arp['table-size']);
         if (c.multipath['ignore-unreachable-nexthops']) {
-          await configApi.set('system ip multipath ignore-unreachable-nexthops');
+          await configStore.setConfig('system ip multipath ignore-unreachable-nexthops');
         }
         if (c.multipath['layer4-hashing']) {
-          await configApi.set('system ip multipath layer4-hashing');
+          await configStore.setConfig('system ip multipath layer4-hashing');
         }
         if (c.nht['no-resolve-via-default']) {
-          await configApi.set('system ip nht no-resolve-via-default');
+          await configStore.setConfig('system ip nht no-resolve-via-default');
         }
         for (const [proto, rm] of Object.entries(c.protocol)) {
-          if (rm) await configApi.set(`system ip protocol ${proto} route-map`, rm);
+          if (rm) await configStore.setConfig(`system ip protocol ${proto} route-map`, rm);
         }
-        if (c.tcp.mss.base) await configApi.set('system ip tcp mss base', String(c.tcp.mss.base));
-        if (c.tcp.mss.floor) await configApi.set('system ip tcp mss floor', String(c.tcp.mss.floor));
-        if (c.tcp.mss.probing) await configApi.set('system ip tcp mss probing', c.tcp.mss.probing);
+        if (c.tcp.mss.base) await configStore.setConfig('system ip tcp mss base', String(c.tcp.mss.base));
+        if (c.tcp.mss.floor) await configStore.setConfig('system ip tcp mss floor', String(c.tcp.mss.floor));
+        if (c.tcp.mss.probing) await configStore.setConfig('system ip tcp mss probing', c.tcp.mss.probing);
         for (const item of c['import-table']) {
-          if (item.distance) await configApi.set(`system ip import-table ${item.number} distance`, item.distance);
-          if (item['route-map']) await configApi.set(`system ip import-table ${item.number} route-map`, item['route-map']);
+          if (item.distance) await configStore.setConfig(`system ip import-table ${item.number} distance`, item.distance);
+          if (item['route-map']) await configStore.setConfig(`system ip import-table ${item.number} route-map`, item['route-map']);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('systemIp.messages.saveFailed'));
@@ -129,7 +130,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {t,
       

@@ -106,16 +106,17 @@ export default defineComponent({
     async function saveConfig() {
       saving.value = true;
       try {
-        await configApi.delete('container network');
+        await configStore.deleteConfig('container network');
         const payload = {};
         for (const n of networkList.value) {
           if (!n.name) continue;
           payload[n.name] = formToNetwork(n);
         }
         if (Object.keys(payload).length) {
-          await configApi.set('container network', payload);
+          await configStore.setConfig('container network', payload);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('containerNetwork.save_failed'));
@@ -169,6 +170,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     const modalTitle = computed(() => {

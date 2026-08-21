@@ -212,12 +212,13 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('vpp nat44');
+        await configStore.deleteConfig('vpp nat44');
         const payload = formToNat44(config.value);
         if (Object.keys(payload).length) {
-          await configApi.set('vpp nat44', payload);
+          await configStore.setConfig('vpp nat44', payload);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('app.saveFailed'));
@@ -316,6 +317,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {t,

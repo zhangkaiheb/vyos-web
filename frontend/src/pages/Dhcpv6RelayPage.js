@@ -183,6 +183,7 @@ export default defineComponent({
       try {
         await configStore.setConfig('service dhcpv6-relay', dhcpv6RelayToConfig(config.value));
         configStore.markPending();
+        await configStore.checkSessionChanged();
         saved.value = true;
         await load();
       } catch (e) {
@@ -269,6 +270,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

@@ -350,14 +350,18 @@ export const FIREWALL_RULE_SCHEMA = [
         "title": "组",
         "help": "firewall.rule.help.interface-group",
         "type": "select",
-        "dynamic": true
+        "dynamic": true,
+        "default": "",
+        "noAutoFill": true
       },
       {
         "key": "name",
         "title": "名称",
         "help": "firewall.rule.help.interface-name",
         "type": "select",
-        "dynamic": true
+        "dynamic": true,
+        "default": "",
+        "noAutoFill": true
       }
     ]
   },
@@ -427,6 +431,7 @@ export const FIREWALL_RULE_SCHEMA = [
     "title": "日志选项",
     "help": "firewall.rule.help.log-options",
     "type": "group",
+    "showWhen": { "log": true },
     "children": [
       {
         "key": "group",
@@ -450,7 +455,9 @@ export const FIREWALL_RULE_SCHEMA = [
           "notice",
           "info",
           "debug"
-        ]
+        ],
+        "noAutoFill": true,
+        "default": ""
       },
       {
         "key": "queue-threshold",
@@ -497,14 +504,18 @@ export const FIREWALL_RULE_SCHEMA = [
         "title": "组",
         "help": "firewall.rule.help.interface-group",
         "type": "select",
-        "dynamic": true
+        "dynamic": true,
+        "default": "",
+        "noAutoFill": true
       },
       {
         "key": "name",
         "title": "名称",
         "help": "firewall.rule.help.interface-name",
         "type": "select",
-        "dynamic": true
+        "dynamic": true,
+        "default": "",
+        "noAutoFill": true
       }
     ]
   },
@@ -826,7 +837,7 @@ export const FIREWALL_RULE_SCHEMA = [
             "help": "firewall.rule.help.ack",
             "type": "tri-state",
             "options": [
-              { "value": "", "label": "不配置" },
+              { "value": "", "label": "" },
               { "value": "set", "label": "Set" },
               { "value": "not", "label": "Not" }
             ]
@@ -837,7 +848,7 @@ export const FIREWALL_RULE_SCHEMA = [
             "help": "firewall.rule.help.cwr",
             "type": "tri-state",
             "options": [
-              { "value": "", "label": "不配置" },
+              { "value": "", "label": "" },
               { "value": "set", "label": "Set" },
               { "value": "not", "label": "Not" }
             ]
@@ -848,7 +859,7 @@ export const FIREWALL_RULE_SCHEMA = [
             "help": "firewall.rule.help.ecn",
             "type": "tri-state",
             "options": [
-              { "value": "", "label": "不配置" },
+              { "value": "", "label": "" },
               { "value": "set", "label": "Set" },
               { "value": "not", "label": "Not" }
             ]
@@ -859,7 +870,7 @@ export const FIREWALL_RULE_SCHEMA = [
             "help": "firewall.rule.help.fin",
             "type": "tri-state",
             "options": [
-              { "value": "", "label": "不配置" },
+              { "value": "", "label": "" },
               { "value": "set", "label": "Set" },
               { "value": "not", "label": "Not" }
             ]
@@ -870,7 +881,7 @@ export const FIREWALL_RULE_SCHEMA = [
             "help": "firewall.rule.help.psh",
             "type": "tri-state",
             "options": [
-              { "value": "", "label": "不配置" },
+              { "value": "", "label": "" },
               { "value": "set", "label": "Set" },
               { "value": "not", "label": "Not" }
             ]
@@ -881,7 +892,7 @@ export const FIREWALL_RULE_SCHEMA = [
             "help": "firewall.rule.help.rst",
             "type": "tri-state",
             "options": [
-              { "value": "", "label": "不配置" },
+              { "value": "", "label": "" },
               { "value": "set", "label": "Set" },
               { "value": "not", "label": "Not" }
             ]
@@ -892,7 +903,7 @@ export const FIREWALL_RULE_SCHEMA = [
             "help": "firewall.rule.help.syn",
             "type": "tri-state",
             "options": [
-              { "value": "", "label": "不配置" },
+              { "value": "", "label": "" },
               { "value": "set", "label": "Set" },
               { "value": "not", "label": "Not" }
             ]
@@ -903,7 +914,7 @@ export const FIREWALL_RULE_SCHEMA = [
             "help": "firewall.rule.help.urg",
             "type": "tri-state",
             "options": [
-              { "value": "", "label": "不配置" },
+              { "value": "", "label": "" },
               { "value": "set", "label": "Set" },
               { "value": "not", "label": "Not" }
             ]

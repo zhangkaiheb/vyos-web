@@ -265,12 +265,13 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('vpp settings');
+        await configStore.deleteConfig('vpp settings');
         const payload = formToSettings(config.value);
         if (Object.keys(payload).length) {
-          await configApi.set('vpp settings', payload);
+          await configStore.setConfig('vpp settings', payload);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('vpp.error.saveFailed'));
@@ -311,6 +312,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

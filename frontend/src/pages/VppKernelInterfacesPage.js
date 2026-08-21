@@ -136,12 +136,13 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('vpp kernel-interfaces');
+        await configStore.deleteConfig('vpp kernel-interfaces');
         const payload = formToKernelInterfaces(config.value);
         if (Object.keys(payload).length) {
-          await configApi.set('vpp kernel-interfaces', payload);
+          await configStore.setConfig('vpp kernel-interfaces', payload);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('app.saveFailed'));
@@ -211,6 +212,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {t,

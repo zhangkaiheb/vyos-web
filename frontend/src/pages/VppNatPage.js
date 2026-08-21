@@ -130,12 +130,13 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('vpp nat');
+        await configStore.deleteConfig('vpp nat');
         const payload = formToNat(config.value);
         if (Object.keys(payload).length) {
-          await configApi.set('vpp nat', payload);
+          await configStore.setConfig('vpp nat', payload);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('vppNat.saveFailed'));
@@ -176,6 +177,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {t,

@@ -34,10 +34,10 @@ export default defineComponent({
       if (!hostName.value.trim()) return showError({ message: t('hostname.errors.hostnameRequired') });
       saving.value = true;
       try {
-        await configApi.delete('system host-name');
-        await configApi.set('system host-name', hostName.value.trim());
+        await configStore.deleteConfig('system host-name');
+        await configStore.setConfig('system host-name', hostName.value.trim());
         configStore.markPending();
-        await load();
+        await configStore.checkSessionChanged(); await load();
       } catch (e) {
         showError(e.message || t('hostname.errors.saveFailed'));
       } finally {
@@ -47,6 +47,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       onMenuRefresh(load);
     });
 

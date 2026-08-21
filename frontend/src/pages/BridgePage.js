@@ -7,8 +7,27 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
-import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { useI18n } from '/src/i18n/index.js';
+import { buildDhcpv6BaseSchema, dhcpv6ConfigToForm, dhcpv6FormToConfig, dhcpv6ToCommands, DHCPV6_DEFAULTS } from '/src/utils/dhcpv6Common.js';
+import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+
+function formatJson(obj) {
+  if (!obj || Object.keys(obj).length === 0) return '';
+  try {
+    return JSON.stringify(obj, null, 2);
+  } catch {
+    return '';
+  }
+}
+
+function safeJsonParse(str) {
+  if (!str) return {};
+  try {
+    return JSON.parse(str);
+  } catch {
+    return {};
+  }
+}
 
 const SOURCE_VALIDATION_OPTIONS = [
   { value: 'strict', label: 'strict - Strict Reverse Path Forwarding (RFC3704)' },
@@ -38,6 +57,7 @@ export default defineComponent({
     const COLUMNS = computed(() => [
       { key: 'name', title: t('interface.bridge.name'), dataIndex: 'name', width: 100 },
       { key: 'description', title: t('interface.bridge.description'), dataIndex: 'description', width: 120 },
+      { key: 'address', title: t('interface.tunnel.address'), dataIndex: 'address', width: 180 },
       { key: 'mac', title: t('interface.bridge.mac'), dataIndex: 'mac', width: 130 },
       { key: 'protocol', title: t('interface.bridge.protocol_label'), dataIndex: 'protocol', width: 80 },
       { key: 'members', title: t('interface.bridge.members'), dataIndex: 'members', width: 150 },
@@ -70,6 +90,11 @@ export default defineComponent({
     // Delete confirmation modal
     const deleteModalVisible = ref(false);
     const pendingDeleteNames = ref([]);
+    const acceptDadOptions = computed(() => [
+      { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
+      { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
+      { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
+    ]);
 
     // Member columns for DataTable
     const memberColumns = computed(() => [
@@ -86,6 +111,7 @@ export default defineComponent({
     const basicSchema = computed(() => [
       { key: 'name', title: t('interface.bridge.name'), type: 'text', required: true, placeholder: t('interface.bridge.name_placeholder'), help: t('interface.bridge.name_help'), disabled: isEditMode.value },
       { key: 'description', title: t('interface.bridge.description'), type: 'text', placeholder: t('interface.bridge.description_placeholder') },
+      { key: 'address', title: t('interface.tunnel.address'), type: 'textarea', placeholder: t('interface.tunnel.address_placeholder'), help: t('interface.tunnel.address_help') },
       { key: 'mac', title: t('interface.bridge.mac'), type: 'text', placeholder: t('interface.bridge.mac_placeholder'), help: t('interface.bridge.mac_help') },
       { key: 'aging', title: t('interface.bridge.aging'), type: 'number', min: 0, max: 1000000, placeholder: t('interface.bridge.aging_placeholder'), help: t('interface.bridge.aging_help') },
       { key: 'forwarding_delay', title: t('interface.bridge.forwarding_delay'), type: 'number', min: 0, max: 30, placeholder: t('interface.bridge.forwarding_delay_placeholder'), help: t('interface.bridge.forwarding_delay_help') },
@@ -159,15 +185,12 @@ export default defineComponent({
       { key: 'dhcp_vendor_class_id', title: t('interface.bridge.dhcp.vendor_class_id'), type: 'text', placeholder: t('interface.bridge.dhcp.vendor_class_id_placeholder'), help: t('interface.bridge.dhcp.vendor_class_id_help') },
     ]);
 
-    const dhcpv6Schema = computed(() => [
-      { key: 'dhcpv6_duid', title: t('interface.bridge.dhcpv6.duid'), type: 'text', placeholder: t('interface.bridge.dhcpv6.duid_placeholder'), help: t('interface.bridge.dhcpv6.duid_help') },
-      { key: 'dhcpv6_no_release', title: t('interface.bridge.dhcpv6.no_release'), type: 'checkbox', help: t('interface.bridge.dhcpv6.no_release_help') },
-      { key: 'dhcpv6_no_request_dns', title: t('interface.bridge.dhcpv6.no_request_dns'), type: 'checkbox', help: t('interface.bridge.dhcpv6.no_request_dns_help') },
-      { key: 'dhcpv6_no_request_domain', title: t('interface.bridge.dhcpv6.no_request_domain'), type: 'checkbox', help: t('interface.bridge.dhcpv6.no_request_domain_help') },
-      { key: 'dhcpv6_parameters_only', title: t('interface.bridge.dhcpv6.parameters_only'), type: 'checkbox', help: t('interface.bridge.dhcpv6.parameters_only_help') },
-      { key: 'dhcpv6_rapid_commit', title: t('interface.bridge.dhcpv6.rapid_commit'), type: 'checkbox', help: t('interface.bridge.dhcpv6.rapid_commit_help') },
-      { key: 'dhcpv6_temporary', title: t('interface.bridge.dhcpv6.temporary'), type: 'checkbox', help: t('interface.bridge.dhcpv6.temporary_help') },
-    ]);
+    const dhcpv6Schema = computed(() => buildDhcpv6BaseSchema('interface.bridge.dhcpv6', t, {
+      withPd: true,
+      pdTitle: 'interface.bridge.dhcpv6.pd_instances',
+      pdPlaceholder: 'interface.bridge.dhcpv6.pd_instances_placeholder',
+      pdHelp: 'interface.bridge.dhcpv6.pd_instances_help',
+    }));
 
     const igmpSchema = computed(() => [
       { key: 'igmp_enable', title: t('interface.bridge.igmp.enable'), type: 'checkbox', help: t('interface.bridge.igmp.enable_help') },
@@ -190,11 +213,7 @@ export default defineComponent({
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: t('interface.bridge.ipv6.accept_dad'), type: 'select', options: [
-        { value: '0', label: '0 - Disable DAD' },
-        { value: '1', label: t('interface.bridge.ipv6.accept_dad_1') },
-        { value: '2', label: '2 - Enable DAD, disable if duplicate MAC found' },
-      ], help: t('interface.bridge.ipv6.accept_dad_help') },
+      { key: 'ipv6_accept_dad', title: t('interface.bridge.ipv6.accept_dad'), type: 'select', options: acceptDadOptions.value, help: t('interface.bridge.ipv6.accept_dad_help') },
       { key: 'ipv6_autoconf', title: t('interface.bridge.ipv6.autoconf'), type: 'checkbox', help: t('interface.bridge.ipv6.autoconf_help') },
       { key: 'ipv6_eui64', title: t('interface.bridge.ipv6.eui64'), type: 'text', placeholder: t('interface.bridge.ipv6.eui64_placeholder'), help: t('interface.bridge.ipv6.eui64_help') },
       { key: 'ipv6_no_default_link_local', title: t('interface.bridge.ipv6.no_default_link_local'), type: 'checkbox', help: t('interface.bridge.ipv6.no_default_link_local_help') },
@@ -225,6 +244,11 @@ export default defineComponent({
       const lines = [];
 
       if (b.description) lines.push(`set interfaces bridge ${name} description "${b.description}"`);
+      if (b.address) {
+        b.address.split('\n').map(a => a.trim()).filter(Boolean).forEach(a => {
+          lines.push(`set interfaces bridge ${name} address ${a}`);
+        });
+      }
       if (b.mac) lines.push(`set interfaces bridge ${name} mac ${b.mac}`);
       if (b.aging !== undefined && b.aging !== null) lines.push(`set interfaces bridge ${name} aging ${b.aging}`);
       if (b.forwarding_delay) lines.push(`set interfaces bridge ${name} forwarding-delay ${b.forwarding_delay}`);
@@ -265,13 +289,7 @@ export default defineComponent({
       if (b.dhcp_vendor_class_id) lines.push(`set interfaces bridge ${name} dhcp-options vendor-class-id ${b.dhcp_vendor_class_id}`);
 
       // DHCPv6
-      if (b.dhcpv6_duid) lines.push(`set interfaces bridge ${name} dhcpv6-options duid ${b.dhcpv6_duid}`);
-      if (b.dhcpv6_no_release) lines.push(`set interfaces bridge ${name} dhcpv6-options no-release`);
-      if (b.dhcpv6_no_request_dns) lines.push(`set interfaces bridge ${name} dhcpv6-options no-request-dns`);
-      if (b.dhcpv6_no_request_domain) lines.push(`set interfaces bridge ${name} dhcpv6-options no-request-domain-name`);
-      if (b.dhcpv6_parameters_only) lines.push(`set interfaces bridge ${name} dhcpv6-options parameters-only`);
-      if (b.dhcpv6_rapid_commit) lines.push(`set interfaces bridge ${name} dhcpv6-options rapid-commit`);
-      if (b.dhcpv6_temporary) lines.push(`set interfaces bridge ${name} dhcpv6-options temporary`);
+      lines.push(...dhcpv6ToCommands(b, 'bridge', name));
 
       // IGMP
       if (b.igmp_enable) lines.push(`set interfaces bridge ${name} igmp enable`);
@@ -329,6 +347,7 @@ export default defineComponent({
       return {
         name: '',
         description: '',
+        address: '',
         mac: '',
         aging: '',
         forwarding_delay: '',
@@ -350,13 +369,8 @@ export default defineComponent({
         dhcp_reject: '',
         dhcp_user_class: '',
         dhcp_vendor_class_id: '',
-        dhcpv6_duid: '',
-        dhcpv6_no_release: false,
-        dhcpv6_no_request_dns: false,
-        dhcpv6_no_request_domain: false,
-        dhcpv6_parameters_only: false,
-        dhcpv6_rapid_commit: false,
-        dhcpv6_temporary: false,
+        ...DHCPV6_DEFAULTS,
+        dhcpv6_pd_instances: '',
         igmp_enable: false,
         ip_adjust_mss: '',
         ip_arp_cache_timeout: '',
@@ -390,6 +404,8 @@ export default defineComponent({
       const form = getDefaultForm();
       form.name = name || cfg.name || '';
       form.description = cfg.description || '';
+      if (Array.isArray(cfg.address)) form.address = cfg.address.join('\n');
+      else if (cfg.address) form.address = String(cfg.address);
       form.mac = cfg.mac || '';
       if (cfg.aging !== undefined) form.aging = cfg.aging;
       if (cfg['forwarding-delay'] !== undefined) form.forwarding_delay = cfg['forwarding-delay'];
@@ -440,15 +456,8 @@ export default defineComponent({
       }
 
       // DHCPv6
-      if (cfg['dhcpv6-options']) {
-        form.dhcpv6_duid = cfg['dhcpv6-options'].duid || '';
-        form.dhcpv6_no_release = !!cfg['dhcpv6-options']['no-release'];
-        form.dhcpv6_no_request_dns = !!cfg['dhcpv6-options']['no-request-dns'];
-        form.dhcpv6_no_request_domain = !!cfg['dhcpv6-options']['no-request-domain-name'];
-        form.dhcpv6_parameters_only = !!cfg['dhcpv6-options']['parameters-only'];
-        form.dhcpv6_rapid_commit = !!cfg['dhcpv6-options']['rapid-commit'];
-        form.dhcpv6_temporary = !!cfg['dhcpv6-options'].temporary;
-      }
+      Object.assign(form, dhcpv6ConfigToForm(cfg['dhcpv6-options']));
+      form.dhcpv6_pd_instances = formatJson(cfg['dhcpv6-options']?.pd || {});
 
       // IGMP
       if (cfg.igmp) {
@@ -501,6 +510,10 @@ export default defineComponent({
       const value = {};
 
       if (form.description) value.description = form.description;
+      if (form.address) {
+        const addresses = String(form.address).split('\n').map(a => a.trim()).filter(Boolean);
+        if (addresses.length) value.address = addresses;
+      }
       if (form.mac) value.mac = form.mac;
       if (form.aging !== undefined && form.aging !== null && form.aging !== '') value.aging = String(form.aging);
       if (form.forwarding_delay !== undefined && form.forwarding_delay !== null && form.forwarding_delay !== '') value['forwarding-delay'] = String(form.forwarding_delay);
@@ -550,14 +563,11 @@ export default defineComponent({
       if (Object.keys(dhcp).length) value['dhcp-options'] = dhcp;
 
       // DHCPv6
-      const dhcpv6 = {};
-      if (form.dhcpv6_duid) dhcpv6.duid = form.dhcpv6_duid;
-      if (form.dhcpv6_no_release) dhcpv6['no-release'] = '';
-      if (form.dhcpv6_no_request_dns) dhcpv6['no-request-dns'] = '';
-      if (form.dhcpv6_no_request_domain) dhcpv6['no-request-domain-name'] = '';
-      if (form.dhcpv6_parameters_only) dhcpv6['parameters-only'] = '';
-      if (form.dhcpv6_rapid_commit) dhcpv6['rapid-commit'] = '';
-      if (form.dhcpv6_temporary) dhcpv6.temporary = '';
+      const dhcpv6 = dhcpv6FormToConfig(form) || {};
+      if (form.dhcpv6_pd_instances) {
+        const pd = safeJsonParse(form.dhcpv6_pd_instances);
+        if (Object.keys(pd).length) dhcpv6.pd = pd;
+      }
       if (Object.keys(dhcpv6).length) value['dhcpv6-options'] = dhcpv6;
 
       // IGMP
@@ -616,6 +626,7 @@ export default defineComponent({
         bridges.value = Object.entries(res.data || {}).map(([name, cfg]) => ({
           name,
           description: cfg.description || '',
+          address: Array.isArray(cfg.address) ? cfg.address.join(', ') : (cfg.address || ''),
           mac: cfg.mac || '',
           protocol: cfg.protocol || '',
           members: (() => {

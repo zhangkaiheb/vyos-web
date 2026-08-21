@@ -297,7 +297,7 @@ def _init_default_feature_visibility(cursor):
         ('loopback', 'Loopback', 'system-interfaces', '网络接口', 'Network Interfaces'),
         ('geneve', 'Geneve', 'system-interfaces', '网络接口', 'Network Interfaces'),
         ('input', 'Input', 'system-interfaces', '网络接口', 'Network Interfaces'),
-        ('ethernet-eapol', 'EAPoL', 'system-interfaces', '网络接口', 'Network Interfaces'),
+        ('dummy', 'Dummy', 'system-interfaces', '网络接口', 'Network Interfaces'),
 
         # Category: system-container (系统管理-容器)
         ('container', '容器', 'system-container', '容器', 'Container'),

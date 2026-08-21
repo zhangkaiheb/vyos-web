@@ -564,6 +564,7 @@ export default defineComponent({
       load();
       loadInterfaces();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
     watch(() => route.path, () => { load(); loadInterfaces(); ruleSelected.value = []; });
 

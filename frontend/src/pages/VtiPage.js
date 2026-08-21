@@ -14,12 +14,6 @@ const SOURCE_VALIDATION_OPTIONS = [
   { value: 'disable', label: 'disable' },
 ];
 
-const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0' },
-  { value: '1', label: '1' },
-  { value: '2', label: '2' },
-];
-
 export default defineComponent({
   name: 'VtiPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
@@ -29,6 +23,7 @@ export default defineComponent({
     const COLUMNS = computed(() => [
       { key: 'name', title: t('interface.vti.name'), width: 120 },
       { key: 'description', title: t('interface.vti.description'), width: 160 },
+      { key: 'address', title: t('interface.vti.ip_address'), width: 220 },
       { key: 'mtu', title: t('interface.vti.mtu'), width: 80 },
       { key: 'vrf', title: t('interface.vti.vrf'), width: 100 },
       { key: 'disable', title: t('interface.vti.disable'), width: 80 },
@@ -38,14 +33,23 @@ export default defineComponent({
     const vtis = ref([]);
     const modalVisible = ref(false);
     const editingVti = ref(null);
+    const isEditMode = ref(false);
     const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
     const activeTab = ref('basic');
     const selectedVti = ref([]);
     const deleteModalVisible = ref(false);
     const pendingDeleteNames = ref([]);
 
+    const acceptDadOptions = computed(() => [
+      { value: '', label: '' },
+      { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
+      { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
+      { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
+    ]);
+
     const basicSchema = computed(() => [
-      { key: 'name', title: t('interface.vti.name'), type: 'text', required: true, placeholder: t('interface.vti.name_placeholder'), help: t('interface.vti.name_help') },
+      { key: 'name', title: t('interface.vti.name'), type: 'text', required: true, placeholder: t('interface.vti.name_placeholder'), help: t('interface.vti.name_help'), disabled: isEditMode.value },
       { key: 'description', title: t('interface.vti.description'), type: 'text', placeholder: t('interface.vti.description_placeholder') },
       { key: 'address', title: t('interface.vti.ip_address'), type: 'textarea', placeholder: t('interface.vti.address_placeholder'), help: t('interface.vti.address_help') },
       { key: 'mtu', title: t('interface.vti.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('interface.vti.mtu_placeholder'), help: t('interface.vti.mtu_help') },
@@ -63,11 +67,11 @@ export default defineComponent({
       { key: 'ip_enable_directed_broadcast', title: t('interface.vti.ip.enable_directed_broadcast'), type: 'checkbox', help: t('interface.vti.ip.enable_directed_broadcast_help') },
       { key: 'ip_enable_proxy_arp', title: t('interface.vti.ip.enable_proxy_arp'), type: 'checkbox', help: t('interface.vti.ip.enable_proxy_arp_help') },
       { key: 'ip_proxy_arp_pvlan', title: t('interface.vti.ip.proxy_arp_pvlan'), type: 'checkbox', help: t('interface.vti.ip.proxy_arp_pvlan_help') },
-      { key: 'ip_source_validation', title: t('interface.vti.ip.source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('interface.vti.ip.source_validation_placeholder'), help: t('interface.vti.ip.source_validation_help') },
+      { key: 'ip_source_validation', title: t('interface.vti.ip.source_validation'), type: 'select', options: [{ value: '', label: '' }, ...SOURCE_VALIDATION_OPTIONS], placeholder: t('interface.vti.ip.source_validation_placeholder'), help: t('interface.vti.ip.source_validation_help') },
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: t('interface.vti.ipv6.accept_dad'), type: 'select', options: ACCEPT_DAD_OPTIONS, help: t('interface.vti.ipv6.accept_dad_help') },
+      { key: 'ipv6_accept_dad', title: t('interface.vti.ipv6.accept_dad'), type: 'select', options: acceptDadOptions.value, help: t('interface.vti.ipv6.accept_dad_help') },
       { key: 'ipv6_autoconf', title: t('interface.vti.ipv6.address_autoconf'), type: 'checkbox', help: t('interface.vti.ipv6.address_autoconf_help') },
       { key: 'ipv6_eui64', title: t('interface.vti.ipv6.address_eui64'), type: 'text', placeholder: t('interface.vti.ipv6.address_eui64_placeholder'), help: t('interface.vti.ipv6.eui64_help') },
       { key: 'ipv6_no_default_link_local', title: t('interface.vti.ipv6.no_default_link_local'), type: 'checkbox', help: t('interface.vti.ipv6.no_default_link_local_help') },
@@ -75,17 +79,17 @@ export default defineComponent({
       { key: 'ipv6_base_reachable_time', title: t('interface.vti.ipv6.base_reachable_time'), type: 'number', min: 1, max: 86400, placeholder: t('interface.vti.ipv6.base_reachable_time_placeholder'), help: t('interface.vti.ipv6.base_reachable_time_help') },
       { key: 'ipv6_disable_forwarding', title: t('interface.vti.ipv6.disable_forwarding'), type: 'checkbox', help: t('interface.vti.ipv6.disable_forwarding_help') },
       { key: 'ipv6_dup_addr_detect_transmits', title: t('interface.vti.ipv6.dup_addr_detect_transmits'), type: 'number', min: 0, max: 100, placeholder: t('interface.vti.ipv6.dup_addr_detect_transmits_placeholder'), help: t('interface.vti.ipv6.dup_addr_detect_transmits_help') },
-      { key: 'ipv6_source_validation', title: t('interface.vti.ipv6.source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('interface.vti.ipv6.source_validation_placeholder'), help: t('interface.vti.ipv6.source_validation_help') },
+      { key: 'ipv6_source_validation', title: t('interface.vti.ipv6.source_validation'), type: 'select', options: [{ value: '', label: '' }, ...SOURCE_VALIDATION_OPTIONS], placeholder: t('interface.vti.ipv6.source_validation_placeholder'), help: t('interface.vti.ipv6.source_validation_help') },
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: t('interface.vti.mirror.egress'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.vti.mirror.placeholder'), help: t('interface.vti.mirror.egress_help') },
-      { key: 'mirror_ingress', title: t('interface.vti.mirror.ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.vti.mirror.placeholder'), help: t('interface.vti.mirror.ingress_help') },
+      { key: 'mirror_egress', title: t('interface.vti.mirror.egress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('interface.vti.mirror.placeholder'), help: t('interface.vti.mirror.egress_help') },
+      { key: 'mirror_ingress', title: t('interface.vti.mirror.ingress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('interface.vti.mirror.placeholder'), help: t('interface.vti.mirror.ingress_help') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: t('interface.vti.other.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.vti.other.redirect_placeholder'), help: t('interface.vti.other.redirect_help') },
-      { key: 'vrf', title: t('interface.vti.other.vrf'), type: 'text', placeholder: t('interface.vti.other.vrf_placeholder'), help: t('interface.vti.other.vrf_help') },
+      { key: 'redirect', title: t('interface.vti.other.redirect'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('interface.vti.other.redirect_placeholder'), help: t('interface.vti.other.redirect_help') },
+      { key: 'vrf', title: t('interface.vti.other.vrf'), type: 'select', options: [{ value: '', label: '' }, ...vrfOptions.value], placeholder: t('interface.vti.other.vrf_placeholder'), help: t('interface.vti.other.vrf_help') },
     ]);
 
     const commandText = computed(() => {
@@ -149,7 +153,7 @@ export default defineComponent({
         ip_disable_forwarding: false, ip_enable_arp_accept: false, ip_enable_arp_announce: false,
         ip_enable_arp_ignore: false, ip_enable_directed_broadcast: false,
         ip_enable_proxy_arp: false, ip_proxy_arp_pvlan: false, ip_source_validation: '',
-        ipv6_accept_dad: '1', ipv6_autoconf: false, ipv6_eui64: '', ipv6_no_default_link_local: false,
+        ipv6_accept_dad: '', ipv6_autoconf: false, ipv6_eui64: '', ipv6_no_default_link_local: false,
         ipv6_adjust_mss: '', ipv6_base_reachable_time: '', ipv6_disable_forwarding: false,
         ipv6_dup_addr_detect_transmits: '', ipv6_source_validation: '',
         mirror_egress: '', mirror_ingress: '',
@@ -175,7 +179,7 @@ export default defineComponent({
         ip_enable_proxy_arp: !!v.ip?.enable_proxy_arp,
         ip_proxy_arp_pvlan: !!v.ip?.proxy_arp_pvlan,
         ip_source_validation: v.ip?.source_validation || '',
-        ipv6_accept_dad: v.ipv6?.accept_dad || '1',
+        ipv6_accept_dad: v.ipv6?.accept_dad || '',
         ipv6_autoconf: !!v.ipv6?.address?.autoconf,
         ipv6_eui64: v.ipv6?.address?.eui64 || '',
         ipv6_no_default_link_local: !!v.ipv6?.address?.no_default_link_local,
@@ -192,40 +196,40 @@ export default defineComponent({
     }
 
     function formToVti(form) {
-      const result = { name: form.name };
+      const result = {};
       if (form.description) result.description = form.description;
       if (form.address) result.address = form.address.split('\n').filter(Boolean).map(s => s.trim());
       if (form.mtu) result.mtu = Number(form.mtu);
       if (form.disable) result.disable = true;
 
       const ip = {};
-      if (form.ip_adjust_mss) ip.adjust_mss = form.ip_adjust_mss;
-      if (form.ip_arp_cache_timeout) ip.arp_cache_timeout = Number(form.ip_arp_cache_timeout);
-      if (form.ip_disable_arp_filter) ip.disable_arp_filter = true;
-      if (form.ip_disable_forwarding) ip.disable_forwarding = true;
-      if (form.ip_enable_arp_accept) ip.enable_arp_accept = true;
-      if (form.ip_enable_arp_announce) ip.enable_arp_announce = true;
-      if (form.ip_enable_arp_ignore) ip.enable_arp_ignore = true;
-      if (form.ip_enable_directed_broadcast) ip.enable_directed_broadcast = true;
-      if (form.ip_enable_proxy_arp) ip.enable_proxy_arp = true;
-      if (form.ip_proxy_arp_pvlan) ip.proxy_arp_pvlan = true;
-      if (form.ip_source_validation) ip.source_validation = form.ip_source_validation;
+      if (form.ip_adjust_mss) ip['adjust-mss'] = form.ip_adjust_mss;
+      if (form.ip_arp_cache_timeout) ip['arp-cache-timeout'] = Number(form.ip_arp_cache_timeout);
+      if (form.ip_disable_arp_filter) ip['disable-arp-filter'] = '';
+      if (form.ip_disable_forwarding) ip['disable-forwarding'] = '';
+      if (form.ip_enable_arp_accept) ip['enable-arp-accept'] = '';
+      if (form.ip_enable_arp_announce) ip['enable-arp-announce'] = '';
+      if (form.ip_enable_arp_ignore) ip['enable-arp-ignore'] = '';
+      if (form.ip_enable_directed_broadcast) ip['enable-directed-broadcast'] = '';
+      if (form.ip_enable_proxy_arp) ip['enable-proxy-arp'] = '';
+      if (form.ip_proxy_arp_pvlan) ip['proxy-arp-pvlan'] = '';
+      if (form.ip_source_validation) ip['source-validation'] = form.ip_source_validation;
       if (Object.keys(ip).length) result.ip = ip;
 
       const ipv6 = {};
-      if (form.ipv6_accept_dad && form.ipv6_accept_dad !== '1') ipv6.accept_dad = form.ipv6_accept_dad;
+      if (form.ipv6_accept_dad && form.ipv6_accept_dad !== '1') ipv6['accept-dad'] = form.ipv6_accept_dad;
       if (form.ipv6_autoconf || form.ipv6_eui64 || form.ipv6_no_default_link_local) {
         const addr = {};
-        if (form.ipv6_autoconf) addr.autoconf = true;
+        if (form.ipv6_autoconf) addr.autoconf = '';
         if (form.ipv6_eui64) addr.eui64 = form.ipv6_eui64;
-        if (form.ipv6_no_default_link_local) addr.no_default_link_local = true;
+        if (form.ipv6_no_default_link_local) addr['no-default-link-local'] = '';
         ipv6.address = addr;
       }
-      if (form.ipv6_adjust_mss) ipv6.adjust_mss = form.ipv6_adjust_mss;
-      if (form.ipv6_base_reachable_time) ipv6.base_reachable_time = Number(form.ipv6_base_reachable_time);
-      if (form.ipv6_disable_forwarding) ipv6.disable_forwarding = true;
-      if (form.ipv6_dup_addr_detect_transmits !== '' && form.ipv6_dup_addr_detect_transmits !== null && form.ipv6_dup_addr_detect_transmits !== undefined) ipv6.dup_addr_detect_transmits = Number(form.ipv6_dup_addr_detect_transmits);
-      if (form.ipv6_source_validation) ipv6.source_validation = form.ipv6_source_validation;
+      if (form.ipv6_adjust_mss) ipv6['adjust-mss'] = form.ipv6_adjust_mss;
+      if (form.ipv6_base_reachable_time) ipv6['base-reachable-time'] = Number(form.ipv6_base_reachable_time);
+      if (form.ipv6_disable_forwarding) ipv6['disable-forwarding'] = '';
+      if (form.ipv6_dup_addr_detect_transmits !== '' && form.ipv6_dup_addr_detect_transmits !== null && form.ipv6_dup_addr_detect_transmits !== undefined) ipv6['dup-addr-detect-transmits'] = Number(form.ipv6_dup_addr_detect_transmits);
+      if (form.ipv6_source_validation) ipv6['source-validation'] = form.ipv6_source_validation;
       if (Object.keys(ipv6).length) result.ipv6 = ipv6;
 
       const mirror = {};
@@ -239,6 +243,22 @@ export default defineComponent({
       return result;
     }
 
+    function hasValue(v) {
+      if (v === undefined || v === null || v === '') return false;
+      if (typeof v === 'boolean') return v;
+      if (Array.isArray(v)) return v.length > 0;
+      if (typeof v === 'object') return Object.keys(v).length > 0;
+      return true;
+    }
+
+    async function setOrDelete(path, value) {
+      if (hasValue(value)) {
+        await configStore.setConfig(path, value);
+      } else {
+        try { await configStore.deleteConfig(path); } catch (_) {}
+      }
+    }
+
     async function load() {
       loading.value = true;
       try {
@@ -247,6 +267,7 @@ export default defineComponent({
         vtis.value = Object.entries(cfg).map(([name, val]) => ({
           name,
           ...val,
+          address: Array.isArray(val.address) ? val.address.join(', ') : (val.address || ''),
           mtu: val.mtu || '',
           vrf: val.vrf || '',
           disable: !!val.disable,
@@ -259,6 +280,17 @@ export default defineComponent({
           value: iface.name || iface,
           label: iface.name || iface,
         }));
+
+        try {
+          const vrfRes = await api.get('/config', { path: 'vrf' });
+          const vrfData = vrfRes.data || {};
+          const vrfNameData = vrfData.name || vrfData;
+          vrfOptions.value = Object.keys(vrfNameData)
+            .filter(name => typeof vrfNameData[name] === 'object')
+            .map(name => ({ value: name, label: name }));
+        } catch (e) {
+          vrfOptions.value = [];
+        }
       } catch (err) {
         showError(err);
       } finally {
@@ -266,11 +298,16 @@ export default defineComponent({
       }
     }
 
-    function openModal(index = -1) {
-      if (index >= 0) {
-        editingVti.value = vtiToForm(vtis.value[index]);
+    function openModal(payload = -1) {
+      if (typeof payload === 'number' && payload >= 0) {
+        editingVti.value = vtiToForm(vtis.value[payload]);
+        isEditMode.value = true;
+      } else if (payload && typeof payload === 'object') {
+        editingVti.value = vtiToForm(payload);
+        isEditMode.value = true;
       } else {
         editingVti.value = getDefaultForm();
+        isEditMode.value = false;
       }
       activeTab.value = 'basic';
       modalVisible.value = true;
@@ -280,10 +317,27 @@ export default defineComponent({
       try {
         const form = editingVti.value;
         if (!form.name) { showError({ message: t('interface.vti.nameRequired') }); return; }
+        const basePath = `interfaces vti ${form.name}`;
         const config = formToVti(form);
-        console.log('[VTI] Save config:', JSON.stringify(config, null, 2));
-        await configStore.setConfig(`interfaces vti ${form.name}`, config);
+
+        // Keep the tag node present, then set/delete child nodes like IpsecPage.
+        await configStore.setConfig(basePath, {});
+        await setOrDelete(`${basePath} description`, config.description);
+        await setOrDelete(`${basePath} address`, config.address);
+        await setOrDelete(`${basePath} mtu`, config.mtu);
+        if (config.disable) {
+          await configStore.setConfig(`${basePath} disable`, '');
+        } else {
+          try { await configStore.deleteConfig(`${basePath} disable`); } catch (_) {}
+        }
+        await setOrDelete(`${basePath} ip`, config.ip);
+        await setOrDelete(`${basePath} ipv6`, config.ipv6);
+        await setOrDelete(`${basePath} mirror`, config.mirror);
+        await setOrDelete(`${basePath} redirect`, config.redirect);
+        await setOrDelete(`${basePath} vrf`, config.vrf);
+
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (err) {
@@ -311,11 +365,11 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {
       loading, vtis, selected: selectedVti, modalVisible, editingVti, interfaceOptions, activeTab,
-      deleteModalVisible, pendingDeleteNames,
+      deleteModalVisible, pendingDeleteNames, isEditMode,
       COLUMNS,
       basicSchema, ipSchema, ipv6Schema, mirrorSchema, otherSchema,
       commandText, modalTabs,
@@ -336,19 +390,15 @@ export default defineComponent({
         @refresh="load"
         @selection-change="selected = $event"
       />
-      <DraggableModal v-model:visible="modalVisible" :title="editingVti?.name ? t('interface.vti.modal.edit') : t('interface.vti.modal.create')" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="isEditMode ? t('interface.vti.modal.edit') : t('interface.vti.modal.create')" width="900px" @confirm="save">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
-            <template #basic><ConfigForm :schema="basicSchema" :model="editingVti" /></template>
-            <template #ip><ConfigForm :schema="ipSchema" :model="editingVti" /></template>
-            <template #ipv6><ConfigForm :schema="ipv6Schema" :model="editingVti" /></template>
-            <template #mirror><ConfigForm :schema="mirrorSchema" :model="editingVti" /></template>
-            <template #other><ConfigForm :schema="otherSchema" :model="editingVti" /></template>
+            <template #basic><ConfigForm :schema="basicSchema" v-model="editingVti" /></template>
+            <template #ip><ConfigForm :schema="ipSchema" v-model="editingVti" /></template>
+            <template #ipv6><ConfigForm :schema="ipv6Schema" v-model="editingVti" /></template>
+            <template #mirror><ConfigForm :schema="mirrorSchema" v-model="editingVti" /></template>
+            <template #other><ConfigForm :schema="otherSchema" v-model="editingVti" /></template>
           </TabGroup>
-        </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('common.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="save">{{ t('common.confirm') }}</button>
         </template>
       </DraggableModal>
       <DraggableModal v-model:visible="deleteModalVisible" :title="t('common.confirm_delete')" width="400px" @confirm="confirmRemove">

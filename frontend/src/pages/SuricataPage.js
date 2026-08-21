@@ -384,12 +384,13 @@ export default defineComponent({
           'service suricata port-group',
         ];
         for (const p of paths) {
-          try { await configApi.delete(p); } catch (_) {}
+          try { await configStore.deleteConfig(p); } catch (_) {}
         }
         if (Object.keys(value).length) {
-          await configApi.set('service suricata', value);
+          await configStore.setConfig('service suricata', value);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         saved.value = true;
         await load();
       } catch (e) {
@@ -402,6 +403,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

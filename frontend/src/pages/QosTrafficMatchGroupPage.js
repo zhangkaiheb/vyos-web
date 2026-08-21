@@ -418,62 +418,63 @@ export default defineComponent({
       const { name, description } = editingGroup.value;
 
       try {
-        await configApi.set(`qos traffic-match-group`, name);
+        await configStore.setConfig(`qos traffic-match-group`, name);
         if (description) {
-          await configApi.set(`qos traffic-match-group ${name} description`, description);
+          await configStore.setConfig(`qos traffic-match-group ${name} description`, description);
         }
 
         // Delete existing matches
         const existingGroup = matchGroups.value.find(g => g.name === name);
         if (existingGroup && existingGroup.matches) {
           for (const existingName of Object.keys(existingGroup.matches)) {
-            await configApi.delete(`qos traffic-match-group ${name} match ${existingName}`);
+            await configStore.deleteConfig(`qos traffic-match-group ${name} match ${existingName}`);
           }
         }
 
         // Save rules
         for (const rule of editingRules.value) {
           if (rule._matchConfig) {
-            await configApi.set(`qos traffic-match-group ${name} match`, rule.name);
+            await configStore.setConfig(`qos traffic-match-group ${name} match`, rule.name);
             const m = rule._matchConfig;
             if (m.description) {
-              await configApi.set(`qos traffic-match-group ${name} match ${rule.name} description`, m.description);
+              await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} description`, m.description);
             }
             if (m.type === 'ip' && m.ip) {
-              if (m.ip.destination?.address) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ip destination address`, m.ip.destination.address);
-              if (m.ip.destination?.port != null && m.ip.destination.port !== '') await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ip destination port`, String(m.ip.destination.port));
-              if (m.ip.source?.address) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ip source address`, m.ip.source.address);
-              if (m.ip.source?.port != null && m.ip.source.port !== '') await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ip source port`, String(m.ip.source.port));
-              if (m.ip.dscp) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ip dscp`, m.ip.dscp);
-              if (m.ip.protocol) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ip protocol`, m.ip.protocol);
-              if (m.ip['protocol-not']) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ip protocol not`, '');
-              if (m.ip['max-length'] != null && m.ip['max-length'] !== '') await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ip max-length`, String(m.ip['max-length']));
+              if (m.ip.destination?.address) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ip destination address`, m.ip.destination.address);
+              if (m.ip.destination?.port != null && m.ip.destination.port !== '') await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ip destination port`, String(m.ip.destination.port));
+              if (m.ip.source?.address) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ip source address`, m.ip.source.address);
+              if (m.ip.source?.port != null && m.ip.source.port !== '') await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ip source port`, String(m.ip.source.port));
+              if (m.ip.dscp) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ip dscp`, m.ip.dscp);
+              if (m.ip.protocol) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ip protocol`, m.ip.protocol);
+              if (m.ip['protocol-not']) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ip protocol not`, '');
+              if (m.ip['max-length'] != null && m.ip['max-length'] !== '') await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ip max-length`, String(m.ip['max-length']));
               if (m.ip.tcp?.flags) {
-                for (const flag of m.ip.tcp.flags) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ip tcp ${flag}`, '');
+                for (const flag of m.ip.tcp.flags) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ip tcp ${flag}`, '');
               }
-              if (m.ip.tcp?.not) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ip tcp not`, '');
+              if (m.ip.tcp?.not) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ip tcp not`, '');
             } else if (m.type === 'ipv6' && m.ipv6) {
-              if (m.ipv6.destination?.address) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ipv6 destination address`, m.ipv6.destination.address);
-              if (m.ipv6.destination?.port != null && m.ipv6.destination.port !== '') await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ipv6 destination port`, String(m.ipv6.destination.port));
-              if (m.ipv6.source?.address) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ipv6 source address`, m.ipv6.source.address);
-              if (m.ipv6.source?.port != null && m.ipv6.source.port !== '') await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ipv6 source port`, String(m.ipv6.source.port));
-              if (m.ipv6.dscp) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ipv6 dscp`, m.ipv6.dscp);
-              if (m.ipv6.protocol) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ipv6 protocol`, m.ipv6.protocol);
-              if (m.ipv6['protocol-not']) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ipv6 protocol not`, '');
-              if (m.ipv6['max-length'] != null && m.ipv6['max-length'] !== '') await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ipv6 max-length`, String(m.ipv6['max-length']));
+              if (m.ipv6.destination?.address) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ipv6 destination address`, m.ipv6.destination.address);
+              if (m.ipv6.destination?.port != null && m.ipv6.destination.port !== '') await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ipv6 destination port`, String(m.ipv6.destination.port));
+              if (m.ipv6.source?.address) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ipv6 source address`, m.ipv6.source.address);
+              if (m.ipv6.source?.port != null && m.ipv6.source.port !== '') await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ipv6 source port`, String(m.ipv6.source.port));
+              if (m.ipv6.dscp) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ipv6 dscp`, m.ipv6.dscp);
+              if (m.ipv6.protocol) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ipv6 protocol`, m.ipv6.protocol);
+              if (m.ipv6['protocol-not']) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ipv6 protocol not`, '');
+              if (m.ipv6['max-length'] != null && m.ipv6['max-length'] !== '') await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ipv6 max-length`, String(m.ipv6['max-length']));
               if (m.ipv6.tcp?.flags) {
-                for (const flag of m.ipv6.tcp.flags) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ipv6 tcp ${flag}`, '');
+                for (const flag of m.ipv6.tcp.flags) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ipv6 tcp ${flag}`, '');
               }
-              if (m.ipv6.tcp?.not) await configApi.set(`qos traffic-match-group ${name} match ${rule.name} ipv6 tcp not`, '');
+              if (m.ipv6.tcp?.not) await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} ipv6 tcp not`, '');
             } else if (m.type === 'mark') {
-              await configApi.set(`qos traffic-match-group ${name} match ${rule.name} mark`, '');
+              await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} mark`, '');
             } else if (m.type === 'vif') {
-              if (m.vif != null && m.vif !== '') await configApi.set(`qos traffic-match-group ${name} match ${rule.name} vif`, String(m.vif));
+              if (m.vif != null && m.vif !== '') await configStore.setConfig(`qos traffic-match-group ${name} match ${rule.name} vif`, String(m.vif));
             }
           }
         }
 
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (e) {
@@ -489,8 +490,9 @@ export default defineComponent({
     async function confirmRemoveGroup() {
       deleteGroupModalVisible.value = false;
       try {
-        await configApi.delete(`qos traffic-match-group ${pendingDeleteGroupName.value}`);
+        await configStore.deleteConfig(`qos traffic-match-group ${pendingDeleteGroupName.value}`);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         pendingDeleteGroupName.value = '';
         await load();
       } catch (e) {
@@ -596,86 +598,87 @@ export default defineComponent({
       const m = editingMatch.value;
 
       try {
-        await configApi.set(`qos traffic-match-group ${groupName} match`, m.name);
+        await configStore.setConfig(`qos traffic-match-group ${groupName} match`, m.name);
         if (m.description) {
-          await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} description`, m.description);
+          await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} description`, m.description);
         }
 
         if (m.type === 'ip' && m.ip) {
           if (m.ip.destination?.address) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ip destination address`, m.ip.destination.address);
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ip destination address`, m.ip.destination.address);
           }
           if (m.ip.destination?.port != null && m.ip.destination.port !== '') {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ip destination port`, String(m.ip.destination.port));
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ip destination port`, String(m.ip.destination.port));
           }
           if (m.ip.source?.address) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ip source address`, m.ip.source.address);
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ip source address`, m.ip.source.address);
           }
           if (m.ip.source?.port != null && m.ip.source.port !== '') {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ip source port`, String(m.ip.source.port));
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ip source port`, String(m.ip.source.port));
           }
           if (m.ip.dscp) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ip dscp`, m.ip.dscp);
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ip dscp`, m.ip.dscp);
           }
           if (m.ip.protocol) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ip protocol`, m.ip.protocol);
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ip protocol`, m.ip.protocol);
           }
           if (m.ip['protocol-not']) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ip protocol not`, '');
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ip protocol not`, '');
           }
           if (m.ip['max-length'] != null && m.ip['max-length'] !== '') {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ip max-length`, String(m.ip['max-length']));
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ip max-length`, String(m.ip['max-length']));
           }
           if (m.ip.tcp?.flags) {
             for (const flag of m.ip.tcp.flags) {
-              await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ip tcp ${flag}`, '');
+              await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ip tcp ${flag}`, '');
             }
           }
           if (m.ip.tcp?.not) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ip tcp not`, '');
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ip tcp not`, '');
           }
         } else if (m.type === 'ipv6' && m.ipv6) {
           if (m.ipv6.destination?.address) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ipv6 destination address`, m.ipv6.destination.address);
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ipv6 destination address`, m.ipv6.destination.address);
           }
           if (m.ipv6.destination?.port != null && m.ipv6.destination.port !== '') {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ipv6 destination port`, String(m.ipv6.destination.port));
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ipv6 destination port`, String(m.ipv6.destination.port));
           }
           if (m.ipv6.source?.address) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ipv6 source address`, m.ipv6.source.address);
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ipv6 source address`, m.ipv6.source.address);
           }
           if (m.ipv6.source?.port != null && m.ipv6.source.port !== '') {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ipv6 source port`, String(m.ipv6.source.port));
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ipv6 source port`, String(m.ipv6.source.port));
           }
           if (m.ipv6.dscp) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ipv6 dscp`, m.ipv6.dscp);
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ipv6 dscp`, m.ipv6.dscp);
           }
           if (m.ipv6.protocol) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ipv6 protocol`, m.ipv6.protocol);
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ipv6 protocol`, m.ipv6.protocol);
           }
           if (m.ipv6['protocol-not']) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ipv6 protocol not`, '');
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ipv6 protocol not`, '');
           }
           if (m.ipv6['max-length'] != null && m.ipv6['max-length'] !== '') {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ipv6 max-length`, String(m.ipv6['max-length']));
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ipv6 max-length`, String(m.ipv6['max-length']));
           }
           if (m.ipv6.tcp?.flags) {
             for (const flag of m.ipv6.tcp.flags) {
-              await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ipv6 tcp ${flag}`, '');
+              await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ipv6 tcp ${flag}`, '');
             }
           }
           if (m.ipv6.tcp?.not) {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} ipv6 tcp not`, '');
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} ipv6 tcp not`, '');
           }
         } else if (m.type === 'mark') {
-          await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} mark`, '');
+          await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} mark`, '');
         } else if (m.type === 'vif') {
           if (m.vif != null && m.vif !== '') {
-            await configApi.set(`qos traffic-match-group ${groupName} match ${m.name} vif`, String(m.vif));
+            await configStore.setConfig(`qos traffic-match-group ${groupName} match ${m.name} vif`, String(m.vif));
           }
         }
 
         configStore.markPending();
+        await configStore.checkSessionChanged();
         matchModalVisible.value = false;
         await load();
       } catch (e) {
@@ -691,8 +694,9 @@ export default defineComponent({
     async function confirmRemoveMatch() {
       deleteMatchModalVisible.value = false;
       try {
-        await configApi.delete(`qos traffic-match-group ${pendingDeleteMatchInfo.value.groupName} match ${pendingDeleteMatchInfo.value.matchName}`);
+        await configStore.deleteConfig(`qos traffic-match-group ${pendingDeleteMatchInfo.value.groupName} match ${pendingDeleteMatchInfo.value.matchName}`);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         pendingDeleteMatchInfo.value = { groupName: '', matchName: '' };
         await load();
       } catch (e) {
@@ -811,8 +815,9 @@ export default defineComponent({
     async function confirmRemoveMatchInGroup() {
       deleteMatchModalVisible.value = false;
       try {
-        await configApi.delete(`qos traffic-match-group ${pendingDeleteMatchInfo.value.groupName} match ${pendingDeleteMatchInfo.value.matchName}`);
+        await configStore.deleteConfig(`qos traffic-match-group ${pendingDeleteMatchInfo.value.groupName} match ${pendingDeleteMatchInfo.value.matchName}`);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         pendingDeleteMatchInfo.value = { groupName: '', matchName: '' };
         await load();
       } catch (e) {
@@ -984,6 +989,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {t,

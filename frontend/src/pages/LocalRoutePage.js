@@ -222,6 +222,7 @@ export default defineComponent({
       onMenuRefresh(load);
       loadInterfaces();
       loadProtocols();
+      window.addEventListener('config-committed', load);
     });
     watch(() => route.path, () => { load(); loadInterfaces(); loadProtocols(); });
 

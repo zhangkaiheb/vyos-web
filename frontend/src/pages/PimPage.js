@@ -381,13 +381,13 @@ export default defineComponent({
       saved.value = false;
       try {
         const payload = configToConfig(config.value);
-        await configApi.set('protocols pim', payload);
+        await configStore.setConfig('protocols pim', payload);
         configStore.markPending();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         interfaceModalVisible.value = false;
         rpModalVisible.value = false;
-        await load();
+        await configStore.checkSessionChanged(); await load();
       } catch (e) {
         showError(e);
       } finally {
@@ -517,6 +517,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       loadInterfaces();
       onMenuRefresh(load);
     });

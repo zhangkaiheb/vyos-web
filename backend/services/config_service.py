@@ -1113,7 +1113,8 @@ class ConfigService:
                     raw_text = session.show_config(path_list, format='raw') or ''
                     break
                 except Exception as e:
-                    if 'without config session' in str(e) and attempt == 0:
+                    error_msg = str(e)
+                    if ('without config session' in error_msg or 'cfgPathExists' in error_msg) and attempt == 0:
                         _logger.warning(f'[compare_config] Session expired, recreating (attempt {attempt+1}/2)...')
                         _invalidate_and_recreate_session(token)
                     else:

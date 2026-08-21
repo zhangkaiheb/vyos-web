@@ -199,6 +199,7 @@ export default defineComponent({
         }
         await configStore.setConfig(`${path} rule ${rule.id}`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (e) {
@@ -312,6 +313,7 @@ export default defineComponent({
         }
         await configStore.setConfig(`${path} pool ${poolType} ${pool.name}`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         poolModalVisible.value = false;
         await load();
       } catch (e) {
@@ -375,6 +377,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
     watch(() => route.path, load);
 
@@ -433,7 +436,7 @@ export default defineComponent({
       </TabGroup>
 
       <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? t('cgnat.modals.editRule') : t('cgnat.modals.createRule')" width="600px" :key="ruleModalKey">
-        <ConfigForm v-model="editingRule" :schema="ruleSchema" :showAdvanced="true" />
+        <ConfigForm v-model="editingRule" :schema="ruleSchema" :showAdvanced="true" :editMode="!!editingOriginalId" />
         <template #footer>
           <button @click="modalVisible = false">{{ t('common.buttons.cancel') }}</button>
           <button class="btn-primary" @click="saveRule">{{ t('common.buttons.confirm') }}</button>

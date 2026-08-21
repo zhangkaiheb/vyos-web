@@ -564,8 +564,9 @@ export default defineComponent({
 
       saving.value = true;
       try {
-        await configApi.set('service dhcpv6-server', dhcpv6ServerToConfig(config.value));
+        await configStore.setConfig('service dhcpv6-server', dhcpv6ServerToConfig(config.value));
         configStore.markPending();
+        await configStore.checkSessionChanged();
         saved.value = true;
         await load();
       } catch (e) {
@@ -828,6 +829,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

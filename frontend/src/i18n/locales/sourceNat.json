@@ -52,10 +52,16 @@
         "ruleNumber": "规则编号",
         "description": "描述",
         "protocol": "协议",
+        "packetType": "数据包类型",
         "sourceAddress": "源地址",
+        "sourcePort": "源端口",
         "destinationAddress": "目标地址",
+        "destinationGroup": "目标组",
+        "destinationPort": "目标端口",
         "outboundInterface": "出站接口",
         "translationAddress": "转换地址",
+        "translationPort": "转换端口",
+        "translationOptions": "转换选项",
         "log": "日志",
         "disable": "禁用"
       },
@@ -133,10 +139,16 @@
         "ruleNumber": "Rule Number",
         "description": "Description",
         "protocol": "Protocol",
+        "packetType": "Packet Type",
         "sourceAddress": "Source Address",
+        "sourcePort": "Source Port",
         "destinationAddress": "Destination Address",
+        "destinationGroup": "Destination Group",
+        "destinationPort": "Destination Port",
         "outboundInterface": "Outbound Interface",
         "translationAddress": "Translation Address",
+        "translationPort": "Translation Port",
+        "translationOptions": "Translation Options",
         "log": "Log",
         "disable": "Disable"
       },
@@ -167,7 +179,7 @@
       "field": { "ruleNumber": "規則編號", "description": "描述", "protocol": "協定", "packetType": "資料包類型", "log": "日誌", "exclude": "排除", "disable": "停用", "port": "埠", "interfaceName": "介面名稱", "interfaceGroup": "介面群組", "translationAddress": "轉換位址", "masquerade": "偽裝", "translationPort": "轉換埠", "addressMapping": "位址映射", "portMapping": "埠映射" },
       "help": { "ruleNumber": "規則編號", "description": "規則描述", "protocol": "協定類型", "packetType": "資料包類型", "log": "啟用日誌記錄", "exclude": "排除此規則匹配", "disable": "停用此規則", "sourcePort": "來源埠", "destinationPort": "目標埠", "outboundInterfaceName": "出站介面名稱", "outboundInterfaceGroup": "出站介面群組", "translationAddress": "轉換後的位址", "masquerade": "使用偽裝位址", "translationPort": "轉換後的埠", "addressMapping": "位址映射方式", "portMapping": "埠映射方式" },
       "placeholder": { "port": "埠號或範圍", "translationAddress": "轉換位址", "translationPort": "轉換埠" },
-      "column": { "ruleNumber": "規則編號", "description": "描述", "protocol": "協定", "sourceAddress": "來源位址", "destinationAddress": "目標位址", "outboundInterface": "出站介面", "translationAddress": "轉換位址", "log": "日誌", "disable": "停用" },
+      "column": { "ruleNumber": "規則編號", "description": "描述", "protocol": "協定", "packetType": "資料包類型", "sourceAddress": "來源位址", "sourcePort": "來源埠", "destinationAddress": "目標位址", "destinationGroup": "目標群組", "destinationPort": "目標埠", "outboundInterface": "出站介面", "translationAddress": "轉換位址", "translationPort": "轉換埠", "translationOptions": "轉換選項", "log": "日誌", "disable": "停用" },
       "groupType": { "address": "位址", "addressGroup": "位址群組", "networkGroup": "網路群組", "domainGroup": "網域群組" },
       "loadFailed": "載入來源 NAT 規則失敗", "saveFailed": "儲存來源 NAT 規則失敗", "deleteFailed": "刪除來源 NAT 規則失敗", "editRule": "編輯來源 NAT 規則", "createRule": "建立來源 NAT 規則", "ruleNumberRequired": "規則編號為必填項", "portProtocolError": "埠欄位僅在協定為 tcp、udp 或 tcp_udp 時可用", "confirmDelete": "確定要刪除選取的規則嗎？", "sourceAddress": "來源位址", "destinationAddress": "目標位址", "ipAddressGroupPlaceholder": "輸入 IP 位址或選擇位址群組", "macGroupPlaceholder": "輸入 MAC 位址或選擇 MAC 群組", "portGroupPlaceholder": "輸入埠或選擇埠群組"
     }
@@ -178,7 +190,7 @@
       "field": { "ruleNumber": "Номер правила", "description": "Описание", "protocol": "Протокол", "packetType": "Тип пакета", "log": "Журнал", "exclude": "Исключить", "disable": "Отключить", "port": "Порт", "interfaceName": "Имя интерфейса", "interfaceGroup": "Группа интерфейсов", "translationAddress": "Адрес трансляции", "masquerade": "Маскарад", "translationPort": "Порт трансляции", "addressMapping": "Сопоставление адресов", "portMapping": "Сопоставление портов" },
       "help": { "ruleNumber": "Номер правила", "description": "Описание правила", "protocol": "Тип протокола", "packetType": "Тип пакета", "log": "Включить ведение журнала", "exclude": "Исключить это правило", "disable": "Отключить это правило", "sourcePort": "Исходный порт", "destinationPort": "Порт назначения", "outboundInterfaceName": "Имя исходящего интерфейса", "outboundInterfaceGroup": "Группа исходящих интерфейсов", "translationAddress": "Транслированный адрес", "masquerade": "Использовать маскарадный адрес", "translationPort": "Транслированный порт", "addressMapping": "Метод сопоставления адресов", "portMapping": "Метод сопоставления портов" },
       "placeholder": { "port": "Номер или диапазон портов", "translationAddress": "Адрес трансляции", "translationPort": "Порт трансляции" },
-      "column": { "ruleNumber": "Номер правила", "description": "Описание", "protocol": "Протокол", "sourceAddress": "Исходный адрес", "destinationAddress": "Адрес назначения", "outboundInterface": "Исходящий интерфейс", "translationAddress": "Адрес трансляции", "log": "Журнал", "disable": "Отключить" },
+      "column": { "ruleNumber": "Номер правила", "description": "Описание", "protocol": "Протокол", "packetType": "Тип пакета", "sourceAddress": "Исходный адрес", "sourcePort": "Исходный порт", "destinationAddress": "Адрес назначения", "destinationGroup": "Группа назначения", "destinationPort": "Порт назначения", "outboundInterface": "Исходящий интерфейс", "translationAddress": "Адрес трансляции", "translationPort": "Порт трансляции", "translationOptions": "Параметры трансляции", "log": "Журнал", "disable": "Отключить" },
       "groupType": { "address": "Адрес", "addressGroup": "Группа адресов", "networkGroup": "Группа сетей", "domainGroup": "Группа доменов" },
       "loadFailed": "Ошибка загрузки правил Source NAT", "saveFailed": "Ошибка сохранения правила Source NAT", "deleteFailed": "Ошибка удаления правила Source NAT", "editRule": "Редактировать правило Source NAT", "createRule": "Создать правило Source NAT", "ruleNumberRequired": "Номер правила обязателен", "portProtocolError": "Поля портов доступны только при протоколе tcp, udp или tcp_udp", "confirmDelete": "Удалить выбранные правила?", "sourceAddress": "Исходный адрес", "destinationAddress": "Адрес назначения", "ipAddressGroupPlaceholder": "Введите IP-адрес или выберите группу адресов", "macGroupPlaceholder": "Введите MAC-адрес или выберите группу MAC", "portGroupPlaceholder": "Введите порт или выберите группу портов"
     }
@@ -189,7 +201,7 @@
       "field": { "ruleNumber": "Regelnummer", "description": "Beschreibung", "protocol": "Protokoll", "packetType": "Pakettyp", "log": "Protokoll", "exclude": "Ausschließen", "disable": "Deaktivieren", "port": "Port", "interfaceName": "Schnittstellenname", "interfaceGroup": "Schnittstellengruppe", "translationAddress": "Übersetzungsadresse", "masquerade": "Masquerade", "translationPort": "Übersetzungsport", "addressMapping": "Adresszuordnung", "portMapping": "Portzuordnung" },
       "help": { "ruleNumber": "Regelnummer", "description": "Regelbeschreibung", "protocol": "Protokolltyp", "packetType": "Pakettyp", "log": "Protokollierung aktivieren", "exclude": "Diese Regel ausschließen", "disable": "Diese Regel deaktivieren", "sourcePort": "Quellport", "destinationPort": "Zielport", "outboundInterfaceName": "Name der ausgehenden Schnittstelle", "outboundInterfaceGroup": "Gruppe der ausgehenden Schnittstelle", "translationAddress": "Übersetzte Adresse", "masquerade": "Masquerade-Adresse verwenden", "translationPort": "Übersetzter Port", "addressMapping": "Adresszuordnungsmethode", "portMapping": "Portzuordnungsmethode" },
       "placeholder": { "port": "Portnummer oder Bereich", "translationAddress": "Übersetzungsadresse", "translationPort": "Übersetzungsport" },
-      "column": { "ruleNumber": "Regelnummer", "description": "Beschreibung", "protocol": "Protokoll", "sourceAddress": "Quelladresse", "destinationAddress": "Zieladresse", "outboundInterface": "Ausgehende Schnittstelle", "translationAddress": "Übersetzungsadresse", "log": "Protokoll", "disable": "Deaktivieren" },
+      "column": { "ruleNumber": "Regelnummer", "description": "Beschreibung", "protocol": "Protokoll", "packetType": "Pakettyp", "sourceAddress": "Quelladresse", "sourcePort": "Quellport", "destinationAddress": "Zieladresse", "destinationGroup": "Zielgruppe", "destinationPort": "Zielport", "outboundInterface": "Ausgehende Schnittstelle", "translationAddress": "Übersetzungsadresse", "translationPort": "Übersetzungsport", "translationOptions": "Übersetzungsoptionen", "log": "Protokoll", "disable": "Deaktivieren" },
       "groupType": { "address": "Adresse", "addressGroup": "Adressgruppe", "networkGroup": "Netzwerkgruppe", "domainGroup": "Domänengruppe" },
       "loadFailed": "Source-NAT-Regeln konnten nicht geladen werden", "saveFailed": "Source-NAT-Regel konnte nicht gespeichert werden", "deleteFailed": "Source-NAT-Regel konnte nicht gelöscht werden", "editRule": "Source-NAT-Regel bearbeiten", "createRule": "Source-NAT-Regel erstellen", "ruleNumberRequired": "Regelnummer ist erforderlich", "portProtocolError": "Portfelder sind nur verfügbar, wenn das Protokoll tcp, udp oder tcp_udp ist", "confirmDelete": "Ausgewählte Regeln löschen?", "sourceAddress": "Quelladresse", "destinationAddress": "Zieladresse", "ipAddressGroupPlaceholder": "IP-Adresse eingeben oder Adressgruppe auswählen", "macGroupPlaceholder": "MAC-Adresse eingeben oder MAC-Gruppe auswählen", "portGroupPlaceholder": "Port eingeben oder Portgruppe auswählen"
     }
@@ -200,7 +212,7 @@
       "field": { "ruleNumber": "Numéro de règle", "description": "Description", "protocol": "Protocole", "packetType": "Type de paquet", "log": "Journal", "exclude": "Exclure", "disable": "Désactiver", "port": "Port", "interfaceName": "Nom d'interface", "interfaceGroup": "Groupe d'interfaces", "translationAddress": "Adresse de translation", "masquerade": "Masquerade", "translationPort": "Port de translation", "addressMapping": "Correspondance d'adresse", "portMapping": "Correspondance de port" },
       "help": { "ruleNumber": "Numéro de règle", "description": "Description de la règle", "protocol": "Type de protocole", "packetType": "Type de paquet", "log": "Activer la journalisation", "exclude": "Exclure cette règle", "disable": "Désactiver cette règle", "sourcePort": "Port source", "destinationPort": "Port de destination", "outboundInterfaceName": "Nom de l'interface sortante", "outboundInterfaceGroup": "Groupe d'interfaces sortantes", "translationAddress": "Adresse traduite", "masquerade": "Utiliser l'adresse de masquerade", "translationPort": "Port traduit", "addressMapping": "Méthode de correspondance d'adresse", "portMapping": "Méthode de correspondance de port" },
       "placeholder": { "port": "Numéro ou plage de ports", "translationAddress": "Adresse de translation", "translationPort": "Port de translation" },
-      "column": { "ruleNumber": "Numéro de règle", "description": "Description", "protocol": "Protocole", "sourceAddress": "Adresse source", "destinationAddress": "Adresse de destination", "outboundInterface": "Interface sortante", "translationAddress": "Adresse de translation", "log": "Journal", "disable": "Désactiver" },
+      "column": { "ruleNumber": "Numéro de règle", "description": "Description", "protocol": "Protocole", "packetType": "Type de paquet", "sourceAddress": "Adresse source", "sourcePort": "Port source", "destinationAddress": "Adresse de destination", "destinationGroup": "Groupe de destination", "destinationPort": "Port de destination", "outboundInterface": "Interface sortante", "translationAddress": "Adresse de translation", "translationPort": "Port de translation", "translationOptions": "Options de translation", "log": "Journal", "disable": "Désactiver" },
       "groupType": { "address": "Adresse", "addressGroup": "Groupe d'adresses", "networkGroup": "Groupe de réseaux", "domainGroup": "Groupe de domaines" },
       "loadFailed": "Échec du chargement des règles Source NAT", "saveFailed": "Échec de l'enregistrement de la règle Source NAT", "deleteFailed": "Échec de la suppression de la règle Source NAT", "editRule": "Modifier la règle Source NAT", "createRule": "Créer une règle Source NAT", "ruleNumberRequired": "Le numéro de règle est requis", "portProtocolError": "Les champs de port ne sont disponibles que lorsque le protocole est tcp, udp ou tcp_udp", "confirmDelete": "Supprimer les règles sélectionnées ?", "sourceAddress": "Adresse source", "destinationAddress": "Adresse de destination", "ipAddressGroupPlaceholder": "Entrez une adresse IP ou sélectionnez un groupe d'adresses", "macGroupPlaceholder": "Entrez une adresse MAC ou sélectionnez un groupe MAC", "portGroupPlaceholder": "Entrez un port ou sélectionnez un groupe de ports"
     }
@@ -211,7 +223,7 @@
       "field": { "ruleNumber": "규칙 번호", "description": "설명", "protocol": "프로토콜", "packetType": "패킷 유형", "log": "로그", "exclude": "제외", "disable": "비활성화", "port": "포트", "interfaceName": "인터페이스 이름", "interfaceGroup": "인터페이스 그룹", "translationAddress": "변환 주소", "masquerade": "마스커레이드", "translationPort": "변환 포트", "addressMapping": "주소 매핑", "portMapping": "포트 매핑" },
       "help": { "ruleNumber": "규칙 번호", "description": "규칙 설명", "protocol": "프로토콜 유형", "packetType": "패킷 유형", "log": "로깅 활성화", "exclude": "이 규칙 제외", "disable": "이 규칙 비활성화", "sourcePort": "소스 포트", "destinationPort": "목적지 포트", "outboundInterfaceName": "송신 인터페이스 이름", "outboundInterfaceGroup": "송신 인터페이스 그룹", "translationAddress": "변환된 주소", "masquerade": "마스커레이드 주소 사용", "translationPort": "변환된 포트", "addressMapping": "주소 매핑 방식", "portMapping": "포트 매핑 방식" },
       "placeholder": { "port": "포트 번호 또는 범위", "translationAddress": "변환 주소", "translationPort": "변환 포트" },
-      "column": { "ruleNumber": "규칙 번호", "description": "설명", "protocol": "프로토콜", "sourceAddress": "소스 주소", "destinationAddress": "목적지 주소", "outboundInterface": "송신 인터페이스", "translationAddress": "변환 주소", "log": "로그", "disable": "비활성화" },
+      "column": { "ruleNumber": "규칙 번호", "description": "설명", "protocol": "프로토콜", "packetType": "패킷 유형", "sourceAddress": "소스 주소", "sourcePort": "소스 포트", "destinationAddress": "목적지 주소", "destinationGroup": "목적지 그룹", "destinationPort": "목적지 포트", "outboundInterface": "송신 인터페이스", "translationAddress": "변환 주소", "translationPort": "변환 포트", "translationOptions": "변환 옵션", "log": "로그", "disable": "비활성화" },
       "groupType": { "address": "주소", "addressGroup": "주소 그룹", "networkGroup": "네트워크 그룹", "domainGroup": "도메인 그룹" },
       "loadFailed": "Source NAT 규칙을 불러오지 못했습니다", "saveFailed": "Source NAT 규칙을 저장하지 못했습니다", "deleteFailed": "Source NAT 규칙을 삭제하지 못했습니다", "editRule": "Source NAT 규칙 편집", "createRule": "Source NAT 규칙 생성", "ruleNumberRequired": "규칙 번호는 필수입니다", "portProtocolError": "포트 필드는 프로토콜이 tcp, udp 또는 tcp_udp인 경우에만 사용할 수 있습니다", "confirmDelete": "선택한 규칙을 삭제하시겠습니까?", "sourceAddress": "소스 주소", "destinationAddress": "목적지 주소", "ipAddressGroupPlaceholder": "IP 주소를 입력하거나 주소 그룹을 선택하세요", "macGroupPlaceholder": "MAC 주소를 입력하거나 MAC 그룹을 선하세요", "portGroupPlaceholder": "포트를 입력하거나 포트 그룹을 선택하세요"
     }

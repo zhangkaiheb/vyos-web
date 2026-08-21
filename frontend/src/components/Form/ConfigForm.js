@@ -29,6 +29,7 @@ export default defineComponent({
     disabled: { type: Boolean, default: false },
     suggestionPath: { type: String, default: '' },
     showAdvanced: { type: Boolean, default: false },
+    editMode: { type: Boolean, default: false },
   },
   emits: ['update:modelValue'],
   setup(props, { emit, expose, slots }) {
@@ -66,7 +67,7 @@ export default defineComponent({
         suggestionsCache.value[key] = combined;
         // Auto-select first option if field value is empty and noAutoFill is not set
         const formObj = getFormObj(path);
-        if (formObj && combined.length && !formObj[field.key] && !field.noAutoFill) {
+        if (formObj && combined.length && (formObj[field.key] === undefined || formObj[field.key] === null) && !field.noAutoFill) {
           formObj[field.key] = combined[0];
         }
         return combined;
@@ -159,6 +160,8 @@ export default defineComponent({
 
     function fieldDisabled(field, formObj) {
       if (props.disabled) return true;
+      // Disable rule number field in edit mode
+      if (props.editMode && (field.key === 'rule' || field.key === 'id')) return true;
       if (field.disabledWhen && formObj) {
         for (const [key, val] of Object.entries(field.disabledWhen)) {
           const actual = formObj[key];
@@ -342,8 +345,13 @@ export default defineComponent({
         const options = dynamicOpts.length > 0 
           ? dynamicOpts.map(o => ({ value: o, label: o }))
           : (field.options || []);
+        // If current value is not in options (e.g. dynamic options not yet loaded), add it as a temp option
+        const currentValue = formObj[field.key];
+        if (currentValue && !/^\d+$/.test(currentValue) && !options.find(o => (typeof o === 'object' ? o.value : o) === currentValue)) {
+          options.push({ value: currentValue, label: currentValue });
+        }
         children.push(h('select', {
-          value: formObj[field.key] || '',
+          value: currentValue != null ? currentValue : '',
           disabled,
           class: 'form-control',
           onChange: (e) => { formObj[field.key] = e.target.value; },
@@ -538,20 +546,22 @@ export default defineComponent({
           ]);
         })));
       } else if (field.type === 'tri-state') {
-        // Tri-state selector: dropdown with 不配置 / Set / Not
+        // Tri-state selector: dropdown with empty / Set / Not
         const currentValue = formObj[field.key] || '';
         const options = field.options || [
-          { value: '', label: '不配置' },
+          { value: '', label: '' },
           { value: 'set', label: 'Set' },
           { value: 'not', label: 'Not' },
         ];
+        const emptyOpt = options.find(opt => !opt.value);
+        const emptyLabel = emptyOpt ? (emptyOpt.label || '') : '';
         children.push(h('select', {
           class: 'form-control',
           value: currentValue,
           disabled,
           onChange: (e) => { formObj[field.key] = e.target.value; },
         }, [
-          h('option', { value: '' }, '不配置'),
+          h('option', { value: '' }, emptyLabel),
           ...options.filter(opt => opt.value).map(opt =>
             h('option', { value: opt.value }, opt.label)
           ),

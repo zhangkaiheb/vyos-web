@@ -266,12 +266,13 @@ export default defineComponent({
         const value = configSyncToConfig(config.value);
         const paths = ['service config-sync'];
         for (const p of paths) {
-          try { await configApi.delete(p); } catch (_) {}
+          try { await configStore.deleteConfig(p); } catch (_) {}
         }
         if (Object.keys(value).length) {
-          await configApi.set('service config-sync', value);
+          await configStore.setConfig('service config-sync', value);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         saved.value = true;
         await load();
       } catch (e) {
@@ -284,6 +285,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {t,

@@ -438,8 +438,8 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/dummy",
-            "component": "TablePage",
-            "hidden": true
+            "component": "DummyPage",
+            "featureKey": "dummy"
           },
           {
             "id": "loopback",

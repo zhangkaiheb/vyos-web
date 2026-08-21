@@ -107,9 +107,10 @@ export default defineComponent({
       loading.value = true;
       try {
         for (const addr of deleteTargetKeys.value) {
-          await configApi.delete(`system name-server ${addr}`);
+          await config.deleteConfig(`system name-server ${addr}`);
         }
         config.markPending();
+        await config.checkSessionChanged();
         showDeleteModal.value = false;
         deleteTargetKeys.value = [];
         await loadData();
@@ -122,10 +123,10 @@ export default defineComponent({
     };
 
     const handleSave = async () => {
-      const value = inputMode.value === 'address' 
-        ? editingServer.value.address.trim() 
+      const value = inputMode.value === 'address'
+        ? editingServer.value.address.trim()
         : editingServer.value.interface;
-      
+
       if (!value) {
         showError({ message: inputMode.value === 'address' ? t('dnsserver.messages.enterAddress') : t('dnsserver.messages.selectInterface') });
         return;
@@ -133,8 +134,9 @@ export default defineComponent({
 
       loading.value = true;
       try {
-        await configApi.set('system name-server', value);
+        await config.setConfig('system name-server', value);
         config.markPending();
+        await config.checkSessionChanged();
         showEditModal.value = false;
         await loadData();
       } catch (err) {
@@ -147,6 +149,7 @@ export default defineComponent({
     onMounted(() => {
       loadData();
       loadInterfaces();
+      window.addEventListener('config-committed', loadData);
       onMenuRefresh(loadData);
     });
 

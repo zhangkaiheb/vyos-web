@@ -198,9 +198,10 @@ export default defineComponent({
       }
       const payload = conntrackSyncToConfig(config.value);
       saving.value = true;
-      configApi.set('service conntrack-sync', payload)
-        .then(() => {
+      configStore.setConfig('service conntrack-sync', payload)
+        .then(async () => {
           configStore.markPending();
+          await configStore.checkSessionChanged();
           saved.value = true;
           setTimeout(() => saved.value = false, 2000);
         })
@@ -320,6 +321,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

@@ -72,7 +72,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
     watch(() => route.path, load);
 
     return { data, schema, loading, saved, load, save, route, path, writeDisabled, t };

@@ -226,6 +226,7 @@ export default defineComponent({
       load();
       loadIncludes();
       onMenuRefresh(handleMenuRefresh);
+      window.addEventListener('config-committed', load);
     });
     onUnmounted(() => {
       offMenuRefresh(handleMenuRefresh);

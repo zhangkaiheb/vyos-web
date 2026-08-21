@@ -41,14 +41,24 @@ function formatEndpoint(ep) {
   const parts = [];
   if (ep.address) parts.push(ep.address);
   if (ep.port) parts.push(`:${ep.port}`);
-  if (ep['mac-address']) parts.push(`MAC:${ep['mac-address']}`);
-  if (ep.group?.['address-group']) parts.push(`AG:${ep.group['address-group']}`);
-  if (ep.group?.['network-group']) parts.push(`NG:${ep.group['network-group']}`);
-  if (ep.group?.['port-group']) parts.push(`PG:${ep.group['port-group']}`);
-  if (ep.group?.['dynamic-address-group']) parts.push(`DG:${ep.group['dynamic-address-group']}`);
-  if (ep.group?.['domain-group']) parts.push(`DOM:${ep.group['domain-group']}`);
-  if (ep.group?.['mac-group']) parts.push(`MG:${ep.group['mac-group']}`);
-  if (ep.geoip?.['country-code']) parts.push(`GEO:${ep.geoip['country-code']}`);
+  const mac = ep['mac-address'] || ep.mac_address;
+  if (mac) parts.push(`MAC:${mac}`);
+  const group = ep.group || {};
+  const addrGroup = group['address-group'] || group.address_group;
+  const netGroup = group['network-group'] || group.network_group;
+  const portGroup = group['port-group'] || group.port_group;
+  const dynGroup = group['dynamic-address-group'] || group.dynamic_address_group;
+  const domGroup = group['domain-group'] || group.domain_group;
+  const macGroup = group['mac-group'] || group.mac_group;
+  if (addrGroup) parts.push(`AG:${addrGroup}`);
+  if (netGroup) parts.push(`NG:${netGroup}`);
+  if (portGroup) parts.push(`PG:${portGroup}`);
+  if (dynGroup) parts.push(`DG:${dynGroup}`);
+  if (domGroup) parts.push(`DOM:${domGroup}`);
+  if (macGroup) parts.push(`MG:${macGroup}`);
+  const geoip = ep.geoip || {};
+  const countryCode = geoip['country-code'] || geoip.country_code;
+  if (countryCode) parts.push(`GEO:${countryCode}`);
   return parts.join('') || '';
 }
 
@@ -175,15 +185,15 @@ export default defineComponent({
     const columns = computed(() => [
       { key: 'rule', title: t('firewall.ruleNumber') },
       { key: 'description', title: t('rule.description') },
-      { key: 'action', title: t('rule.action') },
+      { key: 'inbound-interface', title: t('rule.inboundInterface') },
+      { key: 'outbound-interface', title: t('rule.outboundInterface') },
       { key: 'protocol', title: t('rule.protocol') },
       { key: 'source', title: t('rule.source') },
       { key: 'destination', title: t('rule.destination') },
-      { key: 'inbound-interface', title: t('rule.inboundInterface') },
-      { key: 'outbound-interface', title: t('rule.outboundInterface') },
       { key: 'packets', title: t('firewall.packets') },
       { key: 'bytes', title: t('firewall.bytes') },
       { key: 'log', title: t('rule.log') },
+      { key: 'action', title: t('rule.action') },
       { key: 'disable', title: t('rule.disable') },
     ]);
 
@@ -223,6 +233,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(handleMenuRefresh);
+      window.addEventListener('config-committed', load);
     });
     onUnmounted(() => {
       offMenuRefresh(handleMenuRefresh);
@@ -238,13 +249,26 @@ export default defineComponent({
     function create() {
       editingItem.value = {};
       editingOriginalId.value = null;
+      activeTab.value = 'basic';
       modalVisible.value = true;
     }
 
     function edit() {
       if (!selected.value.length) return showError({ message: t('firewall.selectRow') });
       const row = data.value.find(r => r.id === selected.value[0]) || {};
-      editingItem.value = JSON.parse(JSON.stringify(row));
+      const editingData = JSON.parse(JSON.stringify(row));
+      
+      // Convert underscored keys to hyphenated keys for form compatibility
+      if (editingData.inbound_interface) {
+        editingData['inbound-interface'] = editingData.inbound_interface;
+        delete editingData.inbound_interface;
+      }
+      if (editingData.outbound_interface) {
+        editingData['outbound-interface'] = editingData.outbound_interface;
+        delete editingData.outbound_interface;
+      }
+      
+      editingItem.value = editingData;
       editingOriginalId.value = row.id || null;
       modalVisible.value = true;
     }
@@ -458,10 +482,10 @@ export default defineComponent({
           {{ formatEndpoint(row.destination) }}
         </template>
         <template #inbound-interface="{ row }">
-          {{ formatInterface(row['inbound-interface']) }}
+          {{ formatInterface(row['inbound-interface'] || row.inbound_interface) }}
         </template>
         <template #outbound-interface="{ row }">
-          {{ formatInterface(row['outbound-interface']) }}
+          {{ formatInterface(row['outbound-interface'] || row.outbound_interface) }}
         </template>
         <template #log="{ row }">
           {{ row.log !== undefined ? $t('firewall.yes') : '' }}
@@ -473,7 +497,7 @@ export default defineComponent({
       <DraggableModal v-model:visible="modalVisible" :title="editingItem?.id ? $t('firewall.editIpv6Rule') : $t('firewall.createIpv6Rule')" width="820px" @confirm="save">
         <TabGroup v-model="activeTab" :tabs="tabs">
           <template v-for="tab in tabs" :key="tab.key" #[tab.key]>
-            <ConfigForm v-model="editingItem" :schema="tabSchemas[tab.key]" :disabled="writeDisabled" :showAdvanced="true" :formKey="'firewall_ipv6_rule_' + path + '_' + tab.key" :suggestionPath="rulePath" />
+            <ConfigForm v-model="editingItem" :schema="tabSchemas[tab.key]" :disabled="writeDisabled" :showAdvanced="true" :formKey="'firewall_ipv6_rule_' + path + '_' + tab.key" :suggestionPath="rulePath" :editMode="!!editingItem?.id" />
           </template>
         </TabGroup>
       </DraggableModal>

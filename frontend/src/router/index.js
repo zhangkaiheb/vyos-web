@@ -103,6 +103,7 @@ import QosInterfacePage from '/src/pages/QosInterfacePage.js';
 import QosPolicyPage from '/src/pages/QosPolicyPage.js';
 import QosTrafficMatchGroupPage from '/src/pages/QosTrafficMatchGroupPage.js';
 import TunnelPage from '/src/pages/TunnelPage.js';
+import DummyPage from '/src/pages/DummyPage.js';
 import OpenVpnPage from '/src/pages/OpenVpnPage.js';
 import BondingPage from '/src/pages/BondingPage.js';
 import BridgePage from '/src/pages/BridgePage.js';
@@ -245,6 +246,7 @@ const componentMap = {
   QosPolicyPage,
   QosTrafficMatchGroupPage,
   TunnelPage,
+  DummyPage,
   OpenVpnPage,
   BondingPage,
   BridgePage,

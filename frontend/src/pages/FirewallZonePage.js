@@ -182,9 +182,9 @@ export default defineComponent({
       saving.value = true;
       try {
         const payload = formToZone(zones.value);
-        await configApi.set('firewall zone', payload);
+        await configStore.setConfig('firewall zone', payload);
         configStore.markPending();
-        await load();
+        await configStore.checkSessionChanged(); await load();
       } catch (e) {
         showError(e.message || t('firewall.saveFailed'));
       } finally {
@@ -269,6 +269,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       onMenuRefresh(load);
     });
 

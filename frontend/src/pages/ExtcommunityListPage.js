@@ -109,7 +109,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
     watch(() => route.path, () => {
       selectedListNames.value = [];
       selectedRuleNumbers.value = [];

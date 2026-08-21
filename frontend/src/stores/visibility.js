@@ -28,7 +28,6 @@ const TAB_FEATURE_MAP = {
     'remote-access': 'ipsec-remote-access',
   },
   'ethernet': {
-    'eapol': 'ethernet-eapol',
   },
 };
 

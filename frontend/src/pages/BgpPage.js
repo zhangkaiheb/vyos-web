@@ -2534,8 +2534,9 @@ export default defineComponent({
 
       saving.value = true;
       try {
-        await configApi.set('protocols bgp', configToConfig(config.value));
+        await configStore.setConfig('protocols bgp', configToConfig(config.value));
         configStore.markPending();
+        await configStore.checkSessionChanged();
         saved.value = true;
         await load();
       } catch (e) {
@@ -3548,6 +3549,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       loadInterfaces();
+      window.addEventListener('config-committed', load);
       onMenuRefresh(load);
     });
 

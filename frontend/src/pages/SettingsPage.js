@@ -50,6 +50,7 @@ export default defineComponent({
         // Reload settings on menu refresh
         window.location.reload();
       });
+      window.addEventListener('config-committed', () => { window.location.reload(); });
     });
 
     async function save() {
@@ -61,12 +62,13 @@ export default defineComponent({
           localStorage.setItem('locale', lang.value);
           await userApi.preferences(payload.username, { language: lang.value, theme: 'light' });
         }
-        await configApi.set('system settings', { commit_mode: commitMode.value });
+        await configStore.setConfig('system settings', { commit_mode: commitMode.value });
         await conntrackLogApi.set({ enabled: Object.values(conntrackLog.value).some(Boolean), ...conntrackLog.value });
         for (const [type, maxEntries] of Object.entries(quotas.value)) {
           await quotasApi.set({ type, max_entries: maxEntries });
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         message.value = t('settings.saved');
       } catch (e) {
         showError(e);

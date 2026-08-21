@@ -166,6 +166,7 @@ export default defineComponent({
         const payload = configToConfig(config.value);
         await configStore.setConfig('protocols bfd', payload);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         peerModalVisible.value = false;
@@ -262,6 +263,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

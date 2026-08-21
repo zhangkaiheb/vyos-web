@@ -1,5 +1,5 @@
 import { defineComponent, ref, computed, onMounted, onUnmounted, inject } from '/src/utils/vue-import.js';
-import { configApi, interfaceApi } from '/src/api/index.js';
+import { configApi, interfaceApi, monitorApi } from '/src/api/index.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
@@ -7,6 +7,32 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
+import { useI18n } from '/src/i18n/index.js';
+import { buildDhcpv6BaseSchema, dhcpv6ConfigToForm, dhcpv6FormToConfig, dhcpv6ToCommands, DHCPV6_DEFAULTS } from '/src/utils/dhcpv6Common.js';
+
+function formatJson(obj) {
+  if (!obj || Object.keys(obj).length === 0) return '';
+  try {
+    return JSON.stringify(obj, null, 2);
+  } catch {
+    return '';
+  }
+}
+
+function safeJsonParse(str) {
+  if (!str) return {};
+  try {
+    return JSON.parse(str);
+  } catch {
+    return {};
+  }
+}
+
+function toArray(val) {
+  if (val === undefined || val === null) return [];
+  if (Array.isArray(val)) return val;
+  return [val];
+}
 
 // Options
 const BOND_MODE_OPTIONS = [
@@ -38,18 +64,17 @@ const SOURCE_VALIDATION_OPTIONS = [
   { value: 'disable', label: 'disable - No source validation' },
 ];
 
-const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0 - Disable DAD' },
-  { value: '1', label: '1 - Enable DAD' },
-  { value: '2', label: '2 - Enable DAD, disable if duplicate MAC found' },
-];
-
 export default defineComponent({
   name: 'BondingPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
     const { t } = inject('i18n');
     const configStore = useConfigStore();
+    const acceptDadOptions = computed(() => [
+      { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
+      { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
+      { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
+    ]);
     const COLUMNS = computed(() => [
       { key: 'name', title: t('interface.bonding.name'), dataIndex: 'name', width: 120 },
       { key: 'description', title: t('interface.bonding.description'), dataIndex: 'description', width: 150 },
@@ -66,6 +91,7 @@ export default defineComponent({
     const editingBond = ref(null);
     const isEditMode = ref(false);
     const interfaceOptions = ref([]);
+    const mirrorInterfaceOptions = ref([]);
     const vrfOptions = ref([]);
     const bridgeMembers = ref(new Set());
     const activeTab = ref('basic');
@@ -80,6 +106,7 @@ export default defineComponent({
     const basicSchema = computed(() => [
       { key: 'name', title: t('interface.bonding.name'), type: 'text', required: true, placeholder: t('interface.bonding.name_placeholder'), help: t('interface.bonding.name_help'), disabled: isEditMode.value },
       { key: 'description', title: t('interface.bonding.description'), type: 'text', placeholder: t('interface.bonding.description_placeholder') },
+      { key: 'address', title: t('interface.tunnel.address'), type: 'textarea', placeholder: t('interface.tunnel.address_placeholder'), help: t('interface.tunnel.address_help') },
       { key: 'mac', title: t('interface.bonding.mac'), type: 'text', placeholder: t('interface.bonding.mac_placeholder'), help: t('interface.bonding.mac_help') },
       { key: 'mode', title: t('interface.bonding.mode'), type: 'select', options: BOND_MODE_OPTIONS, help: t('interface.bonding.mode_help') },
       { key: 'hash_policy', title: t('interface.bonding.hash_policy'), type: 'select', options: HASH_POLICY_OPTIONS, help: t('interface.bonding.hash_policy_help'), showWhen: { mode: ['balance-xor', '802.3ad', 'balance-tlb'] } },
@@ -121,15 +148,12 @@ export default defineComponent({
       { key: 'dhcp_vendor_class_id', title: t('interface.bonding.dhcp.vendor_class_id'), type: 'text', placeholder: t('interface.bonding.dhcp.vendor_class_id_placeholder'), help: t('interface.bonding.dhcp.vendor_class_id_help') },
     ]);
 
-    const dhcpv6Schema = computed(() => [
-      { key: 'dhcpv6_duid', title: t('interface.bonding.dhcpv6.duid'), type: 'text', placeholder: t('interface.bonding.dhcpv6.duid_placeholder'), help: t('interface.bonding.dhcpv6.duid_help') },
-      { key: 'dhcpv6_no_release', title: t('interface.bonding.dhcpv6.no_release'), type: 'checkbox', help: t('interface.bonding.dhcpv6.no_release_help') },
-      { key: 'dhcpv6_no_request_dns', title: t('interface.bonding.dhcpv6.no_request_dns'), type: 'checkbox', help: t('interface.bonding.dhcpv6.no_request_dns_help') },
-      { key: 'dhcpv6_no_request_domain', title: t('interface.bonding.dhcpv6.no_request_domain'), type: 'checkbox', help: t('interface.bonding.dhcpv6.no_request_domain_help') },
-      { key: 'dhcpv6_parameters_only', title: t('interface.bonding.dhcpv6.parameters_only'), type: 'checkbox', help: t('interface.bonding.dhcpv6.parameters_only_help') },
-      { key: 'dhcpv6_rapid_commit', title: t('interface.bonding.dhcpv6.rapid_commit'), type: 'checkbox', help: t('interface.bonding.dhcpv6.rapid_commit_help') },
-      { key: 'dhcpv6_temporary', title: t('interface.bonding.dhcpv6.temporary'), type: 'checkbox', help: t('interface.bonding.dhcpv6.temporary_help') },
-    ]);
+    const dhcpv6Schema = computed(() => buildDhcpv6BaseSchema('interface.bonding.dhcpv6', t, {
+      withPd: true,
+      pdTitle: 'interface.bonding.dhcpv6.pd_instances',
+      pdPlaceholder: 'interface.bonding.dhcpv6.pd_instances_placeholder',
+      pdHelp: 'interface.bonding.dhcpv6.pd_instances_help',
+    }));
 
     const eapolSchema = computed(() => [
       { key: 'eapol_ca_certificate', title: t('interface.bonding.eapol.ca_certificate'), type: 'text', placeholder: t('interface.bonding.eapol.ca_certificate_placeholder'), help: t('interface.bonding.eapol.ca_certificate_help') },
@@ -161,7 +185,7 @@ export default defineComponent({
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: t('interface.bonding.ipv6.accept_dad'), type: 'select', options: ACCEPT_DAD_OPTIONS, help: t('interface.bonding.ipv6.accept_dad_help') },
+      { key: 'ipv6_accept_dad', title: t('interface.bonding.ipv6.accept_dad'), type: 'select', options: acceptDadOptions.value, help: t('interface.bonding.ipv6.accept_dad_help') },
       { key: 'ipv6_autoconf', title: t('interface.bonding.ipv6.autoconf'), type: 'checkbox', help: t('interface.bonding.ipv6.autoconf_help') },
       { key: 'ipv6_eui64', title: t('interface.bonding.ipv6.eui64'), type: 'text', placeholder: t('interface.bonding.ipv6.eui64_placeholder'), help: t('interface.bonding.ipv6.eui64_help') },
       { key: 'ipv6_no_default_link_local', title: t('interface.bonding.ipv6.no_default_link_local'), type: 'checkbox', help: t('interface.bonding.ipv6.no_default_link_local_help') },
@@ -175,12 +199,12 @@ export default defineComponent({
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: t('interface.bonding.mirror.egress'), type: 'select', options: ['', ...interfaceNames.value], placeholder: t('interface.bonding.mirror.placeholder'), help: t('interface.bonding.mirror.egress_help') },
-      { key: 'mirror_ingress', title: t('interface.bonding.mirror.ingress'), type: 'select', options: ['', ...interfaceNames.value], placeholder: t('interface.bonding.mirror.placeholder'), help: t('interface.bonding.mirror.ingress_help') },
+      { key: 'mirror_egress', title: t('interface.bonding.mirror.egress'), type: 'select', options: ['', ...mirrorInterfaceOptions.value], placeholder: t('interface.bonding.mirror.placeholder'), help: t('interface.bonding.mirror.egress_help') },
+      { key: 'mirror_ingress', title: t('interface.bonding.mirror.ingress'), type: 'select', options: ['', ...mirrorInterfaceOptions.value], placeholder: t('interface.bonding.mirror.placeholder'), help: t('interface.bonding.mirror.ingress_help') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: t('interface.bonding.other.redirect'), type: 'select', options: ['', ...interfaceNames.value], placeholder: t('interface.bonding.other.redirect_placeholder'), help: t('interface.bonding.other.redirect_help') },
+      { key: 'redirect', title: t('interface.bonding.other.redirect'), type: 'select', options: ['', ...mirrorInterfaceOptions.value], placeholder: t('interface.bonding.other.redirect_placeholder'), help: t('interface.bonding.other.redirect_help') },
       { key: 'vrf', title: t('interface.bonding.other.vrf'), type: 'select', options: ['', ...vrfOptions.value], placeholder: t('interface.bonding.other.vrf_placeholder'), help: t('interface.bonding.other.vrf_help') },
     ]);
 
@@ -192,6 +216,11 @@ export default defineComponent({
       const lines = [];
 
       if (b.description) lines.push(`set interfaces bonding ${name} description "${b.description}"`);
+      if (b.address) {
+        b.address.split('\n').map(a => a.trim()).filter(Boolean).forEach(a => {
+          lines.push(`set interfaces bonding ${name} address ${a}`);
+        });
+      }
       if (b.mac) lines.push(`set interfaces bonding ${name} mac ${b.mac}`);
       if (b.mode) lines.push(`set interfaces bonding ${name} mode ${b.mode}`);
       if (b.hash_policy) lines.push(`set interfaces bonding ${name} hash-policy ${b.hash_policy}`);
@@ -210,7 +239,7 @@ export default defineComponent({
       if (b.primary) lines.push(`set interfaces bonding ${name} primary ${b.primary}`);
 
       // ARP monitor
-      if (b.arp_interval !== undefined && b.arp_interval !== null) lines.push(`set interfaces bonding ${name} arp-monitor interval ${b.arp_interval}`);
+      if (b.arp_interval !== undefined && b.arp_interval !== null && b.arp_interval !== '') lines.push(`set interfaces bonding ${name} arp-monitor interval ${b.arp_interval}`);
       if (b.arp_targets) {
         b.arp_targets.split('\n').filter(t => t.trim()).forEach(t => lines.push(`set interfaces bonding ${name} arp-monitor target ${t.trim()}`));
       }
@@ -228,13 +257,7 @@ export default defineComponent({
       if (b.dhcp_vendor_class_id) lines.push(`set interfaces bonding ${name} dhcp-options vendor-class-id ${b.dhcp_vendor_class_id}`);
 
       // DHCPv6
-      if (b.dhcpv6_duid) lines.push(`set interfaces bonding ${name} dhcpv6-options duid ${b.dhcpv6_duid}`);
-      if (b.dhcpv6_no_release) lines.push(`set interfaces bonding ${name} dhcpv6-options no-release`);
-      if (b.dhcpv6_no_request_dns) lines.push(`set interfaces bonding ${name} dhcpv6-options no-request-dns`);
-      if (b.dhcpv6_no_request_domain) lines.push(`set interfaces bonding ${name} dhcpv6-options no-request-domain-name`);
-      if (b.dhcpv6_parameters_only) lines.push(`set interfaces bonding ${name} dhcpv6-options parameters-only`);
-      if (b.dhcpv6_rapid_commit) lines.push(`set interfaces bonding ${name} dhcpv6-options rapid-commit`);
-      if (b.dhcpv6_temporary) lines.push(`set interfaces bonding ${name} dhcpv6-options temporary`);
+      lines.push(...dhcpv6ToCommands(b, 'bonding', name));
 
       // EAPOL
       if (b.eapol_ca_certificate) lines.push(`set interfaces bonding ${name} eapol ca-certificate ${b.eapol_ca_certificate}`);
@@ -302,6 +325,7 @@ export default defineComponent({
       return {
         name: '',
         description: '',
+        address: '',
         mac: '',
         mode: '',
         hash_policy: '',
@@ -324,13 +348,8 @@ export default defineComponent({
         dhcp_reject: '',
         dhcp_user_class: '',
         dhcp_vendor_class_id: '',
-        dhcpv6_duid: '',
-        dhcpv6_no_release: false,
-        dhcpv6_no_request_dns: false,
-        dhcpv6_no_request_domain: false,
-        dhcpv6_parameters_only: false,
-        dhcpv6_rapid_commit: false,
-        dhcpv6_temporary: false,
+        ...DHCPV6_DEFAULTS,
+        dhcpv6_pd_instances: '',
         eapol_ca_certificate: '',
         eapol_certificate: '',
         eapol_passphrase: '',
@@ -370,6 +389,7 @@ export default defineComponent({
       const form = getDefaultForm();
       form.name = cfg.name || '';
       form.description = cfg.description || '';
+      form.address = toArray(cfg.address).join('\n');
       form.mac = cfg.mac || '';
       form.mode = cfg.mode || '802.3ad';
       form.hash_policy = cfg['hash-policy'] || 'layer2';
@@ -391,8 +411,8 @@ export default defineComponent({
 
       // ARP monitor
       if (cfg['arp-monitor']) {
-        form.arp_interval = cfg['arp-monitor'].interval || null;
-        form.arp_targets = (cfg['arp-monitor'].target || []).join('\n');
+        form.arp_interval = cfg['arp-monitor'].interval !== undefined ? cfg['arp-monitor'].interval : '';
+        form.arp_targets = toArray(cfg['arp-monitor'].target).join('\n');
       }
 
       // DHCP
@@ -408,15 +428,8 @@ export default defineComponent({
       }
 
       // DHCPv6
-      if (cfg['dhcpv6-options']) {
-        form.dhcpv6_duid = cfg['dhcpv6-options'].duid || '';
-        form.dhcpv6_no_release = !!cfg['dhcpv6-options']['no-release'];
-        form.dhcpv6_no_request_dns = !!cfg['dhcpv6-options']['no-request-dns'];
-        form.dhcpv6_no_request_domain = !!cfg['dhcpv6-options']['no-request-domain-name'];
-        form.dhcpv6_parameters_only = !!cfg['dhcpv6-options']['parameters-only'];
-        form.dhcpv6_rapid_commit = !!cfg['dhcpv6-options']['rapid-commit'];
-        form.dhcpv6_temporary = !!cfg['dhcpv6-options'].temporary;
-      }
+      Object.assign(form, dhcpv6ConfigToForm(cfg['dhcpv6-options']));
+      form.dhcpv6_pd_instances = formatJson(cfg['dhcpv6-options']?.pd || {});
 
       // EAPOL
       if (cfg.eapol) {
@@ -474,6 +487,71 @@ export default defineComponent({
       return form;
     }
 
+    async function loadMirrorInterfaceOptions() {
+      const normalizeNames = (source) => {
+        const list = [];
+        if (Array.isArray(source)) {
+          source.forEach(item => {
+            if (typeof item === 'string') {
+              list.push(item.trim());
+              return;
+            }
+            if (item && typeof item === 'object') {
+              const val = item.value || item.name || item.label || item.text || item.completion || '';
+              if (val) list.push(String(val).trim());
+            }
+          });
+        } else if (source && typeof source === 'object') {
+          Object.keys(source).forEach(key => list.push(String(key).trim()));
+        }
+
+        return list
+          .filter(Boolean)
+          .filter(name => !name.startsWith('<') && name !== 'Enter' && name !== '[edit]')
+          .filter(name => name !== 'Destination interface name')
+          .filter(name => name !== 'Interface name');
+      };
+
+      try {
+        const names = new Set();
+
+        // Configured interfaces from all interface families.
+        try {
+          const ifCfgRes = await configApi.get('interfaces');
+          const ifData = ifCfgRes.data || {};
+          Object.values(ifData).forEach(group => {
+            if (group && typeof group === 'object') {
+              Object.keys(group).forEach(name => {
+                if (name) names.add(String(name).trim());
+              });
+            }
+          });
+        } catch (e) {
+          // Continue with other sources.
+        }
+
+        // Runtime interfaces (captures interfaces not explicitly configured in current tree).
+        try {
+          const monitorRes = await monitorApi.interfaces();
+          normalizeNames(monitorRes.interfaces || []).forEach(name => names.add(name));
+        } catch (e) {
+          // Continue with fallback.
+        }
+
+        const sorted = Array.from(names).sort();
+
+        if (sorted.length) {
+          mirrorInterfaceOptions.value = sorted;
+          return;
+        }
+      } catch (e) {
+        // fallback below
+      }
+
+      // Fallback to currently known interfaces if suggestions are unavailable.
+      mirrorInterfaceOptions.value = Array.from(new Set(interfaceNames.value)).sort();
+    }
+
     // Load data
     async function load() {
       loading.value = true;
@@ -516,6 +594,8 @@ export default defineComponent({
         } catch (e) {
           console.error('Failed to load VRF options:', e);
         }
+
+        await loadMirrorInterfaceOptions();
       } catch (err) {
         showError(err);
       } finally {
@@ -541,6 +621,10 @@ export default defineComponent({
       const value = {};
 
       if (form.description) value.description = form.description;
+      if (form.address) {
+        const addresses = String(form.address).split('\n').map(a => a.trim()).filter(Boolean);
+        if (addresses.length) value.address = addresses;
+      }
       if (form.mac) value.mac = form.mac;
       if (form.mode) value.mode = form.mode;
       // hash-policy only supported in balance-xor, 802.3ad, balance-tlb modes
@@ -594,14 +678,11 @@ export default defineComponent({
       if (Object.keys(dhcp).length) value['dhcp-options'] = dhcp;
 
       // DHCPv6
-      const dhcpv6 = {};
-      if (form.dhcpv6_duid) dhcpv6.duid = form.dhcpv6_duid;
-      if (form.dhcpv6_no_release) dhcpv6['no-release'] = '';
-      if (form.dhcpv6_no_request_dns) dhcpv6['no-request-dns'] = '';
-      if (form.dhcpv6_no_request_domain) dhcpv6['no-request-domain-name'] = '';
-      if (form.dhcpv6_parameters_only) dhcpv6['parameters-only'] = '';
-      if (form.dhcpv6_rapid_commit) dhcpv6['rapid-commit'] = '';
-      if (form.dhcpv6_temporary) dhcpv6.temporary = '';
+      const dhcpv6 = dhcpv6FormToConfig(form) || {};
+      if (form.dhcpv6_pd_instances) {
+        const pd = safeJsonParse(form.dhcpv6_pd_instances);
+        if (Object.keys(pd).length) dhcpv6.pd = pd;
+      }
       if (Object.keys(dhcpv6).length) value['dhcpv6-options'] = dhcpv6;
 
       // EAPOL

@@ -14,6 +14,7 @@ export default defineComponent({
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
     const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const l2tpv3s = ref([]);
     const modalVisible = ref(false);
@@ -354,6 +355,7 @@ export default defineComponent({
         const path = `interfaces l2tpv3 ${name}`;
         await configStore.setConfig(path, config);
         configStore.markPending();
+        await configStore.checkSessionChanged();
 
         modalVisible.value = false;
         await load();
@@ -386,6 +388,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {t,

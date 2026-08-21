@@ -291,12 +291,13 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('vpp interfaces');
+        await configStore.deleteConfig('vpp interfaces');
         const payload = formToInterfaces(config.value);
         if (Object.keys(payload).length) {
-          await configApi.set('vpp interfaces', payload);
+          await configStore.setConfig('vpp interfaces', payload);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('vppInterfaces.save_failed'));
@@ -350,6 +351,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

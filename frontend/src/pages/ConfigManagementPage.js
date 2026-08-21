@@ -243,6 +243,7 @@ export default defineComponent({
         commitComment.value = '';
         showError({ message: res.message || t('configManagement.messages.commitSuccess') });
         configStore.markPending();
+        await configStore.checkSessionChanged();
         loadRevisions();
       } catch (e) {
         showError(e);
@@ -258,6 +259,7 @@ export default defineComponent({
         showCommitConfirm.value = false;
         showError({ message: res.message || t('configManagement.messages.commitConfirmSuccess') });
         configStore.markPending();
+        await configStore.checkSessionChanged();
         loadRevisions();
       } catch (e) {
         showError(e);
@@ -270,6 +272,7 @@ export default defineComponent({
         showConfirm.value = false;
         showError({ message: res.message || t('configManagement.messages.confirmSuccess') });
         configStore.markPending();
+        await configStore.checkSessionChanged();
       } catch (e) {
         showError(e);
       }
@@ -281,6 +284,7 @@ export default defineComponent({
         showDiscard.value = false;
         showError({ message: res.message || t('configManagement.messages.discardSuccess') });
         configStore.markPending();
+        await configStore.checkSessionChanged();
       } catch (e) {
         showError(e);
       }
@@ -306,6 +310,7 @@ export default defineComponent({
         showRollback.value = false;
         showError({ message: res.message || t('configManagement.messages.rollbackSuccess') });
         configStore.markPending();
+        await configStore.checkSessionChanged();
         loadRevisions();
       } catch (e) {
         showError(e);
@@ -323,6 +328,7 @@ export default defineComponent({
         loadSource.value = '';
         showError({ message: res.message || t('configManagement.messages.loadSuccess') });
         configStore.markPending();
+        await configStore.checkSessionChanged();
       } catch (e) {
         showError(e);
       }
@@ -339,6 +345,7 @@ export default defineComponent({
         mergeSource.value = '';
         showError({ message: res.message || t('configManagement.messages.mergeSuccess') });
         configStore.markPending();
+        await configStore.checkSessionChanged();
       } catch (e) {
         showError(e);
       }
@@ -355,6 +362,7 @@ export default defineComponent({
         saveTarget.value = '';
         showError({ message: res.message || t('configManagement.messages.saveSuccess') });
         configStore.markPending();
+        await configStore.checkSessionChanged();
       } catch (e) {
         showError(e);
       }
@@ -371,6 +379,7 @@ export default defineComponent({
         commentText.value = '';
         showError({ message: res.message || t('configManagement.messages.commentSuccess') });
         configStore.markPending();
+        await configStore.checkSessionChanged();
       } catch (e) {
         showError(e);
       }
@@ -394,6 +403,7 @@ export default defineComponent({
         renameNewName.value = '';
         showError({ message: res.message || t('configManagement.messages.renameSuccess') });
         configStore.markPending();
+        await configStore.checkSessionChanged();
       } catch (e) {
         showError(e);
       }
@@ -402,6 +412,7 @@ export default defineComponent({
     onMounted(() => {
       loadRevisions();
       onMenuRefresh(loadRevisions);
+      window.addEventListener('config-committed', loadRevisions);
     });
 
     return {

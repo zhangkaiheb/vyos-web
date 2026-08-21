@@ -1141,7 +1141,7 @@ export default defineComponent({
       saved.value = false;
       try {
         const payload = configToConfig(config.value);
-        await configApi.set('protocols ospf', payload);
+        await configStore.setConfig('protocols ospf', payload);
         configStore.markPending();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
@@ -1149,7 +1149,7 @@ export default defineComponent({
         interfaceModalVisible.value = false;
         neighborModalVisible.value = false;
         redistributeModalVisible.value = false;
-        await load();
+        await configStore.checkSessionChanged(); await load();
       } catch (e) {
         showError(e);
       } finally {
@@ -1545,6 +1545,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       loadInterfaces();
       onMenuRefresh(load);
     });

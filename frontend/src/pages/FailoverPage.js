@@ -206,8 +206,9 @@ export default defineComponent({
       saved.value = false;
       try {
         const payload = configToConfig(config.value);
-        await configApi.set('protocols failover', payload);
+        await configStore.setConfig('protocols failover', payload);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         routeModalVisible.value = false;
@@ -314,6 +315,7 @@ export default defineComponent({
       load();
       loadInterfaces();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

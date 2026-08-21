@@ -327,14 +327,17 @@
           "no_release_help": "关闭时不发送 DHCPv6 Release",
           "no_request_dns": "不请求 DNS",
           "no_request_dns_help": "不请求 DNS 服务器信息",
-          "no_request_domain": "不请求域名",
-          "no_request_domain_help": "不请求域名搜索列表",
+          "no_request_domain_name": "不请求域名",
+          "no_request_domain_name_help": "不请求域名搜索列表",
           "parameters_only": "仅参数",
           "parameters_only_help": "仅请求配置参数，不请求地址",
           "rapid_commit": "快速提交",
           "rapid_commit_help": "启用 DHCPv6 快速提交",
           "temporary": "临时地址",
-          "temporary_help": "请求临时 IPv6 地址"
+          "temporary_help": "请求临时 IPv6 地址",
+          "pd_instances": "前缀委派实例",
+          "pd_instances_placeholder": "例如: {\"0\": {\"interface\": \"eth0\", \"length\": 64}}",
+          "pd_instances_help": "DHCPv6 前缀委派实例配置（JSON 格式）"
         },
         "igmp": {
           "enable": "启用 IGMP",
@@ -383,7 +386,7 @@
           "adjust_mss_help": "TCP MSS 值（536-65535 字节）",
           "adjust_mss_placeholder": "例如: 1360",
           "arp_cache_timeout": "ARP 缓存超时",
-          "arp_cache_timeout_help": "ARP 缓存条目超时时间（1-86400 秒，默认：30）",
+          "arp_cache_timeout_help": "ARP 缓存条目超时时间（秒，默认：30）",
           "arp_cache_timeout_placeholder": "请输入超时时间",
           "disable_arp_filter": "禁用 ARP 过滤",
           "disable_arp_filter_help": "禁用 ARP 过滤功能",
@@ -408,7 +411,7 @@
         "ip_address": "IP 地址",
         "ipv6": {
           "accept_dad": "接受 DAD",
-          "accept_dad_help": "重复地址检测配置",
+          "accept_dad_help": "重复地址检测模式（默认：1）",
           "autoconf": "地址自动配置",
           "autoconf_help": "启用 SLAAC 自动配置",
           "eui64": "EUI-64 地址",
@@ -421,12 +424,12 @@
           "adjust_mss_help": "调整 TCP MSS 值",
           "base_reachable_time": "基础可达时间",
           "base_reachable_time_placeholder": "1-86400 秒",
-          "base_reachable_time_help": "邻居可达性基础时间",
+          "base_reachable_time_help": "邻居可达性基础时间（秒，默认：30）",
           "disable_forwarding": "禁用 IPv6 转发",
           "disable_forwarding_help": "禁用 IPv6 数据包转发",
           "dup_addr_detect_transmits": "重复地址检测发送数",
           "dup_addr_detect_transmits_placeholder": "默认: 1",
-          "dup_addr_detect_transmits_help": "发送邻居通告的次数",
+          "dup_addr_detect_transmits_help": "执行 DAD 时发送 NS 消息数（默认：1）",
           "source_validation": "源地址验证",
           "source_validation_placeholder": "选择验证模式",
           "source_validation_help": "源地址验证模式",
@@ -601,6 +604,10 @@
         "duid_placeholder": "请输入 DUID",
         "no_release": "不发送释放消息",
         "no_release_help": "接口删除时不发送 DHCPv6 释放消息",
+        "no_request_dns": "不请求 DNS",
+        "no_request_dns_help": "不请求 DNS 服务器信息",
+        "no_request_domain_name": "不请求域名",
+        "no_request_domain_name_help": "不请求域名搜索列表",
         "parameters_only": "仅参数",
         "parameters_only_help": "仅请求配置参数，不请求地址",
         "pd": "前缀委派",
@@ -609,7 +616,10 @@
         "rapid_commit": "快速提交",
         "rapid_commit_help": "使用两步地址分配过程",
         "temporary": "临时地址",
-        "temporary_help": "使用临时地址而非永久地址"
+        "temporary_help": "使用临时地址而非永久地址",
+        "pd_instances": "前缀委派实例",
+        "pd_instances_placeholder": "例如: {\"0\": {\"interface\": \"eth0\", \"length\": 64}}",
+        "pd_instances_help": "DHCPv6 前缀委派实例配置（JSON 格式）"
       },
       "eapol": {
         "ca_certificate": "CA 证书",
@@ -1132,6 +1142,8 @@
       "dhcpv6": {
         "duid": "duid",
         "no_release": "no_release",
+        "no_request_dns": "no_request_dns",
+        "no_request_domain_name": "no_request_domain_name",
         "parameters_only": "parameters_only",
         "parameters_only_help": "parameters_only_help",
         "pd": "pd",
@@ -1140,7 +1152,10 @@
         "rapid_commit": "rapid_commit",
         "rapid_commit_help": "rapid_commit_help",
         "temporary": "temporary",
-        "temporary_help": "temporary_help"
+        "temporary_help": "temporary_help",
+        "pd_instances": "pd_instances",
+        "pd_instances_placeholder": "pd_instances_placeholder",
+        "pd_instances_help": "pd_instances_help"
       },
       "eapol": {
         "ca_certificate": "ca_certificate",
@@ -1566,6 +1581,8 @@
       "dhcpv6": {
         "duid": "Duid",
         "no_release": "No_release",
+        "no_request_dns": "No_request_dns",
+        "no_request_domain_name": "No_request_domain_name",
         "parameters_only": "Parameters_only",
         "parameters_only_help": "Parameters_only_help",
         "pd": "Pd",
@@ -2071,6 +2088,8 @@
       "dhcpv6": {
         "duid": "duid",
         "no_release": "no_release",
+        "no_request_dns": "no_request_dns",
+        "no_request_domain_name": "no_request_domain_name",
         "parameters_only": "parameters_only",
         "parameters_only_help": "parameters_only_help",
         "pd": "pd",
@@ -2079,7 +2098,10 @@
         "rapid_commit": "rapid_commit",
         "rapid_commit_help": "rapid_commit_help",
         "temporary": "temporary",
-        "temporary_help": "temporary_help"
+        "temporary_help": "temporary_help",
+        "pd_instances": "pd_instances",
+        "pd_instances_placeholder": "pd_instances_placeholder",
+        "pd_instances_help": "pd_instances_help"
       },
       "eapol": {
         "ca_certificate": "ca_certificate",
@@ -2550,6 +2572,8 @@
       "dhcpv6": {
         "duid": "duid",
         "no_release": "no_release",
+        "no_request_dns": "no_request_dns",
+        "no_request_domain_name": "no_request_domain_name",
         "parameters_only": "parameters_only",
         "parameters_only_help": "parameters_only_help",
         "pd": "pd",
@@ -2558,7 +2582,10 @@
         "rapid_commit": "rapid_commit",
         "rapid_commit_help": "rapid_commit_help",
         "temporary": "temporary",
-        "temporary_help": "temporary_help"
+        "temporary_help": "temporary_help",
+        "pd_instances": "pd_instances",
+        "pd_instances_placeholder": "pd_instances_placeholder",
+        "pd_instances_help": "pd_instances_help"
       },
       "eapol": {
         "ca_certificate": "ca_certificate",
@@ -3029,6 +3056,8 @@
       "dhcpv6": {
         "duid": "duid",
         "no_release": "no_release",
+        "no_request_dns": "no_request_dns",
+        "no_request_domain_name": "no_request_domain_name",
         "parameters_only": "parameters_only",
         "parameters_only_help": "parameters_only_help",
         "pd": "pd",
@@ -3037,7 +3066,10 @@
         "rapid_commit": "rapid_commit",
         "rapid_commit_help": "rapid_commit_help",
         "temporary": "temporary",
-        "temporary_help": "temporary_help"
+        "temporary_help": "temporary_help",
+        "pd_instances": "pd_instances",
+        "pd_instances_placeholder": "pd_instances_placeholder",
+        "pd_instances_help": "pd_instances_help"
       },
       "eapol": {
         "ca_certificate": "ca_certificate",
@@ -3508,6 +3540,8 @@
       "dhcpv6": {
         "duid": "duid",
         "no_release": "no_release",
+        "no_request_dns": "no_request_dns",
+        "no_request_domain_name": "no_request_domain_name",
         "parameters_only": "parameters_only",
         "parameters_only_help": "parameters_only_help",
         "pd": "pd",
@@ -3516,7 +3550,10 @@
         "rapid_commit": "rapid_commit",
         "rapid_commit_help": "rapid_commit_help",
         "temporary": "temporary",
-        "temporary_help": "temporary_help"
+        "temporary_help": "temporary_help",
+        "pd_instances": "pd_instances",
+        "pd_instances_placeholder": "pd_instances_placeholder",
+        "pd_instances_help": "pd_instances_help"
       },
       "eapol": {
         "ca_certificate": "ca_certificate",

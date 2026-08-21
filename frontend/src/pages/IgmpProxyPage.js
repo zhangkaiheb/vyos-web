@@ -132,6 +132,7 @@ export default defineComponent({
         const payload = configToConfig(config.value);
         await configStore.setConfig('protocols igmp-proxy', payload);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         interfaceModalVisible.value = false;
@@ -180,6 +181,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       loadInterfaces();
+      window.addEventListener('config-committed', load);
     });
 
     return {

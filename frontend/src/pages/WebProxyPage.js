@@ -878,12 +878,13 @@ export default defineComponent({
           'service webproxy',
         ];
         for (const p of paths) {
-          try { await configApi.delete(p); } catch (_) {}
+          try { await configStore.deleteConfig(p); } catch (_) {}
         }
         if (Object.keys(value).length) {
-          await configApi.set('service webproxy', value);
+          await configStore.setConfig('service webproxy', value);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         saved.value = true;
         await load();
       } catch (e) {
@@ -896,6 +897,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

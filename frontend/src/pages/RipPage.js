@@ -365,14 +365,14 @@ export default defineComponent({
       saved.value = false;
       try {
         const payload = configToConfig(config.value);
-        await configApi.set('protocols rip', payload);
+        await configStore.setConfig('protocols rip', payload);
         configStore.markPending();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         interfaceModalVisible.value = false;
         networkDistModalVisible.value = false;
         redistributeModalVisible.value = false;
-        await load();
+        await configStore.checkSessionChanged(); await load();
       } catch (e) {
         showError(e);
       } finally {
@@ -537,6 +537,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       loadInterfaces();
       onMenuRefresh(load);
     });

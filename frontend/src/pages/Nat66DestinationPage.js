@@ -157,6 +157,7 @@ export default defineComponent({
         }
         await configStore.setConfig(`${path} rule ${rule.id}`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (e) {
@@ -188,6 +189,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
     watch(() => route.path, load);
 
@@ -208,7 +210,7 @@ export default defineComponent({
                  rowKey="id" :actions="['create', 'edit', 'delete']"
                  @create="openModal(-1)" @edit="openModal" @delete="deleteRule" />
       <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? t('nat66.destination.editRule') : t('nat66.destination.createRule')" width="700px">
-        <ConfigForm v-model="editingRule" :schema="ruleSchema" :showAdvanced="true" />
+        <ConfigForm v-model="editingRule" :schema="ruleSchema" :showAdvanced="true" :editMode="!!editingOriginalId" />
         <template #footer>
           <button @click="modalVisible = false">{{ t('app.cancel') }}</button>
           <button class="btn-primary" @click="saveRule">{{ t('app.confirm') }}</button>

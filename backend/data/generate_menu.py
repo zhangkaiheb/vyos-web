@@ -6,7 +6,7 @@ import json
 import os
 
 
-def menu_item(id, label, label_en, icon='', children=None, route=None, component=None):
+def menu_item(id, label, label_en, icon='', children=None, route=None, component=None, featureKey=None):
     item = {
         'id': id,
         'label': label,
@@ -16,6 +16,8 @@ def menu_item(id, label, label_en, icon='', children=None, route=None, component
         'route': route,
         'component': component,
     }
+    if featureKey:
+        item['featureKey'] = featureKey
     return item
 
 
@@ -71,7 +73,7 @@ def main():
                 menu_item('vxlan', 'VXLAN', 'VXLAN', route='/system/interfaces/vxlan', component='TablePage'),
                 menu_item('pppoe', 'PPPoE', 'PPPoE', route='/system/interfaces/pppoe', component='TablePage'),
                 menu_item('tunnel', '隧道', 'Tunnel', route='/system/interfaces/tunnel', component='TunnelPage'),
-                menu_item('dummy', 'Dummy', 'Dummy', route='/system/interfaces/dummy', component='TablePage'),
+                menu_item('dummy', 'Dummy', 'Dummy', route='/system/interfaces/dummy', component='DummyPage', featureKey='dummy'),
                 menu_item('loopback', 'Loopback', 'Loopback', route='/system/interfaces/loopback', component='TablePage'),
                 menu_item('input', 'Input', 'Input', route='/system/interfaces/input', component='ConfigPage'),
             ]),

@@ -306,24 +306,25 @@ export default defineComponent({
       saved.value = false;
       try {
         const value = formToConfig(form.value);
-        await configApi.set('firewall global-options', value);
+        await configStore.setConfig('firewall global-options', value);
         configStore.markPending();
         // Boolean nodes must be set without a value (null) because set_section
         // treats empty strings as leaf values and creates invalid paths.
         if (form.value.resolver_cache) {
-          await configApi.set('firewall global-options resolver-cache', null);
+          await configStore.setConfig('firewall global-options resolver-cache', null);
           configStore.markPending();
         } else {
-          try { await configApi.delete('firewall global-options resolver-cache'); } catch (_) {}
+          try { await configStore.deleteConfig('firewall global-options resolver-cache'); } catch (_) {}
         }
         for (const state of ['established', 'invalid', 'related']) {
           if (form.value[`state_policy_${state}_log`]) {
-            await configApi.set(`firewall global-options state-policy ${state} log`, null);
+            await configStore.setConfig(`firewall global-options state-policy ${state} log`, null);
             configStore.markPending();
           } else {
-            try { await configApi.delete(`firewall global-options state-policy ${state} log`); } catch (_) {}
+            try { await configStore.deleteConfig(`firewall global-options state-policy ${state} log`); } catch (_) {}
           }
         }
+        await configStore.checkSessionChanged();
         saved.value = true;
       } catch (e) {
         showError(e);
@@ -334,6 +335,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       onMenuRefresh(load);
     });
 

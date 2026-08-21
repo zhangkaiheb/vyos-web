@@ -279,10 +279,10 @@ export default defineComponent({
 
       saving.value = true;
       try {
-        await configApi.set('service ssh', sshToConfig(config.value));
+        await configStore.setConfig('service ssh', sshToConfig(config.value));
         configStore.markPending();
         saved.value = true;
-        await load();
+        await configStore.checkSessionChanged(); await load();
       } catch (e) {
         showError(e);
       } finally {
@@ -292,6 +292,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       onMenuRefresh(load);
     });
 

@@ -171,6 +171,7 @@ export default defineComponent({
         }
         await configStore.setConfig(`${path} rule ${rule.id}`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (e) {
@@ -234,6 +235,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
     watch(() => route.path, load);
 
@@ -261,7 +263,7 @@ export default defineComponent({
       <!-- Rule Modal with embedded pool management -->
       <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? t('nat64.source.editRule') : t('nat64.source.createRule')" width="800px">
         <div style="margin-bottom:16px;">
-          <ConfigForm v-model="editingRule" :schema="ruleSchema" :showAdvanced="true" />
+          <ConfigForm v-model="editingRule" :schema="ruleSchema" :showAdvanced="true" :editMode="!!editingOriginalId" />
         </div>
         <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
           <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('nat64.source.translationPool') }}</div>

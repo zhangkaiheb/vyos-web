@@ -104,9 +104,9 @@ export default defineComponent({
       ],
       inbound: [
         { key: 'inboundInterfaceName', title: t('destinationNat.field.interfaceName'), type: 'select', help: t('destinationNat.help.inboundInterfaceName'),
-          options: ['any', ...interfaces.value].map(n => ({ value: n, label: n })) },
+          options: ['', 'any', ...interfaces.value].map(n => ({ value: n, label: n })), default: '' },
         { key: 'inboundInterfaceGroup', title: t('destinationNat.field.interfaceGroup'), type: 'select', help: t('destinationNat.help.inboundInterfaceGroup'),
-          options: interfaceGroups.value.map(g => ({ value: g, label: g })) },
+          options: ['', ...interfaceGroups.value].map(g => ({ value: g, label: g })), default: '' },
       ],
       translation: [
         { key: 'translationAddress', title: t('destinationNat.field.translationAddress'), type: 'text', placeholder: t('destinationNat.placeholder.translationAddress'), help: t('destinationNat.help.translationAddress') },
@@ -115,16 +115,21 @@ export default defineComponent({
         { key: 'translationRedirectPort', title: t('destinationNat.field.redirectPort'), type: 'number', min: 1, max: 65535, placeholder: t('destinationNat.placeholder.redirectPort'), help: t('destinationNat.help.redirectPort') },
         { key: 'translationAddressMapping', title: t('destinationNat.field.addressMapping'), type: 'select', help: t('destinationNat.help.addressMapping'),
           options: [
+            { value: '', label: '' },
             { value: 'persistent', label: t('destinationNat.mapping.persistent') },
             { value: 'random', label: t('destinationNat.mapping.random') },
-          ] },
+          ], default: '' },
         { key: 'translationPortMapping', title: t('destinationNat.field.portMapping'), type: 'select', help: t('destinationNat.help.portMapping'),
           options: [
+            { value: '', label: '' },
             { value: 'random', label: t('destinationNat.mapping.randomPort') },
             { value: 'none', label: t('destinationNat.mapping.nonePort') },
-          ] },
+          ], default: '' },
         { key: 'loadBalanceHash', title: t('destinationNat.field.loadBalanceHash'), type: 'select', help: t('destinationNat.help.loadBalanceHash'),
-          options: HASH_OPTIONS.map(o => ({ value: o.value, label: o.label })) },
+          options: [
+            { value: '', label: '' },
+            ...HASH_OPTIONS.map(o => ({ value: o.value, label: o.label })),
+          ], default: '' },
       ],
     }));
 
@@ -132,22 +137,38 @@ export default defineComponent({
       { key: 'id', title: t('destinationNat.column.ruleNumber') },
       { key: 'description', title: t('destinationNat.column.description') },
       { key: 'protocol', title: t('destinationNat.column.protocol') },
+      { key: 'packetType', title: t('destinationNat.column.packetType') },
       { key: 'sourceValue', title: t('destinationNat.column.sourceAddress'), render: (val, row) => {
-        if (row.sourceGroupType === 'address-group') return row.sourceGroupValue || '';
-        if (row.sourceGroupType === 'network-group') return row.sourceGroupValue || '';
-        if (row.sourceGroupType === 'domain-group') return row.sourceGroupValue || '';
-        return val || '';
+        const parts = [];
+        if (val) parts.push(val);
+        if (row.sourceGroupTypes && row.sourceGroupTypes.length) parts.push(row.sourceGroupTypes.join(', '));
+        return parts.join(' ') || '';
       }},
+      { key: 'sourcePort', title: t('destinationNat.column.sourcePort') },
       { key: 'destinationValue', title: t('destinationNat.column.destinationAddress'), render: (val, row) => {
-        if (row.destinationGroupType === 'address-group') return row.destinationGroupValue || '';
-        if (row.destinationGroupType === 'network-group') return row.destinationGroupValue || '';
-        if (row.destinationGroupType === 'domain-group') return row.destinationGroupValue || '';
+        const parts = [];
+        if (val) parts.push(val);
+        if (row.destinationGroupTypes && row.destinationGroupTypes.length) parts.push(row.destinationGroupTypes.join(', '));
+        return parts.join(' ') || '';
+      }},
+      { key: 'destinationPort', title: t('destinationNat.column.destinationPort') },
+      { key: 'inboundInterfaceName', title: t('destinationNat.column.inboundInterface'), render: (val, row) => {
+        if (val) return val;
+        return row.inboundInterfaceGroup || '';
+      }},
+      { key: 'translationAddress', title: t('destinationNat.column.translationAddress'), render: (val, row) => {
+        if (row.translationMasquerade) return 'masquerade';
         return val || '';
       }},
-      { key: 'inboundInterfaceName', title: t('destinationNat.column.inboundInterface') },
-      { key: 'translationAddress', title: t('destinationNat.column.translationAddress') },
-      { key: 'log', title: t('destinationNat.column.log') },
-      { key: 'disable', title: t('destinationNat.column.disable') },
+      { key: 'translationPort', title: t('destinationNat.column.translationPort') },
+      { key: 'translationOptions', title: t('destinationNat.column.translationOptions'), render: (val, row) => {
+        const parts = [];
+        if (row.translationAddressMapping) parts.push(row.translationAddressMapping);
+        if (row.translationPortMapping) parts.push(row.translationPortMapping);
+        return parts.join(', ') || '';
+      }},
+      { key: 'log', title: t('destinationNat.column.log'), render: (val) => val ? t('app.yes') : '' },
+      { key: 'disable', title: t('destinationNat.column.disable'), render: (val) => val ? t('app.yes') : '' },
     ]);
 
     async function loadDynamicOptions() {
@@ -236,40 +257,48 @@ export default defineComponent({
       if (attrs.disable) rule.disable = true;
       if (attrs.exclude) rule.exclude = true;
       if (attrs.log) rule.log = true;
-      if (attrs['packet-type']) rule.packetType = attrs['packet-type'];
+      if (attrs['packet-type'] || attrs.packet_type) rule.packetType = attrs['packet-type'] || attrs.packet_type;
       if (attrs.protocol) rule.protocol = attrs.protocol;
 
       const src = attrs.source || {};
-      rule.sourceGroupType = 'address';
       rule.sourceValue = '';
+      rule.sourceGroupType = 'address';
       rule.sourceGroupValue = '';
+      rule.sourceGroupTypes = [];
       if (src.address) { rule.sourceValue = src.address; }
       if (src.group) {
         const g = src.group;
-        if (g['address-group']) { rule.sourceGroupType = 'address-group'; rule.sourceGroupValue = g['address-group']; }
-        else if (g['network-group']) { rule.sourceGroupType = 'network-group'; rule.sourceGroupValue = g['network-group']; }
-        else if (g['domain-group']) { rule.sourceGroupType = 'domain-group'; rule.sourceGroupValue = g['domain-group']; }
-        if (g['mac-group']) rule.sourceMacValue = g['mac-group'];
+        if (g['address-group'] || g.address_group) { const v = g['address-group'] || g.address_group; rule.sourceGroupType = 'address-group'; rule.sourceGroupValue = v; rule.sourceGroupTypes.push('AG:' + v); }
+        if (g['network-group'] || g.network_group) { const v = g['network-group'] || g.network_group; rule.sourceGroupType = 'network-group'; rule.sourceGroupValue = v; rule.sourceGroupTypes.push('NG:' + v); }
+        if (g['domain-group'] || g.domain_group) { const v = g['domain-group'] || g.domain_group; rule.sourceGroupType = 'domain-group'; rule.sourceGroupValue = v; rule.sourceGroupTypes.push('DG:' + v); }
+        if (g['mac-group'] || g.mac_group) { const v = g['mac-group'] || g.mac_group; rule.sourceMacValue = v; rule.sourceGroupTypes.push('MG:' + v); }
       }
       if (src.port) rule.sourcePort = src.port;
 
       const dst = attrs.destination || {};
-      rule.destinationGroupType = 'address';
       rule.destinationValue = '';
+      rule.destinationGroupType = 'address';
       rule.destinationGroupValue = '';
+      rule.destinationGroupTypes = [];
       if (dst.address) { rule.destinationValue = dst.address; }
       if (dst.group) {
         const g = dst.group;
-        if (g['address-group']) { rule.destinationGroupType = 'address-group'; rule.destinationGroupValue = g['address-group']; }
-        else if (g['network-group']) { rule.destinationGroupType = 'network-group'; rule.destinationGroupValue = g['network-group']; }
-        else if (g['domain-group']) { rule.destinationGroupType = 'domain-group'; rule.destinationGroupValue = g['domain-group']; }
-        if (g['mac-group']) rule.destinationMacValue = g['mac-group'];
-        if (g['port-group']) rule.destinationPortGroup = g['port-group'];
+        if (g['address-group'] || g.address_group) { const v = g['address-group'] || g.address_group; rule.destinationGroupType = 'address-group'; rule.destinationGroupValue = v; rule.destinationGroupTypes.push('AG:' + v); }
+        if (g['network-group'] || g.network_group) { const v = g['network-group'] || g.network_group; rule.destinationGroupType = 'network-group'; rule.destinationGroupValue = v; rule.destinationGroupTypes.push('NG:' + v); }
+        if (g['domain-group'] || g.domain_group) { const v = g['domain-group'] || g.domain_group; rule.destinationGroupType = 'domain-group'; rule.destinationGroupValue = v; rule.destinationGroupTypes.push('DG:' + v); }
+        if (g['mac-group'] || g.mac_group) { const v = g['mac-group'] || g.mac_group; rule.destinationMacValue = v; rule.destinationGroupTypes.push('MG:' + v); }
+        if (g['port-group'] || g.port_group) { const v = g['port-group'] || g.port_group; rule.destinationPortGroup = v; rule.destinationGroupTypes.push('PG:' + v); }
       }
       if (dst.port) rule.destinationPort = dst.port;
 
       const trans = attrs.translation || {};
-      if (trans.address) rule.translationAddress = trans.address;
+      if (trans.address) {
+        if (trans.address === 'masquerade') {
+          rule.translationMasquerade = true;
+        } else {
+          rule.translationAddress = trans.address;
+        }
+      }
       if (trans.port) rule.translationPort = trans.port;
       if (trans.redirect) {
         rule.translationRedirect = true;
@@ -279,8 +308,23 @@ export default defineComponent({
       }
       if (trans.options) {
         const opts = trans.options;
-        if (opts['address-mapping']) rule.translationAddressMapping = Object.keys(opts['address-mapping'])[0] || 'random';
-        if (opts['port-mapping']) rule.translationPortMapping = Object.keys(opts['port-mapping'])[0] || 'none';
+        if (opts['address-mapping'] || opts.address_mapping) {
+          const keys = Object.keys(opts['address-mapping'] || opts.address_mapping);
+          const v = keys.find(k => k && !/^\d+$/.test(k));
+          rule.translationAddressMapping = v || '';
+        } else {
+          rule.translationAddressMapping = '';
+        }
+        if (opts['port-mapping'] || opts.port_mapping) {
+          const keys = Object.keys(opts['port-mapping'] || opts.port_mapping);
+          const v = keys.find(k => k && !/^\d+$/.test(k));
+          rule.translationPortMapping = v || '';
+        } else {
+          rule.translationPortMapping = '';
+        }
+      } else {
+        rule.translationAddressMapping = '';
+        rule.translationPortMapping = '';
       }
 
       const lb = attrs['load-balance'] || {};
@@ -299,8 +343,8 @@ export default defineComponent({
         rule.loadBalanceHash = '';
       }
 
-      if (attrs['inbound-interface']) {
-        const ii = attrs['inbound-interface'];
+      if (attrs['inbound-interface'] || attrs.inbound_interface) {
+        const ii = attrs['inbound-interface'] || attrs.inbound_interface;
         rule.inboundInterfaceName = ii.name || '';
         rule.inboundInterfaceGroup = ii.group || '';
       }
@@ -448,9 +492,11 @@ export default defineComponent({
           sourceGroupType: 'address',
           sourceValue: '',
           sourceMacValue: '',
+          sourceGroupTypes: [],
           destinationGroupType: 'address',
           destinationValue: '',
           destinationMacValue: '',
+          destinationGroupTypes: [],
         };
         editingOriginalId.value = null;
         loadBalanceBackends.value = [];
@@ -481,6 +527,7 @@ export default defineComponent({
         }
         await configStore.setConfig(`${path} rule ${rule.id}`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (error) {
@@ -505,6 +552,7 @@ export default defineComponent({
           showError(t('destinationNat.deleteRuleFailed'), e);
         }
       }
+      await configStore.checkSessionChanged();
       pendingDeleteNames.value = [];
       await load();
     }
@@ -525,7 +573,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(async () => { load(); await loadDynamicOptions(); optionsLoaded = true; onMenuRefresh(load); });
+    onMounted(async () => { load(); await loadDynamicOptions(); optionsLoaded = true; onMenuRefresh(load); window.addEventListener('config-committed', load); });
     watch(() => route.path, async () => { load(); await loadDynamicOptions(); optionsLoaded = true; });
 
     return {t,
@@ -571,7 +619,7 @@ export default defineComponent({
               @update:macValue="editingRule.sourceMacValue = $event"
               @update:portGroupValue="editingRule.sourcePortGroup = $event"
             />
-            <ConfigForm v-model="editingRule" :schema="tabSchemas.source" :showAdvanced="true" :formKey="'destination_nat_rule_source'" />
+            <ConfigForm v-model="editingRule" :schema="tabSchemas.source" :showAdvanced="true" :formKey="'destination_nat_rule_source'" :editMode="!!editingOriginalId" />
           </template>
           <template #destination>
             <SourceDestMatchCards
@@ -597,16 +645,16 @@ export default defineComponent({
               @update:macValue="editingRule.destinationMacValue = $event"
               @update:portGroupValue="editingRule.destinationPortGroup = $event"
             />
-            <ConfigForm v-model="editingRule" :schema="tabSchemas.destination" :showAdvanced="true" :formKey="'destination_nat_rule_destination'" />
+            <ConfigForm v-model="editingRule" :schema="tabSchemas.destination" :showAdvanced="true" :formKey="'destination_nat_rule_destination'" :editMode="!!editingOriginalId" />
           </template>
           <template #basic>
-            <ConfigForm v-model="editingRule" :schema="tabSchemas.basic" :showAdvanced="true" :formKey="'destination_nat_rule_basic'" />
+            <ConfigForm v-model="editingRule" :schema="tabSchemas.basic" :showAdvanced="true" :formKey="'destination_nat_rule_basic'" :editMode="!!editingOriginalId" />
           </template>
           <template #inbound>
-            <ConfigForm v-model="editingRule" :schema="tabSchemas.inbound" :showAdvanced="true" :formKey="'destination_nat_rule_inbound'" />
+            <ConfigForm v-model="editingRule" :schema="tabSchemas.inbound" :showAdvanced="true" :formKey="'destination_nat_rule_inbound'" :editMode="!!editingOriginalId" />
           </template>
           <template #translation>
-            <ConfigForm v-model="editingRule" :schema="tabSchemas.translation" :showAdvanced="true" :formKey="'destination_nat_rule_translation'" />
+            <ConfigForm v-model="editingRule" :schema="tabSchemas.translation" :showAdvanced="true" :formKey="'destination_nat_rule_translation'" :editMode="!!editingOriginalId" />
             <div style="margin-top:16px;">
               <div style="font-weight:bold; font-size:14px; margin-bottom:8px;">{{ $t('destinationNat.loadBalanceBackends') }}</div>
               <DataTable :columns="backendColumns" :data="loadBalanceBackends" rowKey="address"

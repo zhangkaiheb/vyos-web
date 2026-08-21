@@ -8,18 +8,39 @@ import { useConfigStore } from '/src/stores/config.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import { useI18n } from '/src/i18n/index.js';
+import { dhcpv6ConfigToForm, dhcpv6FormToConfig, dhcpv6ToCommands, DHCPV6_DEFAULTS } from '/src/utils/dhcpv6Common.js';
+
+function formatJson(obj) {
+  if (!obj || Object.keys(obj).length === 0) return '';
+  try {
+    return JSON.stringify(obj, null, 2);
+  } catch {
+    return '';
+  }
+}
+
+function safeJsonParse(str) {
+  if (!str) return {};
+  try {
+    return JSON.parse(str);
+  } catch {
+    return {};
+  }
+}
 
 export default defineComponent({
   name: 'PPPoEPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
     const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const pppoes = ref([]);
     const selected = ref([]);
     const modalVisible = ref(false);
     const editingPPPoE = ref(null);
     const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
     const activeTab = ref('basic');
     const selectedPPPoEs = ref([]);
     const deleteModalVisible = ref(false);
@@ -78,11 +99,14 @@ export default defineComponent({
     ]);
 
     const dhcpv6Schema = computed(() => [
-      { key: 'dhcpv6_instance_name', title: t('pppoe.form.dhcpv6_instance_name'), type: 'text', placeholder: t('pppoe.form.dhcpv6_instance_name_placeholder') },
+      { key: 'dhcpv6_duid', title: t('pppoe.form.dhcpv6_duid'), type: 'text', placeholder: t('pppoe.form.dhcpv6_duid_placeholder') },
       { key: 'dhcpv6_no_release', title: t('pppoe.form.dhcpv6_no_release'), type: 'checkbox', help: t('pppoe.form.dhcpv6_no_release_help') },
+      { key: 'dhcpv6_no_request_dns', title: t('pppoe.form.dhcpv6_no_request_dns'), type: 'checkbox', help: t('pppoe.form.dhcpv6_no_request_dns_help') },
+      { key: 'dhcpv6_no_request_domain_name', title: t('pppoe.form.dhcpv6_no_request_domain_name'), type: 'checkbox', help: t('pppoe.form.dhcpv6_no_request_domain_name_help') },
+      { key: 'dhcpv6_parameters_only', title: t('pppoe.form.dhcpv6_parameters_only'), type: 'checkbox', help: t('pppoe.form.dhcpv6_parameters_only_help') },
       { key: 'dhcpv6_rapid_commit', title: t('pppoe.form.dhcpv6_rapid_commit'), type: 'checkbox', help: t('pppoe.form.dhcpv6_rapid_commit_help') },
       { key: 'dhcpv6_temporary', title: t('pppoe.form.dhcpv6_temporary'), type: 'checkbox', help: t('pppoe.form.dhcpv6_temporary_help') },
-      { key: 'dhcpv6_pd_length', title: t('pppoe.form.dhcpv6_pd_length'), type: 'number', min: 32, max: 64, placeholder: '32-64', help: t('pppoe.form.dhcpv6_pd_length_help') },
+      { key: 'dhcpv6_pd_instances', title: t('pppoe.form.dhcpv6_pd_instances'), type: 'textarea', placeholder: t('pppoe.form.dhcpv6_pd_instances_placeholder'), help: t('pppoe.form.dhcpv6_pd_instances_help') },
     ]);
 
     const ipSchema = computed(() => [
@@ -105,7 +129,7 @@ export default defineComponent({
 
     const otherSchema = computed(() => [
       { key: 'redirect', title: t('pppoe.form.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('pppoe.form.redirect_placeholder'), help: t('pppoe.form.redirect_help') },
-      { key: 'vrf', title: t('pppoe.form.vrf_instance'), type: 'text', placeholder: t('pppoe.form.vrf_instance_placeholder'), help: t('pppoe.form.vrf_instance_help') },
+      { key: 'vrf', title: t('pppoe.form.vrf_instance'), type: 'select', options: [{ value: '', label: '' }, ...vrfOptions.value], placeholder: t('pppoe.form.vrf_instance_placeholder'), help: t('pppoe.form.vrf_instance_help') },
     ]);
 
     // Command text
@@ -149,11 +173,7 @@ export default defineComponent({
       if (p.dhcp_vendor_class_id) lines.push(`set interfaces pppoe ${name} dhcp-options vendor-class-id ${p.dhcp_vendor_class_id}`);
 
       // DHCPv6
-      const d6inst = p.dhcpv6_instance_name || 'instance';
-      if (p.dhcpv6_no_release) lines.push(`set interfaces pppoe ${name} dhcpv6-options ${d6inst} no-release`);
-      if (p.dhcpv6_rapid_commit) lines.push(`set interfaces pppoe ${name} dhcpv6-options ${d6inst} rapid-commit`);
-      if (p.dhcpv6_temporary) lines.push(`set interfaces pppoe ${name} dhcpv6-options ${d6inst} temporary`);
-      if (p.dhcpv6_pd_length) lines.push(`set interfaces pppoe ${name} dhcpv6-options ${d6inst} pd length ${p.dhcpv6_pd_length}`);
+      lines.push(...dhcpv6ToCommands(p, 'pppoe', name));
 
       // IP
       if (p.ip_adjust_mss) lines.push(`set interfaces pppoe ${name} ip adjust-mss ${p.ip_adjust_mss}`);
@@ -179,13 +199,13 @@ export default defineComponent({
 
     // Dynamic tabs
     const modalTabs = computed(() => [
-      { key: 'basic', title: t('pppoe.tabs.basic') },
-      { key: 'dhcp', title: 'DHCP' },
-      { key: 'dhcpv6', title: 'DHCPv6' },
-      { key: 'ip', title: t('pppoe.tabs.ipv4_params') },
-      { key: 'ipv6', title: t('pppoe.tabs.ipv6_params') },
-      { key: 'mirror', title: t('pppoe.tabs.mirror') },
-      { key: 'other', title: t('pppoe.tabs.other') },
+      { key: 'basic', title: t('pppoe.tabs.basic'), schema: basicSchema.value },
+      { key: 'dhcp', title: 'DHCP', schema: dhcpSchema.value },
+      { key: 'dhcpv6', title: 'DHCPv6', schema: dhcpv6Schema.value },
+      { key: 'ip', title: t('pppoe.tabs.ipv4_params'), schema: ipSchema.value },
+      { key: 'ipv6', title: t('pppoe.tabs.ipv6_params'), schema: ipv6Schema.value },
+      { key: 'mirror', title: t('pppoe.tabs.mirror'), schema: mirrorSchema.value },
+      { key: 'other', title: t('pppoe.tabs.other'), schema: otherSchema.value },
     ]);
 
     function getDefaultForm() {
@@ -199,8 +219,8 @@ export default defineComponent({
         dhcp_client_id: '', dhcp_default_route_distance: '', dhcp_host_name: '',
         dhcp_mtu: false, dhcp_no_default_route: false, dhcp_reject: '',
         dhcp_user_class: '', dhcp_vendor_class_id: '',
-        dhcpv6_instance_name: '', dhcpv6_no_release: false, dhcpv6_rapid_commit: false,
-        dhcpv6_temporary: false, dhcpv6_pd_length: '',
+        ...DHCPV6_DEFAULTS,
+        dhcpv6_pd_instances: '',
         ip_adjust_mss: '', ip_disable_forwarding: false, ip_source_validation: '',
         ipv6_autoconf: false, ipv6_interface_identifier: '', ipv6_adjust_mss: '',
         ipv6_disable_forwarding: false,
@@ -213,43 +233,43 @@ export default defineComponent({
       return {
         name: p.name || '',
         description: p.description || '',
-        source_interface: p.source_interface || '',
-        access_concentrator: p.access_concentrator || '',
-        service_name: p.service_name || '',
+        source_interface: p.source_interface || p['source-interface'] || '',
+        access_concentrator: p.access_concentrator || p['access-concentrator'] || '',
+        service_name: p.service_name || p['service-name'] || '',
         authentication_username: p.authentication?.username || '',
         authentication_password: p.authentication?.password || '',
-        remote_address: p.remote_address || '',
-        local_address: p.local_address || '',
-        host_uniq: p.host_uniq || '',
-        connect_on_demand: !!p.connect_on_demand,
-        no_default_route: !!p.no_default_route,
-        no_peer_dns: !!p.no_peer_dns,
+        remote_address: p.remote_address || p['remote-address'] || '',
+        local_address: p.local_address || p['local-address'] || '',
+        host_uniq: p.host_uniq || p['host-uniq'] || '',
+        connect_on_demand: !!(p.connect_on_demand || p['connect-on-demand']),
+        no_default_route: !!(p.no_default_route || p['no-default-route']),
+        no_peer_dns: !!(p.no_peer_dns || p['no-peer-dns']),
         mru: p.mru || '',
         mtu: p.mtu || '',
         holdoff: p.holdoff !== undefined ? p.holdoff : '',
-        idle_timeout: p.idle_timeout !== undefined ? p.idle_timeout : '',
-        default_route_distance: p.default_route_distance || '',
+        idle_timeout: p.idle_timeout !== undefined ? p.idle_timeout : (p['idle-timeout'] !== undefined ? p['idle-timeout'] : ''),
+        default_route_distance: p.default_route_distance || p['default-route-distance'] || '',
         disable: !!p.disable,
-        dhcp_client_id: p.dhcp_options?.client_id || '',
-        dhcp_default_route_distance: p.dhcp_options?.default_route_distance || '',
-        dhcp_host_name: p.dhcp_options?.host_name || '',
-        dhcp_mtu: !!p.dhcp_options?.mtu,
-        dhcp_no_default_route: !!p.dhcp_options?.no_default_route,
-        dhcp_reject: Array.isArray(p.dhcp_options?.reject) ? p.dhcp_options.reject.join('\n') : (p.dhcp_options?.reject || ''),
-        dhcp_user_class: p.dhcp_options?.user_class || '',
-        dhcp_vendor_class_id: p.dhcp_options?.vendor_class_id || '',
-        dhcpv6_instance_name: p.dhcpv6_options?.instance_name || '',
-        dhcpv6_no_release: !!p.dhcpv6_options?.no_release,
-        dhcpv6_rapid_commit: !!p.dhcpv6_options?.rapid_commit,
-        dhcpv6_temporary: !!p.dhcpv6_options?.temporary,
-        dhcpv6_pd_length: p.dhcpv6_options?.pd?.length || '',
-        ip_adjust_mss: p.ip?.adjust_mss || '',
-        ip_disable_forwarding: !!p.ip?.disable_forwarding,
-        ip_source_validation: p.ip?.source_validation || '',
+        dhcp_client_id: (p.dhcp_options || p['dhcp-options'])?.client_id || (p.dhcp_options || p['dhcp-options'])?.['client-id'] || '',
+        dhcp_default_route_distance: (p.dhcp_options || p['dhcp-options'])?.default_route_distance || (p.dhcp_options || p['dhcp-options'])?.['default-route-distance'] || '',
+        dhcp_host_name: (p.dhcp_options || p['dhcp-options'])?.host_name || (p.dhcp_options || p['dhcp-options'])?.['host-name'] || '',
+        dhcp_mtu: !!(p.dhcp_options || p['dhcp-options'])?.mtu,
+        dhcp_no_default_route: !!((p.dhcp_options || p['dhcp-options'])?.no_default_route || (p.dhcp_options || p['dhcp-options'])?.['no-default-route']),
+        dhcp_reject: (() => {
+          const reject = (p.dhcp_options || p['dhcp-options'])?.reject;
+          return Array.isArray(reject) ? reject.join('\n') : (reject || '');
+        })(),
+        dhcp_user_class: (p.dhcp_options || p['dhcp-options'])?.user_class || (p.dhcp_options || p['dhcp-options'])?.['user-class'] || '',
+        dhcp_vendor_class_id: (p.dhcp_options || p['dhcp-options'])?.vendor_class_id || (p.dhcp_options || p['dhcp-options'])?.['vendor-class-id'] || '',
+        ...dhcpv6ConfigToForm(p.dhcpv6_options || p['dhcpv6-options']),
+        dhcpv6_pd_instances: formatJson((p.dhcpv6_options || p['dhcpv6-options'])?.pd || {}),
+        ip_adjust_mss: p.ip?.adjust_mss || p.ip?.['adjust-mss'] || '',
+        ip_disable_forwarding: !!(p.ip?.disable_forwarding || p.ip?.['disable-forwarding']),
+        ip_source_validation: p.ip?.source_validation || p.ip?.['source-validation'] || '',
         ipv6_autoconf: !!p.ipv6?.address?.autoconf,
-        ipv6_interface_identifier: p.ipv6?.address?.interface_identifier || '',
-        ipv6_adjust_mss: p.ipv6?.adjust_mss || '',
-        ipv6_disable_forwarding: !!p.ipv6?.disable_forwarding,
+        ipv6_interface_identifier: p.ipv6?.address?.interface_identifier || p.ipv6?.address?.['interface-identifier'] || '',
+        ipv6_adjust_mss: p.ipv6?.adjust_mss || p.ipv6?.['adjust-mss'] || '',
+        ipv6_disable_forwarding: !!(p.ipv6?.disable_forwarding || p.ipv6?.['disable-forwarding']),
         mirror_egress: p.mirror?.egress || '',
         mirror_ingress: p.mirror?.ingress || '',
         redirect: p.redirect || '',
@@ -258,59 +278,56 @@ export default defineComponent({
     }
 
     function formToPPPoE(form) {
-      const result = { name: form.name };
+      const result = {};
       if (form.description) result.description = form.description;
-      if (form.source_interface) result.source_interface = form.source_interface;
-      if (form.access_concentrator) result.access_concentrator = form.access_concentrator;
-      if (form.service_name) result.service_name = form.service_name;
+      if (form.source_interface) result['source-interface'] = form.source_interface;
+      if (form.access_concentrator) result['access-concentrator'] = form.access_concentrator;
+      if (form.service_name) result['service-name'] = form.service_name;
       if (form.authentication_username || form.authentication_password) {
         result.authentication = {};
         if (form.authentication_username) result.authentication.username = form.authentication_username;
         if (form.authentication_password) result.authentication.password = form.authentication_password;
       }
-      if (form.remote_address) result.remote_address = form.remote_address;
-      if (form.local_address) result.local_address = form.local_address;
-      if (form.host_uniq) result.host_uniq = form.host_uniq;
-      if (form.connect_on_demand) result.connect_on_demand = true;
-      if (form.no_default_route) result.no_default_route = true;
-      if (form.no_peer_dns) result.no_peer_dns = true;
+      if (form.remote_address) result['remote-address'] = form.remote_address;
+      if (form.local_address) result['local-address'] = form.local_address;
+      if (form.host_uniq) result['host-uniq'] = form.host_uniq;
+      if (form.connect_on_demand) result['connect-on-demand'] = true;
+      if (form.no_default_route) result['no-default-route'] = true;
+      if (form.no_peer_dns) result['no-peer-dns'] = true;
       if (form.mru) result.mru = Number(form.mru);
       if (form.mtu) result.mtu = Number(form.mtu);
       if (form.holdoff !== '' && form.holdoff !== null && form.holdoff !== undefined) result.holdoff = Number(form.holdoff);
-      if (form.idle_timeout !== '' && form.idle_timeout !== null && form.idle_timeout !== undefined) result.idle_timeout = Number(form.idle_timeout);
-      if (form.default_route_distance) result.default_route_distance = Number(form.default_route_distance);
+      if (form.idle_timeout !== '' && form.idle_timeout !== null && form.idle_timeout !== undefined) result['idle-timeout'] = Number(form.idle_timeout);
+      if (form.default_route_distance) result['default-route-distance'] = Number(form.default_route_distance);
       if (form.disable) result.disable = true;
 
       // DHCP
       const dhcp = {};
-      if (form.dhcp_client_id) dhcp.client_id = form.dhcp_client_id;
-      if (form.dhcp_default_route_distance) dhcp.default_route_distance = Number(form.dhcp_default_route_distance);
-      if (form.dhcp_host_name) dhcp.host_name = form.dhcp_host_name;
+      if (form.dhcp_client_id) dhcp['client-id'] = form.dhcp_client_id;
+      if (form.dhcp_default_route_distance) dhcp['default-route-distance'] = Number(form.dhcp_default_route_distance);
+      if (form.dhcp_host_name) dhcp['host-name'] = form.dhcp_host_name;
       if (form.dhcp_mtu) dhcp.mtu = true;
-      if (form.dhcp_no_default_route) dhcp.no_default_route = true;
+      if (form.dhcp_no_default_route) dhcp['no-default-route'] = true;
       if (form.dhcp_reject) {
         dhcp.reject = form.dhcp_reject.split('\n').filter(Boolean).map(s => s.trim());
       }
-      if (form.dhcp_user_class) dhcp.user_class = form.dhcp_user_class;
-      if (form.dhcp_vendor_class_id) dhcp.vendor_class_id = form.dhcp_vendor_class_id;
-      if (Object.keys(dhcp).length) result.dhcp_options = dhcp;
+      if (form.dhcp_user_class) dhcp['user-class'] = form.dhcp_user_class;
+      if (form.dhcp_vendor_class_id) dhcp['vendor-class-id'] = form.dhcp_vendor_class_id;
+      if (Object.keys(dhcp).length) result['dhcp-options'] = dhcp;
 
       // DHCPv6
-      const d6 = {};
-      if (form.dhcpv6_no_release) d6.no_release = true;
-      if (form.dhcpv6_rapid_commit) d6.rapid_commit = true;
-      if (form.dhcpv6_temporary) d6.temporary = true;
-      if (form.dhcpv6_pd_length) d6.pd = { length: Number(form.dhcpv6_pd_length) };
-      if (Object.keys(d6).length) {
-        d6.instance_name = form.dhcpv6_instance_name || 'instance';
-        result.dhcpv6_options = d6;
+      const d6 = dhcpv6FormToConfig(form) || {};
+      if (form.dhcpv6_pd_instances) {
+        const pd = safeJsonParse(form.dhcpv6_pd_instances);
+        if (Object.keys(pd).length) d6.pd = pd;
       }
+      if (Object.keys(d6).length) result['dhcpv6-options'] = d6;
 
       // IP
       const ip = {};
-      if (form.ip_adjust_mss) ip.adjust_mss = form.ip_adjust_mss;
-      if (form.ip_disable_forwarding) ip.disable_forwarding = true;
-      if (form.ip_source_validation) ip.source_validation = form.ip_source_validation;
+      if (form.ip_adjust_mss) ip['adjust-mss'] = form.ip_adjust_mss;
+      if (form.ip_disable_forwarding) ip['disable-forwarding'] = true;
+      if (form.ip_source_validation) ip['source-validation'] = form.ip_source_validation;
       if (Object.keys(ip).length) result.ip = ip;
 
       // IPv6
@@ -318,11 +335,11 @@ export default defineComponent({
       if (form.ipv6_autoconf || form.ipv6_interface_identifier) {
         const addr = {};
         if (form.ipv6_autoconf) addr.autoconf = true;
-        if (form.ipv6_interface_identifier) addr.interface_identifier = form.ipv6_interface_identifier;
+        if (form.ipv6_interface_identifier) addr['interface-identifier'] = form.ipv6_interface_identifier;
         ipv6.address = addr;
       }
-      if (form.ipv6_adjust_mss) ipv6.adjust_mss = form.ipv6_adjust_mss;
-      if (form.ipv6_disable_forwarding) ipv6.disable_forwarding = true;
+      if (form.ipv6_adjust_mss) ipv6['adjust-mss'] = form.ipv6_adjust_mss;
+      if (form.ipv6_disable_forwarding) ipv6['disable-forwarding'] = true;
       if (Object.keys(ipv6).length) result.ipv6 = ipv6;
 
       // Mirror
@@ -361,6 +378,18 @@ export default defineComponent({
           value: iface.name || iface,
           label: iface.name || iface,
         }));
+
+        // Load VRF options
+        try {
+          const vrfRes = await api.get('/config', { path: 'vrf' });
+          const vrfData = vrfRes.data || {};
+          const vrfNameData = vrfData.name || vrfData;
+          vrfOptions.value = Object.keys(vrfNameData)
+            .filter(name => typeof vrfNameData[name] === 'object')
+            .map(name => ({ value: name, label: name }));
+        } catch (e) {
+          vrfOptions.value = [];
+        }
       } catch (err) {
         handleError(err);
       } finally {
@@ -394,6 +423,7 @@ export default defineComponent({
         const path = `interfaces pppoe ${name}`;
         await configStore.setConfig(path, config);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (err) {
@@ -422,7 +452,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {
       loading, pppoes, selected: selectedPPPoEs, modalVisible, editingPPPoE, interfaceOptions, activeTab,
@@ -448,34 +478,13 @@ export default defineComponent({
         @selection-change="selected = $event"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="editingPPPoE?.name ? t('pppoe.modal.edit_title') : t('pppoe.modal.create_title')" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingPPPoE?.name ? t('pppoe.modal.edit_title') : t('pppoe.modal.create_title')" width="900px" @confirm="save">
         <template #default>
-          <TabGroup v-model="activeTab" :tabs="modalTabs" />
-          <div v-show="activeTab === 'basic'" style="padding: 16px 0;">
-            <ConfigForm :schema="basicSchema" :model="editingPPPoE" />
-          </div>
-          <div v-show="activeTab === 'dhcp'" style="padding: 16px 0;">
-            <ConfigForm :schema="dhcpSchema" :model="editingPPPoE" />
-          </div>
-          <div v-show="activeTab === 'dhcpv6'" style="padding: 16px 0;">
-            <ConfigForm :schema="dhcpv6Schema" :model="editingPPPoE" />
-          </div>
-          <div v-show="activeTab === 'ip'" style="padding: 16px 0;">
-            <ConfigForm :schema="ipSchema" :model="editingPPPoE" />
-          </div>
-          <div v-show="activeTab === 'ipv6'" style="padding: 16px 0;">
-            <ConfigForm :schema="ipv6Schema" :model="editingPPPoE" />
-          </div>
-          <div v-show="activeTab === 'mirror'" style="padding: 16px 0;">
-            <ConfigForm :schema="mirrorSchema" :model="editingPPPoE" />
-          </div>
-          <div v-show="activeTab === 'other'" style="padding: 16px 0;">
-            <ConfigForm :schema="otherSchema" :model="editingPPPoE" />
-          </div>
-        </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('pppoe.buttons.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="save">{{ t('pppoe.buttons.confirm') }}</button>
+          <TabGroup v-model="activeTab" :tabs="modalTabs">
+            <template v-for="tab in modalTabs" :key="tab.key" #[tab.key]>
+              <ConfigForm v-if="tab.schema" v-model="editingPPPoE" :schema="tab.schema" />
+            </template>
+          </TabGroup>
         </template>
       </DraggableModal>
       <DraggableModal v-model:visible="deleteModalVisible" :title="t('pppoe.modal.confirm_delete')" width="400px" @confirm="confirmRemove">

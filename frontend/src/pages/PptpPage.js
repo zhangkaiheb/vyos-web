@@ -362,10 +362,10 @@ export default defineComponent({
 
       saving.value = true;
       try {
-        await configApi.set('vpn pptp', pptpToConfig(config.value));
+        await configStore.setConfig('vpn pptp', pptpToConfig(config.value));
         configStore.markPending();
         saved.value = true;
-        await load();
+        await configStore.checkSessionChanged(); await load();
       } catch (e) {
         showError(e);
       } finally {
@@ -481,6 +481,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       onMenuRefresh(load);
     });
 

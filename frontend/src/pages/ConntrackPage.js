@@ -372,6 +372,7 @@ export default defineComponent({
         if (basicData.value.flowAccounting) value['flow-accounting'] = '';
         await configStore.setConfig(path.value, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(t('conntrack.saveBasicFailed'), e);
@@ -386,6 +387,7 @@ export default defineComponent({
         value['max-retrans'] = String(tcpData.value.maxRetrans);
         await configStore.setConfig(`${path.value}/tcp`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(t('conntrack.saveTcpFailed'), e);
@@ -417,6 +419,7 @@ export default defineComponent({
         if (Object.keys(other).length) value.other = other;
         await configStore.setConfig(`${path.value}/log`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(t('conntrack.saveLoggingFailed'), e);
@@ -436,6 +439,7 @@ export default defineComponent({
         if (modulesData.value.tftp) value.tftp = '';
         await configStore.setConfig(`${path.value}/modules`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(t('conntrack.saveModuleFailed'), e);
@@ -489,6 +493,7 @@ export default defineComponent({
         if (Object.keys(tcp).length) value.tcp = tcp;
         await configStore.setConfig(`${path.value}/ignore/ipv4/rule/${rule.id}`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         ignoreIpv4ModalVisible.value = false;
         await load();
       } catch (e) { showError(t('conntrack.saveIgnoreRuleFailed'), e); }
@@ -550,6 +555,7 @@ export default defineComponent({
         if (Object.keys(tcp).length) value.tcp = tcp;
         await configStore.setConfig(`${path.value}/ignore/ipv6/rule/${rule.id}`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         ignoreIpv6ModalVisible.value = false;
         await load();
       } catch (e) { showError(t('conntrack.saveIgnoreRuleFailed'), e); }
@@ -604,6 +610,7 @@ export default defineComponent({
         if (Object.keys(proto).length) value.protocol = proto;
         await configStore.setConfig(`${path.value}/timeout/custom/ipv4/rule/${rule.id}`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         customIpv4ModalVisible.value = false;
         await load();
       } catch (e) { showError(t('conntrack.saveTimeoutRuleFailed'), e); }
@@ -656,6 +663,7 @@ export default defineComponent({
         if (Object.keys(proto).length) value.protocol = proto;
         await configStore.setConfig(`${path.value}/timeout/custom/ipv6/rule/${rule.id}`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         customIpv6ModalVisible.value = false;
         await load();
       } catch (e) { showError(t('conntrack.saveTimeoutRuleFailed'), e); }
@@ -672,7 +680,7 @@ export default defineComponent({
       } catch (e) { showError(t('conntrack.deleteTimeoutRuleFailed'), e); }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {t,
       

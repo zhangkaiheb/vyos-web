@@ -289,9 +289,9 @@ export default defineComponent({
       saving.value = true;
       try {
         const payload = formToOpenconnect(config.value);
-        await configApi.set('vpn openconnect', payload);
+        await configStore.setConfig('vpn openconnect', payload);
         configStore.markPending();
-        await load();
+        await configStore.checkSessionChanged(); await load();
       } catch (e) {
         showError(e.message || t('openconnect.errors.saveFailed'));
       } finally {
@@ -377,6 +377,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       onMenuRefresh(load);
     });
 

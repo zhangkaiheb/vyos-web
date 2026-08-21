@@ -491,6 +491,7 @@ export default defineComponent({
         }
 
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await loadConfig();
       } catch (e) {
         showError(e, t('wan.errors.saveFailed'));
@@ -499,7 +500,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { loadConfig(); });
+    onMounted(() => { loadConfig(); window.addEventListener('config-committed', loadConfig); });
 
     return {
       loading, globalConfig, healthList, ruleList,

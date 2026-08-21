@@ -117,22 +117,23 @@ export default defineComponent({
     async function save() {
       saving.value = true;
       try {
-        await configApi.delete('system task-scheduler');
+        await configStore.deleteConfig('system task-scheduler');
         for (const task of tasks.value) {
           if (task.crontab_spec) {
-            await configApi.set(`system task-scheduler task ${task.name} crontab-spec`, task.crontab_spec);
+            await configStore.setConfig(`system task-scheduler task ${task.name} crontab-spec`, task.crontab_spec);
           }
           if (task.executable_path) {
-            await configApi.set(`system task-scheduler task ${task.name} executable path`, task.executable_path);
+            await configStore.setConfig(`system task-scheduler task ${task.name} executable path`, task.executable_path);
           }
           if (task.executable_arguments) {
-            await configApi.set(`system task-scheduler task ${task.name} executable arguments`, task.executable_arguments);
+            await configStore.setConfig(`system task-scheduler task ${task.name} executable arguments`, task.executable_arguments);
           }
           if (task.interval) {
-            await configApi.set(`system task-scheduler task ${task.name} interval`, task.interval);
+            await configStore.setConfig(`system task-scheduler task ${task.name} interval`, task.interval);
           }
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await load();
       } catch (e) {
         showError(e.message || t('taskScheduler.errors.saveFailed'));
@@ -141,7 +142,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {t,
       

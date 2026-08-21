@@ -112,12 +112,13 @@ export default defineComponent({
       const { interface: iface, egress, ingress } = editingItem.value;
       try {
         if (egress) {
-          await configApi.set(`qos interface ${iface} egress`, egress);
+          await configStore.setConfig(`qos interface ${iface} egress`, egress);
         }
         if (ingress) {
-          await configApi.set(`qos interface ${iface} ingress`, ingress);
+          await configStore.setConfig(`qos interface ${iface} ingress`, ingress);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (e) {
@@ -136,12 +137,13 @@ export default defineComponent({
       if (!record) return;
       try {
         if (record.egress) {
-          await configApi.delete(`qos interface ${record.interface} egress`);
+          await configStore.deleteConfig(`qos interface ${record.interface} egress`);
         }
         if (record.ingress) {
-          await configApi.delete(`qos interface ${record.interface} ingress`);
+          await configStore.deleteConfig(`qos interface ${record.interface} ingress`);
         }
         configStore.markPending();
+        await configStore.checkSessionChanged();
         pendingDeleteRecord.value = null;
         await load();
       } catch (e) {
@@ -152,6 +154,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

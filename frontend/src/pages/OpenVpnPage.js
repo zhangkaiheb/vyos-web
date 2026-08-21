@@ -60,12 +60,6 @@ const SOURCE_VALIDATION_OPTIONS = [
   { value: 'disable', label: 'openvpn.sourceValidation.disable' },
 ];
 
-const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: 'openvpn.acceptDad.0' },
-  { value: '1', label: 'openvpn.acceptDad.1' },
-  { value: '2', label: 'openvpn.acceptDad.2' },
-];
-
 const TLS_VERSION_OPTIONS = [
   { value: '1.0', label: '1.0' },
   { value: '1.1', label: '1.1' },
@@ -121,6 +115,11 @@ export default defineComponent({
     const editingItem = ref(null);
     const interfaceOptions = ref([]);
     const activeTab = ref('basic');
+    const acceptDadOptions = computed(() => [
+      { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
+      { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
+      { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
+    ]);
 
     const basicSchema = computed(() => [
       { key: 'name', title: 'openvpn.schema.name', type: 'text', required: true, placeholder: 'openvpn.schema.namePlaceholder', disabled: !!editingItem.value?.name },
@@ -186,7 +185,7 @@ export default defineComponent({
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: 'openvpn.schema.ipv6AcceptDad', type: 'select', options: ACCEPT_DAD_OPTIONS, help: 'openvpn.schema.ipv6AcceptDadHelp' },
+      { key: 'ipv6_accept_dad', title: 'openvpn.schema.ipv6AcceptDad', type: 'select', options: acceptDadOptions.value, help: 'openvpn.schema.ipv6AcceptDadHelp' },
       { key: 'ipv6_address_autoconf', title: 'openvpn.schema.ipv6AddressAutoconf', type: 'checkbox', help: 'openvpn.schema.ipv6AddressAutoconfHelp' },
       { key: 'ipv6_address_eui64', title: 'openvpn.schema.ipv6AddressEui64', type: 'text', placeholder: 'openvpn.schema.ipv6AddressEui64Placeholder' },
       { key: 'ipv6_address_iface_id', title: 'openvpn.schema.ipv6AddressIfaceId', type: 'text', placeholder: 'openvpn.schema.ipv6AddressIfaceIdPlaceholder' },
@@ -902,11 +901,11 @@ export default defineComponent({
 
       try {
         console.log('[OpenVPN] Calling API: set interfaces openvpn', editingItem.value.name);
-        await configApi.set(`interfaces openvpn ${editingItem.value.name}`, config);
+        await configStore.setConfig(`interfaces openvpn ${editingItem.value.name}`, config);
         configStore.markPending();
         console.log('[OpenVPN] API call success');
         modalVisible.value = false;
-        await load();
+        await configStore.checkSessionChanged(); await load();
         console.log('[OpenVPN] Config saved, list reloaded');
       } catch (e) {
         console.error('[OpenVPN] Save failed:', e);
@@ -921,10 +920,10 @@ export default defineComponent({
       }
       const names = selected.value.map(s => s.name);
       try {
-        await Promise.all(names.map(name => configApi.delete(`interfaces openvpn ${name}`)));
+        await Promise.all(names.map(name => configStore.deleteConfig(`interfaces openvpn ${name}`)));
         configStore.markPending();
         selected.value = [];
-        await load();
+        await configStore.checkSessionChanged(); await load();
       } catch (e) {
         showError(e.message || t('openvpn.deleteFailed'));
       }
@@ -932,6 +931,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
       onMenuRefresh(load);
     });
 

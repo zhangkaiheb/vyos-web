@@ -142,6 +142,7 @@ export default defineComponent({
         }
         await configStore.setConfig(`${path} rule ${rule.id}`, value);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (e) {
@@ -177,7 +178,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); loadInterfaces(); onMenuRefresh(load); });
+    onMounted(() => { load(); loadInterfaces(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
     watch(() => route.path, () => { load(); loadInterfaces(); });
 
     return { path, writeDisabled, rules, loading, modalVisible, modalKey, editingRule, editingOriginalId, tabs, activeTab, tabSchemas, columns, openModal, saveRule, deleteRule, deleteModalVisible, pendingDeleteRuleId, confirmDeleteRule, load, t };
@@ -191,7 +192,7 @@ export default defineComponent({
       <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? t('staticNat.editRule') : t('staticNat.createRule')" width="820px" :key="modalKey" @confirm="saveRule">
         <TabGroup v-model="activeTab" :tabs="tabs">
           <template v-for="tab in tabs" :key="tab.key" #[tab.key]>
-            <ConfigForm v-model="editingRule" :schema="tabSchemas[tab.key]" :showAdvanced="true" :formKey="'static_nat_rule_' + tab.key" />
+            <ConfigForm v-model="editingRule" :schema="tabSchemas[tab.key]" :showAdvanced="true" :formKey="'static_nat_rule_' + tab.key" :editMode="!!editingOriginalId" />
           </template>
         </TabGroup>
       </DraggableModal>

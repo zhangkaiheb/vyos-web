@@ -51,15 +51,37 @@ export default defineComponent({
     });
 
     function getGroupOptionsForType(type) {
+      let options = [];
       switch (type) {
-        case 'address-group': return props.addressGroupOptions;
-        case 'network-group': return props.networkGroupOptions;
-        case 'domain-group': return props.domainGroupOptions;
+        case 'address-group': options = props.addressGroupOptions; break;
+        case 'network-group': options = props.networkGroupOptions; break;
+        case 'domain-group': options = props.domainGroupOptions; break;
         default: return [];
       }
+      // Include current value if not in options (for edit mode)
+      if (props.groupValue && selectedType.value === type && !options.includes(props.groupValue)) {
+        options = [props.groupValue, ...options];
+      }
+      return options;
     }
 
-    return { selectedType, addressInput, groupInput, macInput, portGroupInput, getGroupOptionsForType, t };
+    function getMacOptions() {
+      let options = props.macGroupOptions;
+      if (props.macValue && !options.includes(props.macValue)) {
+        options = [props.macValue, ...options];
+      }
+      return options;
+    }
+
+    function getPortOptions() {
+      let options = props.portGroupOptions;
+      if (props.portGroupValue && !options.includes(props.portGroupValue)) {
+        options = [props.portGroupValue, ...options];
+      }
+      return options;
+    }
+
+    return { selectedType, addressInput, groupInput, macInput, portGroupInput, getGroupOptionsForType, getMacOptions, getPortOptions, t };
   },
   template: `
     <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden; margin-bottom:16px;">
@@ -115,7 +137,7 @@ export default defineComponent({
             @change="macInput = $event.target.value"
           >
             <option value="" style="color:#999;">{{ t('sourceDest.selectMacGroup') }}</option>
-            <option v-for="g in macGroupOptions" :key="g" :value="g" style="color:#333;">{{ g }}</option>
+            <option v-for="g in getMacOptions()" :key="g" :value="g" style="color:#333;">{{ g }}</option>
           </select>
         </div>
         <div style="display:flex; align-items:center; margin-bottom:10px; gap:8px;">
@@ -127,7 +149,7 @@ export default defineComponent({
             @change="portGroupInput = $event.target.value"
           >
             <option value="" style="color:#999;">{{ t('sourceDest.selectPortGroup') }}</option>
-            <option v-for="g in portGroupOptions" :key="g" :value="g" style="color:#333;">{{ g }}</option>
+            <option v-for="g in getPortOptions()" :key="g" :value="g" style="color:#333;">{{ g }}</option>
           </select>
         </div>
       </div>

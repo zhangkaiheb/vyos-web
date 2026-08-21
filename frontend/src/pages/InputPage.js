@@ -13,6 +13,7 @@ export default defineComponent({
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
     const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const items = ref([]);
     const modalVisible = ref(false);
@@ -125,6 +126,7 @@ export default defineComponent({
         const config = formToItem(form);
         await configStore.setConfig(`interfaces input ${form.name}`, config);
         configStore.markPending();
+        await configStore.checkSessionChanged();
         modalVisible.value = false;
         await load();
       } catch (err) {
@@ -156,6 +158,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

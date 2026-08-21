@@ -1,0 +1,590 @@
+{
+  "zh-CN": {
+    "dummy": {
+      "columns": {
+        "name": "名称",
+        "description": "描述",
+        "address": "地址",
+        "mac": "MAC",
+        "mtu": "MTU",
+        "netns": "命名空间",
+        "vrf": "VRF",
+        "disable": "禁用",
+        "actions": "操作"
+      },
+      "tabs": {
+        "basic": "基本",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "镜像",
+        "other": "其他"
+      },
+      "labels": {
+        "name": "接口名称",
+        "description": "描述",
+        "address": "IP 地址",
+        "mac": "MAC 地址",
+        "mtu": "MTU",
+        "netns": "网络命名空间",
+        "disable": "禁用接口",
+        "ipDisableForwarding": "IPv4 禁用转发",
+        "ipSourceValidation": "IPv4 源验证",
+        "ipv6Eui64": "IPv6 EUI64 前缀",
+        "ipv6NoDefaultLinkLocal": "IPv6 禁用默认链路本地地址",
+        "ipv6DisableForwarding": "IPv6 禁用转发",
+        "ipv6SourceValidation": "IPv6 源验证",
+        "mirrorEgress": "出口镜像",
+        "mirrorIngress": "入口镜像",
+        "redirect": "重定向",
+        "vrf": "VRF"
+      },
+      "placeholders": {
+        "name": "例如 dum0",
+        "description": "接口描述",
+        "address": "每行一个 IPv4/IPv6 地址",
+        "mac": "例如 00:11:22:33:44:55",
+        "mtu": "68-16000",
+        "netns": "选择命名空间",
+        "vrf": "选择 VRF",
+        "interface": "选择接口",
+        "ipSourceValidation": "选择源验证模式",
+        "ipv6Eui64": "每行一个 /64 前缀，例如 2001:db8:1::/64",
+        "ipv6SourceValidation": "选择源验证模式"
+      },
+      "help": {
+        "name": "格式: dumN",
+        "address": "支持多行地址",
+        "mac": "媒体访问控制地址",
+        "mtu": "最大传输单元，默认 1500",
+        "netns": "网络命名空间名称",
+        "disable": "管理性禁用接口",
+        "ipDisableForwarding": "关闭该接口 IPv4 转发",
+        "ipSourceValidation": "反向路径源地址验证",
+        "ipv6Eui64": "用于基于 MAC 的 EUI-64 方式配置 IPv6 /64 前缀",
+        "ipv6NoDefaultLinkLocal": "移除该接口默认的链路本地地址",
+        "ipv6DisableForwarding": "关闭该接口 IPv6 转发",
+        "ipv6SourceValidation": "反向路径源地址验证",
+        "mirrorEgress": "镜像出口流量到目标接口",
+        "mirrorIngress": "镜像入口流量到目标接口",
+        "redirect": "将入向流量重定向到目标接口",
+        "vrf": "绑定到指定 VRF"
+      },
+      "modals": {
+        "create": "创建 Dummy 接口",
+        "edit": "编辑 Dummy 接口",
+        "confirmDelete": "确认删除"
+      },
+      "messages": {
+        "enterName": "请输入接口名称",
+        "invalidName": "Dummy 接口名称必须为 dumN 格式",
+        "descriptionTooLong": "描述过长（最多 255 个字符）",
+        "selectToDelete": "请先选择要删除的 Dummy 接口",
+        "confirmDelete": "确认删除以下 Dummy 接口？"
+      }
+    }
+  },
+  "zh-TW": {
+    "dummy": {
+      "columns": {
+        "name": "名稱",
+        "description": "描述",
+        "address": "位址",
+        "mac": "MAC",
+        "mtu": "MTU",
+        "netns": "命名空間",
+        "vrf": "VRF",
+        "disable": "停用",
+        "actions": "操作"
+      },
+      "tabs": {
+        "basic": "基本",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "鏡像",
+        "other": "其他"
+      },
+      "labels": {
+        "name": "介面名稱",
+        "description": "描述",
+        "address": "IP 位址",
+        "mac": "MAC 位址",
+        "mtu": "MTU",
+        "netns": "網路命名空間",
+        "disable": "停用介面",
+        "ipDisableForwarding": "IPv4 停用轉送",
+        "ipSourceValidation": "IPv4 來源驗證",
+        "ipv6Eui64": "IPv6 EUI64 前綴",
+        "ipv6NoDefaultLinkLocal": "IPv6 停用預設鏈路本地位址",
+        "ipv6DisableForwarding": "IPv6 停用轉送",
+        "ipv6SourceValidation": "IPv6 來源驗證",
+        "mirrorEgress": "出口鏡像",
+        "mirrorIngress": "入口鏡像",
+        "redirect": "重導向",
+        "vrf": "VRF"
+      },
+      "placeholders": {
+        "name": "例如 dum0",
+        "description": "介面描述",
+        "address": "每行一個 IPv4/IPv6 位址",
+        "mac": "例如 00:11:22:33:44:55",
+        "mtu": "68-16000",
+        "netns": "選擇命名空間",
+        "vrf": "選擇 VRF",
+        "interface": "選擇介面",
+        "ipSourceValidation": "選擇來源驗證模式",
+        "ipv6Eui64": "每行一個 /64 前綴，例如 2001:db8:1::/64",
+        "ipv6SourceValidation": "選擇來源驗證模式"
+      },
+      "help": {
+        "name": "格式: dumN",
+        "address": "支援多行位址",
+        "mac": "媒體存取控制位址",
+        "mtu": "最大傳輸單元，預設 1500",
+        "netns": "網路命名空間名稱",
+        "disable": "管理性停用介面",
+        "ipDisableForwarding": "關閉該介面 IPv4 轉送",
+        "ipSourceValidation": "反向路徑來源位址驗證",
+        "ipv6Eui64": "用於基於 MAC 的 EUI-64 方式設定 IPv6 /64 前綴",
+        "ipv6NoDefaultLinkLocal": "移除該介面預設的鏈路本地位址",
+        "ipv6DisableForwarding": "關閉該介面 IPv6 轉送",
+        "ipv6SourceValidation": "反向路徑來源位址驗證",
+        "mirrorEgress": "鏡像出口流量到目標介面",
+        "mirrorIngress": "鏡像入口流量到目標介面",
+        "redirect": "將入向流量重導向到目標介面",
+        "vrf": "綁定到指定 VRF"
+      },
+      "modals": {
+        "create": "建立 Dummy 介面",
+        "edit": "編輯 Dummy 介面",
+        "confirmDelete": "確認刪除"
+      },
+      "messages": {
+        "enterName": "請輸入介面名稱",
+        "invalidName": "Dummy 介面名稱必須為 dumN 格式",
+        "descriptionTooLong": "描述過長（最多 255 個字元）",
+        "selectToDelete": "請先選擇要刪除的 Dummy 介面",
+        "confirmDelete": "確認刪除以下 Dummy 介面？"
+      }
+    }
+  },
+  "en": {
+    "dummy": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "address": "Address",
+        "mac": "MAC",
+        "mtu": "MTU",
+        "netns": "Namespace",
+        "vrf": "VRF",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other"
+      },
+      "labels": {
+        "name": "Interface Name",
+        "description": "Description",
+        "address": "IP Address",
+        "mac": "MAC Address",
+        "mtu": "MTU",
+        "netns": "Network Namespace",
+        "disable": "Disable Interface",
+        "ipDisableForwarding": "Disable IPv4 Forwarding",
+        "ipSourceValidation": "IPv4 Source Validation",
+        "ipv6Eui64": "IPv6 EUI64 Prefix",
+        "ipv6NoDefaultLinkLocal": "IPv6 No Default Link-Local",
+        "ipv6DisableForwarding": "Disable IPv6 Forwarding",
+        "ipv6SourceValidation": "IPv6 Source Validation",
+        "mirrorEgress": "Mirror Egress",
+        "mirrorIngress": "Mirror Ingress",
+        "redirect": "Redirect",
+        "vrf": "VRF"
+      },
+      "placeholders": {
+        "name": "e.g. dum0",
+        "description": "Interface description",
+        "address": "One IPv4/IPv6 address per line",
+        "mac": "e.g. 00:11:22:33:44:55",
+        "mtu": "68-16000",
+        "netns": "Select namespace",
+        "vrf": "Select VRF",
+        "interface": "Select interface",
+        "ipSourceValidation": "Select source validation mode",
+        "ipv6Eui64": "One /64 prefix per line, e.g. 2001:db8:1::/64",
+        "ipv6SourceValidation": "Select source validation mode"
+      },
+      "help": {
+        "name": "Format: dumN",
+        "address": "Supports multiline addresses",
+        "mac": "Media Access Control address",
+        "mtu": "Maximum transmission unit, default 1500",
+        "netns": "Network namespace name",
+        "disable": "Administratively disable interface",
+        "ipDisableForwarding": "Disable IPv4 forwarding on this interface",
+        "ipSourceValidation": "Reverse-path source validation",
+        "ipv6Eui64": "Prefix for IPv6 address with MAC-based EUI-64 (IPv6 /64 network)",
+        "ipv6NoDefaultLinkLocal": "Remove the default link-local address from the interface",
+        "ipv6DisableForwarding": "Disable IPv6 forwarding on this interface",
+        "ipv6SourceValidation": "Reverse-path source validation",
+        "mirrorEgress": "Mirror egress traffic to target interface",
+        "mirrorIngress": "Mirror ingress traffic to target interface",
+        "redirect": "Redirect incoming traffic to destination interface",
+        "vrf": "Bind interface to VRF"
+      },
+      "modals": {
+        "create": "Create Dummy Interface",
+        "edit": "Edit Dummy Interface",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "enterName": "Please enter interface name",
+        "invalidName": "Dummy interface must be named dumN",
+        "descriptionTooLong": "Description too long (limit 255 characters)",
+        "selectToDelete": "Please select dummy interfaces to delete first",
+        "confirmDelete": "Confirm delete the following dummy interfaces?"
+      }
+    }
+  },
+  "ru": {
+    "dummy": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "address": "Address",
+        "mac": "MAC",
+        "mtu": "MTU",
+        "netns": "Namespace",
+        "vrf": "VRF",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other"
+      },
+      "labels": {
+        "name": "Interface Name",
+        "description": "Description",
+        "address": "IP Address",
+        "mac": "MAC Address",
+        "mtu": "MTU",
+        "netns": "Network Namespace",
+        "disable": "Disable Interface",
+        "ipDisableForwarding": "Disable IPv4 Forwarding",
+        "ipSourceValidation": "IPv4 Source Validation",
+        "ipv6Eui64": "IPv6 EUI64 Prefix",
+        "ipv6NoDefaultLinkLocal": "IPv6 No Default Link-Local",
+        "ipv6DisableForwarding": "Disable IPv6 Forwarding",
+        "ipv6SourceValidation": "IPv6 Source Validation",
+        "mirrorEgress": "Mirror Egress",
+        "mirrorIngress": "Mirror Ingress",
+        "redirect": "Redirect",
+        "vrf": "VRF"
+      },
+      "placeholders": {
+        "name": "e.g. dum0",
+        "description": "Interface description",
+        "address": "One IPv4/IPv6 address per line",
+        "mac": "e.g. 00:11:22:33:44:55",
+        "mtu": "68-16000",
+        "netns": "Select namespace",
+        "vrf": "Select VRF",
+        "interface": "Select interface",
+        "ipSourceValidation": "Select source validation mode",
+        "ipv6Eui64": "One /64 prefix per line, e.g. 2001:db8:1::/64",
+        "ipv6SourceValidation": "Select source validation mode"
+      },
+      "help": {
+        "name": "Format: dumN",
+        "address": "Supports multiline addresses",
+        "mac": "Media Access Control address",
+        "mtu": "Maximum transmission unit, default 1500",
+        "netns": "Network namespace name",
+        "disable": "Administratively disable interface",
+        "ipDisableForwarding": "Disable IPv4 forwarding on this interface",
+        "ipSourceValidation": "Reverse-path source validation",
+        "ipv6Eui64": "Prefix for IPv6 address with MAC-based EUI-64 (IPv6 /64 network)",
+        "ipv6NoDefaultLinkLocal": "Remove the default link-local address from the interface",
+        "ipv6DisableForwarding": "Disable IPv6 forwarding on this interface",
+        "ipv6SourceValidation": "Reverse-path source validation",
+        "mirrorEgress": "Mirror egress traffic to target interface",
+        "mirrorIngress": "Mirror ingress traffic to target interface",
+        "redirect": "Redirect incoming traffic to destination interface",
+        "vrf": "Bind interface to VRF"
+      },
+      "modals": {
+        "create": "Create Dummy Interface",
+        "edit": "Edit Dummy Interface",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "enterName": "Please enter interface name",
+        "invalidName": "Dummy interface must be named dumN",
+        "descriptionTooLong": "Description too long (limit 255 characters)",
+        "selectToDelete": "Please select dummy interfaces to delete first",
+        "confirmDelete": "Confirm delete the following dummy interfaces?"
+      }
+    }
+  },
+  "de": {
+    "dummy": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "address": "Address",
+        "mac": "MAC",
+        "mtu": "MTU",
+        "netns": "Namespace",
+        "vrf": "VRF",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other"
+      },
+      "labels": {
+        "name": "Interface Name",
+        "description": "Description",
+        "address": "IP Address",
+        "mac": "MAC Address",
+        "mtu": "MTU",
+        "netns": "Network Namespace",
+        "disable": "Disable Interface",
+        "ipDisableForwarding": "Disable IPv4 Forwarding",
+        "ipSourceValidation": "IPv4 Source Validation",
+        "ipv6Eui64": "IPv6 EUI64 Prefix",
+        "ipv6NoDefaultLinkLocal": "IPv6 No Default Link-Local",
+        "ipv6DisableForwarding": "Disable IPv6 Forwarding",
+        "ipv6SourceValidation": "IPv6 Source Validation",
+        "mirrorEgress": "Mirror Egress",
+        "mirrorIngress": "Mirror Ingress",
+        "redirect": "Redirect",
+        "vrf": "VRF"
+      },
+      "placeholders": {
+        "name": "e.g. dum0",
+        "description": "Interface description",
+        "address": "One IPv4/IPv6 address per line",
+        "mac": "e.g. 00:11:22:33:44:55",
+        "mtu": "68-16000",
+        "netns": "Select namespace",
+        "vrf": "Select VRF",
+        "interface": "Select interface",
+        "ipSourceValidation": "Select source validation mode",
+        "ipv6Eui64": "One /64 prefix per line, e.g. 2001:db8:1::/64",
+        "ipv6SourceValidation": "Select source validation mode"
+      },
+      "help": {
+        "name": "Format: dumN",
+        "address": "Supports multiline addresses",
+        "mac": "Media Access Control address",
+        "mtu": "Maximum transmission unit, default 1500",
+        "netns": "Network namespace name",
+        "disable": "Administratively disable interface",
+        "ipDisableForwarding": "Disable IPv4 forwarding on this interface",
+        "ipSourceValidation": "Reverse-path source validation",
+        "ipv6Eui64": "Prefix for IPv6 address with MAC-based EUI-64 (IPv6 /64 network)",
+        "ipv6NoDefaultLinkLocal": "Remove the default link-local address from the interface",
+        "ipv6DisableForwarding": "Disable IPv6 forwarding on this interface",
+        "ipv6SourceValidation": "Reverse-path source validation",
+        "mirrorEgress": "Mirror egress traffic to target interface",
+        "mirrorIngress": "Mirror ingress traffic to target interface",
+        "redirect": "Redirect incoming traffic to destination interface",
+        "vrf": "Bind interface to VRF"
+      },
+      "modals": {
+        "create": "Create Dummy Interface",
+        "edit": "Edit Dummy Interface",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "enterName": "Please enter interface name",
+        "invalidName": "Dummy interface must be named dumN",
+        "descriptionTooLong": "Description too long (limit 255 characters)",
+        "selectToDelete": "Please select dummy interfaces to delete first",
+        "confirmDelete": "Confirm delete the following dummy interfaces?"
+      }
+    }
+  },
+  "fr": {
+    "dummy": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "address": "Address",
+        "mac": "MAC",
+        "mtu": "MTU",
+        "netns": "Namespace",
+        "vrf": "VRF",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other"
+      },
+      "labels": {
+        "name": "Interface Name",
+        "description": "Description",
+        "address": "IP Address",
+        "mac": "MAC Address",
+        "mtu": "MTU",
+        "netns": "Network Namespace",
+        "disable": "Disable Interface",
+        "ipDisableForwarding": "Disable IPv4 Forwarding",
+        "ipSourceValidation": "IPv4 Source Validation",
+        "ipv6Eui64": "IPv6 EUI64 Prefix",
+        "ipv6NoDefaultLinkLocal": "IPv6 No Default Link-Local",
+        "ipv6DisableForwarding": "Disable IPv6 Forwarding",
+        "ipv6SourceValidation": "IPv6 Source Validation",
+        "mirrorEgress": "Mirror Egress",
+        "mirrorIngress": "Mirror Ingress",
+        "redirect": "Redirect",
+        "vrf": "VRF"
+      },
+      "placeholders": {
+        "name": "e.g. dum0",
+        "description": "Interface description",
+        "address": "One IPv4/IPv6 address per line",
+        "mac": "e.g. 00:11:22:33:44:55",
+        "mtu": "68-16000",
+        "netns": "Select namespace",
+        "vrf": "Select VRF",
+        "interface": "Select interface",
+        "ipSourceValidation": "Select source validation mode",
+        "ipv6Eui64": "One /64 prefix per line, e.g. 2001:db8:1::/64",
+        "ipv6SourceValidation": "Select source validation mode"
+      },
+      "help": {
+        "name": "Format: dumN",
+        "address": "Supports multiline addresses",
+        "mac": "Media Access Control address",
+        "mtu": "Maximum transmission unit, default 1500",
+        "netns": "Network namespace name",
+        "disable": "Administratively disable interface",
+        "ipDisableForwarding": "Disable IPv4 forwarding on this interface",
+        "ipSourceValidation": "Reverse-path source validation",
+        "ipv6Eui64": "Prefix for IPv6 address with MAC-based EUI-64 (IPv6 /64 network)",
+        "ipv6NoDefaultLinkLocal": "Remove the default link-local address from the interface",
+        "ipv6DisableForwarding": "Disable IPv6 forwarding on this interface",
+        "ipv6SourceValidation": "Reverse-path source validation",
+        "mirrorEgress": "Mirror egress traffic to target interface",
+        "mirrorIngress": "Mirror ingress traffic to target interface",
+        "redirect": "Redirect incoming traffic to destination interface",
+        "vrf": "Bind interface to VRF"
+      },
+      "modals": {
+        "create": "Create Dummy Interface",
+        "edit": "Edit Dummy Interface",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "enterName": "Please enter interface name",
+        "invalidName": "Dummy interface must be named dumN",
+        "descriptionTooLong": "Description too long (limit 255 characters)",
+        "selectToDelete": "Please select dummy interfaces to delete first",
+        "confirmDelete": "Confirm delete the following dummy interfaces?"
+      }
+    }
+  },
+  "ko": {
+    "dummy": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "address": "Address",
+        "mac": "MAC",
+        "mtu": "MTU",
+        "netns": "Namespace",
+        "vrf": "VRF",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other"
+      },
+      "labels": {
+        "name": "Interface Name",
+        "description": "Description",
+        "address": "IP Address",
+        "mac": "MAC Address",
+        "mtu": "MTU",
+        "netns": "Network Namespace",
+        "disable": "Disable Interface",
+        "ipDisableForwarding": "Disable IPv4 Forwarding",
+        "ipSourceValidation": "IPv4 Source Validation",
+        "ipv6Eui64": "IPv6 EUI64 Prefix",
+        "ipv6NoDefaultLinkLocal": "IPv6 No Default Link-Local",
+        "ipv6DisableForwarding": "Disable IPv6 Forwarding",
+        "ipv6SourceValidation": "IPv6 Source Validation",
+        "mirrorEgress": "Mirror Egress",
+        "mirrorIngress": "Mirror Ingress",
+        "redirect": "Redirect",
+        "vrf": "VRF"
+      },
+      "placeholders": {
+        "name": "e.g. dum0",
+        "description": "Interface description",
+        "address": "One IPv4/IPv6 address per line",
+        "mac": "e.g. 00:11:22:33:44:55",
+        "mtu": "68-16000",
+        "netns": "Select namespace",
+        "vrf": "Select VRF",
+        "interface": "Select interface",
+        "ipSourceValidation": "Select source validation mode",
+        "ipv6Eui64": "One /64 prefix per line, e.g. 2001:db8:1::/64",
+        "ipv6SourceValidation": "Select source validation mode"
+      },
+      "help": {
+        "name": "Format: dumN",
+        "address": "Supports multiline addresses",
+        "mac": "Media Access Control address",
+        "mtu": "Maximum transmission unit, default 1500",
+        "netns": "Network namespace name",
+        "disable": "Administratively disable interface",
+        "ipDisableForwarding": "Disable IPv4 forwarding on this interface",
+        "ipSourceValidation": "Reverse-path source validation",
+        "ipv6Eui64": "Prefix for IPv6 address with MAC-based EUI-64 (IPv6 /64 network)",
+        "ipv6NoDefaultLinkLocal": "Remove the default link-local address from the interface",
+        "ipv6DisableForwarding": "Disable IPv6 forwarding on this interface",
+        "ipv6SourceValidation": "Reverse-path source validation",
+        "mirrorEgress": "Mirror egress traffic to target interface",
+        "mirrorIngress": "Mirror ingress traffic to target interface",
+        "redirect": "Redirect incoming traffic to destination interface",
+        "vrf": "Bind interface to VRF"
+      },
+      "modals": {
+        "create": "Create Dummy Interface",
+        "edit": "Edit Dummy Interface",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "enterName": "Please enter interface name",
+        "invalidName": "Dummy interface must be named dumN",
+        "descriptionTooLong": "Description too long (limit 255 characters)",
+        "selectToDelete": "Please select dummy interfaces to delete first",
+        "confirmDelete": "Confirm delete the following dummy interfaces?"
+      }
+    }
+  }
+}

@@ -1104,6 +1104,7 @@ export default defineComponent({
         }
 
         configStore.markPending();
+        await configStore.checkSessionChanged();
         await loadConfig();
       } catch (e) {
         showError({ message: t('haproxy.messages.saveFailed') + (e.message || e) });
@@ -1416,6 +1417,7 @@ export default defineComponent({
 
     onMounted(() => {
       loadConfig();
+      window.addEventListener('config-committed', loadConfig);
     });
 
     return {

@@ -51,12 +51,16 @@ function formatEndpoint(ep) {
   const parts = [];
   if (ep.address) parts.push(ep.address);
   if (ep.port) parts.push(`:${ep.port}`);
-  if (ep['mac-address']) parts.push(`MAC:${ep['mac-address']}`);
-  if (ep.group?.['address-group']) parts.push(`AG:${ep.group['address-group']}`);
-  if (ep.group?.['network-group']) parts.push(`NG:${ep.group['network-group']}`);
-  if (ep.group?.['port-group']) parts.push(`PG:${ep.group['port-group']}`);
-  if (ep.group?.['dynamic-address-group']) parts.push(`DG:${ep.group['dynamic-address-group']}`);
-  if (ep.geoip?.['country-code']) parts.push(`GEO:${ep.geoip['country-code']}`);
+  if (ep['mac-address'] || ep.mac_address) parts.push(`MAC:${ep['mac-address'] || ep.mac_address}`);
+  const group = ep.group || {};
+  if (group['address-group'] || group.address_group) parts.push(`AG:${group['address-group'] || group.address_group}`);
+  if (group['network-group'] || group.network_group) parts.push(`NG:${group['network-group'] || group.network_group}`);
+  if (group['port-group'] || group.port_group) parts.push(`PG:${group['port-group'] || group.port_group}`);
+  if (group['dynamic-address-group'] || group.dynamic_address_group) parts.push(`DG:${group['dynamic-address-group'] || group.dynamic_address_group}`);
+  if (group['domain-group'] || group.domain_group) parts.push(`DM:${group['domain-group'] || group.domain_group}`);
+  if (group['mac-group'] || group.mac_group) parts.push(`MG:${group['mac-group'] || group.mac_group}`);
+  const geoip = ep.geoip || {};
+  if (geoip['country-code'] || geoip.country_code) parts.push(`GEO:${geoip['country-code'] || geoip.country_code}`);
   return parts.join('') || '';
 }
 
@@ -150,6 +154,16 @@ function transformDataForForm(data) {
   if (!data || typeof data !== 'object') return data;
   
   const result = { ...data };
+  
+  // Convert underscored keys to hyphenated keys for form compatibility
+  if (result.inbound_interface) {
+    result['inbound-interface'] = result.inbound_interface;
+    delete result.inbound_interface;
+  }
+  if (result.outbound_interface) {
+    result['outbound-interface'] = result.outbound_interface;
+    delete result.outbound_interface;
+  }
   
   if (result.tcp && result.tcp.flags) {
     result.tcp = {
@@ -273,15 +287,15 @@ export default defineComponent({
     const columns = computed(() => [
       { key: 'rule', title: t('firewall.columns.rule') },
       { key: 'description', title: t('firewall.columns.description') },
-      { key: 'action', title: t('firewall.columns.action') },
+      { key: 'inbound-interface', title: t('firewall.columns.inboundInterface') },
+      { key: 'outbound-interface', title: t('firewall.columns.outboundInterface') },
       { key: 'protocol', title: t('firewall.columns.protocol') },
       { key: 'source', title: t('firewall.columns.source') },
       { key: 'destination', title: t('firewall.columns.destination') },
-      { key: 'inbound-interface', title: t('firewall.columns.inboundInterface') },
-      { key: 'outbound-interface', title: t('firewall.columns.outboundInterface') },
       { key: 'packets', title: t('firewall.columns.packets') },
       { key: 'bytes', title: t('firewall.columns.bytes') },
       { key: 'log', title: t('firewall.columns.log') },
+      { key: 'action', title: t('firewall.columns.action') },
       { key: 'disable', title: t('firewall.columns.disable') },
     ]);
 
@@ -321,6 +335,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       onMenuRefresh(handleMenuRefresh);
+      window.addEventListener('config-committed', load);
     });
     onUnmounted(() => {
       offMenuRefresh(handleMenuRefresh);
@@ -338,6 +353,7 @@ export default defineComponent({
       const nextId = existingIds.length ? Math.max(...existingIds) + 1 : 1;
       editingItem.value = { rule: nextId };
       editingOriginalId.value = null;
+      activeTab.value = 'basic';
       modalVisible.value = true;
     }
 
@@ -370,8 +386,7 @@ export default defineComponent({
       const targetRule = editingItem.value.rule;
       if (!targetRule) return showError({ message: t('msg.ruleNumberRequired') });
       const originalId = editingOriginalId.value;
-      const transformed = transformDataForSave(editingItem.value);
-      const value = buildSaveValue(ruleSchema, transformed);
+      const value = buildSaveValue(ruleSchema, editingItem.value);
       try {
         if (originalId && String(originalId) !== String(targetRule)) {
           await configStore.deleteConfig(`${rulePath.value} ${originalId}`);
@@ -533,6 +548,7 @@ export default defineComponent({
       deleteModalVisible, pendingDeleteNames,
       load, create, edit, remove, confirmRemove, save, clearStats, exportExcel, openImport, onImportFileChange, confirmImport, openMove, moveRule, copyRule, ruleSchema,
       formatEndpoint, formatInterface,
+      rulePath,
     };
   },
   template: `
@@ -563,10 +579,10 @@ export default defineComponent({
           {{ formatEndpoint(row.destination) }}
         </template>
         <template #inbound-interface="{ row }">
-          {{ formatInterface(row['inbound-interface']) }}
+          {{ formatInterface(row['inbound-interface'] || row.inbound_interface) }}
         </template>
         <template #outbound-interface="{ row }">
-          {{ formatInterface(row['outbound-interface']) }}
+          {{ formatInterface(row['outbound-interface'] || row.outbound_interface) }}
         </template>
         <template #log="{ row }">
           {{ row.log !== undefined ? $t('firewall.yes') : '' }}
@@ -578,7 +594,7 @@ export default defineComponent({
       <DraggableModal v-model:visible="modalVisible" :title="editingItem?.id ? $t('firewall.editRule') : $t('firewall.createRule')" width="820px" @confirm="save">
         <TabGroup v-model="activeTab" :tabs="tabs">
           <template v-for="tab in tabs" :key="tab.key" #[tab.key]>
-            <ConfigForm v-model="editingItem" :schema="tabSchemas[tab.key]" :disabled="writeDisabled" :showAdvanced="true" :formKey="'firewall_rule_' + path + '_' + tab.key" :suggestionPath="rulePath" />
+            <ConfigForm v-model="editingItem" :schema="tabSchemas[tab.key]" :disabled="writeDisabled" :showAdvanced="true" :formKey="'firewall_rule_' + path + '_' + tab.key" :suggestionPath="rulePath" :editMode="!!editingItem?.id" />
           </template>
         </TabGroup>
       </DraggableModal>

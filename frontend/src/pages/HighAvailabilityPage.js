@@ -1,5 +1,6 @@
 import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
+import { configApi, monitorApi } from '/src/api/index.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { useVisibilityStore } from '/src/stores/visibility.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -33,13 +34,17 @@ const PROTOCOL_OPTIONS = [
 ];
 
 const AUTH_TYPE_OPTIONS = [
-  { value: 'pass', label: 'Simple Password' },
-  { value: 'ah', label: 'AH (Authentication Header)' },
+  { value: 'plaintext-password', label: 'plaintext-password' },
+  { value: 'ah', label: 'ah' },
 ];
 
 const VRRP_VERSION_OPTIONS = [
   { value: '2', label: 'VRRPv2' },
   { value: '3', label: 'VRRPv3' },
+];
+const GLOBAL_VRRP_VERSION_OPTIONS = [
+  { value: '', label: '' },
+  ...VRRP_VERSION_OPTIONS,
 ];
 
 // TABS will be computed in setup() using t()
@@ -54,6 +59,7 @@ export default defineComponent({
     const vrrpGroups = ref([]);
     const vrrpSyncGroups = ref([]);
     const vrrpGlobal = ref({});
+    const trackInterfaceOptions = ref([]);
     const loading = ref(false);
     const selectedVS = ref([]);
     const selectedVRRPGroup = ref([]);
@@ -68,11 +74,14 @@ export default defineComponent({
     const vrrpModalVisible = ref(false);
     const editingVRRP = ref(null);
     const editingOriginalVRRP = ref('');
+    const vrrpModalTab = ref('basic');
+    const vrrpModalTitle = computed(() => (editingOriginalVRRP.value ? '编辑VRRP组' : '创建VRRP组'));
 
     // Sync Group modal
     const syncModalVisible = ref(false);
     const editingSync = ref(null);
     const editingOriginalSync = ref('');
+    const syncModalTitle = computed(() => (editingOriginalSync.value ? '编辑VRRP同步组' : '创建VRRP同步组'));
 
     // Real Server modal
     const rsModalVisible = ref(false);
@@ -124,16 +133,29 @@ export default defineComponent({
 
     const vrrpGroupColumns = computed(() => [
       { key: 'name', title: t('highAvailability.columns.name') },
+      { key: 'description', title: '描述' },
       { key: 'vrid', title: t('highAvailability.columns.vrid') },
       { key: 'interface', title: t('highAvailability.columns.interface') },
       { key: 'priority', title: t('highAvailability.columns.priority') },
+      { key: 'advertiseInterval', title: '通告间隔' },
+      { key: 'preemptDelay', title: '抢占延迟' },
+      { key: 'noPreempt', title: '禁用抢占', render: (val) => val ? t('app.yes') : '' },
       { key: 'addressCount', title: t('highAvailability.columns.addressCount') },
+      { key: 'disable', title: '禁用', render: (val) => val ? t('app.yes') : '' },
     ]);
 
     const syncGroupColumns = computed(() => [
       { key: 'name', title: t('highAvailability.columns.name') },
+      { key: 'membersDisplay', title: '成员' },
       { key: 'memberCount', title: t('highAvailability.columns.memberCount') },
     ]);
+
+    const syncMemberOptions = computed(() =>
+      vrrpGroups.value
+        .map(g => g.name)
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b))
+    );
 
     const vsSchema = computed(() => [
       { key: 'name', title: t('highAvailability.vsSchema.name.title'), type: 'text', required: true, placeholder: t('highAvailability.vsSchema.name.placeholder') },
@@ -147,31 +169,56 @@ export default defineComponent({
       { key: 'fwmark', title: t('highAvailability.vsSchema.fwmark.title'), type: 'number', min: 1, max: 2147483647, placeholder: t('highAvailability.vsSchema.fwmark.placeholder') },
     ]);
 
-    const vrrpGroupSchema = computed(() => [
-      { key: 'name', title: t('highAvailability.vrrpGroupSchema.name.title'), type: 'text', required: true, placeholder: t('highAvailability.vrrpGroupSchema.name.placeholder') },
+    const vrrpModalTabs = computed(() => [
+      { key: 'basic', title: '基本' },
+      { key: 'garp', title: 'GARP' },
+      { key: 'health-check', title: '健康检查' },
+      { key: 'track', title: '跟踪' },
+      { key: 'transition-script', title: '切换脚本' },
+    ]);
+
+    const vrrpGroupInterfaceOptions = computed(() => ['', ...trackInterfaceOptions.value]);
+
+    const vrrpGroupBasicSchema = computed(() => [
+      { key: 'name', title: t('highAvailability.vrrpGroupSchema.name.title'), type: 'text', required: true, placeholder: t('highAvailability.vrrpGroupSchema.name.placeholder'), disabled: !!editingOriginalVRRP.value },
+      { key: 'description', title: t('highAvailability.vrrpGroupSchema.description.title'), type: 'text' },
       { key: 'vrid', title: t('highAvailability.vrrpGroupSchema.vrid.title'), type: 'number', min: 1, max: 255, required: true, placeholder: t('highAvailability.vrrpGroupSchema.vrid.placeholder') },
-      { key: 'interface', title: t('highAvailability.vrrpGroupSchema.interface.title'), type: 'text', required: true, placeholder: t('highAvailability.vrrpGroupSchema.interface.placeholder') },
-      { key: 'priority', title: t('highAvailability.vrrpGroupSchema.priority.title'), type: 'number', min: 1, max: 255, defaultValue: 100, help: t('highAvailability.vrrpGroupSchema.priority.help') },
-      { key: 'advertiseInterval', title: t('highAvailability.vrrpGroupSchema.advertiseInterval.title'), type: 'number', min: 1, max: 255, defaultValue: 1, help: t('highAvailability.vrrpGroupSchema.advertiseInterval.help') },
-      { key: 'preemptDelay', title: t('highAvailability.vrrpGroupSchema.preemptDelay.title'), type: 'number', min: 0, max: 1000, defaultValue: 0, help: t('highAvailability.vrrpGroupSchema.preemptDelay.help') },
+      { key: 'interface', title: t('highAvailability.vrrpGroupSchema.interface.title'), type: 'select', required: true, options: vrrpGroupInterfaceOptions.value, placeholder: t('highAvailability.vrrpGroupSchema.interface.placeholder') },
+      { key: 'addressesText', title: '虚拟地址（每行一个）', type: 'textarea', placeholder: 'IPv4/IPv6 地址' },
+      { key: 'excludedAddressesText', title: '排除地址（每行一个）', type: 'textarea', placeholder: 'IPv4/IPv6 地址' },
+      { key: 'priority', title: t('highAvailability.vrrpGroupSchema.priority.title'), type: 'number', min: 1, max: 255, help: t('highAvailability.vrrpGroupSchema.priority.help') },
+      { key: 'advertiseInterval', title: t('highAvailability.vrrpGroupSchema.advertiseInterval.title'), type: 'number', min: 1, max: 255, help: t('highAvailability.vrrpGroupSchema.advertiseInterval.help') },
+      { key: 'preemptDelay', title: t('highAvailability.vrrpGroupSchema.preemptDelay.title'), type: 'number', min: 0, max: 1000, help: t('highAvailability.vrrpGroupSchema.preemptDelay.help') },
       { key: 'helloSourceAddress', title: t('highAvailability.vrrpGroupSchema.helloSourceAddress.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.helloSourceAddress.placeholder') },
       { key: 'peerAddress', title: t('highAvailability.vrrpGroupSchema.peerAddress.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.peerAddress.placeholder') },
-      { key: 'description', title: t('highAvailability.vrrpGroupSchema.description.title'), type: 'text' },
       { key: 'disable', title: t('highAvailability.vrrpGroupSchema.disable.title'), type: 'checkbox' },
       { key: 'noPreempt', title: t('highAvailability.vrrpGroupSchema.noPreempt.title'), type: 'checkbox' },
       { key: 'rfc3768Compatibility', title: t('highAvailability.vrrpGroupSchema.rfc3768Compatibility.title'), type: 'checkbox', help: t('highAvailability.vrrpGroupSchema.rfc3768Compatibility.help') },
       { key: 'authType', title: t('highAvailability.vrrpGroupSchema.authType.title'), type: 'select', options: AUTH_TYPE_OPTIONS, help: t('highAvailability.vrrpGroupSchema.authType.help') },
       { key: 'authPassword', title: t('highAvailability.vrrpGroupSchema.authPassword.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.authPassword.placeholder') },
-      { key: 'garpInterval', title: t('highAvailability.vrrpGroupSchema.garpInterval.title'), type: 'number', min: 0, max: 1000, defaultValue: 0, help: t('highAvailability.vrrpGroupSchema.garpInterval.help') },
-      { key: 'garpMasterDelay', title: t('highAvailability.vrrpGroupSchema.garpMasterDelay.title'), type: 'number', min: 1, max: 1000, defaultValue: 5, help: t('highAvailability.vrrpGroupSchema.garpMasterDelay.help') },
-      { key: 'garpMasterRefresh', title: t('highAvailability.vrrpGroupSchema.garpMasterRefresh.title'), type: 'number', min: 0, max: 255, defaultValue: 5, help: t('highAvailability.vrrpGroupSchema.garpMasterRefresh.help') },
-      { key: 'garpMasterRefreshRepeat', title: t('highAvailability.vrrpGroupSchema.garpMasterRefreshRepeat.title'), type: 'number', min: 1, max: 255, defaultValue: 1, help: t('highAvailability.vrrpGroupSchema.garpMasterRefreshRepeat.help') },
-      { key: 'garpMasterRepeat', title: t('highAvailability.vrrpGroupSchema.garpMasterRepeat.title'), type: 'number', min: 1, max: 255, defaultValue: 5, help: t('highAvailability.vrrpGroupSchema.garpMasterRepeat.help') },
-      { key: 'healthCheckFailureCount', title: t('highAvailability.vrrpGroupSchema.healthCheckFailureCount.title'), type: 'text', defaultValue: '3', help: t('highAvailability.vrrpGroupSchema.healthCheckFailureCount.help') },
-      { key: 'healthCheckInterval', title: t('highAvailability.vrrpGroupSchema.healthCheckInterval.title'), type: 'text', defaultValue: '60', help: t('highAvailability.vrrpGroupSchema.healthCheckInterval.help') },
+    ]);
+
+    const vrrpGroupGarpSchema = computed(() => [
+      { key: 'garpInterval', title: t('highAvailability.vrrpGroupSchema.garpInterval.title'), type: 'number', min: 0, max: 1000, help: t('highAvailability.vrrpGroupSchema.garpInterval.help') },
+      { key: 'garpMasterDelay', title: t('highAvailability.vrrpGroupSchema.garpMasterDelay.title'), type: 'number', min: 1, max: 1000, help: t('highAvailability.vrrpGroupSchema.garpMasterDelay.help') },
+      { key: 'garpMasterRefresh', title: t('highAvailability.vrrpGroupSchema.garpMasterRefresh.title'), type: 'number', min: 0, max: 255, help: t('highAvailability.vrrpGroupSchema.garpMasterRefresh.help') },
+      { key: 'garpMasterRefreshRepeat', title: t('highAvailability.vrrpGroupSchema.garpMasterRefreshRepeat.title'), type: 'number', min: 1, max: 255, help: t('highAvailability.vrrpGroupSchema.garpMasterRefreshRepeat.help') },
+      { key: 'garpMasterRepeat', title: t('highAvailability.vrrpGroupSchema.garpMasterRepeat.title'), type: 'number', min: 1, max: 255, help: t('highAvailability.vrrpGroupSchema.garpMasterRepeat.help') },
+    ]);
+
+    const vrrpGroupHealthCheckSchema = computed(() => [
+      { key: 'healthCheckFailureCount', title: t('highAvailability.vrrpGroupSchema.healthCheckFailureCount.title'), type: 'text', help: t('highAvailability.vrrpGroupSchema.healthCheckFailureCount.help') },
+      { key: 'healthCheckInterval', title: t('highAvailability.vrrpGroupSchema.healthCheckInterval.title'), type: 'text', help: t('highAvailability.vrrpGroupSchema.healthCheckInterval.help') },
       { key: 'healthCheckPing', title: t('highAvailability.vrrpGroupSchema.healthCheckPing.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.healthCheckPing.placeholder') },
       { key: 'healthCheckScript', title: t('highAvailability.vrrpGroupSchema.healthCheckScript.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.healthCheckScript.placeholder') },
+    ]);
+
+    const vrrpGroupTrackSchema = computed(() => [
+      { key: 'trackInterfaces', title: '跟踪接口', type: 'multi-select', options: trackInterfaceOptions.value, help: '可多选接口' },
       { key: 'trackExcludeInterface', title: t('highAvailability.vrrpGroupSchema.trackExcludeInterface.title'), type: 'checkbox', help: t('highAvailability.vrrpGroupSchema.trackExcludeInterface.help') },
+    ]);
+
+    const vrrpGroupTransitionScriptSchema = computed(() => [
       { key: 'transitionScriptBackup', title: t('highAvailability.vrrpGroupSchema.transitionScriptBackup.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.transitionScriptBackup.placeholder') },
       { key: 'transitionScriptFault', title: t('highAvailability.vrrpGroupSchema.transitionScriptFault.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.transitionScriptFault.placeholder') },
       { key: 'transitionScriptMaster', title: t('highAvailability.vrrpGroupSchema.transitionScriptMaster.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.transitionScriptMaster.placeholder') },
@@ -180,17 +227,17 @@ export default defineComponent({
 
     const syncGroupSchema = computed(() => [
       { key: 'name', title: t('highAvailability.syncGroupSchema.name.title'), type: 'text', required: true, placeholder: t('highAvailability.syncGroupSchema.name.placeholder') },
-      { key: 'members', title: t('highAvailability.syncGroupSchema.members.title'), type: 'text', required: true, placeholder: t('highAvailability.syncGroupSchema.members.placeholder') },
+      { key: 'members', title: '成员', type: 'multi-select', options: syncMemberOptions.value, required: true, help: '可多选' },
     ]);
 
     const vrrpGlobalSchema = computed(() => [
       { key: 'startupDelay', title: t('highAvailability.vrrpGlobalSchema.startupDelay.title'), type: 'number', min: 1, max: 600, placeholder: t('highAvailability.vrrpGlobalSchema.startupDelay.placeholder'), help: t('highAvailability.vrrpGlobalSchema.startupDelay.help') },
-      { key: 'version', title: t('highAvailability.vrrpGlobalSchema.version.title'), type: 'select', options: VRRP_VERSION_OPTIONS, defaultValue: '2', help: t('highAvailability.vrrpGlobalSchema.version.help') },
-      { key: 'garpInterval', title: t('highAvailability.vrrpGlobalSchema.garpInterval.title'), type: 'number', min: 0, max: 1000, defaultValue: 0, help: t('highAvailability.vrrpGlobalSchema.garpInterval.help') },
-      { key: 'garpMasterDelay', title: t('highAvailability.vrrpGlobalSchema.garpMasterDelay.title'), type: 'number', min: 1, max: 1000, defaultValue: 5, help: t('highAvailability.vrrpGlobalSchema.garpMasterDelay.help') },
-      { key: 'garpMasterRefresh', title: t('highAvailability.vrrpGlobalSchema.garpMasterRefresh.title'), type: 'number', min: 0, max: 255, defaultValue: 5, help: t('highAvailability.vrrpGlobalSchema.garpMasterRefresh.help') },
-      { key: 'garpMasterRefreshRepeat', title: t('highAvailability.vrrpGlobalSchema.garpMasterRefreshRepeat.title'), type: 'number', min: 1, max: 255, defaultValue: 1, help: t('highAvailability.vrrpGlobalSchema.garpMasterRefreshRepeat.help') },
-      { key: 'garpMasterRepeat', title: t('highAvailability.vrrpGlobalSchema.garpMasterRepeat.title'), type: 'number', min: 1, max: 255, defaultValue: 5, help: t('highAvailability.vrrpGlobalSchema.garpMasterRepeat.help') },
+      { key: 'version', title: t('highAvailability.vrrpGlobalSchema.version.title'), type: 'select', options: GLOBAL_VRRP_VERSION_OPTIONS, help: t('highAvailability.vrrpGlobalSchema.version.help') },
+      { key: 'garpInterval', title: t('highAvailability.vrrpGlobalSchema.garpInterval.title'), type: 'number', min: 0, max: 1000, help: t('highAvailability.vrrpGlobalSchema.garpInterval.help') },
+      { key: 'garpMasterDelay', title: t('highAvailability.vrrpGlobalSchema.garpMasterDelay.title'), type: 'number', min: 1, max: 1000, help: t('highAvailability.vrrpGlobalSchema.garpMasterDelay.help') },
+      { key: 'garpMasterRefresh', title: t('highAvailability.vrrpGlobalSchema.garpMasterRefresh.title'), type: 'number', min: 0, max: 255, help: t('highAvailability.vrrpGlobalSchema.garpMasterRefresh.help') },
+      { key: 'garpMasterRefreshRepeat', title: t('highAvailability.vrrpGlobalSchema.garpMasterRefreshRepeat.title'), type: 'number', min: 1, max: 255, help: t('highAvailability.vrrpGlobalSchema.garpMasterRefreshRepeat.help') },
+      { key: 'garpMasterRepeat', title: t('highAvailability.vrrpGlobalSchema.garpMasterRepeat.title'), type: 'number', min: 1, max: 255, help: t('highAvailability.vrrpGlobalSchema.garpMasterRepeat.help') },
     ]);
 
     const rsColumns = computed(() => [
@@ -206,6 +253,39 @@ export default defineComponent({
       { key: 'connectionTimeout', title: t('highAvailability.rsSchema.connectionTimeout.title'), type: 'number', min: 1, max: 86400, placeholder: t('highAvailability.rsSchema.connectionTimeout.placeholder'), help: t('highAvailability.rsSchema.connectionTimeout.help') },
       { key: 'healthCheckScript', title: t('highAvailability.rsSchema.healthCheckScript.title'), type: 'text', placeholder: t('highAvailability.rsSchema.healthCheckScript.placeholder') },
     ]);
+
+    async function loadTrackInterfaceOptions() {
+      const normalizeSuggestionInterfaces = (items = []) => {
+        return items
+          .map(v => String(v || '').trim())
+          .filter(Boolean)
+          .map(v => v.split(/\s+/)[0])
+          .filter(v => v && !v.startsWith('<') && /^[a-zA-Z][a-zA-Z0-9_.:-]*$/.test(v));
+      };
+
+      try {
+        const res = await configApi.suggestions('high-availability vrrp group vg01 track', 'interface');
+        const list = normalizeSuggestionInterfaces(res?.suggestions || []);
+        const uniqueSorted = Array.from(new Set(list)).sort((a, b) => a.localeCompare(b));
+        if (uniqueSorted.length) {
+          trackInterfaceOptions.value = uniqueSorted;
+          return;
+        }
+      } catch (e) {
+        // Fallback to ethernet list when CLI suggestions are unavailable.
+      }
+
+      try {
+        const ifRes = await monitorApi.interfaces();
+        const ifaces = ifRes?.interfaces || [];
+        trackInterfaceOptions.value = ifaces
+          .map(iface => (typeof iface === 'string' ? iface : iface?.name))
+          .filter(Boolean)
+          .sort((a, b) => a.localeCompare(b));
+      } catch (e) {
+        trackInterfaceOptions.value = [];
+      }
+    }
 
     async function load() {
       loading.value = true;
@@ -265,14 +345,16 @@ export default defineComponent({
         vrrpGroups.value = groupResult;
 
         // Parse sync groups
-        const syncData = vrrpData['sync-group'] || {};
+        const syncData = vrrpData['sync-group'] || vrrpData.sync_group || {};
         const syncResult = [];
         for (const [name, attrs] of Object.entries(syncData)) {
-          const members = attrs.member || [];
+          const members = attrs.member || attrs.members || [];
+          const memberList = Array.isArray(members) ? members : Object.keys(members);
           syncResult.push({
             id: name,
             name,
-            memberCount: Array.isArray(members) ? members.length : Object.keys(members).length,
+            membersDisplay: memberList.join(', '),
+            memberCount: memberList.length,
             _raw: attrs,
           });
         }
@@ -284,12 +366,12 @@ export default defineComponent({
         const garpData = globalData.garp || {};
         vrrpGlobal.value = {
           startupDelay: globalData['startup-delay'] || '',
-          version: globalData.version || '2',
-          garpInterval: garpData.interval || 0,
-          garpMasterDelay: garpData['master-delay'] || 5,
-          garpMasterRefresh: garpData['master-refresh'] || 5,
-          garpMasterRefreshRepeat: garpData['master-refresh-repeat'] || 1,
-          garpMasterRepeat: garpData['master-repeat'] || 5,
+          version: globalData.version ?? '',
+          garpInterval: garpData.interval ?? '',
+          garpMasterDelay: garpData['master-delay'] ?? '',
+          garpMasterRefresh: garpData['master-refresh'] ?? '',
+          garpMasterRefreshRepeat: garpData['master-refresh-repeat'] ?? '',
+          garpMasterRepeat: garpData['master-repeat'] ?? '',
         };
 
         if (selectedVS.value.length && !vsResult.some(n => n.name === selectedVS.value[0])) {
@@ -308,7 +390,18 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); });
+    async function handleCommittedRefresh() {
+      await load();
+      // Commit result may become visible slightly later in active config.
+      setTimeout(() => { load(); }, 500);
+    }
+
+    onMounted(() => {
+      load();
+      loadTrackInterfaceOptions();
+      onMenuRefresh(load);
+      window.addEventListener('config-committed', handleCommittedRefresh);
+    });
     watch(() => route.path, () => {
       selectedVS.value = [];
       selectedVRRPGroup.value = [];
@@ -493,15 +586,17 @@ export default defineComponent({
     // VRRP Group functions
     function emptyVRRPGroup() {
       return {
-        name: '', vrid: '', interface: '', priority: 100,
-        advertiseInterval: 1, preemptDelay: 0,
+        name: '', vrid: '', interface: '', priority: '',
+        advertiseInterval: '', preemptDelay: '',
         helloSourceAddress: '', peerAddress: '', description: '',
+        addressesText: '', excludedAddressesText: '',
         disable: false, noPreempt: false, rfc3768Compatibility: false,
         authType: '', authPassword: '',
-        garpInterval: 0, garpMasterDelay: 5, garpMasterRefresh: 5,
-        garpMasterRefreshRepeat: 1, garpMasterRepeat: 5,
-        healthCheckFailureCount: '3', healthCheckInterval: '60',
+        garpInterval: '', garpMasterDelay: '', garpMasterRefresh: '',
+        garpMasterRefreshRepeat: '', garpMasterRepeat: '',
+        healthCheckFailureCount: '', healthCheckInterval: '',
         healthCheckPing: '', healthCheckScript: '',
+        trackInterfaces: [],
         trackExcludeInterface: false,
         transitionScriptBackup: '', transitionScriptFault: '',
         transitionScriptMaster: '', transitionScriptStop: '',
@@ -512,6 +607,8 @@ export default defineComponent({
     function flattenVRRPGroupData(name, attrs) {
       const addresses = attrs.address || {};
       const addressList = Object.keys(addresses);
+      const excludedAddresses = attrs['excluded-address'] || {};
+      const excludedAddressList = Object.keys(excludedAddresses);
       const auth = attrs.authentication || {};
       const garp = attrs.garp || {};
       const healthCheck = attrs['health-check'] || {};
@@ -522,32 +619,38 @@ export default defineComponent({
         name,
         vrid: attrs.vrid || '',
         interface: attrs.interface || '',
-        priority: attrs.priority || 100,
-        advertiseInterval: attrs['advertise-interval'] || 1,
-        preemptDelay: attrs['preempt-delay'] || 0,
+        priority: attrs.priority ?? '',
+        advertiseInterval: attrs['advertise-interval'] ?? '',
+        preemptDelay: attrs['preempt-delay'] ?? '',
         helloSourceAddress: attrs['hello-source-address'] || '',
         peerAddress: attrs['peer-address'] || '',
         description: attrs.description || '',
+        addressesText: addressList.join('\n'),
+        excludedAddressesText: excludedAddressList.join('\n'),
         disable: !!attrs.disable,
         noPreempt: !!attrs['no-preempt'],
         rfc3768Compatibility: !!attrs['rfc3768-compatibility'],
-        authType: auth.type || '',
+        authType: auth.type === 'pass' ? 'plaintext-password' : (auth.type || ''),
         authPassword: auth.password || '',
-        garpInterval: garp.interval || 0,
-        garpMasterDelay: garp['master-delay'] || 5,
-        garpMasterRefresh: garp['master-refresh'] || 5,
-        garpMasterRefreshRepeat: garp['master-refresh-repeat'] || 1,
-        garpMasterRepeat: garp['master-repeat'] || 5,
-        healthCheckFailureCount: healthCheck['failure-count'] || '3',
-        healthCheckInterval: healthCheck.interval || '60',
+        garpInterval: garp.interval ?? '',
+        garpMasterDelay: garp['master-delay'] ?? '',
+        garpMasterRefresh: garp['master-refresh'] ?? '',
+        garpMasterRefreshRepeat: garp['master-refresh-repeat'] ?? '',
+        garpMasterRepeat: garp['master-repeat'] ?? '',
+        healthCheckFailureCount: healthCheck['failure-count'] ?? '',
+        healthCheckInterval: healthCheck.interval ?? '',
         healthCheckPing: healthCheck.ping || '',
         healthCheckScript: healthCheck.script || '',
+        trackInterfaces: Array.isArray(track.interface)
+          ? [...track.interface]
+          : (track.interface && typeof track.interface === 'object'
+              ? Object.keys(track.interface)
+              : (track.interface ? [track.interface] : [])),
         trackExcludeInterface: !!track['exclude-vrrp-interface'],
         transitionScriptBackup: transitionScript.backup || '',
         transitionScriptFault: transitionScript.fault || '',
         transitionScriptMaster: transitionScript.master || '',
         transitionScriptStop: transitionScript.stop || '',
-        addresses: addressList,
         _raw: attrs,
       };
     }
@@ -556,9 +659,9 @@ export default defineComponent({
       const result = {};
       if (v.vrid) result.vrid = v.vrid;
       if (v.interface) result.interface = v.interface;
-      if (v.priority) result.priority = v.priority;
-      if (v.advertiseInterval) result['advertise-interval'] = v.advertiseInterval;
-      if (v.preemptDelay) result['preempt-delay'] = v.preemptDelay;
+      if (v.priority !== '' && v.priority !== null && v.priority !== undefined) result.priority = v.priority;
+      if (v.advertiseInterval !== '' && v.advertiseInterval !== null && v.advertiseInterval !== undefined) result['advertise-interval'] = v.advertiseInterval;
+      if (v.preemptDelay !== '' && v.preemptDelay !== null && v.preemptDelay !== undefined) result['preempt-delay'] = v.preemptDelay;
       if (v.helloSourceAddress) result['hello-source-address'] = v.helloSourceAddress;
       if (v.peerAddress) result['peer-address'] = v.peerAddress;
       if (v.description) result.description = v.description;
@@ -569,29 +672,39 @@ export default defineComponent({
       // Authentication
       if (v.authType || v.authPassword) {
         result.authentication = {};
-        if (v.authType) result.authentication.type = v.authType;
+        if (v.authType) result.authentication.type = v.authType === 'pass' ? 'plaintext-password' : v.authType;
         if (v.authPassword) result.authentication.password = v.authPassword;
       }
 
       // GARP
       const garp = {};
-      if (v.garpInterval !== undefined) garp.interval = v.garpInterval;
-      if (v.garpMasterDelay) garp['master-delay'] = v.garpMasterDelay;
-      if (v.garpMasterRefresh) garp['master-refresh'] = v.garpMasterRefresh;
-      if (v.garpMasterRefreshRepeat) garp['master-refresh-repeat'] = v.garpMasterRefreshRepeat;
-      if (v.garpMasterRepeat) garp['master-repeat'] = v.garpMasterRepeat;
+      if (v.garpInterval !== '' && v.garpInterval !== null && v.garpInterval !== undefined) garp.interval = v.garpInterval;
+      if (v.garpMasterDelay !== '' && v.garpMasterDelay !== null && v.garpMasterDelay !== undefined) garp['master-delay'] = v.garpMasterDelay;
+      if (v.garpMasterRefresh !== '' && v.garpMasterRefresh !== null && v.garpMasterRefresh !== undefined) garp['master-refresh'] = v.garpMasterRefresh;
+      if (v.garpMasterRefreshRepeat !== '' && v.garpMasterRefreshRepeat !== null && v.garpMasterRefreshRepeat !== undefined) garp['master-refresh-repeat'] = v.garpMasterRefreshRepeat;
+      if (v.garpMasterRepeat !== '' && v.garpMasterRepeat !== null && v.garpMasterRepeat !== undefined) garp['master-repeat'] = v.garpMasterRepeat;
       if (Object.keys(garp).length) result.garp = garp;
 
       // Health check
       const healthCheck = {};
-      if (v.healthCheckFailureCount) healthCheck['failure-count'] = v.healthCheckFailureCount;
-      if (v.healthCheckInterval) healthCheck.interval = v.healthCheckInterval;
+      if (v.healthCheckFailureCount !== '' && v.healthCheckFailureCount !== null && v.healthCheckFailureCount !== undefined) healthCheck['failure-count'] = v.healthCheckFailureCount;
+      if (v.healthCheckInterval !== '' && v.healthCheckInterval !== null && v.healthCheckInterval !== undefined) healthCheck.interval = v.healthCheckInterval;
       if (v.healthCheckPing) healthCheck.ping = v.healthCheckPing;
       if (v.healthCheckScript) healthCheck.script = v.healthCheckScript;
       if (Object.keys(healthCheck).length) result['health-check'] = healthCheck;
 
       // Track
-      if (v.trackExcludeInterface) result.track = { 'exclude-vrrp-interface': {} };
+      if (v.trackExcludeInterface || (Array.isArray(v.trackInterfaces) && v.trackInterfaces.length)) {
+        result.track = {};
+        if (v.trackExcludeInterface) result.track['exclude-vrrp-interface'] = {};
+        if (Array.isArray(v.trackInterfaces) && v.trackInterfaces.length) {
+          const trackIf = {};
+          for (const iface of v.trackInterfaces) {
+            if (iface) trackIf[iface] = {};
+          }
+          if (Object.keys(trackIf).length) result.track.interface = trackIf;
+        }
+      }
 
       // Transition script
       const transitionScript = {};
@@ -602,12 +715,23 @@ export default defineComponent({
       if (Object.keys(transitionScript).length) result['transition-script'] = transitionScript;
 
       // Addresses
-      if (v.addresses?.length) {
+      const addressList = String(v.addressesText || '').split('\n').map(a => a.trim()).filter(Boolean);
+      if (addressList.length) {
         const addresses = {};
-        for (const addr of v.addresses) {
+        for (const addr of addressList) {
           if (addr) addresses[addr] = {};
         }
         result.address = addresses;
+      }
+
+      // Excluded addresses
+      const excludedAddressList = String(v.excludedAddressesText || '').split('\n').map(a => a.trim()).filter(Boolean);
+      if (excludedAddressList.length) {
+        const excludedAddresses = {};
+        for (const addr of excludedAddressList) {
+          if (addr) excludedAddresses[addr] = {};
+        }
+        result['excluded-address'] = excludedAddresses;
       }
       return result;
     }
@@ -615,6 +739,7 @@ export default defineComponent({
     function createVRRPGroup() {
       editingVRRP.value = emptyVRRPGroup();
       editingOriginalVRRP.value = '';
+      vrrpModalTab.value = 'basic';
       vrrpModalVisible.value = true;
     }
 
@@ -625,6 +750,7 @@ export default defineComponent({
       if (!group) return;
       editingVRRP.value = flattenVRRPGroupData(group.name, group._raw || {});
       editingOriginalVRRP.value = group.name;
+      vrrpModalTab.value = 'basic';
       vrrpModalVisible.value = true;
     }
 
@@ -675,7 +801,7 @@ export default defineComponent({
 
     // Sync Group functions
     function emptySyncGroup() {
-      return { name: '', members: '' };
+      return { name: '', members: [] };
     }
 
     function flattenSyncGroupData(name, attrs) {
@@ -683,16 +809,15 @@ export default defineComponent({
       const memberList = Array.isArray(members) ? members : Object.keys(members);
       return {
         name,
-        members: memberList.join(','),
+        members: memberList,
         _raw: attrs,
       };
     }
 
     function unflattenSyncGroupData(s) {
       const result = {};
-      if (s.members) {
-        const memberList = s.members.split(',').map(m => m.trim()).filter(m => m);
-        result.member = memberList;
+      if (Array.isArray(s.members) && s.members.length) {
+        result.member = s.members.filter(Boolean);
       }
       return result;
     }
@@ -733,7 +858,9 @@ export default defineComponent({
 
     async function saveSyncGroup() {
       if (!editingSync.value.name) return showError({ message: t('highAvailability.messages.enterName') });
-      if (!editingSync.value.members) return showError({ message: t('highAvailability.messages.enterMembers') });
+      if (!Array.isArray(editingSync.value.members) || !editingSync.value.members.length) {
+        return showError({ message: t('highAvailability.messages.enterMembers') });
+      }
       const original = editingOriginalSync.value;
       if (!original && vrrpSyncGroups.value.some(n => n.name === editingSync.value.name)) {
         return showError({ message: t('highAvailability.messages.nameExists') });
@@ -764,11 +891,11 @@ export default defineComponent({
       if (vrrpGlobal.value.version) value.version = vrrpGlobal.value.version;
       
       const garp = {};
-      if (vrrpGlobal.value.garpInterval !== undefined) garp.interval = vrrpGlobal.value.garpInterval;
-      if (vrrpGlobal.value.garpMasterDelay !== undefined) garp['master-delay'] = vrrpGlobal.value.garpMasterDelay;
-      if (vrrpGlobal.value.garpMasterRefresh !== undefined) garp['master-refresh'] = vrrpGlobal.value.garpMasterRefresh;
-      if (vrrpGlobal.value.garpMasterRefreshRepeat !== undefined) garp['master-refresh-repeat'] = vrrpGlobal.value.garpMasterRefreshRepeat;
-      if (vrrpGlobal.value.garpMasterRepeat !== undefined) garp['master-repeat'] = vrrpGlobal.value.garpMasterRepeat;
+      if (vrrpGlobal.value.garpInterval !== '' && vrrpGlobal.value.garpInterval !== null && vrrpGlobal.value.garpInterval !== undefined) garp.interval = vrrpGlobal.value.garpInterval;
+      if (vrrpGlobal.value.garpMasterDelay !== '' && vrrpGlobal.value.garpMasterDelay !== null && vrrpGlobal.value.garpMasterDelay !== undefined) garp['master-delay'] = vrrpGlobal.value.garpMasterDelay;
+      if (vrrpGlobal.value.garpMasterRefresh !== '' && vrrpGlobal.value.garpMasterRefresh !== null && vrrpGlobal.value.garpMasterRefresh !== undefined) garp['master-refresh'] = vrrpGlobal.value.garpMasterRefresh;
+      if (vrrpGlobal.value.garpMasterRefreshRepeat !== '' && vrrpGlobal.value.garpMasterRefreshRepeat !== null && vrrpGlobal.value.garpMasterRefreshRepeat !== undefined) garp['master-refresh-repeat'] = vrrpGlobal.value.garpMasterRefreshRepeat;
+      if (vrrpGlobal.value.garpMasterRepeat !== '' && vrrpGlobal.value.garpMasterRepeat !== null && vrrpGlobal.value.garpMasterRepeat !== undefined) garp['master-repeat'] = vrrpGlobal.value.garpMasterRepeat;
       
       if (Object.keys(garp).length) value.garp = garp;
 
@@ -794,8 +921,12 @@ export default defineComponent({
       rsDeleteModalVisible, pendingDeleteRSNames,
       vrrpDeleteModalVisible, pendingDeleteVRRPNames,
       syncDeleteModalVisible, pendingDeleteSyncNames,
+      vrrpModalTitle,
+      syncModalTitle,
       vsColumns, vrrpGroupColumns, syncGroupColumns, rsColumns,
-      vsSchema, vrrpGroupSchema, syncGroupSchema, vrrpGlobalSchema, rsSchema,
+      vsSchema, syncGroupSchema, vrrpGlobalSchema, rsSchema,
+      vrrpModalTab, vrrpModalTabs,
+      vrrpGroupBasicSchema, vrrpGroupGarpSchema, vrrpGroupHealthCheckSchema, vrrpGroupTrackSchema, vrrpGroupTransitionScriptSchema,
       path, writeDisabled, activeTab, TABS,
       ALGORITHM_OPTIONS, FORWARD_METHOD_OPTIONS, PROTOCOL_OPTIONS, AUTH_TYPE_OPTIONS, VRRP_VERSION_OPTIONS,
       load,
@@ -808,8 +939,7 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div class="section">
-        <TabGroup v-model="activeTab" :tabs="TABS">
+      <TabGroup v-model="activeTab" :tabs="TABS">
           <template #virtual-server>
             <div class="toolbar">
               <div class="toolbar-left">
@@ -851,9 +981,13 @@ export default defineComponent({
           </template>
           <template #vrrp-global>
             <ConfigForm v-model="vrrpGlobal" :schema="vrrpGlobalSchema" :disabled="writeDisabled" :showAdvanced="true" />
+            <div style="text-align:right;padding:16px 0;">
+              <ToolbarButton icon="save" primary :disabled="writeDisabled" @click="saveVRRPGlobal">
+                {{ t('app.confirm') }}
+              </ToolbarButton>
+            </div>
           </template>
-        </TabGroup>
-      </div>
+      </TabGroup>
 
       <!-- Virtual Server Modal -->
       <DraggableModal v-model:visible="vsModalVisible" :title="t('highAvailability.modals.virtualServer')" width="800px" @confirm="saveVS">
@@ -879,12 +1013,28 @@ export default defineComponent({
       </DraggableModal>
       
       <!-- VRRP Group Modal -->
-      <DraggableModal v-model:visible="vrrpModalVisible" :title="editingOriginalVRRP ? t('highAvailability.modals.edit') : t('highAvailability.modals.create')" width="600px" @confirm="saveVRRPGroup">
-        <ConfigForm v-model="editingVRRP" :schema="vrrpGroupSchema" :disabled="writeDisabled" :showAdvanced="true" />
+      <DraggableModal v-model:visible="vrrpModalVisible" :title="vrrpModalTitle" width="600px" @confirm="saveVRRPGroup">
+        <TabGroup v-model="vrrpModalTab" :tabs="vrrpModalTabs">
+          <template #basic>
+            <ConfigForm v-model="editingVRRP" :schema="vrrpGroupBasicSchema" :disabled="writeDisabled" :showAdvanced="true" />
+          </template>
+          <template #garp>
+            <ConfigForm v-model="editingVRRP" :schema="vrrpGroupGarpSchema" :disabled="writeDisabled" :showAdvanced="true" />
+          </template>
+          <template #health-check>
+            <ConfigForm v-model="editingVRRP" :schema="vrrpGroupHealthCheckSchema" :disabled="writeDisabled" :showAdvanced="true" />
+          </template>
+          <template #track>
+            <ConfigForm v-model="editingVRRP" :schema="vrrpGroupTrackSchema" :disabled="writeDisabled" :showAdvanced="true" />
+          </template>
+          <template #transition-script>
+            <ConfigForm v-model="editingVRRP" :schema="vrrpGroupTransitionScriptSchema" :disabled="writeDisabled" :showAdvanced="true" />
+          </template>
+        </TabGroup>
       </DraggableModal>
       
       <!-- Sync Group Modal -->
-      <DraggableModal v-model:visible="syncModalVisible" :title="editingOriginalSync ? t('highAvailability.modals.edit') : t('highAvailability.modals.create')" width="500px" @confirm="saveSyncGroup">
+      <DraggableModal v-model:visible="syncModalVisible" :title="syncModalTitle" width="500px" @confirm="saveSyncGroup">
         <ConfigForm v-model="editingSync" :schema="syncGroupSchema" :disabled="writeDisabled" :showAdvanced="true" />
       </DraggableModal>
 
