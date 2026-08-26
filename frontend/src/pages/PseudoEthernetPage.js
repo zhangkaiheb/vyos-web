@@ -535,7 +535,7 @@ export default defineComponent({
         @refresh="load"
         @selection-change="selected = $event"
       />
-      <DraggableModal v-model:visible="modalVisible" :title="editingItem?.name ? t('pseudoEthernet.modal.edit') : t('pseudoEthernet.modal.create')" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingItem?.name ? t('pseudoEthernet.modal.edit') : t('pseudoEthernet.modal.create')" width="900px" @confirm="save">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic><ConfigForm :schema="basicSchema" :model="editingItem" /></template>
@@ -547,10 +547,6 @@ export default defineComponent({
             <template #mirror><ConfigForm :schema="mirrorSchema" :model="editingItem" /></template>
             <template #other><ConfigForm :schema="otherSchema" :model="editingItem" /></template>
           </TabGroup>
-        </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('pseudoEthernet.buttons.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="save">{{ t('pseudoEthernet.buttons.confirm') }}</button>
         </template>
       </DraggableModal>
       <DraggableModal v-model:visible="deleteModalVisible" :title="t('pseudoEthernet.modal.confirmDelete')" width="400px" @confirm="confirmRemove">

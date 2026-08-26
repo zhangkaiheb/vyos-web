@@ -428,7 +428,7 @@ export default defineComponent({
         @selection-change="selected = $event"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="editingVeth?.name ? t('veth.modals.editVeth') : t('veth.modals.createVeth')" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingVeth?.name ? t('veth.modals.editVeth') : t('veth.modals.createVeth')" width="900px" @confirm="save">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic>
@@ -447,10 +447,6 @@ export default defineComponent({
               <ConfigForm v-model="editingVeth" :schema="otherSchema" />
             </template>
           </TabGroup>
-        </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('veth.buttons.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="save">{{ t('veth.buttons.confirm') }}</button>
         </template>
       </DraggableModal>
       <DraggableModal v-model:visible="deleteModalVisible" :title="t('veth.modals.confirmDelete')" width="400px" @confirm="confirmRemove">

@@ -19,7 +19,9 @@ export default defineComponent({
     const l2tpv3s = ref([]);
     const modalVisible = ref(false);
     const editingL2tpv3 = ref(null);
+    const isEditMode = ref(false);
     const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
     const activeTab = ref('basic');
     const selectedL2tpv3 = ref([]);
     const deleteModalVisible = ref(false);
@@ -38,25 +40,28 @@ export default defineComponent({
     ]);
 
     const ENCAPSULATION_OPTIONS = computed(() => [
+      { value: '', label: '' },
       { value: 'udp', label: t('l2tpv3.options.encapsulation.udp') },
       { value: 'ip', label: t('l2tpv3.options.encapsulation.ip') },
     ]);
 
     const SOURCE_VALIDATION_OPTIONS = computed(() => [
+      { value: '', label: '' },
       { value: 'strict', label: t('l2tpv3.options.sourceValidation.strict') },
       { value: 'loose', label: t('l2tpv3.options.sourceValidation.loose') },
       { value: 'disable', label: t('l2tpv3.options.sourceValidation.disable') },
     ]);
 
-    const ACCEPT_DAD_OPTIONS = computed(() => [
-      { value: '0', label: t('l2tpv3.options.acceptDad.0') },
-      { value: '1', label: t('l2tpv3.options.acceptDad.1') },
-      { value: '2', label: t('l2tpv3.options.acceptDad.2') },
+    const acceptDadOptions = computed(() => [
+      { value: '', label: '' },
+      { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
+      { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
+      { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
     ]);
 
     // Schema definitions
     const basicSchema = computed(() => [
-      { key: 'name', title: t('l2tpv3.schema.basic.name'), type: 'text', required: true, placeholder: t('l2tpv3.schema.basic.namePlaceholder'), help: t('l2tpv3.schema.basic.nameHelp') },
+      { key: 'name', title: t('l2tpv3.schema.basic.name'), type: 'text', required: true, placeholder: t('l2tpv3.schema.basic.namePlaceholder'), help: t('l2tpv3.schema.basic.nameHelp'), disabled: isEditMode.value },
       { key: 'description', title: t('l2tpv3.schema.basic.description'), type: 'text', placeholder: t('l2tpv3.schema.basic.descriptionPlaceholder') },
       { key: 'address', title: t('l2tpv3.schema.basic.address'), type: 'textarea', placeholder: t('l2tpv3.schema.basic.addressPlaceholder'), help: t('l2tpv3.schema.basic.addressHelp') },
       { key: 'encapsulation', title: t('l2tpv3.schema.basic.encapsulation'), type: 'select', options: ENCAPSULATION_OPTIONS.value, help: t('l2tpv3.schema.basic.encapsulationHelp') },
@@ -87,7 +92,7 @@ export default defineComponent({
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: t('l2tpv3.schema.ipv6.acceptDad'), type: 'select', options: ACCEPT_DAD_OPTIONS.value, help: t('l2tpv3.schema.ipv6.acceptDadHelp') },
+      { key: 'ipv6_accept_dad', title: t('l2tpv3.schema.ipv6.acceptDad'), type: 'select', options: acceptDadOptions.value, help: t('l2tpv3.schema.ipv6.acceptDadHelp') },
       { key: 'ipv6_autoconf', title: t('l2tpv3.schema.ipv6.autoconf'), type: 'checkbox', help: t('l2tpv3.schema.ipv6.autoconfHelp') },
       { key: 'ipv6_eui64', title: t('l2tpv3.schema.ipv6.eui64'), type: 'text', placeholder: t('l2tpv3.schema.ipv6.eui64Placeholder'), help: t('l2tpv3.schema.ipv6.eui64Help') },
       { key: 'ipv6_interface_identifier', title: t('l2tpv3.schema.ipv6.interfaceIdentifier'), type: 'text', placeholder: t('l2tpv3.schema.ipv6.interfaceIdentifierPlaceholder'), help: t('l2tpv3.schema.ipv6.interfaceIdentifierHelp') },
@@ -100,12 +105,12 @@ export default defineComponent({
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: t('l2tpv3.schema.mirror.egress'), type: 'select', options: interfaceOptions.value, placeholder: t('l2tpv3.schema.mirror.placeholder'), help: t('l2tpv3.schema.mirror.egressHelp') },
-      { key: 'mirror_ingress', title: t('l2tpv3.schema.mirror.ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('l2tpv3.schema.mirror.placeholder'), help: t('l2tpv3.schema.mirror.ingressHelp') },
+      { key: 'mirror_egress', title: t('l2tpv3.schema.mirror.egress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('l2tpv3.schema.mirror.placeholder'), help: t('l2tpv3.schema.mirror.egressHelp') },
+      { key: 'mirror_ingress', title: t('l2tpv3.schema.mirror.ingress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('l2tpv3.schema.mirror.placeholder'), help: t('l2tpv3.schema.mirror.ingressHelp') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'vrf', title: t('l2tpv3.schema.other.vrf'), type: 'text', placeholder: t('l2tpv3.schema.other.vrfPlaceholder'), help: t('l2tpv3.schema.other.vrfHelp') },
+      { key: 'vrf', title: t('l2tpv3.schema.other.vrf'), type: 'select', options: [{ value: '', label: '' }, ...vrfOptions.value], placeholder: t('l2tpv3.schema.other.vrfPlaceholder'), help: t('l2tpv3.schema.other.vrfHelp') },
     ]);
 
     // Command text
@@ -178,7 +183,7 @@ export default defineComponent({
 
     function getDefaultForm() {
       return {
-        name: '', description: '', address: '', encapsulation: 'udp', remote: '',
+        name: '', description: '', address: '', encapsulation: '', remote: '',
         source_address: '', source_port: '', destination_port: '',
         tunnel_id: '', peer_tunnel_id: '', session_id: '', peer_session_id: '',
         mtu: '', disable: false,
@@ -186,7 +191,7 @@ export default defineComponent({
         ip_disable_forwarding: false, ip_enable_arp_accept: false, ip_enable_arp_announce: false,
         ip_enable_arp_ignore: false, ip_enable_directed_broadcast: false,
         ip_enable_proxy_arp: false, ip_proxy_arp_pvlan: false, ip_source_validation: '',
-        ipv6_accept_dad: '1', ipv6_autoconf: false, ipv6_eui64: '',
+        ipv6_accept_dad: '', ipv6_autoconf: false, ipv6_eui64: '',
         ipv6_interface_identifier: '', ipv6_no_default_link_local: false,
         ipv6_adjust_mss: '', ipv6_base_reachable_time: '', ipv6_disable_forwarding: false,
         ipv6_dup_addr_detect_transmits: '', ipv6_source_validation: '',
@@ -200,7 +205,7 @@ export default defineComponent({
         name: l.name || '',
         description: l.description || '',
         address: Array.isArray(l.address) ? l.address.join('\n') : (l.address || ''),
-        encapsulation: l.encapsulation || 'udp',
+        encapsulation: l.encapsulation || '',
         remote: l.remote || '',
         source_address: l.source_address || '',
         source_port: l.source_port || '',
@@ -222,7 +227,7 @@ export default defineComponent({
         ip_enable_proxy_arp: !!l.ip?.enable_proxy_arp,
         ip_proxy_arp_pvlan: !!l.ip?.proxy_arp_pvlan,
         ip_source_validation: l.ip?.source_validation || '',
-        ipv6_accept_dad: l.ipv6?.accept_dad || '1',
+        ipv6_accept_dad: l.ipv6?.accept_dad || '',
         ipv6_autoconf: !!l.ipv6?.address?.autoconf,
         ipv6_eui64: l.ipv6?.address?.eui64 || '',
         ipv6_interface_identifier: l.ipv6?.address?.interface_identifier || '',
@@ -322,6 +327,18 @@ export default defineComponent({
           value: iface.name || iface,
           label: iface.name || iface,
         }));
+
+        // Load VRF options
+        try {
+          const vrfRes = await api.get('/config', { path: 'vrf' });
+          const vrfData = vrfRes.data || {};
+          const nameData = vrfData.name || vrfData;
+          vrfOptions.value = Object.keys(nameData)
+            .filter(name => typeof nameData[name] === 'object')
+            .map(name => ({ value: name, label: name }));
+        } catch (e) {
+          vrfOptions.value = [];
+        }
       } catch (err) {
         handleError(err);
       } finally {
@@ -336,11 +353,22 @@ export default defineComponent({
     function openModal(index = -1) {
       if (index >= 0) {
         editingL2tpv3.value = l2tpv3ToForm(l2tpv3s.value[index]);
+        isEditMode.value = true;
       } else {
         editingL2tpv3.value = getDefaultForm();
+        isEditMode.value = false;
       }
       activeTab.value = 'basic';
       modalVisible.value = true;
+    }
+
+    function openModalByRow(row) {
+      if (!row) {
+        openModal(-1);
+        return;
+      }
+      const index = l2tpv3s.value.findIndex(l => l.name === row.name);
+      openModal(index);
     }
 
     async function save() {
@@ -393,12 +421,12 @@ export default defineComponent({
 
     return {t,
       
-      loading, l2tpv3s, selected: selectedL2tpv3, modalVisible, editingL2tpv3, interfaceOptions, activeTab,
+      loading, l2tpv3s, selected: selectedL2tpv3, modalVisible, editingL2tpv3, isEditMode, interfaceOptions, vrfOptions, activeTab,
       deleteModalVisible, pendingDeleteNames,
       COLUMNS,
       basicSchema, ipSchema, ipv6Schema, mirrorSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, confirmRemove, load,
+      openModal, openModalByRow, save, remove, confirmRemove, load,
     };
   },
   template: `
@@ -410,13 +438,13 @@ export default defineComponent({
         :selectable="true"
         :actions="['create', 'edit', 'delete', 'refresh']"
         @create="openModal(-1)"
-        @edit="openModal"
+        @edit="openModalByRow($event)"
         @delete="remove"
         @refresh="load"
         @selection-change="selected = $event"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="editingL2tpv3?.name ? t('l2tpv3.modal.edit') : t('l2tpv3.modal.create')" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingL2tpv3?.name ? t('l2tpv3.modal.edit') : t('l2tpv3.modal.create')" width="900px" @confirm="save">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic>
@@ -435,10 +463,6 @@ export default defineComponent({
               <ConfigForm :schema="otherSchema" :model="editingL2tpv3" />
             </template>
           </TabGroup>
-        </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('l2tpv3.buttons.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="save">{{ t('l2tpv3.buttons.confirm') }}</button>
         </template>
       </DraggableModal>
       <DraggableModal v-model:visible="deleteModalVisible" :title="t('l2tpv3.modal.confirmDelete')" width="400px" @confirm="confirmRemove">

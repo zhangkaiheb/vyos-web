@@ -1481,6 +1481,10 @@ select {
   margin-top: 4px;
 }
 
+.vrf-page .form-hint {
+  white-space: nowrap;
+}
+
 .form-error {
   color: var(--color-error);
   font-size: 12px;
@@ -1889,11 +1893,15 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 
 .tab-headers {
   display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   background: #f5f5f5;
   border-bottom: 1px solid var(--color-border);
 }
 
 .tab-header {
+  flex: 0 0 auto;
+  white-space: nowrap;
   padding: 10px 16px;
   cursor: pointer;
   border-right: 1px solid var(--color-border);
@@ -1911,6 +1919,15 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 
 .tab-panel {
   padding: 16px;
+}
+
+.bgp-branch-headers-only {
+  border: 0;
+  margin-top: 0;
+}
+
+.bgp-collection-block {
+  padding-left: 0;
 }
 
 /* Dialog panes */

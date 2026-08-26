@@ -12,15 +12,10 @@ import { useI18n } from '/src/i18n/index.js';
 
 
 const SOURCE_VALIDATION_OPTIONS = [
+  { value: '', label: '' },
   { value: 'strict', labelKey: 'wireguard.options.source_validation.strict' },
   { value: 'loose', labelKey: 'wireguard.options.source_validation.loose' },
   { value: 'disable', labelKey: 'wireguard.options.source_validation.disable' },
-];
-
-const ACCEPT_DAD_OPTIONS = [
-  { value: '0', labelKey: 'wireguard.options.accept_dad.0' },
-  { value: '1', labelKey: 'wireguard.options.accept_dad.1' },
-  { value: '2', labelKey: 'wireguard.options.accept_dad.2' },
 ];
 
 function resolveOptions(options, t) {
@@ -31,9 +26,9 @@ function resolveOptions(options, t) {
   });
 }
 
-function buildBasicSchema(t) {
+function buildBasicSchema(t, isEditMode) {
   return [
-    { key: 'name', title: t('wireguard.basic.name'), type: 'text', required: true, placeholder: t('wireguard.basic.name_placeholder'), help: t('wireguard.basic.name_help') },
+    { key: 'name', title: t('wireguard.basic.name'), type: 'text', required: true, placeholder: t('wireguard.basic.name_placeholder'), help: t('wireguard.basic.name_help'), disabled: isEditMode },
     { key: 'description', title: t('wireguard.basic.description'), type: 'text', placeholder: t('wireguard.basic.description_placeholder') },
     { key: 'private_key', title: t('wireguard.basic.private_key'), type: 'textarea', placeholder: t('wireguard.basic.private_key_placeholder'), help: t('wireguard.basic.private_key_help') },
     { key: 'port', title: t('wireguard.basic.port'), type: 'number', min: 1, max: 65535, placeholder: '1-65535', help: t('wireguard.basic.port_help') },
@@ -61,9 +56,9 @@ function buildIpSchema(t) {
   ];
 }
 
-function buildIpv6Schema(t) {
+function buildIpv6Schema(t, acceptDadOptions) {
   return [
-    { key: 'ipv6_accept_dad', title: t('wireguard.ipv6.accept_dad'), type: 'select', options: resolveOptions(ACCEPT_DAD_OPTIONS, t), help: t('wireguard.ipv6.accept_dad_help') },
+    { key: 'ipv6_accept_dad', title: t('wireguard.ipv6.accept_dad'), type: 'select', options: acceptDadOptions, help: t('wireguard.ipv6.accept_dad_help') },
     { key: 'ipv6_autoconf', title: t('wireguard.ipv6.autoconf'), type: 'checkbox', help: t('wireguard.ipv6.autoconf_help') },
     { key: 'ipv6_eui64', title: t('wireguard.ipv6.eui64'), type: 'text', placeholder: t('wireguard.ipv6.eui64_placeholder'), help: t('wireguard.ipv6.eui64_help') },
     { key: 'ipv6_no_default_link_local', title: t('wireguard.ipv6.no_default_link_local'), type: 'checkbox', help: t('wireguard.ipv6.no_default_link_local_help') },
@@ -77,15 +72,15 @@ function buildIpv6Schema(t) {
 
 function buildMirrorSchema(t, interfaceOptions) {
   return [
-    { key: 'mirror_egress', title: t('wireguard.mirror.egress'), type: 'select', options: interfaceOptions, placeholder: t('wireguard.mirror.target_placeholder'), help: t('wireguard.mirror.egress_help') },
-    { key: 'mirror_ingress', title: t('wireguard.mirror.ingress'), type: 'select', options: interfaceOptions, placeholder: t('wireguard.mirror.target_placeholder'), help: t('wireguard.mirror.ingress_help') },
+    { key: 'mirror_egress', title: t('wireguard.mirror.egress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions], placeholder: t('wireguard.mirror.target_placeholder'), help: t('wireguard.mirror.egress_help') },
+    { key: 'mirror_ingress', title: t('wireguard.mirror.ingress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions], placeholder: t('wireguard.mirror.target_placeholder'), help: t('wireguard.mirror.ingress_help') },
   ];
 }
 
-function buildOtherSchema(t, interfaceOptions) {
+function buildOtherSchema(t, interfaceOptions, vrfOptions) {
   return [
-    { key: 'redirect', title: t('wireguard.other.redirect'), type: 'select', options: interfaceOptions, placeholder: t('wireguard.other.target_placeholder'), help: t('wireguard.other.redirect_help') },
-    { key: 'vrf', title: t('wireguard.other.vrf'), type: 'text', placeholder: t('wireguard.other.vrf_placeholder'), help: t('wireguard.other.vrf_help') },
+    { key: 'redirect', title: t('wireguard.other.redirect'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions], placeholder: t('wireguard.other.target_placeholder'), help: t('wireguard.other.redirect_help') },
+    { key: 'vrf', title: t('wireguard.other.vrf'), type: 'select', options: [{ value: '', label: '' }, ...vrfOptions], placeholder: t('wireguard.other.vrf_placeholder'), help: t('wireguard.other.vrf_help') },
   ];
 }
 
@@ -114,7 +109,9 @@ export default defineComponent({
     const wireguards = ref([]);
     const modalVisible = ref(false);
     const editingWG = ref(null);
+    const isEditMode = ref(false);
     const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
     const activeTab = ref('basic');
     const selectedWG = ref([]);
 
@@ -131,6 +128,12 @@ export default defineComponent({
     const peerModalVisible = ref(false);
     const peerForm = ref(null);
     const selectedPeers = ref([]);
+    const acceptDadOptions = computed(() => [
+      { value: '', label: '' },
+      { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
+      { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
+      { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
+    ]);
 
     // Resolved columns
     const columns = computed(() => [
@@ -153,11 +156,11 @@ export default defineComponent({
     ]);
 
     // Schema definitions
-    const basicSchema = computed(() => buildBasicSchema(t));
+    const basicSchema = computed(() => buildBasicSchema(t, isEditMode.value));
     const ipSchema = computed(() => buildIpSchema(t));
-    const ipv6Schema = computed(() => buildIpv6Schema(t));
+    const ipv6Schema = computed(() => buildIpv6Schema(t, acceptDadOptions.value));
     const mirrorSchema = computed(() => buildMirrorSchema(t, interfaceOptions.value));
-    const otherSchema = computed(() => buildOtherSchema(t, interfaceOptions.value));
+    const otherSchema = computed(() => buildOtherSchema(t, interfaceOptions.value, vrfOptions.value));
     const peerSchema = computed(() => buildPeerSchema(t));
 
     // Command text
@@ -249,7 +252,7 @@ export default defineComponent({
         ip_disable_forwarding: false, ip_enable_arp_accept: false, ip_enable_arp_announce: false,
         ip_enable_arp_ignore: false, ip_enable_directed_broadcast: false,
         ip_enable_proxy_arp: false, ip_proxy_arp_pvlan: false, ip_source_validation: '',
-        ipv6_accept_dad: '1', ipv6_autoconf: false, ipv6_eui64: '',
+        ipv6_accept_dad: '', ipv6_autoconf: false, ipv6_eui64: '',
         ipv6_no_default_link_local: false, ipv6_adjust_mss: '',
         ipv6_base_reachable_time: '', ipv6_disable_forwarding: false,
         ipv6_dup_addr_detect_transmits: '', ipv6_source_validation: '',
@@ -288,7 +291,7 @@ export default defineComponent({
         ip_enable_proxy_arp: !!w.ip?.enable_proxy_arp,
         ip_proxy_arp_pvlan: !!w.ip?.proxy_arp_pvlan,
         ip_source_validation: w.ip?.source_validation || '',
-        ipv6_accept_dad: w.ipv6?.accept_dad || '1',
+        ipv6_accept_dad: w.ipv6?.accept_dad || '',
         ipv6_autoconf: !!w.ipv6?.address?.autoconf,
         ipv6_eui64: w.ipv6?.address?.eui64 || '',
         ipv6_no_default_link_local: !!w.ipv6?.address?.no_default_link_local,
@@ -381,6 +384,17 @@ export default defineComponent({
           value: iface.name || iface,
           label: iface.name || iface,
         }));
+
+        try {
+          const vrfRes = await api.get('/config', { path: 'vrf' });
+          const vrfData = vrfRes.data || {};
+          const nameData = vrfData.name || vrfData;
+          vrfOptions.value = Object.keys(nameData)
+            .filter(name => typeof nameData[name] === 'object')
+            .map(name => ({ value: name, label: name }));
+        } catch (e) {
+          vrfOptions.value = [];
+        }
       } catch (err) {
         handleError(err);
       } finally {
@@ -396,6 +410,7 @@ export default defineComponent({
       if (index >= 0) {
         const raw = wireguards.value[index];
         editingWG.value = wgToForm(raw);
+        isEditMode.value = true;
         // Load peers from raw config
         const peerData = raw.peer || {};
         peers.value = Object.entries(peerData).map(([name, p]) => ({
@@ -405,10 +420,20 @@ export default defineComponent({
         }));
       } else {
         editingWG.value = getDefaultForm();
+        isEditMode.value = false;
         peers.value = [];
       }
       activeTab.value = 'basic';
       modalVisible.value = true;
+    }
+
+    function openModalByRow(row) {
+      if (!row) {
+        openModal(-1);
+        return;
+      }
+      const index = wireguards.value.findIndex(w => w.name === row.name);
+      openModal(index);
     }
 
     async function save() {
@@ -518,14 +543,14 @@ export default defineComponent({
     onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {
-      t, loading, wireguards, selected: selectedWG, modalVisible, editingWG, interfaceOptions, activeTab,
+      t, loading, wireguards, selected: selectedWG, modalVisible, editingWG, interfaceOptions, vrfOptions, activeTab,
       deleteModalVisible, pendingDeleteNames,
       peers, editingPeerIndex, peerModalVisible, peerForm, selectedPeers, peerColumns,
       peerDeleteModalVisible, pendingDeletePeerName,
       columns,
       basicSchema, ipSchema, ipv6Schema, mirrorSchema, otherSchema, peerSchema,
       commandText, modalTabs,
-      openModal, save, remove, confirmRemove, load,
+      openModal, openModalByRow, save, remove, confirmRemove, load,
       openPeerModal, savePeer, deletePeer, confirmRemovePeer,
     };
   },
@@ -538,13 +563,13 @@ export default defineComponent({
         :selectable="true"
         :actions="['create', 'edit', 'delete', 'refresh']"
         @create="openModal(-1)"
-        @edit="openModal"
+        @edit="openModalByRow($event)"
         @delete="remove"
         @refresh="load"
         @selection-change="selected = $event"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="editingWG?.name ? t('wireguard.modal.edit') : t('wireguard.modal.create')" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingWG?.name ? t('wireguard.modal.edit') : t('wireguard.modal.create')" width="900px" @confirm="save">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic><ConfigForm :schema="basicSchema" :model="editingWG" /></template>
@@ -566,19 +591,11 @@ export default defineComponent({
             <template #other><ConfigForm :schema="otherSchema" :model="editingWG" /></template>
           </TabGroup>
         </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('common.buttons.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="save">{{ t('common.buttons.ok') }}</button>
-        </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="peerModalVisible" :title="editingPeerIndex >= 0 ? t('wireguard.peer.modal.edit') : t('wireguard.peer.modal.create')" width="700px">
+      <DraggableModal v-model:visible="peerModalVisible" :title="editingPeerIndex >= 0 ? t('wireguard.peer.modal.edit') : t('wireguard.peer.modal.create')" width="700px" @confirm="savePeer">
         <template #default>
           <ConfigForm :schema="peerSchema" :model="peerForm" />
-        </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="peerModalVisible = false">{{ t('common.buttons.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="savePeer">{{ t('common.buttons.ok') }}</button>
         </template>
       </DraggableModal>
 

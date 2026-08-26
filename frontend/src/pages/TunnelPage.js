@@ -9,6 +9,7 @@ import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { useConfigStore } from '/src/stores/config.js';
 
 const ENCAPSULATION_OPTIONS = [
+  { value: '', label: '' },
   { value: 'erspan', label: 'erspan (Encapsulated Remote SPAN)' },
   { value: 'gre', label: 'gre (Generic Routing Encapsulation - Network Layer)' },
   { value: 'gretap', label: 'gretap (Generic Routing Encapsulation - Data Link Layer)' },
@@ -22,27 +23,32 @@ const ENCAPSULATION_OPTIONS = [
 ];
 
 const SOURCE_VALIDATION_OPTIONS = [
+  { value: '', label: '' },
   { value: 'strict', label: 'strict (Strict Reverse Path Forwarding RFC3704)' },
   { value: 'loose', label: 'loose (Loose Reverse Path Forwarding RFC3704)' },
   { value: 'disable', label: 'disable (No source validation)' },
 ];
 
 const ERSPAN_DIRECTION_OPTIONS = [
+  { value: '', label: '' },
   { value: 'ingress', label: 'ingress (Mirror ingress traffic)' },
   { value: 'egress', label: 'egress (Mirror egress traffic)' },
 ];
 
 const ERSPAN_VERSION_OPTIONS = [
+  { value: '', label: '' },
   { value: '1', label: '1 (ERSPAN Type II)' },
   { value: '2', label: '2 (ERSPAN Type III)' },
 ];
 
 const TOS_OPTIONS = [
+  { value: '', label: '' },
   { value: 'inherit', label: 'inherit' },
   ...Array.from({ length: 100 }, (_, i) => ({ value: String(i), label: String(i) })),
 ];
 
 const ENCAPLIMIT_OPTIONS = [
+  { value: '', label: '' },
   { value: 'none', label: 'none' },
   ...Array.from({ length: 256 }, (_, i) => ({ value: String(i), label: String(i) })),
 ];
@@ -76,8 +82,10 @@ export default defineComponent({
     const editingTunnel = ref(null);
     const isEditMode = ref(false);
     const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
     const activeTab = ref('basic');
     const acceptDadOptions = computed(() => [
+      { value: '', label: '' },
       { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
       { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
       { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
@@ -89,7 +97,7 @@ export default defineComponent({
       { key: 'encapsulation', title: t('interface.tunnel.encapsulation'), type: 'select', options: ENCAPSULATION_OPTIONS, required: true },
       { key: 'remote', title: t('interface.tunnel.remote'), type: 'text', placeholder: t('interface.tunnel.remote_placeholder') },
       { key: 'source_address', title: t('interface.tunnel.source_address'), type: 'text', placeholder: t('interface.tunnel.source_address_placeholder') },
-      { key: 'source_interface', title: t('interface.tunnel.source_interface'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.tunnel.source_interface_placeholder') },
+      { key: 'source_interface', title: t('interface.tunnel.source_interface'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('interface.tunnel.source_interface_placeholder') },
       { key: 'address', title: t('interface.tunnel.address'), type: 'textarea', placeholder: t('interface.tunnel.address_placeholder'), help: t('interface.tunnel.address_help') },
       { key: 'mtu', title: t('interface.tunnel.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('interface.tunnel.mtu_placeholder'), help: t('interface.tunnel.mtu_help') },
       { key: '6rd_prefix', title: t('interface.tunnel.6rd_prefix'), type: 'text', placeholder: t('interface.tunnel.6rd_prefix_placeholder') },
@@ -97,8 +105,8 @@ export default defineComponent({
       { key: 'disable', title: t('interface.tunnel.disable_interface'), type: 'checkbox' },
       { key: 'disable_link_detect', title: t('interface.tunnel.disable_link_detect'), type: 'checkbox' },
       { key: 'enable_multicast', title: t('interface.tunnel.enable_multicast'), type: 'checkbox', help: t('interface.tunnel.enable_multicast_help') },
-      { key: 'redirect', title: t('interface.tunnel.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.tunnel.redirect_placeholder') },
-      { key: 'vrf', title: t('interface.tunnel.vrf'), type: 'text', placeholder: t('interface.tunnel.vrf_placeholder') },
+      { key: 'redirect', title: t('interface.tunnel.redirect'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('interface.tunnel.redirect_placeholder') },
+      { key: 'vrf', title: t('interface.tunnel.vrf'), type: 'select', options: [{ value: '', label: '' }, ...vrfOptions.value], placeholder: t('interface.tunnel.vrf_placeholder') },
     ]);
 
     const ipSchema = computed(() => [
@@ -128,8 +136,8 @@ export default defineComponent({
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_ingress', title: t('interface.tunnel.mirror_ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.tunnel.mirror_placeholder'), help: t('interface.tunnel.mirror_ingress_help') },
-      { key: 'mirror_egress', title: t('interface.tunnel.mirror_egress'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.tunnel.mirror_placeholder'), help: t('interface.tunnel.mirror_egress_help') },
+      { key: 'mirror_ingress', title: t('interface.tunnel.mirror_ingress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('interface.tunnel.mirror_placeholder'), help: t('interface.tunnel.mirror_ingress_help') },
+      { key: 'mirror_egress', title: t('interface.tunnel.mirror_egress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('interface.tunnel.mirror_placeholder'), help: t('interface.tunnel.mirror_egress_help') },
     ]);
 
     const parametersSchema = computed(() => [
@@ -281,7 +289,7 @@ export default defineComponent({
         ip_enable_proxy_arp: !!tun.ip?.enable_proxy_arp || !!tun.ip?.['enable-proxy-arp'],
         ip_proxy_arp_pvlan: !!tun.ip?.proxy_arp_pvlan || !!tun.ip?.['proxy-arp-pvlan'],
         ip_source_validation: tun.ip?.source_validation || tun.ip?.['source-validation'] || '',
-        ipv6_accept_dad: ipv6['accept_dad'] !== undefined ? String(ipv6['accept_dad']) : (ipv6['accept-dad'] !== undefined ? String(ipv6['accept-dad']) : '1'),
+        ipv6_accept_dad: ipv6['accept_dad'] !== undefined ? String(ipv6['accept_dad']) : (ipv6['accept-dad'] !== undefined ? String(ipv6['accept-dad']) : ''),
         ipv6_address_autoconf: ipv6Address.includes('autoconf'),
         ipv6_address_eui64: ipv6Address.find(a => typeof a === 'object' && a.eui64) || '',
         ipv6_no_default_link_local: ipv6Address.includes('no_default_link_local') || ipv6Address.includes('no-default-link-local'),
@@ -296,17 +304,17 @@ export default defineComponent({
           direction: erspan.direction || '',
           hw_id: erspan['hw_id'] !== undefined ? erspan['hw_id'] : (erspan['hw-id'] !== undefined ? erspan['hw-id'] : ''),
           index: erspan.index !== undefined ? erspan.index : '',
-          version: erspan.version || '1',
+          version: erspan.version || '',
         },
         parameters_ip: {
           ignore_df: !!ipParams['ignore_df'] || !!ipParams['ignore-df'],
           key: ipParams.key !== undefined ? ipParams.key : '',
           no_pmtu_discovery: !!ipParams['no_pmtu_discovery'] || !!ipParams['no-pmtu-discovery'],
-          tos: ipParams.tos || 'inherit',
+          tos: ipParams.tos || '',
           ttl: ipParams.ttl !== undefined ? String(ipParams.ttl) : '',
         },
         parameters_ipv6: {
-          encaplimit: ipv6Params.encaplimit !== undefined ? String(ipv6Params.encaplimit) : '4',
+          encaplimit: ipv6Params.encaplimit !== undefined ? String(ipv6Params.encaplimit) : '',
           flowlabel: ipv6Params.flowlabel || '',
           hoplimit: ipv6Params.hoplimit !== undefined ? String(ipv6Params.hoplimit) : '',
           tclass: ipv6Params.tclass || '',
@@ -405,9 +413,10 @@ export default defineComponent({
     async function load() {
       loading.value = true;
       try {
-        const [tunRes, ifRes] = await Promise.all([
+        const [tunRes, ifRes, vrfRes] = await Promise.all([
           configApi.get('interfaces tunnel'),
           interfaceApi.ethernet(),
+          configApi.get('vrf').catch(() => ({ data: {} })),
         ]);
         const tunData = tunRes.data || {};
         tunnels.value = Object.entries(tunData).map(([name, config]) => ({
@@ -427,6 +436,12 @@ export default defineComponent({
           value: iface.name || iface,
           label: iface.name || iface
         }));
+
+        const vrfData = vrfRes?.data || {};
+        const vrfNames = vrfData.name || vrfData;
+        vrfOptions.value = Object.keys(vrfNames)
+          .filter(name => typeof vrfNames[name] === 'object')
+          .map(name => ({ value: name, label: name }));
       } catch (e) {
         showError(e.message || t('common.loadFailed'));
       } finally {
@@ -462,7 +477,7 @@ export default defineComponent({
         ip_enable_proxy_arp: false,
         ip_proxy_arp_pvlan: false,
         ip_source_validation: '',
-        ipv6_accept_dad: '1',
+        ipv6_accept_dad: '',
         ipv6_address_autoconf: false,
         ipv6_address_eui64: '',
         ipv6_no_default_link_local: false,
@@ -473,9 +488,9 @@ export default defineComponent({
         ipv6_source_validation: '',
         mirror_ingress: '',
         mirror_egress: '',
-        parameters_erspan: { direction: '', hw_id: '', index: '', version: '1' },
-        parameters_ip: { ignore_df: false, key: '', no_pmtu_discovery: false, tos: 'inherit', ttl: '' },
-        parameters_ipv6: { encaplimit: '4', flowlabel: '', hoplimit: '', tclass: '' },
+        parameters_erspan: { direction: '', hw_id: '', index: '', version: '' },
+        parameters_ip: { ignore_df: false, key: '', no_pmtu_discovery: false, tos: '', ttl: '' },
+        parameters_ipv6: { encaplimit: '', flowlabel: '', hoplimit: '', tclass: '' },
       };
     }
 
@@ -537,7 +552,7 @@ export default defineComponent({
 
     return {t,
       
-      loading, tunnels, selected, modalVisible, editingTunnel, isEditMode, interfaceOptions, activeTab,
+      loading, tunnels, selected, modalVisible, editingTunnel, isEditMode, interfaceOptions, vrfOptions, activeTab,
       COLUMNS,
       schema, ipSchema, ipv6Schema, mirrorSchema, parametersSchema, commandText, modalTabs,
       openModal, save, remove, load,

@@ -10,11 +10,13 @@ import { useConfigStore } from '/src/stores/config.js';
 import { useI18n } from '/src/i18n/index.js';
 
 const DEVICE_TYPE_OPTIONS = [
+  { value: '', label: '' },
   { value: 'tun', label: 'openvpn.deviceType.tun' },
   { value: 'tap', label: 'openvpn.deviceType.tap' },
 ];
 
 const IP_VERSION_OPTIONS = [
+  { value: '', label: '' },
   { value: 'auto', label: 'openvpn.ipVersion.auto' },
   { value: 'ipv4', label: 'openvpn.ipVersion.ipv4' },
   { value: 'ipv6', label: 'openvpn.ipVersion.ipv6' },
@@ -22,19 +24,21 @@ const IP_VERSION_OPTIONS = [
 ];
 
 const MODE_OPTIONS = [
+  { value: '', label: '' },
   { value: 'site-to-site', label: 'openvpn.mode.siteToSite' },
   { value: 'client', label: 'openvpn.mode.client' },
   { value: 'server', label: 'openvpn.mode.server' },
 ];
 
 const PROTOCOL_OPTIONS = [
+  { value: '', label: '' },
   { value: 'udp', label: 'openvpn.protocol.udp' },
   { value: 'tcp-passive', label: 'openvpn.protocol.tcpPassive' },
   { value: 'tcp-active', label: 'openvpn.protocol.tcpActive' },
 ];
 
 const CIPHER_OPTIONS = [
-  { value: '', label: 'openvpn.cipher.notSet' },
+  { value: '', label: '' },
   { value: 'none', label: 'openvpn.cipher.none' },
   { value: '3des', label: 'openvpn.cipher.3des' },
   { value: 'aes128', label: 'openvpn.cipher.aes128' },
@@ -46,7 +50,7 @@ const CIPHER_OPTIONS = [
 ];
 
 const HASH_OPTIONS = [
-  { value: '', label: 'openvpn.hash.notSet' },
+  { value: '', label: '' },
   { value: 'md5', label: 'md5' },
   { value: 'sha1', label: 'sha1' },
   { value: 'sha256', label: 'sha256' },
@@ -55,12 +59,14 @@ const HASH_OPTIONS = [
 ];
 
 const SOURCE_VALIDATION_OPTIONS = [
+  { value: '', label: '' },
   { value: 'strict', label: 'openvpn.sourceValidation.strict' },
   { value: 'loose', label: 'openvpn.sourceValidation.loose' },
   { value: 'disable', label: 'openvpn.sourceValidation.disable' },
 ];
 
 const TLS_VERSION_OPTIONS = [
+  { value: '', label: '' },
   { value: '1.0', label: '1.0' },
   { value: '1.1', label: '1.1' },
   { value: '1.2', label: '1.2' },
@@ -68,17 +74,20 @@ const TLS_VERSION_OPTIONS = [
 ];
 
 const TLS_ROLE_OPTIONS = [
+  { value: '', label: '' },
   { value: 'active', label: 'openvpn.tlsRole.active' },
   { value: 'passive', label: 'openvpn.tlsRole.passive' },
 ];
 
 const TOPOLOGY_OPTIONS = [
+  { value: '', label: '' },
   { value: 'subnet', label: 'openvpn.topology.subnet' },
   { value: 'point-to-point', label: 'openvpn.topology.pointToPoint' },
   { value: 'net30', label: 'openvpn.topology.net30' },
 ];
 
 const MFA_CHALLENGE_OPTIONS = [
+  { value: '', label: '' },
   { value: 'enable', label: 'openvpn.mfaChallenge.enable' },
   { value: 'disable', label: 'openvpn.mfaChallenge.disable' },
 ];
@@ -114,8 +123,10 @@ export default defineComponent({
     const modalVisible = ref(false);
     const editingItem = ref(null);
     const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
     const activeTab = ref('basic');
     const acceptDadOptions = computed(() => [
+      { value: '', label: '' },
       { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
       { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
       { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
@@ -124,21 +135,21 @@ export default defineComponent({
     const basicSchema = computed(() => [
       { key: 'name', title: 'openvpn.schema.name', type: 'text', required: true, placeholder: 'openvpn.schema.namePlaceholder', disabled: !!editingItem.value?.name },
       { key: 'description', title: 'openvpn.schema.description', type: 'text', placeholder: 'openvpn.schema.descriptionPlaceholder' },
-      { key: 'device_type', title: 'openvpn.schema.deviceType', type: 'select', options: DEVICE_TYPE_OPTIONS, required: true },
+      { key: 'device_type', title: 'openvpn.schema.deviceType', type: 'select', options: DEVICE_TYPE_OPTIONS, required: true, help: '默认值: tun' },
       { key: 'disable', title: 'openvpn.schema.disable', type: 'checkbox' },
-      { key: 'ip_version', title: 'openvpn.schema.ipVersion', type: 'select', options: IP_VERSION_OPTIONS },
+      { key: 'ip_version', title: 'openvpn.schema.ipVersion', type: 'select', options: IP_VERSION_OPTIONS, help: '默认值: auto' },
       { key: 'mode', title: 'openvpn.schema.mode', type: 'select', options: MODE_OPTIONS, required: true },
-      { key: 'protocol', title: 'openvpn.schema.protocol', type: 'select', options: PROTOCOL_OPTIONS },
+      { key: 'protocol', title: 'openvpn.schema.protocol', type: 'select', options: PROTOCOL_OPTIONS, help: '默认值: udp' },
       { key: 'persistent_tunnel', title: 'openvpn.schema.persistentTunnel', type: 'checkbox', help: 'openvpn.schema.persistentTunnelHelp' },
       { key: 'shared_secret_key', title: 'openvpn.schema.sharedSecretKey', type: 'password', placeholder: 'openvpn.schema.sharedSecretKeyPlaceholder' },
       { key: 'use_lzo_compression', title: 'openvpn.schema.useLzoCompression', type: 'checkbox', help: 'openvpn.schema.useLzoCompressionHelp' },
-      { key: 'vrf', title: 'openvpn.schema.vrf', type: 'text', placeholder: 'openvpn.schema.vrfPlaceholder' },
+      { key: 'vrf', title: 'openvpn.schema.vrf', type: 'select', options: [{ value: '', label: '' }, ...vrfOptions.value], placeholder: 'openvpn.schema.vrfPlaceholder' },
       { key: 'openvpn_option', title: 'openvpn.schema.openvpnOption', type: 'textarea', placeholder: 'openvpn.schema.openvpnOptionPlaceholder' },
-      { key: 'local_host', title: 'openvpn.schema.localHost', type: 'text', placeholder: 'openvpn.schema.localHostPlaceholder' },
+      { key: 'local_host', title: 'openvpn.schema.localHost', type: 'text', placeholder: 'openvpn.schema.localHostPlaceholder', help: '未设置时: 接受所有本地地址连接' },
       { key: 'local_port', title: 'openvpn.schema.localPort', type: 'number', min: 1, max: 65535, placeholder: 'openvpn.schema.localPortPlaceholder' },
-      { key: 'remote_host', title: 'openvpn.schema.remoteHost', type: 'text', placeholder: 'openvpn.schema.remoteHostPlaceholder' },
+      { key: 'remote_host', title: 'openvpn.schema.remoteHost', type: 'text', placeholder: 'openvpn.schema.remoteHostPlaceholder', help: '未设置时: dynamic' },
       { key: 'remote_port', title: 'openvpn.schema.remotePort', type: 'number', min: 1, max: 65535, placeholder: 'openvpn.schema.remotePortPlaceholder' },
-      { key: 'redirect', title: 'openvpn.schema.redirect', type: 'select', options: interfaceOptions.value, placeholder: 'openvpn.schema.redirectPlaceholder' },
+      { key: 'redirect', title: 'openvpn.schema.redirect', type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: 'openvpn.schema.redirectPlaceholder' },
       { key: 'local_address', title: 'openvpn.schema.localAddress', type: 'text', placeholder: 'openvpn.schema.localAddressPlaceholder' },
       { key: 'local_subnet_mask', title: 'openvpn.schema.localSubnetMask', type: 'text', placeholder: 'openvpn.schema.localSubnetMaskPlaceholder' },
       { key: 'remote_address', title: 'openvpn.schema.remoteAddress', type: 'text', placeholder: 'openvpn.schema.remoteAddressPlaceholder' },
@@ -151,14 +162,14 @@ export default defineComponent({
 
     const encryptionSchema = computed(() => [
       { key: 'encryption_cipher', title: 'openvpn.schema.encryptionCipher', type: 'select', options: CIPHER_OPTIONS },
-      { key: 'encryption_data_ciphers', title: 'openvpn.schema.encryptionDataCiphers', type: 'text', placeholder: 'openvpn.schema.encryptionDataCiphersPlaceholder', help: 'openvpn.schema.encryptionDataCiphersHelp' },
+      { key: 'encryption_data_ciphers', title: 'openvpn.schema.encryptionDataCiphers', type: 'select', options: CIPHER_OPTIONS, placeholder: 'openvpn.schema.encryptionDataCiphersPlaceholder', help: 'openvpn.schema.encryptionDataCiphersHelp' },
       { key: 'encryption_data_ciphers_fallback', title: 'openvpn.schema.encryptionDataCiphersFallback', type: 'select', options: CIPHER_OPTIONS },
       { key: 'hash', title: 'openvpn.schema.hash', type: 'select', options: HASH_OPTIONS },
     ]);
 
     const keepAliveSchema = computed(() => [
-      { key: 'keepalive_failure_count', title: 'openvpn.schema.keepaliveFailureCount', type: 'number', min: 0, max: 1000, placeholder: 'openvpn.schema.keepaliveFailureCountPlaceholder' },
-      { key: 'keepalive_interval', title: 'openvpn.schema.keepaliveInterval', type: 'number', min: 0, max: 600, placeholder: 'openvpn.schema.keepaliveIntervalPlaceholder' },
+      { key: 'keepalive_failure_count', title: 'openvpn.schema.keepaliveFailureCount', type: 'number', min: 0, max: 1000, placeholder: 'openvpn.schema.keepaliveFailureCountPlaceholder', help: '范围: 0-1000；默认值: 60' },
+      { key: 'keepalive_interval', title: 'openvpn.schema.keepaliveInterval', type: 'number', min: 0, max: 600, placeholder: 'openvpn.schema.keepaliveIntervalPlaceholder', help: '范围: 0-600；默认值: 10 秒' },
     ]);
 
     const offloadSchema = computed(() => [
@@ -166,8 +177,8 @@ export default defineComponent({
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: 'openvpn.schema.mirrorEgress', type: 'select', options: interfaceOptions.value, placeholder: 'openvpn.schema.mirrorPlaceholder', help: 'openvpn.schema.mirrorEgressHelp' },
-      { key: 'mirror_ingress', title: 'openvpn.schema.mirrorIngress', type: 'select', options: interfaceOptions.value, placeholder: 'openvpn.schema.mirrorPlaceholder', help: 'openvpn.schema.mirrorIngressHelp' },
+      { key: 'mirror_egress', title: 'openvpn.schema.mirrorEgress', type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: 'openvpn.schema.mirrorPlaceholder', help: 'openvpn.schema.mirrorEgressHelp' },
+      { key: 'mirror_ingress', title: 'openvpn.schema.mirrorIngress', type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: 'openvpn.schema.mirrorPlaceholder', help: 'openvpn.schema.mirrorIngressHelp' },
     ]);
 
     const ipSchema = computed(() => [
@@ -319,7 +330,7 @@ export default defineComponent({
       { key: 'tls_dh_params', title: 'openvpn.schema.tlsDhParams', type: 'text', placeholder: 'openvpn.schema.tlsDhParamsPlaceholder', help: 'openvpn.schema.tlsDhParamsHelp' },
       { key: 'tls_peer_fingerprint', title: 'openvpn.schema.tlsPeerFingerprint', type: 'text', placeholder: 'openvpn.schema.tlsPeerFingerprintPlaceholder' },
       { key: 'tls_role', title: 'openvpn.schema.tlsRole', type: 'select', options: TLS_ROLE_OPTIONS, placeholder: 'openvpn.schema.tlsRolePlaceholder' },
-      { key: 'tls_version_min', title: 'openvpn.schema.tlsVersionMin', type: 'select', options: [{ value: '', label: 'openvpn.schema.notSet' }, ...TLS_VERSION_OPTIONS] },
+      { key: 'tls_version_min', title: 'openvpn.schema.tlsVersionMin', type: 'select', options: TLS_VERSION_OPTIONS },
     ]);
 
     const replaceRouteSchema = computed(() => [
@@ -501,11 +512,11 @@ export default defineComponent({
       return {
         name: name || '',
         description: cfg.description || '',
-        device_type: cfg['device-type'] || 'tun',
+        device_type: cfg['device-type'] || '',
         disable: !!cfg.disable || cfg.disable === '',
-        ip_version: cfg['ip-version'] || 'auto',
+        ip_version: cfg['ip-version'] || '',
         mode: cfg.mode || '',
-        protocol: cfg.protocol || 'udp',
+        protocol: cfg.protocol || '',
         persistent_tunnel: !!cfg['persistent-tunnel'] || cfg['persistent-tunnel'] === '',
         shared_secret_key: cfg['shared-secret-key'] || '',
         use_lzo_compression: !!cfg['use-lzo-compression'] || cfg['use-lzo-compression'] === '',
@@ -525,8 +536,8 @@ export default defineComponent({
         encryption_data_ciphers: encryption['data-ciphers'] || '',
         encryption_data_ciphers_fallback: encryption['data-ciphers-fallback'] || '',
         hash: cfg.hash || '',
-        keepalive_failure_count: keepalive['failure-count'] !== undefined ? String(keepalive['failure-count']) : '60',
-        keepalive_interval: keepalive.interval !== undefined ? String(keepalive.interval) : '10',
+        keepalive_failure_count: keepalive['failure-count'] !== undefined ? String(keepalive['failure-count']) : '',
+        keepalive_interval: keepalive.interval !== undefined ? String(keepalive.interval) : '',
         offload_dco: !!offload.dco || offload.dco === '',
         mirror_egress: mirror.egress || '',
         mirror_ingress: mirror.ingress || '',
@@ -541,7 +552,7 @@ export default defineComponent({
         ip_enable_proxy_arp: !!ip['enable-proxy-arp'] || ip['enable-proxy-arp'] === '',
         ip_proxy_arp_pvlan: !!ip['proxy-arp-pvlan'] || ip['proxy-arp-pvlan'] === '',
         ip_source_validation: ip['source-validation'] || '',
-        ipv6_accept_dad: ipv6['accept-dad'] !== undefined ? String(ipv6['accept-dad']) : '1',
+        ipv6_accept_dad: ipv6['accept-dad'] !== undefined ? String(ipv6['accept-dad']) : '',
         ipv6_address_autoconf: ipv6Addresses.includes('autoconf'),
         ipv6_address_eui64: ipv6Addresses.find(a => typeof a === 'object' && a.eui64)?.eui64 || '',
         ipv6_address_iface_id: ipv6Addresses.find(a => typeof a === 'object' && a['interface-identifier'])?.['interface-identifier'] || '',
@@ -549,7 +560,7 @@ export default defineComponent({
         ipv6_adjust_mss: ipv6['adjust-mss'] || '',
         ipv6_base_reachable_time: ipv6['base-reachable-time'] || '',
         ipv6_disable_forwarding: !!ipv6['disable-forwarding'] || ipv6['disable-forwarding'] === '',
-        ipv6_dup_addr_detect_transmits: ipv6['dup-addr-detect-transmits'] !== undefined ? String(ipv6['dup-addr-detect-transmits']) : '1',
+        ipv6_dup_addr_detect_transmits: ipv6['dup-addr-detect-transmits'] !== undefined ? String(ipv6['dup-addr-detect-transmits']) : '',
         ipv6_source_validation: ipv6['source-validation'] || '',
         server_bridge_disable: !!serverBridge.disable || serverBridge.disable === '',
         server_bridge_gateway: serverBridge.gateway || '',
@@ -568,9 +579,9 @@ export default defineComponent({
         server_push_route: toArray(server['push-route']).join('\n'),
         server_reject_unconfigured: !!server['reject-unconfigured-clients'] || server['reject-unconfigured-clients'] === '',
         server_subnet: server.subnet || '',
-        server_topology: server.topology || 'subnet',
+        server_topology: server.topology || '',
         server_clients: serverClients,
-        server_mfa_totp_challenge: serverMfa.challenge || 'enable',
+        server_mfa_totp_challenge: serverMfa.challenge || '',
         server_mfa_totp_digits: serverMfa.digits !== undefined ? String(serverMfa.digits) : '6',
         server_mfa_totp_drift: serverMfa.drift !== undefined ? String(serverMfa.drift) : '0',
         server_mfa_totp_slop: serverMfa.slop !== undefined ? String(serverMfa.slop) : '180',
@@ -756,11 +767,11 @@ export default defineComponent({
       return {
         name: '',
         description: '',
-        device_type: 'tun',
+        device_type: '',
         disable: false,
-        ip_version: 'auto',
-        mode: 'site-to-site',
-        protocol: 'udp',
+        ip_version: '',
+        mode: '',
+        protocol: '',
         persistent_tunnel: false,
         shared_secret_key: '',
         use_lzo_compression: false,
@@ -780,8 +791,8 @@ export default defineComponent({
         encryption_data_ciphers: '',
         encryption_data_ciphers_fallback: '',
         hash: '',
-        keepalive_failure_count: '60',
-        keepalive_interval: '10',
+        keepalive_failure_count: '',
+        keepalive_interval: '',
         offload_dco: false,
         mirror_egress: '',
         mirror_ingress: '',
@@ -796,7 +807,7 @@ export default defineComponent({
         ip_enable_proxy_arp: false,
         ip_proxy_arp_pvlan: false,
         ip_source_validation: '',
-        ipv6_accept_dad: '1',
+        ipv6_accept_dad: '',
         ipv6_address_autoconf: false,
         ipv6_address_eui64: '',
         ipv6_address_iface_id: '',
@@ -804,7 +815,7 @@ export default defineComponent({
         ipv6_adjust_mss: '',
         ipv6_base_reachable_time: '',
         ipv6_disable_forwarding: false,
-        ipv6_dup_addr_detect_transmits: '1',
+        ipv6_dup_addr_detect_transmits: '',
         ipv6_source_validation: '',
         server_bridge_disable: false,
         server_bridge_gateway: '',
@@ -823,9 +834,9 @@ export default defineComponent({
         server_push_route: '',
         server_reject_unconfigured: false,
         server_subnet: '',
-        server_topology: 'subnet',
+        server_topology: '',
         server_clients: [],
-        server_mfa_totp_challenge: 'enable',
+        server_mfa_totp_challenge: '',
         server_mfa_totp_digits: '6',
         server_mfa_totp_drift: '0',
         server_mfa_totp_slop: '180',
@@ -845,9 +856,10 @@ export default defineComponent({
     async function load() {
       loading.value = true;
       try {
-        const [cfgRes, ifRes] = await Promise.all([
+        const [cfgRes, ifRes, vrfRes] = await Promise.all([
           configApi.get('interfaces openvpn'),
           interfaceApi.ethernet(),
+          configApi.get('vrf').catch(() => ({ data: {} })),
         ]);
         const cfgData = cfgRes.data || {};
         openvpnList.value = Object.entries(cfgData).map(([name, config]) => ({
@@ -863,6 +875,12 @@ export default defineComponent({
           value: iface.name || iface,
           label: iface.name || iface,
         }));
+
+        const vrfData = vrfRes?.data || {};
+        const vrfNames = vrfData.name || vrfData;
+        vrfOptions.value = Object.keys(vrfNames)
+          .filter(name => typeof vrfNames[name] === 'object')
+          .map(name => ({ value: name, label: name }));
       } catch (e) {
         showError(e.message || t('openvpn.loadFailed'));
       } finally {
@@ -1018,34 +1036,48 @@ export default defineComponent({
                 {{ t('openvpn.serverModeOnly') }}
               </div>
               <template v-else>
-                <h3 style="margin-top: 0;">{{ t('openvpn.serverConfig') }}</h3>
-                <ConfigForm v-model="editingItem" :schema="serverSchema" />
-                <h3>MFA TOTP</h3>
-                <ConfigForm v-model="editingItem" :schema="serverMfaSchema" />
-                <h3 style="margin-top: 20px;">{{ t('openvpn.clientManagement') }}</h3>
-                <DataTable
-                  :columns="clientColumns"
-                  :data="serverClients"
-                  :selectable="false"
-                  :actions="['create', 'edit', 'delete']"
-                  @create="addClient"
-                  @edit="editClient(selectedClients[0] ? serverClients.indexOf(selectedClients[0]) : -1)"
-                  @delete="deleteClient(selectedClients[0] ? serverClients.indexOf(selectedClients[0]) : -1)"
-                  @selection-change="selectedClients = $event"
-                  rowKey="name"
-                >
-                  <template #bodyCell="{ column, record }">
-                    <template v-if="column.key === 'disable'">
-                      <span :class="record.disable ? 'badge badge-danger' : 'badge badge-success'">
-                        {{ record.disable ? t('openvpn.status.yes') : t('openvpn.status.no') }}
-                      </span>
-                    </template>
-                    <template v-if="column.key === 'actions'">
-                      <a @click="editClient(serverClients.indexOf(record))">{{ t('app.edit') }}</a>
-                      <a @click="deleteClient(serverClients.indexOf(record))" style="color: #ff4d4f; margin-left: 8px;">{{ t('app.delete') }}</a>
-                    </template>
-                  </template>
-                </DataTable>
+                <div class="form-group" style="margin-top: 0;">
+                  <div class="form-group-title">{{ t('openvpn.serverConfig') }}</div>
+                  <div class="form-group-content">
+                    <ConfigForm v-model="editingItem" :schema="serverSchema" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="form-group-title">MFA TOTP</div>
+                  <div class="form-group-content">
+                    <ConfigForm v-model="editingItem" :schema="serverMfaSchema" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="form-group-title">{{ t('openvpn.clientManagement') }}</div>
+                  <div class="form-group-content">
+                    <DataTable
+                      :columns="clientColumns"
+                      :data="serverClients"
+                      :selectable="false"
+                      :actions="['create', 'edit', 'delete']"
+                      @create="addClient"
+                      @edit="editClient(selectedClients[0] ? serverClients.indexOf(selectedClients[0]) : -1)"
+                      @delete="deleteClient(selectedClients[0] ? serverClients.indexOf(selectedClients[0]) : -1)"
+                      @selection-change="selectedClients = $event"
+                      rowKey="name"
+                    >
+                      <template #bodyCell="{ column, record }">
+                        <template v-if="column.key === 'disable'">
+                          <span :class="record.disable ? 'badge badge-danger' : 'badge badge-success'">
+                            {{ record.disable ? t('openvpn.status.yes') : t('openvpn.status.no') }}
+                          </span>
+                        </template>
+                        <template v-if="column.key === 'actions'">
+                          <a @click="editClient(serverClients.indexOf(record))">{{ t('app.edit') }}</a>
+                          <a @click="deleteClient(serverClients.indexOf(record))" style="color: #ff4d4f; margin-left: 8px;">{{ t('app.delete') }}</a>
+                        </template>
+                      </template>
+                    </DataTable>
+                  </div>
+                </div>
               </template>
             </template>
             <template #keepalive>

@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, onUnmounted, watch, nextTick } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
@@ -10,26 +10,177 @@ import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { useI18n } from '/src/i18n/index.js';
 
-const PROTOCOL_OPTIONS = [
+const IP_PROTOCOL_OPTIONS = [
   { value: 'any', label: 'any' },
   { value: 'babel', label: 'Babel' },
   { value: 'bgp', label: 'BGP' },
-  { value: 'connected', label: 'Connected' },
   { value: 'eigrp', label: 'EIGRP' },
   { value: 'isis', label: 'IS-IS' },
-  { value: 'kernel', label: 'Kernel' },
   { value: 'ospf', label: 'OSPF' },
   { value: 'rip', label: 'RIP' },
   { value: 'static', label: 'Static' },
-  { value: 'table', label: 'Table' },
 ];
 
-const TAB_KEYS = ['basic', 'ip', 'ipv6'];
+const IPV6_PROTOCOL_OPTIONS = [
+  { value: 'any', label: 'any' },
+  { value: 'babel', label: 'Babel' },
+  { value: 'bgp', label: 'BGP' },
+  { value: 'isis', label: 'IS-IS' },
+  { value: 'ospfv3', label: 'OSPFv3' },
+  { value: 'ripng', label: 'RIPng' },
+  { value: 'static', label: 'Static' },
+];
+
+const BGP_NEIGHBOR_LOCAL_ROLE_OPTIONS = ['customer', 'peer', 'provider', 'rs-client', 'rs-server'];
+const BGP_NEIGHBOR_GRACEFUL_RESTART_OPTIONS = ['enable', 'disable', 'restart-helper'];
+const BGP_NEIGHBOR_AF_KEYS = [
+  'ipv4-flowspec',
+  'ipv4-labeled-unicast',
+  'ipv4-multicast',
+  'ipv4-unicast',
+  'ipv4-vpn',
+  'ipv6-flowspec',
+  'ipv6-labeled-unicast',
+  'ipv6-multicast',
+  'ipv6-unicast',
+  'ipv6-vpn',
+  'l2vpn-evpn',
+];
+const BGP_PEER_GROUP_AF_KEYS = [
+  'ipv4-labeled-unicast',
+  'ipv4-unicast',
+  'ipv4-vpn',
+  'ipv6-labeled-unicast',
+  'ipv6-unicast',
+  'ipv6-vpn',
+  'l2vpn-evpn',
+];
+
+const TAB_KEYS = ['basic', 'ip', 'ipv6', 'protocols', 'service'];
+
+function createEmptyBgpNeighborAfPolicy(source = null) {
+  return {
+    addpathTxAll: !!source?.addpathTxAll,
+    addpathTxPerAs: !!source?.addpathTxPerAs,
+    allowasInNumber: source?.allowasInNumber || '',
+    asOverride: !!source?.asOverride,
+    attributeUnchangedAsPath: !!source?.attributeUnchangedAsPath,
+    attributeUnchangedMed: !!source?.attributeUnchangedMed,
+    attributeUnchangedNextHop: !!source?.attributeUnchangedNextHop,
+    capabilityOrfPrefixListReceive: !!source?.capabilityOrfPrefixListReceive,
+    capabilityOrfPrefixListSend: !!source?.capabilityOrfPrefixListSend,
+    conditionallyAdvertiseAdvertiseMap: source?.conditionallyAdvertiseAdvertiseMap || '',
+    conditionallyAdvertiseExistMap: source?.conditionallyAdvertiseExistMap || '',
+    conditionallyAdvertiseNonExistMap: source?.conditionallyAdvertiseNonExistMap || '',
+    defaultOriginateRouteMap: source?.defaultOriginateRouteMap || '',
+    disableSendCommunityExtended: !!source?.disableSendCommunityExtended,
+    disableSendCommunityStandard: !!source?.disableSendCommunityStandard,
+    distributeListExport: source?.distributeListExport || '',
+    distributeListImport: source?.distributeListImport || '',
+    filterListExport: source?.filterListExport || '',
+    filterListImport: source?.filterListImport || '',
+    maximumPrefix: source?.maximumPrefix || '',
+    maximumPrefixOut: source?.maximumPrefixOut || '',
+    nexthopLocalUnchanged: !!source?.nexthopLocalUnchanged,
+    nexthopSelf: !!source?.nexthopSelf,
+    nexthopSelfForce: !!source?.nexthopSelfForce,
+    prefixListExport: source?.prefixListExport || '',
+    prefixListImport: source?.prefixListImport || '',
+    removePrivateAsAll: !!source?.removePrivateAsAll,
+    routeMapExport: source?.routeMapExport || '',
+    routeMapImport: source?.routeMapImport || '',
+    routeReflectorClient: !!source?.routeReflectorClient,
+    routeServerClient: !!source?.routeServerClient,
+    softReconfiguration: !!source?.softReconfiguration,
+    unsuppressMap: source?.unsuppressMap || '',
+    weight: source?.weight || '',
+  };
+}
+
+function createEmptyBgpNeighborAfPolicies(source = null) {
+  const result = {};
+  for (const af of BGP_NEIGHBOR_AF_KEYS) {
+    result[af] = createEmptyBgpNeighborAfPolicy(source?.[af]);
+  }
+  return result;
+}
+
+function createEmptyBgpPeerGroupAfPolicies(source = null) {
+  const result = {};
+  for (const af of BGP_PEER_GROUP_AF_KEYS) {
+    result[af] = createEmptyBgpNeighborAfPolicy(source?.[af]);
+  }
+  return result;
+}
+
+const PROTOCOL_BRANCH_META = {
+  bgp: [
+    { key: 'system-as', label: 'system-as', help: 'ASN. Typical range: 1-4294967294.', snippets: ['system-as = 65001'] },
+    { key: 'timers', label: 'timers', help: 'BGP timers. Example: holdtime/keepalive.', snippets: ['timers holdtime = 30', 'timers keepalive = 10'] },
+    { key: 'address-family', label: 'address-family', help: 'Address-family subtree. Configure ipv4/ipv6/vpn/flowspec policies here.', snippets: ['address-family ipv4-flowspec local-install interface = eth3', 'address-family ipv4-unicast maximum-paths ibgp = 4', 'address-family ipv4-unicast distance external = 20'] },
+    { key: 'neighbor', label: 'neighbor', help: 'Neighbor-specific policies and capabilities.', snippets: ['neighbor 1.1.1.1 remote-as = 65002', 'neighbor 1.1.1.1 address-family ipv4-unicast route-map export = rm01'] },
+    { key: 'peer-group', label: 'peer-group', help: 'Peer-group shared policy.', snippets: ['peer-group CORE remote-as = 65002', 'peer-group CORE address-family ipv4-unicast prefix-list import = prefix01'] },
+    { key: 'interface', label: 'interface', help: 'BGP interface-level parameters.', snippets: ['interface eth0 peer-group = CORE'] },
+    { key: 'listen', label: 'listen', help: 'Dynamic neighbor listener ranges.', snippets: ['listen range 10.0.0.0/24 peer-group = CORE'] },
+    { key: 'parameters', label: 'parameters', help: 'Global BGP process parameters.', snippets: ['parameters router-id = 1.1.1.1'] },
+    { key: 'sid', label: 'sid', help: 'Segment identifier under VRF BGP.', snippets: ['sid = 100'] },
+    { key: 'srv6', label: 'srv6', help: 'SRv6 parameters under BGP.', snippets: ['srv6'] },
+    { key: 'bmp', label: 'bmp', help: 'BGP Monitoring Protocol settings.', snippets: ['bmp'] },
+  ],
+  failover: [
+    { key: 'route', label: 'route', help: 'Failover route and next-hop checks. Metric default is 1; check timeout default is 10; check policy default is any-available.', snippets: ['route 1.1.1.0/24 next-hop 22.2.2.2 interface = eth1', 'route 1.1.1.0/24 next-hop 22.2.2.2 check policy = any-available', 'route 1.1.1.0/24 dhcp-interface = eth1'] },
+  ],
+  isis: [
+    { key: 'net', label: 'net', help: 'ISO NET value.', snippets: ['net = 49.0001.1921.6800.1001.00'] },
+    { key: 'interface', label: 'interface', help: 'Interface-specific ISIS parameters.', snippets: ['interface eth1 passive'] },
+    { key: 'redistribute', label: 'redistribute', help: 'Route redistribution into ISIS.', snippets: ['redistribute static level-2'] },
+  ],
+  ospf: [
+    { key: 'access-list', label: 'access-list', help: 'Access list to filter networks in routing updates.', snippets: ['access-list import 10'] },
+    { key: 'aggregation', label: 'aggregation', help: 'External route aggregation settings.', snippets: ['aggregation 10.0.0.0/8'] },
+    { key: 'parameters', label: 'parameters', help: 'Global OSPF parameters.', snippets: ['parameters router-id = 1.1.1.1'] },
+    { key: 'area', label: 'area', help: 'Area and network settings.', snippets: ['area 0 network 10.0.0.0/24'] },
+    { key: 'auto-cost', label: 'auto-cost', help: 'Calculate interface cost according to bandwidth.', snippets: ['auto-cost reference-bandwidth = 10000'] },
+    { key: 'capability', label: 'capability', help: 'Enable specific OSPF features.', snippets: ['capability opaque'] },
+    { key: 'default-information', label: 'default-information', help: 'Default route advertisement settings.', snippets: ['default-information originate always'] },
+    { key: 'default-metric', label: 'default-metric', help: 'Metric of redistributed routes.', snippets: ['default-metric = 10'] },
+    { key: 'distance', label: 'distance', help: 'Administrative distance settings.', snippets: ['distance global = 110'] },
+    { key: 'graceful-restart', label: 'graceful-restart', help: 'Graceful Restart settings.', snippets: ['graceful-restart helper enable'] },
+    { key: 'interface', label: 'interface', help: 'Per-interface OSPF settings.', snippets: ['interface eth1 area = 0.0.0.0'] },
+    { key: 'ldp-sync', label: 'ldp-sync', help: 'Protocol wide LDP-IGP synchronization.', snippets: ['ldp-sync'] },
+    { key: 'log-adjacency-changes', label: 'log-adjacency-changes', help: 'Log adjacency state changes.', snippets: ['log-adjacency-changes'] },
+    { key: 'max-metric', label: 'max-metric', help: 'OSPF maximum and infinite-distance metrics.', snippets: ['max-metric router-lsa administrative'] },
+    { key: 'maximum-paths', label: 'maximum-paths', help: 'Maximum multiple paths (ECMP).', snippets: ['maximum-paths = 4'] },
+    { key: 'mpls-te', label: 'mpls-te', help: 'MPLS-TE parameters.', snippets: ['mpls-te router-address = 1.1.1.1'] },
+    { key: 'neighbor', label: 'neighbor', help: 'Specify neighbor router.', snippets: ['neighbor 192.0.2.2 poll-interval = 60'] },
+    { key: 'passive-interface', label: 'passive-interface', help: 'Suppress routing updates on interface.', snippets: ['passive-interface = eth1'] },
+    { key: 'redistribute', label: 'redistribute', help: 'Redistribution policies.', snippets: ['redistribute connected metric-type = 2'] },
+    { key: 'refresh', label: 'refresh', help: 'Adjust refresh parameters.', snippets: ['refresh timers lsa-min-interval = 5'] },
+    { key: 'segment-routing', label: 'segment-routing', help: 'Segment-Routing (SPRING) settings.', snippets: ['segment-routing global-block low-label-value = 16000'] },
+    { key: 'summary-address', label: 'summary-address', help: 'External summary address.', snippets: ['summary-address 10.0.0.0/8'] },
+    { key: 'timers', label: 'timers', help: 'Adjust OSPF timers.', snippets: ['timers throttle spf delay = 200'] },
+  ],
+  ospfv3: [
+    { key: 'parameters', label: 'parameters', help: 'Global OSPFv3 parameters.', snippets: ['parameters router-id = 2.2.2.2'] },
+    { key: 'area', label: 'area', help: 'Area settings for OSPFv3.', snippets: ['area 0 interface eth1'] },
+    { key: 'interface', label: 'interface', help: 'Per-interface OSPFv3 settings.', snippets: ['interface eth1 hello-interval = 10'] },
+  ],
+  rpki: [
+    { key: 'cache', label: 'cache', help: 'RPKI cache server settings.', snippets: ['cache 192.0.2.10 port = 3323'] },
+    { key: 'polling-period', label: 'polling-period', help: 'Cache polling period in seconds.', snippets: ['polling-period = 300'] },
+    { key: 'retry-interval', label: 'retry-interval', help: 'Retry interval in seconds.', snippets: ['retry-interval = 60'] },
+    { key: 'expire-interval', label: 'expire-interval', help: 'Expire interval in seconds.', snippets: ['expire-interval = 600'] },
+  ],
+  static: [
+    { key: 'route', label: 'route', help: 'IPv4 static routes.', snippets: ['route 0.0.0.0/0 next-hop 192.0.2.1'] },
+    { key: 'route6', label: 'route6', help: 'IPv6 static routes.', snippets: ['route6 2001:db8::/32 next-hop 2001:db8::1'] },
+  ],
+};
 
 export default defineComponent({
   name: 'VrfPage',
   setup() {
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
     const route = useRoute();
     const configStore = useConfigStore();
     const vrfList = ref([]);
@@ -37,11 +188,209 @@ export default defineComponent({
     const selectedNames = ref([]);
 
     const modalVisible = ref(false);
+    const vrfModalTabsRoot = ref(null);
+    const protocolIndicatorStyle = ref({ left: '16px', right: '16px' });
+    const serviceIndicatorStyle = ref({ left: '16px', right: '16px' });
+    const dhcpServerListenAddressText = ref('');
+    const dhcpServerListenInterfaceText = ref('');
+    const dhcpv6ServerListenInterfaceText = ref('');
+    const dhcpv6GlobalNameServerText = ref('');
     const editingVrf = ref(null);
     const editingOriginalName = ref('');
+    const routeMapOptions = ref([]);
+    const interfaceOptions = ref([]);
+    const bfdProfileOptions = ref([]);
     const activeTab = ref('basic');
+    const activeProtocolTab = ref('bgp');
+    const activeBgpBranchTab = ref('system-as');
+    const activeBgpAfBranchTab = ref('ipv4-unicast');
+    const failoverSubTab = ref('basic');
+    const isisSubTab = ref('basic');
+    const ospfSubTab = ref('basic');
+    const ospfv3SubTab = ref('basic');
+    const rpkiSubTab = ref('basic');
+    const staticSubTab = ref('ipv4');
+    const dhcpServerSubTab = ref('basic');
+    const dhcpv6ServerSubTab = ref('basic');
+    const dhcpSharedNetworkInnerTab = ref('subnet');
+    const dhcpv6SharedNetworkInnerTab = ref('option');
+    const protocolBranchState = ref({
+      bgp: 'system-as',
+      failover: 'route',
+      isis: 'net',
+      ospf: 'parameters',
+      ospfv3: 'parameters',
+      rpki: 'cache',
+      static: 'route',
+    });
     const deleteModalVisible = ref(false);
     const pendingDeleteNames = ref([]);
+    const bgpCollectionModalVisible = ref(false);
+    const bgpCollectionDeleteVisible = ref(false);
+    const bgpCollectionMode = ref('create');
+    const bgpCollectionType = ref('neighbor');
+    const bgpCollectionEditId = ref('');
+    const bgpCollectionDraft = ref({});
+    const bgpVpnNetworkModalVisible = ref(false);
+    const bgpVpnNetworkModalMode = ref('create');
+    const bgpVpnNetworkEditId = ref('');
+    const bgpVpnNetworkDraft = ref({});
+    const bgpVpnNetworkDeleteVisible = ref(false);
+    const pendingBgpVpnNetworkDeleteIds = ref([]);
+    const pendingBgpVpnNetworkDeleteAfKey = ref('ipv4-vpn');
+    const bgpNeighborModalTab = ref('basic');
+    const bgpNeighborModalAfTab = ref('ipv4-unicast');
+    const bgpPeerGroupModalTab = ref('basic');
+    const bgpPeerGroupModalAfTab = ref('ipv4-unicast');
+    const pendingBgpDeleteIds = ref([]);
+    const evpnVniModalVisible = ref(false);
+    const evpnVniModalMode = ref('create');
+    const evpnVniEditId = ref('');
+    const evpnVniDraft = ref({});
+    const failoverRouteModalVisible = ref(false);
+    const failoverRouteModalMode = ref('create');
+    const failoverRouteEditId = ref('');
+    const failoverRouteDraft = ref({});
+    const failoverCheckTargetModalVisible = ref(false);
+    const failoverCheckTargetModalMode = ref('create');
+    const failoverCheckTargetEditId = ref('');
+    const failoverCheckTargetDraft = ref({});
+    const failoverCheckTargetDeleteVisible = ref(false);
+    const pendingFailoverCheckTargetDeleteIds = ref([]);
+    const serviceCollectionModalVisible = ref(false);
+    const serviceCollectionModalMode = ref('create');
+    const serviceCollectionType = ref('dhcp4-listen-address');
+    const serviceCollectionEditId = ref('');
+    const serviceCollectionDraft = ref({});
+    const serviceCollectionParentContext = ref(null);
+    const serviceCollectionContextStack = ref([]);
+    const serviceCollectionRestoringContext = ref(false);
+    const dhcpSharedNetworkModalTab = ref('basic');
+    const dhcp4SharedSubnetModalTab = ref('basic');
+    const dhcpv6SharedNetworkModalTab = ref('basic');
+    const dhcp6SharedSubnetModalTab = ref('basic');
+    const dhcp6SharedSubnetRangeModalTab = ref('basic');
+    const dhcp6SharedSubnetMappingModalTab = ref('basic');
+    const staticRouteModalVisible = ref(false);
+    const staticRouteModalMode = ref('create');
+    const staticRouteModalKind = ref('ipv4');
+    const staticRouteEditId = ref('');
+    const staticRouteDraft = ref({});
+    const staticRouteCollectionModalVisible = ref(false);
+    const staticRouteCollectionModalMode = ref('create');
+    const staticRouteCollectionType = ref('next-hop');
+    const staticRouteCollectionEditId = ref('');
+    const staticRouteCollectionDraft = ref({});
+    const staticRouteCollectionDeleteVisible = ref(false);
+    const staticRouteCollectionDeleteType = ref('next-hop');
+    const pendingStaticRouteCollectionDeleteIds = ref([]);
+    const staticRouteDeleteVisible = ref(false);
+    const staticRouteDeleteKind = ref('ipv4');
+    const pendingStaticRouteDeleteIds = ref([]);
+    const ospfAreaModalVisible = ref(false);
+    const ospfAreaModalMode = ref('create');
+    const ospfAreaEditId = ref('');
+    const ospfAreaDraft = ref({});
+    const ospfAreaDeleteVisible = ref(false);
+    const pendingOspfAreaDeleteIds = ref([]);
+    const ospfAccessListModalVisible = ref(false);
+    const ospfAccessListModalMode = ref('create');
+    const ospfAccessListEditId = ref('');
+    const ospfAccessListDraft = ref({});
+    const ospfAccessListDeleteVisible = ref(false);
+    const pendingOspfAccessListDeleteIds = ref([]);
+    const ospfNeighborModalVisible = ref(false);
+    const ospfNeighborModalMode = ref('create');
+    const ospfNeighborEditId = ref('');
+    const ospfNeighborDraft = ref({});
+    const ospfNeighborDeleteVisible = ref(false);
+    const pendingOspfNeighborDeleteIds = ref([]);
+    const ospfSummaryAddressModalVisible = ref(false);
+    const ospfSummaryAddressModalMode = ref('create');
+    const ospfSummaryAddressEditId = ref('');
+    const ospfSummaryAddressDraft = ref({});
+    const ospfSummaryAddressDeleteVisible = ref(false);
+    const pendingOspfSummaryAddressDeleteIds = ref([]);
+    const ospfSrPrefixModalVisible = ref(false);
+    const ospfSrPrefixModalMode = ref('create');
+    const ospfSrPrefixEditId = ref('');
+    const ospfSrPrefixDraft = ref({});
+    const ospfSrPrefixDeleteVisible = ref(false);
+    const pendingOspfSrPrefixDeleteIds = ref([]);
+    const ospfRedistributeTableModalVisible = ref(false);
+    const ospfRedistributeTableModalMode = ref('create');
+    const ospfRedistributeTableEditId = ref('');
+    const ospfRedistributeTableDraft = ref({});
+    const ospfRedistributeTableDeleteVisible = ref(false);
+    const pendingOspfRedistributeTableDeleteIds = ref([]);
+    const ospfInterfaceModalVisible = ref(false);
+    const ospfInterfaceModalMode = ref('create');
+    const ospfInterfaceEditId = ref('');
+    const ospfInterfaceDraft = ref({});
+    const ospfInterfaceDeleteVisible = ref(false);
+    const pendingOspfInterfaceDeleteIds = ref([]);
+    const ospfRangeModalVisible = ref(false);
+    const ospfRangeModalMode = ref('create');
+    const ospfRangeEditId = ref('');
+    const ospfRangeDraft = ref({});
+    const ospfRangeDeleteVisible = ref(false);
+    const pendingOspfRangeDeleteIds = ref([]);
+    const ospfVirtualLinkModalVisible = ref(false);
+    const ospfVirtualLinkModalMode = ref('create');
+    const ospfVirtualLinkEditId = ref('');
+    const ospfVirtualLinkDraft = ref({});
+    const ospfVirtualLinkDeleteVisible = ref(false);
+    const pendingOspfVirtualLinkDeleteIds = ref([]);
+    const ospfv3InterfaceModalVisible = ref(false);
+    const ospfv3InterfaceModalMode = ref('create');
+    const ospfv3InterfaceEditId = ref('');
+    const ospfv3InterfaceDraft = ref({});
+    const ospfv3InterfaceDeleteVisible = ref(false);
+    const pendingOspfv3InterfaceDeleteIds = ref([]);
+    const ospfv3RedistributeModalVisible = ref(false);
+    const ospfv3RedistributeModalMode = ref('create');
+    const ospfv3RedistributeEditId = ref('');
+    const ospfv3RedistributeDraft = ref({});
+    const ospfv3RedistributeDeleteVisible = ref(false);
+    const pendingOspfv3RedistributeDeleteIds = ref([]);
+    const isisInterfaceModalVisible = ref(false);
+    const isisInterfaceModalMode = ref('create');
+    const isisInterfaceEditId = ref('');
+    const isisInterfaceDraft = ref({});
+    const isisInterfaceDeleteVisible = ref(false);
+    const pendingIsisInterfaceDeleteIds = ref([]);
+    const isisFastRerouteModalVisible = ref(false);
+    const isisFastRerouteModalMode = ref('create');
+    const isisFastRerouteEditId = ref('');
+    const isisFastRerouteDraft = ref({});
+    const isisFastRerouteDeleteVisible = ref(false);
+    const pendingIsisFastRerouteDeleteIds = ref([]);
+    const isisRedistributeModalVisible = ref(false);
+    const isisRedistributeModalMode = ref('create');
+    const isisRedistributeEditId = ref('');
+    const isisRedistributeDraft = ref({});
+    const isisRedistributeDeleteVisible = ref(false);
+    const pendingIsisRedistributeDeleteIds = ref([]);
+    const rpkiCacheModalVisible = ref(false);
+    const rpkiCacheModalMode = ref('create');
+    const rpkiCacheEditId = ref('');
+    const rpkiCacheDraft = ref({});
+    const rpkiCacheDeleteVisible = ref(false);
+    const pendingRpkiCacheDeleteIds = ref([]);
+    const ospfItemModalVisible = ref(false);
+    const ospfItemModalMode = ref('create');
+    const ospfItemEditId = ref('');
+    const ospfItemDraft = ref({ __id: '', command: '', value: '' });
+    const ospfItemDeleteVisible = ref(false);
+    const pendingOspfItemDeleteIds = ref([]);
+    const editingProtocolsBase = ref({});
+    const editingServiceBase = ref({});
+    const bgpRowSeq = ref(0);
+
+    function nextBgpRowId(prefix) {
+      bgpRowSeq.value += 1;
+      return `${prefix}-${Date.now()}-${bgpRowSeq.value}`;
+    }
 
     const path = computed(() => 'vrf');
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
@@ -53,8 +402,19 @@ export default defineComponent({
       { key: 'vni', title: 'VNI' },
     ];
 
+    const vrfNameOptions = computed(() => {
+      const names = new Set(['default']);
+      (vrfList.value || []).forEach((item) => {
+        const name = String(item?.name || '').trim();
+        if (name) names.add(name);
+      });
+      const currentName = String(editingVrf.value?.name || '').trim();
+      if (currentName) names.add(currentName);
+      return Array.from(names).sort((a, b) => a.localeCompare(b));
+    });
+
     const basicSchema = computed(() => [
-      { key: 'name', title: t('vrf.form.name'), type: 'text', required: true, placeholder: t('vrf.form.namePlaceholder') },
+      { key: 'name', title: t('vrf.form.name'), type: 'text', required: true, placeholder: t('vrf.form.namePlaceholder'), disabled: !!editingOriginalName.value },
       { key: 'description', title: t('vrf.form.description'), type: 'text' },
       { key: 'disable', title: t('vrf.form.disable'), type: 'checkbox' },
       { key: 'table', title: t('vrf.form.table'), type: 'number', min: 100, max: 65535, placeholder: '100-65535', help: t('vrf.form.tableHelp') },
@@ -65,11 +425,1391 @@ export default defineComponent({
       { key: 'basic', title: t('vrf.tabs.basic') },
       { key: 'ip', title: 'IPv4' },
       { key: 'ipv6', title: 'IPv6' },
+      { key: 'bgp', title: 'BGP' },
+      { key: 'failover', title: 'Failover' },
+      { key: 'isis', title: 'ISIS' },
+      { key: 'ospf', title: 'OSPF' },
+      { key: 'ospfv3', title: 'OSPFv3' },
+      { key: 'rpki', title: 'RPKI' },
+      { key: 'static', title: 'Static' },
+      { key: 'dhcp-server', title: 'DHCP' },
+      { key: 'dhcpv6-server', title: 'DHCPv6' },
     ]);
 
     const tabSchemas = computed(() => ({
       basic: basicSchema.value,
     }));
+
+    const PROTOCOL_TABS = computed(() => [
+      { key: 'bgp', title: 'BGP' },
+      { key: 'failover', title: 'Failover' },
+      { key: 'isis', title: 'ISIS' },
+      { key: 'ospf', title: 'OSPF' },
+      { key: 'ospfv3', title: 'OSPFv3' },
+      { key: 'rpki', title: 'RPKI' },
+      { key: 'static', title: 'Static' },
+    ]);
+
+    const BGP_BRANCH_TABS = computed(() => [
+      { key: 'system-as', title: 'system-as' },
+      { key: 'timers', title: 'timers' },
+      { key: 'address-family', title: 'address-family' },
+      { key: 'neighbor', title: 'neighbor' },
+      { key: 'peer-group', title: 'peer-group' },
+      { key: 'interface', title: 'interface' },
+      { key: 'listen', title: 'listen' },
+      { key: 'parameters', title: 'parameters' },
+      { key: 'sid', title: 'sid' },
+      { key: 'srv6', title: 'srv6' },
+      { key: 'bmp', title: 'bmp' },
+    ]);
+
+    const BGP_AF_TABS = computed(() => [
+      { key: 'ipv4-flowspec', title: 'ipv4-flowspec' },
+      { key: 'ipv4-labeled-unicast', title: 'ipv4-labeled-unicast' },
+      { key: 'ipv4-multicast', title: 'ipv4-multicast' },
+      { key: 'ipv4-unicast', title: 'ipv4-unicast' },
+      { key: 'ipv4-vpn', title: 'ipv4-vpn' },
+      { key: 'ipv6-flowspec', title: 'ipv6-flowspec' },
+      { key: 'ipv6-labeled-unicast', title: 'ipv6-labeled-unicast' },
+      { key: 'ipv6-multicast', title: 'ipv6-multicast' },
+      { key: 'ipv6-unicast', title: 'ipv6-unicast' },
+      { key: 'ipv6-vpn', title: 'ipv6-vpn' },
+      { key: 'l2vpn-evpn', title: 'l2vpn-evpn' },
+    ]);
+
+    const BGP_NEIGHBOR_MODAL_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'session', title: 'Session' },
+      { key: 'timers', title: 'Timers' },
+      { key: 'bfd', title: 'BFD' },
+      { key: 'interface', title: 'Interface' },
+      { key: 'path-attribute', title: 'Path-Attribute' },
+      { key: 'capability', title: 'Capability' },
+      { key: 'address-family', title: 'Address-Family' },
+    ]);
+
+    const BGP_PEER_GROUP_MODAL_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'session', title: 'Session' },
+      { key: 'bfd', title: 'BFD' },
+      { key: 'path-attribute', title: 'Path-Attribute' },
+      { key: 'capability', title: 'Capability' },
+      { key: 'address-family', title: 'Address-Family' },
+    ]);
+
+    const BGP_PEER_GROUP_AF_TABS = computed(() => BGP_PEER_GROUP_AF_KEYS.map(key => ({ key, title: key })));
+
+    const FAILOVER_SUB_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'check', title: 'Check' },
+    ]);
+
+    const ISIS_SUB_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'auth', title: 'Auth' },
+      { key: 'default-info', title: 'Default-Info' },
+      { key: 'features', title: 'Features' },
+      { key: 'interface', title: 'Interface' },
+      { key: 'fast-reroute', title: 'Fast-Reroute' },
+      { key: 'redistribute', title: 'Redistribute' },
+      { key: 'segment-routing', title: 'Segment-Routing' },
+      { key: 'spf-delay-ietf', title: 'SPF-Delay-IETF' },
+      { key: 'traffic-engineering', title: 'Traffic-Engineering' },
+    ]);
+
+    const OSPF_SUB_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'area', title: 'Area' },
+      { key: 'interface', title: 'Interface' },
+      { key: 'access-list', title: 'Access-List' },
+      { key: 'neighbor', title: 'Neighbor' },
+      { key: 'summary-address', title: 'Summary-Address' },
+      { key: 'segment-routing', title: 'Segment-Routing' },
+      { key: 'redistribute', title: 'Redistribute' },
+    ]);
+
+    const OSPFV3_SUB_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'graceful-restart', title: t('vrf.tabs.ospfv3GracefulRestart') },
+      { key: 'area', title: 'Area' },
+      { key: 'interface', title: 'Interface' },
+      { key: 'redistribute', title: 'Redistribute' },
+    ]);
+
+    const RPKI_SUB_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'cache', title: 'Cache' },
+    ]);
+
+    const STATIC_SUB_TABS = computed(() => [
+      { key: 'ipv4', title: 'IPv4' },
+      { key: 'ipv6', title: 'IPv6' },
+    ]);
+
+    const DHCP_SERVER_SUB_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'client-class', title: 'Client-Class' },
+      { key: 'shared-network', title: 'Shared-Network' },
+      { key: 'dynamic-dns-update', title: 'Dynamic-DNS-Update' },
+      { key: 'high-availability', title: 'High-Availability' },
+    ]);
+
+    const DHCPV6_SERVER_SUB_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'shared-network', title: 'Shared-Network' },
+    ]);
+
+    const DHCP_SHARED_NETWORK_INNER_TABS = computed(() => [
+      { key: 'subnet', title: 'Subnet' },
+      { key: 'dynamic-dns-update', title: 'Dynamic-DNS-Update' },
+      { key: 'option', title: 'Option' },
+    ]);
+
+    const DHCP_SHARED_NETWORK_MODAL_TABS = computed(() => [
+      { key: 'basic', title: t('vrf.tabs.basic') },
+      { key: 'dynamic-dns-update', title: t('vrf.tabs.dhcpDynamicDnsUpdate') },
+      { key: 'subnet', title: t('vrf.tabs.dhcpSubnet') },
+      { key: 'option', title: t('vrf.tabs.dhcpOption') },
+    ]);
+
+    const DHCP4_SHARED_SUBNET_MODAL_TABS = computed(() => [
+      { key: 'basic', title: t('vrf.tabs.basic') },
+      { key: 'dynamic-dns-update', title: t('vrf.tabs.dhcpDynamicDnsUpdate') },
+      { key: 'range', title: t('vrf.tabs.dhcpRange') },
+      { key: 'static-mapping', title: t('vrf.tabs.dhcpStaticMapping') },
+      { key: 'option', title: t('vrf.tabs.dhcpOption') },
+    ]);
+
+    const DHCPV6_SHARED_NETWORK_INNER_TABS = computed(() => [
+      { key: 'option', title: 'Option' },
+      { key: 'subnet', title: 'Subnet' },
+    ]);
+
+    const DHCPV6_SHARED_NETWORK_MODAL_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'option', title: 'Option' },
+      { key: 'subnet', title: 'Subnet' },
+    ]);
+
+    const DHCPV6_SHARED_SUBNET_MODAL_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'range', title: 'Range' },
+      { key: 'static-mapping', title: 'Static-Mapping' },
+      { key: 'prefix-delegation', title: 'Prefix-Delegation' },
+      { key: 'option', title: 'Option' },
+    ]);
+
+    const DHCPV6_SHARED_SUBNET_NESTED_MODAL_TABS = computed(() => [
+      { key: 'basic', title: 'Basic' },
+      { key: 'option', title: 'Option' },
+    ]);
+
+    const BGP_NEIGHBOR_TABLE_COLUMNS = [
+      { key: 'address', title: 'vrf.bgp.columns.neighborAddress' },
+      { key: 'remoteAs', title: 'vrf.bgp.columns.remoteAs' },
+      { key: 'peerGroup', title: 'vrf.bgp.columns.peerGroup' },
+      { key: 'description', title: 'vrf.bgp.columns.description' },
+    ];
+
+    const BGP_PEER_GROUP_TABLE_COLUMNS = [
+      { key: 'name', title: 'vrf.bgp.columns.peerGroupName' },
+      { key: 'remoteAs', title: 'vrf.bgp.columns.remoteAs' },
+      { key: 'description', title: 'vrf.bgp.columns.description' },
+    ];
+
+    const BGP_INTERFACE_TABLE_COLUMNS = [
+      { key: 'name', title: 'vrf.bgp.columns.interfaceName' },
+      { key: 'peerGroup', title: 'vrf.bgp.columns.peerGroup' },
+      { key: 'mplsForwarding', title: 'vrf.bgp.fields.interfaceMplsForwarding' },
+    ];
+
+    const BGP_LISTEN_TABLE_COLUMNS = [
+      { key: 'range', title: 'vrf.bgp.columns.listenRange' },
+      { key: 'peerGroup', title: 'vrf.bgp.columns.peerGroup' },
+    ];
+
+    const BGP_BMP_TABLE_COLUMNS = [
+      { key: 'name', title: 'vrf.bgp.columns.bmpTargetName' },
+      { key: 'address', title: 'vrf.bgp.columns.bmpAddress' },
+      { key: 'port', title: 'vrf.bgp.columns.bmpPort' },
+      { key: 'minRetry', title: 'vrf.bgp.placeholders.bmpMinRetry' },
+      { key: 'maxRetry', title: 'vrf.bgp.placeholders.bmpMaxRetry' },
+      { key: 'mirror', title: 'vrf.bgp.fields.bmpMirror' },
+      { key: 'monitorV4LocalRib', title: 'IPv4 Local-RIB' },
+      { key: 'monitorV4PostPolicy', title: 'IPv4 Post-Policy' },
+      { key: 'monitorV4PrePolicy', title: 'IPv4 Pre-Policy' },
+      { key: 'monitorV6LocalRib', title: 'IPv6 Local-RIB' },
+      { key: 'monitorV6PostPolicy', title: 'IPv6 Post-Policy' },
+      { key: 'monitorV6PrePolicy', title: 'IPv6 Pre-Policy' },
+    ];
+
+    const EVPN_VNI_TABLE_COLUMNS = [
+      { key: 'vni', title: 'vrf.bgp.fields.vni' },
+      { key: 'rd', title: 'vrf.bgp.fields.rd' },
+      { key: 'routeTargetBoth', title: 'vrf.bgp.fields.routeTargetBoth' },
+      { key: 'routeTargetExport', title: 'vrf.bgp.fields.routeTargetExport' },
+      { key: 'routeTargetImport', title: 'vrf.bgp.fields.routeTargetImport' },
+      { key: 'advertiseDefaultGw', title: 'vrf.bgp.fields.advertiseDefaultGw' },
+      { key: 'advertiseSviIp', title: 'vrf.bgp.fields.advertiseSviIp' },
+    ];
+
+    const OSPF_ADVANCED_ITEM_TABLE_COLUMNS = [
+      { key: 'command', title: '配置路径' },
+      { key: 'value', title: '值' },
+      { key: 'preview', title: '预览' },
+    ];
+
+    const OSPF_AREA_TABLE_COLUMNS = [
+      { key: 'area', title: 'Area' },
+      { key: 'areaType', title: 'Area Type' },
+      { key: 'networks', title: 'Network' },
+      { key: 'ranges', title: 'Range' },
+      { key: 'virtualLinks', title: 'Virtual-Link' },
+    ];
+
+    const OSPF_ACCESS_LIST_TABLE_COLUMNS = [
+      { key: 'number', title: 'vrf.protocols.ospfAccessListNumber' },
+      { key: 'export', title: 'vrf.protocols.ospfAccessListExport' },
+    ];
+
+    const ISIS_INTERFACE_TABLE_COLUMNS = [
+      { key: 'name', title: 'vrf.protocols.isisInterfaceName' },
+      { key: 'passive', title: 'vrf.protocols.isisInterfacePassive' },
+      { key: 'metric', title: 'vrf.protocols.isisInterfaceMetric' },
+      { key: 'network', title: 'vrf.protocols.isisInterfaceNetwork' },
+      { key: 'extras', title: 'vrf.protocols.isisInterfaceExtras' },
+    ];
+
+    const ISIS_FAST_REROUTE_TABLE_COLUMNS = [
+      { key: 'command', title: 'vrf.protocols.isisFastRerouteCommand' },
+      { key: 'value', title: 'vrf.protocols.isisFastRerouteValue' },
+    ];
+
+    const ISIS_REDISTRIBUTE_TABLE_COLUMNS = [
+      { key: 'af', title: 'vrf.protocols.isisRedistributeAddressFamily' },
+      { key: 'protocol', title: 'vrf.protocols.isisRedistributeProtocol' },
+      { key: 'level', title: 'vrf.protocols.isisRedistributeLevel' },
+      { key: 'metric', title: 'vrf.protocols.isisRedistributeMetric' },
+      { key: 'routeMap', title: 'vrf.protocols.isisRedistributeRouteMap' },
+    ];
+
+    const RPKI_CACHE_TABLE_COLUMNS = [
+      { key: 'address', title: 'vrf.protocols.rpkiCacheColumnAddress' },
+      { key: 'port', title: 'vrf.protocols.rpkiCacheColumnPort' },
+      { key: 'preference', title: 'vrf.protocols.rpkiCacheColumnPreference' },
+      { key: 'sourceAddress', title: 'vrf.protocols.rpkiCacheColumnSourceAddress' },
+      { key: 'sshUsername', title: 'vrf.protocols.rpkiCacheColumnSshUsername' },
+      { key: 'sshKey', title: 'vrf.protocols.rpkiCacheColumnSshKey' },
+    ];
+
+    const OSPFV3_AREA_TABLE_COLUMNS = [
+      { key: 'area', title: 'vrf.protocols.ospfv3AreaId' },
+      { key: 'areaType', title: 'vrf.protocols.ospfv3AreaType' },
+      { key: 'exportList', title: 'vrf.protocols.ospfv3AreaExportList' },
+      { key: 'importList', title: 'vrf.protocols.ospfv3AreaImportList' },
+      { key: 'ranges', title: 'vrf.protocols.ospfv3AreaRanges' },
+    ];
+
+    const OSPFV3_AREA_RANGE_TABLE_COLUMNS = [
+      { key: 'prefix', title: 'vrf.protocols.ospfv3AreaRangePrefix' },
+      { key: 'action', title: 'vrf.protocols.ospfv3AreaRangeAction' },
+    ];
+    const OSPFV3_INTERFACE_TABLE_COLUMNS = [
+      { key: 'name', title: 'vrf.protocols.ospfv3IfName' },
+      { key: 'area', title: 'vrf.protocols.ospfv3IfArea' },
+      { key: 'bfdProfile', title: 'vrf.protocols.ospfv3IfBfdProfile' },
+      { key: 'network', title: 'vrf.protocols.ospfv3IfNetwork' },
+      { key: 'cost', title: 'vrf.protocols.ospfv3IfCost' },
+      { key: 'timers', title: 'vrf.protocols.ospfv3IfTimers' },
+      { key: 'flags', title: 'vrf.protocols.ospfv3IfFlags' },
+    ];
+    const OSPF_NEIGHBOR_TABLE_COLUMNS = [
+      { key: 'address', title: 'vrf.protocols.ospfNeighborAddress' },
+      { key: 'pollInterval', title: 'vrf.protocols.ospfNeighborPollInterval' },
+      { key: 'priority', title: 'vrf.protocols.ospfNeighborPriority' },
+    ];
+
+    const ospfv3AreaModalVisible = ref(false);
+    const ospfv3AreaModalMode = ref('create');
+    const ospfv3AreaEditId = ref('');
+    const ospfv3AreaDraft = ref({});
+    const ospfv3AreaDeleteVisible = ref(false);
+    const pendingOspfv3AreaDeleteIds = ref([]);
+    const ospfv3AreaRangeModalVisible = ref(false);
+    const ospfv3AreaRangeModalMode = ref('create');
+    const ospfv3AreaRangeEditId = ref('');
+    const ospfv3AreaRangeDraft = ref({});
+    const ospfv3AreaRangeDeleteVisible = ref(false);
+    const pendingOspfv3AreaRangeDeleteIds = ref([]);
+    const OSPF_SUMMARY_ADDRESS_TABLE_COLUMNS = [
+      { key: 'prefix', title: 'vrf.protocols.ospfSummaryAddressPrefix' },
+      { key: 'noAdvertise', title: 'vrf.protocols.ospfSummaryAddressNoAdvertise' },
+      { key: 'tag', title: 'vrf.protocols.ospfSummaryAddressTag' },
+    ];
+
+    const OSPF_SR_PREFIX_TABLE_COLUMNS = [
+      { key: 'prefix', title: 'vrf.protocols.ospfSrPrefix' },
+      { key: 'indexValue', title: 'vrf.protocols.ospfSrPrefixIndexValue' },
+      { key: 'flags', title: 'vrf.protocols.ospfSrPrefixIndexFlags' },
+    ];
+
+    const OSPF_REDISTRIBUTE_PROTOCOLS = [
+      'babel',
+      'bgp',
+      'connected',
+      'isis',
+      'kernel',
+      'nhrp',
+      'rip',
+      'static',
+    ];
+
+    const OSPFV3_REDISTRIBUTE_PROTOCOLS = [
+      'babel',
+      'bgp',
+      'connected',
+      'isis',
+      'kernel',
+      'ripng',
+      'static',
+    ];
+
+    const ISIS_REDISTRIBUTE_PROTOCOLS = [
+      'babel',
+      'bgp',
+      'connected',
+      'kernel',
+      'nhrp',
+      'ospf',
+      'rip',
+      'static',
+    ];
+
+    const ISIS_TOPOLOGY_OPTIONS = [
+      'ipv4-multicast',
+      'ipv4-mgmt',
+      'ipv6-unicast',
+      'ipv6-multicast',
+      'ipv6-mgmt',
+      'ipv6-dstsrc',
+    ];
+
+    const OSPF_REDISTRIBUTE_TABLE_COLUMNS = [
+      { key: 'table', title: 'vrf.protocols.ospfRedistributeTableId' },
+      { key: 'metric', title: 'vrf.protocols.ospfRedistributeMetric' },
+      { key: 'metricType', title: 'vrf.protocols.ospfRedistributeMetricType' },
+      { key: 'routeMap', title: 'vrf.protocols.ospfRedistributeRouteMap' },
+    ];
+
+    const OSPFV3_REDISTRIBUTE_TABLE_COLUMNS = [
+      { key: 'protocol', title: 'vrf.protocols.ospfv3RedistributeProtocol' },
+      { key: 'metric', title: 'vrf.protocols.ospfv3RedistributeMetric' },
+      { key: 'metricType', title: 'vrf.protocols.ospfv3RedistributeMetricType' },
+      { key: 'routeMap', title: 'vrf.protocols.ospfv3RedistributeRouteMap' },
+    ];
+
+    const OSPF_INTERFACE_TABLE_COLUMNS = [
+      { key: 'name', title: 'vrf.protocols.ospfIfName' },
+      { key: 'area', title: 'vrf.protocols.ospfIfArea' },
+      { key: 'network', title: 'vrf.protocols.ospfIfNetwork' },
+      { key: 'auth', title: 'vrf.protocols.ospfIfAuthentication' },
+      { key: 'cost', title: 'vrf.protocols.ospfIfCost' },
+      { key: 'timers', title: 'vrf.protocols.ospfIfTimers' },
+      { key: 'flags', title: 'vrf.protocols.ospfIfFlags' },
+    ];
+
+    const OSPF_AREA_VIRTUAL_LINK_TABLE_COLUMNS = [
+      { key: 'peer', title: 'Peer' },
+      { key: 'auth', title: 'Authentication' },
+      { key: 'deadInterval', title: 'Dead-Interval' },
+      { key: 'helloInterval', title: 'Hello-Interval' },
+      { key: 'retransmitInterval', title: 'Retransmit-Interval' },
+      { key: 'retransmitWindow', title: 'Retransmit-Window' },
+      { key: 'transmitDelay', title: 'Transmit-Delay' },
+    ];
+
+    const OSPF_AREA_RANGE_TABLE_COLUMNS = [
+      { key: 'prefix', title: 'Prefix' },
+      { key: 'cost', title: 'Cost' },
+      { key: 'notAdvertise', title: 'Not-Advertise' },
+      { key: 'substitute', title: 'Substitute' },
+    ];
+
+    const STATIC_ROUTE_TABLE_COLUMNS = [
+      { key: 'prefix', title: 'Prefix' },
+      { key: 'nextHopType', title: '下一跳类型' },
+      { key: 'nextHop', title: 'Next-Hop' },
+      { key: 'interfaceDetail', title: 'Interface' },
+      { key: 'bfdDetail', title: 'BFD' },
+      { key: 'tag', title: 'Tag' },
+      { key: 'description', title: 'Description' },
+    ];
+
+    const STATIC_ROUTE6_TABLE_COLUMNS = [
+      { key: 'prefix', title: 'Prefix' },
+      { key: 'nextHopType', title: '下一跳类型' },
+      { key: 'nextHop', title: 'Next-Hop' },
+      { key: 'interfaceDetail', title: 'Interface' },
+      { key: 'bfdDetail', title: 'BFD' },
+      { key: 'tag', title: 'Tag' },
+      { key: 'description', title: 'Description' },
+    ];
+
+    const FAILOVER_ROUTE_TABLE_COLUMNS = [
+      { key: 'prefix', title: 'Prefix' },
+      { key: 'gatewayType', title: 'Gateway Type' },
+      { key: 'nextHop', title: 'Next-Hop' },
+      { key: 'dhcpInterface', title: 'DHCP Interface' },
+      { key: 'gatewayOptions', title: 'Options' },
+      { key: 'checkOptions', title: 'Check' },
+    ];
+
+    const FAILOVER_CHECK_TARGET_TABLE_COLUMNS = [
+      { key: 'address', title: 'Address' },
+      { key: 'interface', title: 'Interface' },
+      { key: 'vrf', title: 'VRF' },
+    ];
+
+    const DHCP_LISTEN_ADDRESS_TABLE_COLUMNS = [
+      { key: 'address', title: 'Address' },
+    ];
+
+    const DHCP_LISTEN_INTERFACE_TABLE_COLUMNS = [
+      { key: 'name', title: 'Interface' },
+    ];
+
+    const DHCP_CLIENT_CLASS_TABLE_COLUMNS = [
+      { key: 'name', title: 'Name' },
+      { key: 'disable', title: 'Disable' },
+      { key: 'circuitId', title: 'Circuit-ID' },
+      { key: 'remoteId', title: 'Remote-ID' },
+    ];
+
+    const DHCP_SHARED_NETWORK_TABLE_COLUMNS = [
+      { key: 'name', title: 'Name' },
+      { key: 'disable', title: 'Disable' },
+      { key: 'authoritative', title: 'Authoritative' },
+      { key: 'pingCheck', title: 'Ping-Check' },
+      { key: 'dynamicDnsUpdate', title: 'Dynamic-DNS-Update' },
+      { key: 'description', title: 'Description' },
+    ];
+
+    const DHCPV6_SHARED_NETWORK_TABLE_COLUMNS = [
+      { key: 'name', title: 'Name' },
+      { key: 'disable', title: 'Disable' },
+      { key: 'interface', title: 'Interface' },
+      { key: 'description', title: 'Description' },
+      { key: 'options', title: 'Options' },
+      { key: 'subnets', title: 'Subnets' },
+    ];
+
+    const DHCPV6_GLOBAL_NAME_SERVER_TABLE_COLUMNS = [
+      { key: 'address', title: 'Name-Server' },
+    ];
+
+    const DHCPV6_SHARED_OPTION_TABLE_COLUMNS = [
+      { key: 'name', title: 'Option' },
+      { key: 'value', title: 'Value' },
+    ];
+
+    const DHCPV6_SHARED_SUBNET_TABLE_COLUMNS = [
+      { key: 'prefix', title: 'Subnet' },
+      { key: 'interface', title: 'Interface' },
+      { key: 'ranges', title: 'Ranges' },
+      { key: 'mappings', title: 'Static-Mappings' },
+      { key: 'delegations', title: 'Prefix-Delegations' },
+      { key: 'options', title: 'Options' },
+    ];
+
+    const DHCPV6_SUBNET_RANGE_TABLE_COLUMNS = [
+      { key: 'name', title: 'Name' },
+      { key: 'prefix', title: 'Prefix' },
+      { key: 'start', title: 'Start' },
+      { key: 'stop', title: 'Stop' },
+      { key: 'options', title: 'Options' },
+    ];
+
+    const DHCPV6_SUBNET_MAPPING_TABLE_COLUMNS = [
+      { key: 'name', title: 'Name' },
+      { key: 'duid', title: 'DUID' },
+      { key: 'ipv6Address', title: 'IPv6-Address' },
+      { key: 'ipv6Prefix', title: 'IPv6-Prefix' },
+      { key: 'mac', title: 'MAC' },
+      { key: 'disable', title: 'Disable' },
+      { key: 'options', title: 'Options' },
+    ];
+
+    const DHCPV6_SUBNET_DELEGATION_TABLE_COLUMNS = [
+      { key: 'prefix', title: 'Prefix' },
+      { key: 'delegatedLength', title: 'Delegated-Length' },
+      { key: 'prefixLength', title: 'Prefix-Length' },
+      { key: 'excludedPrefix', title: 'Excluded-Prefix' },
+      { key: 'excludedPrefixLength', title: 'Excluded-Prefix-Length' },
+    ];
+
+    const DHCPV6_SUBNET_OPTION_TABLE_COLUMNS = [
+      { key: 'name', title: 'Option' },
+      { key: 'value', title: 'Value' },
+    ];
+
+    const DHCP_DDNS_DOMAIN_TABLE_COLUMNS = [
+      { key: 'name', title: 'Domain' },
+      { key: 'keyName', title: 'Key-Name' },
+      { key: 'dnsServersText', title: 'DNS-Servers' },
+    ];
+
+    const DHCP_DDNS_TSIG_TABLE_COLUMNS = [
+      { key: 'name', title: 'Name' },
+      { key: 'algorithm', title: 'Algorithm' },
+      { key: 'secret', title: 'Secret' },
+    ];
+
+    const DHCP_SHARED_NETWORK_SUBNET_TABLE_COLUMNS = [
+      { key: 'prefix', title: 'Subnet' },
+      { key: 'description', title: 'Description' },
+      { key: 'disable', title: 'Disable' },
+      { key: 'ranges', title: 'Ranges' },
+      { key: 'mappings', title: 'Static-Mappings' },
+      { key: 'options', title: 'Options' },
+    ];
+
+    const DHCP_SHARED_NETWORK_OPTION_TABLE_COLUMNS = [
+      { key: 'name', title: 'Option' },
+      { key: 'value', title: 'Value' },
+    ];
+
+    const DHCP4_SHARED_OPTION_NAMES = [
+      'bootfile-name',
+      'bootfile-server',
+      'bootfile-size',
+      'captive-portal',
+      'capwap-controller',
+      'client-prefix-length',
+      'default-router',
+      'domain-name',
+      'domain-search',
+      'interface-mtu',
+      'ip-forwarding',
+      'ipv6-only-preferred',
+      'name-server',
+      'ntp-server',
+      'pop-server',
+      'server-identifier',
+      'smtp-server',
+      'tftp-server-name',
+      'time-offset',
+      'time-server',
+      'time-zone',
+      'vendor-option ubiquiti unifi-controller',
+      'wins-server',
+      'wpad-url',
+    ];
+
+    const DHCP4_SHARED_OPTION_NAME_SET = new Set(DHCP4_SHARED_OPTION_NAMES);
+
+    const DHCP4_SHARED_MULTI_VALUE_OPTION_NAMES = new Set([
+      'name-server',
+      'ntp-server',
+      'pop-server',
+      'smtp-server',
+      'time-server',
+      'wins-server',
+    ]);
+
+    const DHCP4_SHARED_OPTION_HINTS = {
+      'bootfile-name': 'Bootstrap file name',
+      'bootfile-server': 'Bootfile server IPv4 address or hostname',
+      'bootfile-size': 'Bootstrap file size in 512 byte blocks (1-16)',
+      'captive-portal': 'Captive portal API endpoint',
+      'capwap-controller': 'CAPWAP AC controller IPv4 address',
+      'client-prefix-length': 'DHCP client prefix length (0-32)',
+      'default-router': 'Default router IPv4 address',
+      'domain-name': 'Client domain name',
+      'domain-search': 'Client domain search list',
+      'interface-mtu': 'Client interface MTU (576-9000)',
+      'ip-forwarding': 'Presence option without value',
+      'ipv6-only-preferred': 'Seconds (0-4294967295)',
+      'name-server': 'DNS IPv4 address (add rows for multiple values)',
+      'ntp-server': 'NTP server IPv4 address (add rows for multiple values)',
+      'pop-server': 'POP3 server IPv4 address (add rows for multiple values)',
+      'server-identifier': 'DHCP server identifier IPv4 address',
+      'smtp-server': 'SMTP server IPv4 address (add rows for multiple values)',
+      'tftp-server-name': 'TFTP server IPv4 address or hostname',
+      'time-offset': 'Time offset integer, can be negative',
+      'time-server': 'Time server IPv4 address (add rows for multiple values)',
+      'time-zone': 'Time zone string (RFC4833 options 100/101)',
+      'vendor-option ubiquiti unifi-controller': 'UniFi controller IPv4 address',
+      'wins-server': 'WINS server IPv4 address (add rows for multiple values)',
+      'wpad-url': 'Web Proxy Autodiscovery URL',
+    };
+
+    const DHCP6_SHARED_OPTION_FIELDS = [
+      { name: 'captive-portal', label: 'captive-portal', type: 'text', placeholder: 'Captive portal API endpoint' },
+      { name: 'capwap-controller', label: 'capwap-controller', type: 'text', placeholder: '2001:db8::52' },
+      { name: 'domain-search', label: 'domain-search', type: 'textarea', placeholder: 'example.com' },
+      { name: 'info-refresh-time', label: 'info-refresh-time', type: 'number', min: '1', max: '4294967295', placeholder: '1-4294967295' },
+      { name: 'name-server', label: 'name-server', type: 'textarea', placeholder: '2001:db8::53' },
+      { name: 'nis-domain', label: 'nis-domain', type: 'text', placeholder: 'nis.example.com' },
+      { name: 'nis-server', label: 'nis-server', type: 'textarea', placeholder: '2001:db8::60' },
+      { name: 'nisplus-domain', label: 'nisplus-domain', type: 'text', placeholder: 'nisplus.example.com' },
+      { name: 'nisplus-server', label: 'nisplus-server', type: 'textarea', placeholder: '2001:db8::61' },
+      { name: 'sip-server', label: 'sip-server', type: 'textarea', placeholder: '2001:db8::70 or sip.example.com' },
+      { name: 'sntp-server', label: 'sntp-server', type: 'textarea', placeholder: '2001:db8::123' },
+      { name: 'vendor-option cisco tftp-server', label: 'vendor-option cisco tftp-server', type: 'text', placeholder: '2001:db8::69' },
+    ];
+
+    const DHCP6_SHARED_OPTION_FIELD_NAME_SET = new Set(DHCP6_SHARED_OPTION_FIELDS.map(item => item.name));
+    const DHCP6_SHARED_OPTION_MULTI_VALUE_NAMES = new Set([
+      'domain-search',
+      'name-server',
+      'nis-server',
+      'nisplus-server',
+      'sip-server',
+      'sntp-server',
+    ]);
+    const DHCP6_SHARED_OPTION_NAMES = DHCP6_SHARED_OPTION_FIELDS.map(item => item.name);
+
+    const DHCP_SHARED_NETWORK_STATIC_ROUTE_TABLE_COLUMNS = [
+      { key: 'subnet', title: 'Subnet' },
+      { key: 'nextHop', title: 'Next-Hop' },
+    ];
+
+    const DHCP_SHARED_SUBNET_RANGE_TABLE_COLUMNS = [
+      { key: 'name', title: 'Name' },
+      { key: 'clientClass', title: 'Client-Class' },
+      { key: 'start', title: 'Start' },
+      { key: 'stop', title: 'Stop' },
+      { key: 'options', title: 'Options' },
+    ];
+
+    const DHCP_SHARED_SUBNET_MAPPING_TABLE_COLUMNS = [
+      { key: 'name', title: 'Name' },
+      { key: 'duid', title: 'DUID' },
+      { key: 'ipAddress', title: 'IP-Address' },
+      { key: 'macAddress', title: 'MAC' },
+      { key: 'disable', title: 'Disable' },
+      { key: 'description', title: 'Description' },
+      { key: 'options', title: 'Options' },
+    ];
+
+    const DHCP_SHARED_SUBNET_OPTION_TABLE_COLUMNS = [
+      { key: 'name', title: 'Option' },
+      { key: 'value', title: 'Value' },
+    ];
+
+    const STATIC_MODAL_NEXTHOP_TABLE_COLUMNS = [
+      { key: 'address', title: 'vrf.protocols.staticColumnNextHop', width: '140px' },
+      { key: 'distance', title: 'vrf.protocols.staticColumnDistance', width: '92px' },
+      { key: 'interface', title: 'vrf.protocols.staticColumnInterface', width: '110px' },
+      { key: 'vrf', title: 'vrf.protocols.staticColumnVrf', width: '90px' },
+      { key: 'bfdProfile', title: 'vrf.protocols.staticColumnBfdProfile', width: '140px' },
+      { key: 'bfdSourceAddress', title: 'vrf.protocols.staticColumnBfdSourceAddress', width: '150px' },
+      { key: 'disable', title: 'vrf.protocols.staticColumnDisable', width: '82px' },
+    ];
+
+    const STATIC_MODAL_NEXTHOP_TABLE_COLUMNS_IPV6 = [
+      { key: 'address', title: 'vrf.protocols.staticColumnNextHop', width: '140px' },
+      { key: 'distance', title: 'vrf.protocols.staticColumnDistance', width: '92px' },
+      { key: 'interface', title: 'vrf.protocols.staticColumnInterface', width: '110px' },
+      { key: 'vrf', title: 'vrf.protocols.staticColumnVrf', width: '90px' },
+      { key: 'segments', title: 'segments', width: '110px' },
+      { key: 'bfdProfile', title: 'vrf.protocols.staticColumnBfdProfile', width: '140px' },
+      { key: 'bfdSourceAddress', title: 'vrf.protocols.staticColumnBfdSourceAddress', width: '150px' },
+      { key: 'disable', title: 'vrf.protocols.staticColumnDisable', width: '82px' },
+    ];
+
+    const STATIC_MODAL_INTERFACE_TABLE_COLUMNS = [
+      { key: 'name', title: 'vrf.protocols.staticColumnInterface', width: '160px' },
+      { key: 'distance', title: 'vrf.protocols.staticColumnDistance', width: '110px' },
+      { key: 'vrf', title: 'vrf.protocols.staticColumnVrf', width: '120px' },
+      { key: 'disable', title: 'vrf.protocols.staticColumnDisable', width: '90px' },
+    ];
+
+    const BGP_COLLECTION_TABLE_ACTIONS = ['create', 'edit', 'delete', 'refresh'];
+    const STATIC_COLLECTION_TABLE_ACTIONS = ['create', 'edit', 'delete', 'refresh'];
+    const FAILOVER_COLLECTION_TABLE_ACTIONS = ['create', 'edit', 'delete', 'refresh'];
+    const STATIC_MODAL_COLLECTION_TABLE_ACTIONS = ['create', 'edit', 'delete'];
+    const OSPF_ADVANCED_ITEM_TABLE_ACTIONS = ['create', 'edit', 'delete'];
+    const BGP_VPN_NETWORK_TABLE_ACTIONS = ['create', 'edit', 'delete'];
+
+    const ospfAdvancedItems = ref([]);
+    const bgpVpnNetworkRows = ref({
+      'ipv4-vpn': [],
+      'ipv6-vpn': [],
+    });
+
+    function parseProtocolBranchItems(text, idPrefix) {
+      const lines = String(text || '').split('\n').map(line => line.trim()).filter(Boolean);
+      return lines.map((line, idx) => {
+        const eqPos = line.indexOf('=');
+        if (eqPos >= 0) {
+          return {
+            __id: `${idPrefix}-${idx}-${Date.now()}`,
+            command: line.slice(0, eqPos).trim(),
+            value: line.slice(eqPos + 1).trim(),
+          };
+        }
+        return {
+          __id: `${idPrefix}-${idx}-${Date.now()}`,
+          command: line,
+          value: '',
+        };
+      });
+    }
+
+    function formatProtocolBranchItemLine(item) {
+      const command = String(item?.command || '').trim();
+      const value = String(item?.value || '').trim();
+      if (!command) return '';
+      return value ? `${command} = ${value}` : command;
+    }
+
+    function buildProtocolBranchTextFromItems(items) {
+      return (items || [])
+        .map(item => formatProtocolBranchItemLine(item))
+        .filter(Boolean)
+        .join('\n');
+    }
+
+    function refreshOspfAdvancedItems() {
+      const branch = protocolBranchState.value.ospf;
+      const text = getProtocolBranchText('ospf', branch);
+      ospfAdvancedItems.value = parseProtocolBranchItems(text, `ospf-${branch || 'branch'}`);
+    }
+
+    function updateOspfAdvancedItems() {
+      const branch = protocolBranchState.value.ospf;
+      const text = buildProtocolBranchTextFromItems(ospfAdvancedItems.value);
+      setProtocolBranchText('ospf', branch, text);
+    }
+
+    function openOspfAdvancedItemCreate() {
+      ospfItemModalMode.value = 'create';
+      ospfItemEditId.value = '';
+      ospfItemDraft.value = { __id: '', command: '', value: '' };
+      ospfItemModalVisible.value = true;
+    }
+
+    function openOspfAdvancedItemEdit(row) {
+      if (!row || !row.__id) return;
+      ospfItemModalMode.value = 'edit';
+      ospfItemEditId.value = String(row.__id);
+      ospfItemDraft.value = {
+        __id: String(row.__id),
+        command: String(row.command || ''),
+        value: String(row.value || ''),
+      };
+      ospfItemModalVisible.value = true;
+    }
+
+    function saveOspfAdvancedItemModal() {
+      const command = String(ospfItemDraft.value?.command || '').trim();
+      const value = String(ospfItemDraft.value?.value || '').trim();
+      if (!command) return;
+
+      const row = {
+        __id: ospfItemModalMode.value === 'edit' ? String(ospfItemEditId.value) : nextBgpRowId('ospf-item'),
+        command,
+        value,
+      };
+
+      if (ospfItemModalMode.value === 'edit') {
+        const idx = ospfAdvancedItems.value.findIndex(item => String(item.__id) === String(ospfItemEditId.value));
+        if (idx >= 0) ospfAdvancedItems.value[idx] = row;
+      } else {
+        ospfAdvancedItems.value.push(row);
+      }
+
+      updateOspfAdvancedItems();
+      ospfItemModalVisible.value = false;
+      ospfItemEditId.value = '';
+      ospfItemDraft.value = { __id: '', command: '', value: '' };
+    }
+
+    function removeOspfAdvancedItemsByIds(ids) {
+      const idSet = new Set((ids || []).map(id => String(id)));
+      ospfAdvancedItems.value = ospfAdvancedItems.value.filter(item => !idSet.has(String(item.__id)));
+      updateOspfAdvancedItems();
+    }
+
+    function requestOspfAdvancedItemsDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfItemDeleteIds.value = selected;
+      ospfItemDeleteVisible.value = true;
+    }
+
+    function confirmOspfAdvancedItemsDelete() {
+      removeOspfAdvancedItemsByIds(pendingOspfItemDeleteIds.value);
+      ospfItemDeleteVisible.value = false;
+      pendingOspfItemDeleteIds.value = [];
+    }
+
+    function appendOspfAdvancedSnippetItem() {
+      const branch = protocolBranchState.value.ospf;
+      const snippets = getProtocolBranchSnippets('ospf', branch);
+      if (!snippets.length) return;
+      const lines = parseProtocolBranchItems(snippets[0], `ospf-snippet-${branch || 'branch'}`)
+        .map(item => ({ __id: nextBgpRowId('ospf-item'), command: item.command, value: item.value }));
+      ospfAdvancedItems.value.push(...lines);
+      updateOspfAdvancedItems();
+    }
+
+    function clearOspfAdvancedBranch() {
+      clearProtocolBranchFor('ospf', protocolBranchState.value.ospf);
+      refreshOspfAdvancedItems();
+    }
+
+    function getOspfAdvancedItemPreview(row) {
+      return formatProtocolBranchItemLine(row);
+    }
+
+    function getBgpCollectionListKey(type) {
+      if (type === 'neighbor') return 'bgpNeighbors';
+      if (type === 'peer-group') return 'bgpPeerGroups';
+      if (type === 'interface') return 'bgpInterfaces';
+      if (type === 'listen') return 'bgpListenRanges';
+      if (type === 'bmp') return 'bgpBmpTargets';
+      return '';
+    }
+
+    function createBgpCollectionDraft(type, source = null) {
+      if (type === 'neighbor') {
+        return {
+          __id: source?.__id || '',
+          address: source?.address || '',
+          remoteAs: source?.remoteAs || '',
+          peerGroup: source?.peerGroup || '',
+          description: source?.description || '',
+          localAs: source?.localAs || '',
+          localAsNoPrepend: !!source?.localAsNoPrepend,
+          localAsReplaceAs: !!source?.localAsReplaceAs,
+          localRole: source?.localRole || '',
+          localRoleStrict: !!source?.localRoleStrict,
+          port: source?.port || '',
+          advertisementInterval: source?.advertisementInterval || '',
+          ebgpMultihop: source?.ebgpMultihop || '',
+          password: source?.password || '',
+          updateSource: source?.updateSource || '',
+          ttlSecurityHops: source?.ttlSecurityHops || '',
+          timersConnect: source?.timersConnect || '',
+          timersHoldtime: source?.timersHoldtime || '',
+          timersKeepalive: source?.timersKeepalive || '',
+          gracefulRestart: source?.gracefulRestart || '',
+          bfd: !!source?.bfd,
+          bfdCheckControlPlaneFailure: !!source?.bfdCheckControlPlaneFailure,
+          bfdProfile: source?.bfdProfile || '',
+          capabilityDynamic: !!source?.capabilityDynamic,
+          capabilityExtendedNexthop: !!source?.capabilityExtendedNexthop,
+          capabilitySoftwareVersion: !!source?.capabilitySoftwareVersion,
+          passive: !!source?.passive,
+          shutdown: !!source?.shutdown,
+          solo: !!source?.solo,
+          disableConnectedCheck: !!source?.disableConnectedCheck,
+          enforceFirstAs: !!source?.enforceFirstAs,
+          disableCapabilityNegotiation: !!source?.disableCapabilityNegotiation,
+          strictCapabilityMatch: !!source?.strictCapabilityMatch,
+          overrideCapability: !!source?.overrideCapability,
+          interfacePeerGroup: source?.interfacePeerGroup || '',
+          interfaceRemoteAs: source?.interfaceRemoteAs || '',
+          interfaceSourceInterface: source?.interfaceSourceInterface || '',
+          interfaceV6OnlyPeerGroup: source?.interfaceV6OnlyPeerGroup || '',
+          interfaceV6OnlyRemoteAs: source?.interfaceV6OnlyRemoteAs || '',
+          pathAttributeDiscard: source?.pathAttributeDiscard || '',
+          pathAttributeTreatAsWithdraw: source?.pathAttributeTreatAsWithdraw || '',
+          afPolicies: createEmptyBgpNeighborAfPolicies(source?.afPolicies),
+        };
+      }
+      if (type === 'peer-group') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          remoteAs: source?.remoteAs || '',
+          description: source?.description || '',
+          localAs: source?.localAs || '',
+          localAsNoPrepend: !!source?.localAsNoPrepend,
+          localAsReplaceAs: !!source?.localAsReplaceAs,
+          localRole: source?.localRole || '',
+          localRoleStrict: !!source?.localRoleStrict,
+          port: source?.port || '',
+          ebgpMultihop: source?.ebgpMultihop || '',
+          password: source?.password || '',
+          updateSource: source?.updateSource || '',
+          ttlSecurityHops: source?.ttlSecurityHops || '',
+          gracefulRestart: source?.gracefulRestart || '',
+          bfd: !!source?.bfd,
+          bfdCheckControlPlaneFailure: !!source?.bfdCheckControlPlaneFailure,
+          bfdProfile: source?.bfdProfile || '',
+          capabilityDynamic: !!source?.capabilityDynamic,
+          capabilityExtendedNexthop: !!source?.capabilityExtendedNexthop,
+          capabilitySoftwareVersion: !!source?.capabilitySoftwareVersion,
+          passive: !!source?.passive,
+          shutdown: !!source?.shutdown,
+          solo: !!source?.solo,
+          disableConnectedCheck: !!source?.disableConnectedCheck,
+          disableCapabilityNegotiation: !!source?.disableCapabilityNegotiation,
+          overrideCapability: !!source?.overrideCapability,
+          pathAttributeDiscard: source?.pathAttributeDiscard || '',
+          pathAttributeTreatAsWithdraw: source?.pathAttributeTreatAsWithdraw || '',
+          afPolicies: createEmptyBgpPeerGroupAfPolicies(source?.afPolicies),
+        };
+      }
+      if (type === 'interface') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          peerGroup: source?.peerGroup || '',
+          mplsForwarding: !!source?.mplsForwarding,
+        };
+      }
+      if (type === 'listen') {
+        return {
+          __id: source?.__id || '',
+          range: source?.range || '',
+          peerGroup: source?.peerGroup || '',
+        };
+      }
+      if (type === 'bmp') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          address: source?.address || '',
+          port: source?.port || '',
+          minRetry: source?.minRetry || '',
+          maxRetry: source?.maxRetry || '',
+          mirror: !!source?.mirror,
+          monitorV4LocalRib: !!source?.monitorV4LocalRib,
+          monitorV4PostPolicy: !!source?.monitorV4PostPolicy,
+          monitorV4PrePolicy: !!source?.monitorV4PrePolicy,
+          monitorV6LocalRib: !!source?.monitorV6LocalRib,
+          monitorV6PostPolicy: !!source?.monitorV6PostPolicy,
+          monitorV6PrePolicy: !!source?.monitorV6PrePolicy,
+        };
+      }
+      return {};
+    }
+
+    function getBgpCollectionTypeTitle(type) {
+      if (type === 'peer-group') return 'BGP peer-group';
+      if (type === 'interface') return 'BGP interface';
+      if (type === 'listen') return 'BGP listen';
+      if (type === 'bmp') return 'BGP bmp target';
+      return 'BGP neighbor';
+    }
+
+    const bgpCollectionModalTitle = computed(() => `${bgpCollectionMode.value === 'edit' ? t('app.edit') : t('app.create')} ${getBgpCollectionTypeTitle(bgpCollectionType.value)}`);
+
+    function createFailoverRouteDraft(source = null) {
+      const targets = Array.isArray(source?.checkTargets)
+        ? source.checkTargets.map(item => ({
+          __id: item?.__id || nextBgpRowId('failover-target'),
+          address: item?.address || '',
+          interface: item?.interface || '',
+          vrf: item?.vrf || '',
+        }))
+        : [];
+      if (!targets.length) targets.push({ __id: nextBgpRowId('failover-target'), address: '', interface: '', vrf: '' });
+      return {
+        __id: source?.__id || '',
+        prefix: source?.prefix || '',
+        gatewayType: source?.gatewayType || 'next-hop',
+        gateway: source?.gateway || '',
+        interface: source?.interface || '',
+        metric: source?.metric || '',
+        onlink: !!source?.onlink,
+        checkPolicy: source?.checkPolicy || '',
+        checkPort: source?.checkPort || '',
+        checkTimeout: source?.checkTimeout || '',
+        checkType: source?.checkType || '',
+        checkTargets: targets,
+      };
+    }
+
+    const failoverRouteModalTitle = computed(() => `${failoverRouteModalMode.value === 'edit' ? t('app.edit') : t('app.create')} Failover route`);
+
+    function createFailoverCheckTargetDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        address: source?.address || '',
+        interface: source?.interface || '',
+        vrf: source?.vrf || '',
+      };
+    }
+
+    const failoverCheckTargetModalTitle = computed(() => `${failoverCheckTargetModalMode.value === 'edit' ? t('app.edit') : t('app.create')} check target`);
+
+    const failoverCheckTargetDeletePreview = computed(() => {
+      const idSet = new Set((pendingFailoverCheckTargetDeleteIds.value || []).map(v => String(v)));
+      return (failoverRouteDraft.value?.checkTargets || [])
+        .filter(item => idSet.has(String(item.__id || '')))
+        .map(item => String(item?.address || '').trim() || '(empty)');
+    });
+
+    function createStaticRouteDraft(kind = 'ipv4', source = null) {
+      const nextHops = Array.isArray(source?.nextHops)
+        ? source.nextHops.map(item => ({
+          __id: item?.__id || nextBgpRowId('static-modal-nh'),
+          address: item?.address || '',
+          distance: item?.distance || '',
+          interface: item?.interface || '',
+          disable: !!item?.disable,
+          vrf: item?.vrf || '',
+          segments: item?.segments || '',
+          bfdProfile: item?.bfdProfile || '',
+          bfdSourceAddress: item?.bfdSourceAddress || '',
+        }))
+        : [];
+      if (!nextHops.length) {
+        const legacyNextHop = String(source?.nextHop || '').trim();
+        if (legacyNextHop) {
+          nextHops.push({
+            __id: nextBgpRowId('static-modal-nh'),
+            address: legacyNextHop,
+            distance: source?.distance || '',
+            interface: source?.interface || '',
+            disable: !!source?.disable,
+            vrf: source?.vrf || '',
+            segments: source?.segments || '',
+            bfdProfile: source?.bfdProfile || '',
+            bfdSourceAddress: source?.bfdSourceAddress || '',
+          });
+        }
+      }
+
+      const interfaceRows = Array.isArray(source?.interfaceRows)
+        ? source.interfaceRows.map(item => ({
+          __id: item?.__id || nextBgpRowId('static-modal-if'),
+          name: item?.name || '',
+          distance: item?.distance || '',
+          vrf: item?.vrf || '',
+          disable: !!item?.disable,
+        }))
+        : [];
+      if (!interfaceRows.length) {
+        const legacyInterfaceName = String(source?.interface || '').trim();
+        if (legacyInterfaceName) {
+          interfaceRows.push({ __id: nextBgpRowId('static-modal-if'), name: legacyInterfaceName, distance: source?.distance || '', vrf: source?.vrf || '', disable: !!source?.disable });
+        }
+      }
+
+      return {
+        __id: source?.__id || '',
+        prefix: source?.prefix || '',
+        routeType: inferStaticRouteBranch(source || {}, kind),
+        description: source?.description || '',
+        tag: source?.tag || '',
+        dhcpInterface: source?.dhcpInterface || '',
+        blackhole: !!source?.blackhole,
+        reject: !!source?.reject,
+        distance: source?.distance || '',
+        interface: source?.interface || '',
+        disable: !!source?.disable,
+        vrf: source?.vrf || '',
+        segments: source?.segments || '',
+        bfdProfile: source?.bfdProfile || '',
+        bfdSourceAddress: source?.bfdSourceAddress || '',
+        nextHops,
+        interfaceRows,
+        kind,
+      };
+    }
+
+    // VyOS static route has no explicit "action" node; infer branch from populated fields.
+    function inferStaticRouteBranch(row, kind = 'ipv4') {
+      const isIpv6 = kind === 'ipv6';
+      const hasNextHop = Array.isArray(row?.nextHops) && row.nextHops.some(item => String(item?.address || '').trim());
+      const hasInterface = !isIpv6 && Array.isArray(row?.interfaceRows) && row.interfaceRows.some(item => String(item?.name || '').trim());
+      const hasDhcpInterface = !isIpv6 && !!String(row?.dhcpInterface || '').trim();
+      if (hasNextHop) return 'next-hop';
+      if (hasInterface) return 'interface';
+      if (hasDhcpInterface) return 'dhcp-interface';
+      if (row?.reject) return 'reject';
+      if (row?.blackhole || String(row?.distance || '').trim() || String(row?.tag || '').trim()) return 'blackhole';
+      return 'next-hop';
+    }
+
+    function setStaticRouteDraftType(type) {
+      if (!staticRouteDraft.value) return;
+      const isIpv6 = staticRouteModalKind.value === 'ipv6';
+      const normalized = String(type || '').trim();
+      const allowed = isIpv6
+        ? ['next-hop', 'interface', 'blackhole', 'reject']
+        : ['next-hop', 'interface', 'dhcp-interface', 'blackhole', 'reject'];
+      const routeType = allowed.includes(normalized) ? normalized : 'next-hop';
+      staticRouteDraft.value.routeType = routeType;
+
+      if (routeType !== 'next-hop') {
+        staticRouteDraft.value.nextHops = [];
+        staticRouteDraft.value.nextHop = '';
+        staticRouteDraft.value.segments = '';
+        staticRouteDraft.value.bfdProfile = '';
+        staticRouteDraft.value.bfdSourceAddress = '';
+      }
+      if (routeType !== 'interface') {
+        staticRouteDraft.value.interfaceRows = [];
+        staticRouteDraft.value.interface = '';
+      }
+      if (routeType !== 'dhcp-interface') {
+        staticRouteDraft.value.dhcpInterface = '';
+      }
+      if (routeType !== 'blackhole' && routeType !== 'reject') {
+        staticRouteDraft.value.distance = '';
+        staticRouteDraft.value.tag = '';
+      }
+      staticRouteDraft.value.blackhole = routeType === 'blackhole';
+      staticRouteDraft.value.reject = routeType === 'reject';
+    }
+
+    function getStaticRouteTagRangeHint() {
+      return String(t('vrf.protocolHints.staticRouteTag') || '')
+        .replace(/。用于\s*blackhole\/reject。?/i, '')
+        .replace(/\.\s*Used with\s*blackhole\/reject\.?/i, '')
+        .trim();
+    }
+
+    function getStaticModalLabel(key) {
+      const lang = String(locale?.value || '').toLowerCase();
+      const isTw = lang.includes('zh-tw') || lang.includes('zh_hk') || lang.includes('zh-hant');
+      const isZh = lang.startsWith('zh');
+      const dict = {
+        prefixV4: { zh: 'IPv4 前缀', tw: 'IPv4 前綴', en: 'IPv4 Prefix' },
+        prefixV6: { zh: 'IPv6 前缀', tw: 'IPv6 前綴', en: 'IPv6 Prefix' },
+        nextHopType: { zh: '下一跳类型', tw: '下一跳類型', en: 'Next-hop Type' },
+        dhcpInterface: { zh: 'dhcp-interface', tw: 'dhcp-interface', en: 'dhcp-interface' },
+        tag: { zh: 'Tag', tw: 'Tag', en: 'Tag' },
+        segments: { zh: 'segments', tw: 'segments', en: 'segments' },
+        segmentsPlaceholder: { zh: 'Segments (SIDs)', tw: 'Segments (SIDs)', en: 'Segments (SIDs)' },
+      };
+      const entry = dict[key] || {};
+      if (isTw) return entry.tw || entry.en || key;
+      if (isZh) return entry.zh || entry.en || key;
+      return entry.en || key;
+    }
+
+    const staticRouteModalTitle = computed(() => `${staticRouteModalMode.value === 'edit' ? t('app.edit') : t('app.create')} ${staticRouteModalKind.value === 'ipv6' ? 'Static IPv6 route' : 'Static IPv4 route'}`);
+
+    const staticRouteCollectionModalTitle = computed(() => `${staticRouteCollectionModalMode.value === 'edit' ? t('app.edit') : t('app.create')} ${staticRouteCollectionType.value === 'interface' ? t('vrf.modals.staticCollectionInterfaceEntry') : t('vrf.modals.staticCollectionNextHopEntry')}`);
+
+    const staticRouteCollectionDeletePreview = computed(() => {
+      const list = staticRouteCollectionDeleteType.value === 'interface'
+        ? (staticRouteDraft.value?.interfaceRows || [])
+        : (staticRouteDraft.value?.nextHops || []);
+      const idSet = new Set((pendingStaticRouteCollectionDeleteIds.value || []).map(v => String(v)));
+      return list
+        .filter(item => idSet.has(String(item.__id)))
+        .map((item) => {
+          if (staticRouteCollectionDeleteType.value === 'interface') {
+            return item?.name || '(empty)';
+          }
+          return item?.address || '(empty)';
+        });
+    });
+
+    const staticRouteDeletePreview = computed(() => {
+      if (!editingVrf.value) return [];
+      const list = staticRouteDeleteKind.value === 'ipv6'
+        ? (editingVrf.value.staticRoutes6 || [])
+        : (editingVrf.value.staticRoutes || []);
+      const idSet = new Set((pendingStaticRouteDeleteIds.value || []).map(v => String(v)));
+      return list
+        .filter(row => idSet.has(String(row.__id)))
+        .map((row) => row?.prefix || '(empty)');
+    });
+
+    const ospfItemModalTitle = computed(() => `${ospfItemModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF ${protocolBranchState.value.ospf}`);
+
+    const ospfItemDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfItemDeleteIds.value || []).map(v => String(v)));
+      return (ospfAdvancedItems.value || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => formatProtocolBranchItemLine(item) || '(empty)');
+    });
+
+    const ospfAreaModalTitle = computed(() => `${ospfAreaModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF area`);
+
+    const ospfAreaDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfAreaDeleteIds.value || []).map(v => String(v)));
+      return (editingVrf.value?.ospfAreas || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.area || '').trim() || '(empty)');
+    });
+
+    const ospfAccessListModalTitle = computed(() => `${ospfAccessListModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF access-list`);
+
+    const ospfAccessListDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfAccessListDeleteIds.value || []).map(v => String(v)));
+      return (editingVrf.value?.ospfAccessLists || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.number || '').trim() || '(empty)');
+    });
+
+    const ospfNeighborModalTitle = computed(() => `${ospfNeighborModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF neighbor`);
+
+    const ospfNeighborDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfNeighborDeleteIds.value || []).map(v => String(v)));
+      return (editingVrf.value?.ospfNeighbors || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.address || '').trim() || '(empty)');
+    });
+
+    const ospfSummaryAddressModalTitle = computed(() => `${ospfSummaryAddressModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF summary-address`);
+
+    const ospfSummaryAddressDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfSummaryAddressDeleteIds.value || []).map(v => String(v)));
+      return (editingVrf.value?.ospfSummaryAddresses || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.prefix || '').trim() || '(empty)');
+    });
+
+    const ospfSrPrefixModalTitle = computed(() => `${ospfSrPrefixModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF segment-routing prefix`);
+
+    const ospfSrPrefixDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfSrPrefixDeleteIds.value || []).map(v => String(v)));
+      return (editingVrf.value?.ospfSegmentRouting?.prefixes || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.prefix || '').trim() || '(empty)');
+    });
+
+    const ospfRedistributeTableModalTitle = computed(() => `${ospfRedistributeTableModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF redistribute table`);
+
+    const ospfRedistributeTableDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfRedistributeTableDeleteIds.value || []).map(v => String(v)));
+      return (editingVrf.value?.ospfRedistribute?.tables || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.table || '').trim() || '(empty)');
+    });
+
+    const ospfInterfaceModalTitle = computed(() => `${ospfInterfaceModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF interface`);
+
+    const ospfInterfaceDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfInterfaceDeleteIds.value || []).map(v => String(v)));
+      return (editingVrf.value?.ospfInterfaces || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.name || '').trim() || '(empty)');
+    });
+
+    const ospfRangeModalTitle = computed(() => `${ospfRangeModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF area range`);
+
+    const ospfRangeDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfRangeDeleteIds.value || []).map(v => String(v)));
+      return (ospfAreaDraft.value?.ranges || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.prefix || '').trim() || '(empty)');
+    });
+
+    const ospfVirtualLinkModalTitle = computed(() => `${ospfVirtualLinkModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF virtual-link`);
+
+    const ospfVirtualLinkDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfVirtualLinkDeleteIds.value || []).map(v => String(v)));
+      return (ospfAreaDraft.value?.virtualLinks || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.peer || '').trim() || '(empty)');
+    });
+
+    const ospfv3AreaModalTitle = computed(() => `${ospfv3AreaModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPFv3 area`);
+
+    const ospfv3AreaDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfv3AreaDeleteIds.value || []).map(v => String(v)));
+      return (editingVrf.value?.ospfv3Areas || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.area || '').trim() || '(empty)');
+    });
+
+    const ospfv3AreaRangeModalTitle = computed(() => `${ospfv3AreaRangeModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPFv3 area range`);
+
+    const ospfv3AreaRangeDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfv3AreaRangeDeleteIds.value || []).map(v => String(v)));
+      return (ospfv3AreaDraft.value?.ranges || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.prefix || '').trim() || '(empty)');
+    });
+
+    const ospfv3InterfaceModalTitle = computed(() => `${ospfv3InterfaceModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPFv3 interface`);
+
+    const ospfv3InterfaceDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfv3InterfaceDeleteIds.value || []).map(v => String(v)));
+      return (editingVrf.value?.ospfv3Interfaces || [])
+        .filter(item => idSet.has(String(item.__id)))
+        .map(item => String(item?.name || '').trim() || '(empty)');
+    });
+
+    const isisInterfaceDeletePreview = computed(() => {
+      const idSet = new Set((pendingIsisInterfaceDeleteIds.value || []).map(v => String(v)));
+      return isisInterfaceRows.value
+        .filter(item => idSet.has(String(item.__id || item.name || '')))
+        .map(item => String(item?.name || '').trim() || '(empty)');
+    });
+
+    const isisFastRerouteDeletePreview = computed(() => {
+      const idSet = new Set((pendingIsisFastRerouteDeleteIds.value || []).map(v => String(v)));
+      return isisFastRerouteRows.value
+        .filter(item => idSet.has(String(item.__id || '')))
+        .map(item => String(item?.command || '').trim() || '(empty)');
+    });
+
+    const isisRedistributeDeletePreview = computed(() => {
+      const idSet = new Set((pendingIsisRedistributeDeleteIds.value || []).map(v => String(v)));
+      return isisRedistributeRows.value
+        .filter(item => idSet.has(String(item.__id || '')))
+        .map(item => `${String(item?.af || '').trim()} ${String(item?.protocol || '').trim()} ${String(item?.level || '').trim()}`.trim() || '(empty)');
+    });
+
+    const ospfv3RedistributeRows = computed(() => {
+      const base = editingVrf.value?.ospfv3Redistribute || {};
+      return OSPFV3_REDISTRIBUTE_PROTOCOLS
+        .filter((protocol) => !!base?.[protocol]?.enabled)
+        .map((protocol) => ({
+          __id: protocol,
+          protocol,
+          metric: String(base?.[protocol]?.metric || '').trim(),
+          metricType: String(base?.[protocol]?.metricType || '').trim(),
+          routeMap: String(base?.[protocol]?.routeMap || '').trim(),
+        }));
+    });
+
+    const ospfv3RedistributeModalTitle = computed(() => `${ospfv3RedistributeModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPFv3 redistribute`);
+
+    const ospfv3RedistributeDeletePreview = computed(() => {
+      const idSet = new Set((pendingOspfv3RedistributeDeleteIds.value || []).map(v => String(v)));
+      return OSPFV3_REDISTRIBUTE_PROTOCOLS.filter(protocol => idSet.has(String(protocol)));
+    });
+
+    const bgpCollectionDeletePreview = computed(() => {
+      if (!editingVrf.value) return [];
+      const listKey = getBgpCollectionListKey(bgpCollectionType.value);
+      const rows = editingVrf.value[listKey] || [];
+      const idSet = new Set((pendingBgpDeleteIds.value || []).map(v => String(v)));
+      return rows
+        .filter(row => idSet.has(String(row.__id)))
+        .map((row) => {
+          if (bgpCollectionType.value === 'neighbor') return row.address || '(empty)';
+          if (bgpCollectionType.value === 'peer-group') return row.name || '(empty)';
+          if (bgpCollectionType.value === 'interface') return row.name || '(empty)';
+          if (bgpCollectionType.value === 'listen') return row.range || '(empty)';
+          if (bgpCollectionType.value === 'bmp') return row.name || '(empty)';
+          return '(empty)';
+        });
+    });
+
+    const bgpVpnNetworkModalTitle = computed(() => `${bgpVpnNetworkModalMode.value === 'edit' ? t('app.edit') : t('app.create')} BGP ${bgpVpnNetworkDraft.value?.afKey === 'ipv6-vpn' ? 'ipv6-vpn' : 'ipv4-vpn'} network`);
+
+    const bgpVpnNetworkDeletePreview = computed(() => {
+      const afKey = pendingBgpVpnNetworkDeleteAfKey.value === 'ipv6-vpn' ? 'ipv6-vpn' : 'ipv4-vpn';
+      const rows = getBgpVpnNetworkRowsForAf(afKey);
+      const idSet = new Set((pendingBgpVpnNetworkDeleteIds.value || []).map(v => String(v)));
+      return rows
+        .filter(item => idSet.has(String(item.__id)))
+        .map((item) => {
+          const network = String(item?.network || '').trim();
+          const label = String(item?.label || '').trim();
+          const rd = String(item?.rd || '').trim();
+          const extras = [];
+          if (label) extras.push(`label ${label}`);
+          if (rd) extras.push(`rd ${rd}`);
+          return [network || '(empty)', ...extras].join(' ');
+        });
+    });
 
     async function load() {
       loading.value = true;
@@ -107,14 +1847,169 @@ export default defineComponent({
       }
     }
 
+    async function loadRouteMapOptions() {
+      try {
+        const res = await configStore.getConfig('policy route-map', false);
+        const raw = res?.data || {};
+        const mapData = raw.name || raw;
+        const names = Object.keys(mapData || {}).filter(Boolean).sort((a, b) => a.localeCompare(b));
+        routeMapOptions.value = names.map(name => ({ value: name, label: name }));
+      } catch (e) {
+        console.warn('Failed to load route-map options for VRF page:', e);
+        routeMapOptions.value = [];
+      }
+    }
+
+    function collectInterfaceNamesFromTree(raw) {
+      const found = new Set();
+      const typedRoots = ['bridge', 'dummy', 'ethernet', 'loopback', 'tunnel', 'veth', 'vti'];
+      const pattern = /^(br|dum|eth|lo|tun|veth|vti)[a-zA-Z0-9]*(\.[0-9]+)*$/;
+
+      function walk(node, parentIf = '') {
+        if (!node || typeof node !== 'object') return;
+        Object.entries(node).forEach(([key, value]) => {
+          if (key === 'node.def' || key === '__comment') return;
+          if (key === 'vif' && parentIf && value && typeof value === 'object') {
+            Object.entries(value).forEach(([vifId, vifValue]) => {
+              if (!String(vifId).trim()) return;
+              const vifName = `${parentIf}.${vifId}`;
+              found.add(vifName);
+              walk(vifValue, vifName);
+            });
+            return;
+          }
+          if (typedRoots.includes(key) && value && typeof value === 'object') {
+            Object.entries(value).forEach(([ifName, ifValue]) => {
+              if (pattern.test(ifName)) found.add(ifName);
+              walk(ifValue, ifName);
+            });
+            return;
+          }
+          if (pattern.test(key)) found.add(key);
+          walk(value, parentIf);
+        });
+      }
+
+      walk(raw, '');
+      return Array.from(found).sort((a, b) => a.localeCompare(b));
+    }
+
+    async function loadInterfaceOptions() {
+      try {
+        const res = await configStore.getConfig('interfaces', false);
+        const raw = res?.data || {};
+        interfaceOptions.value = collectInterfaceNamesFromTree(raw);
+      } catch (e) {
+        console.warn('Failed to load interface options for VRF page:', e);
+        interfaceOptions.value = [];
+      }
+    }
+
+    async function loadBfdProfileOptions() {
+      try {
+        const res = await configStore.getConfig('protocols bfd', false);
+        const raw = res?.data || {};
+        const profileNode = raw.profile && typeof raw.profile === 'object' ? raw.profile : (raw.name && typeof raw.name === 'object' ? raw.name : raw);
+        bfdProfileOptions.value = Object.keys(profileNode || {}).filter(Boolean).sort((a, b) => a.localeCompare(b));
+      } catch (e) {
+        console.warn('Failed to load BFD profile options for VRF page:', e);
+        bfdProfileOptions.value = [];
+      }
+    }
+
+    function setIndicatorStyleByCenters(styleRef, containerWidth, startCenter, endCenter) {
+      if (!Number.isFinite(containerWidth) || containerWidth <= 0) return;
+      const start = Math.max(0, Math.min(containerWidth, startCenter));
+      const end = Math.max(0, Math.min(containerWidth, endCenter));
+      const leftPx = Math.min(start, end);
+      const rightPx = Math.max(0, containerWidth - Math.max(start, end));
+      styleRef.value = {
+        left: `${leftPx}px`,
+        right: `${rightPx}px`,
+      };
+    }
+
+    function getHeaderCenterX(containerRect, headerEl) {
+      if (!containerRect || !headerEl) return null;
+      const rect = headerEl.getBoundingClientRect();
+      return rect.left - containerRect.left + rect.width / 2;
+    }
+
+    function updateVrfTopIndicatorBars() {
+      const rootEl = vrfModalTabsRoot.value;
+      if (!rootEl) return;
+      const headersEl = rootEl.querySelector(':scope > .tab-group > .tab-headers');
+      if (!headersEl) return;
+
+      const containerRect = headersEl.getBoundingClientRect();
+      const bgpEl = headersEl.querySelector('.tab-header[data-tab-key="bgp"]');
+      const staticEl = headersEl.querySelector('.tab-header[data-tab-key="static"]');
+      const dhcpEl = headersEl.querySelector('.tab-header[data-tab-key="dhcp-server"]');
+      const dhcpv6El = headersEl.querySelector('.tab-header[data-tab-key="dhcpv6-server"]');
+
+      const bgpCenter = getHeaderCenterX(containerRect, bgpEl);
+      const staticCenter = getHeaderCenterX(containerRect, staticEl);
+      const dhcpCenter = getHeaderCenterX(containerRect, dhcpEl);
+      const dhcpv6Center = getHeaderCenterX(containerRect, dhcpv6El);
+
+      if (bgpCenter != null && staticCenter != null) {
+        setIndicatorStyleByCenters(protocolIndicatorStyle, containerRect.width, bgpCenter, staticCenter);
+      }
+      if (dhcpCenter != null && dhcpv6Center != null) {
+        setIndicatorStyleByCenters(serviceIndicatorStyle, containerRect.width, dhcpCenter, dhcpv6Center);
+      }
+    }
+
+    function requestVrfTopIndicatorBarsUpdate() {
+      nextTick(() => {
+        updateVrfTopIndicatorBars();
+      });
+    }
+
     onMounted(() => {
       load();
+      loadRouteMapOptions();
+      loadInterfaceOptions();
+      loadBfdProfileOptions();
       onMenuRefresh(load);
-      window.addEventListener('config-committed', load);
+      window.addEventListener('config-committed', () => {
+        load();
+        loadRouteMapOptions();
+        loadInterfaceOptions();
+        loadBfdProfileOptions();
+      });
+      window.addEventListener('resize', requestVrfTopIndicatorBarsUpdate);
+    });
+    onUnmounted(() => {
+      window.removeEventListener('resize', requestVrfTopIndicatorBarsUpdate);
+    });
+
+    watch(() => modalVisible.value, (visible) => {
+      if (visible) requestVrfTopIndicatorBarsUpdate();
+    });
+    watch(() => TABS.value.map(tab => `${tab.key}:${tab.title}`).join('|'), () => {
+      if (modalVisible.value) requestVrfTopIndicatorBarsUpdate();
     });
     watch(() => route.path, () => {
       selectedNames.value = [];
       load();
+      loadRouteMapOptions();
+      loadInterfaceOptions();
+      loadBfdProfileOptions();
+    });
+
+    watch(() => ospfSubTab.value, (tabKey) => {
+      if (tabKey === 'access-list') {
+        selectOspfBranch('access-list');
+      } else if (tabKey === 'neighbor') {
+        selectOspfBranch('neighbor');
+      } else if (tabKey === 'summary-address') {
+        selectOspfBranch('summary-address');
+      } else if (tabKey === 'segment-routing') {
+        selectOspfBranch('segment-routing');
+      } else if (tabKey === 'redistribute') {
+        selectOspfBranch('redistribute');
+      }
     });
 
     function emptyVrf() {
@@ -127,12 +2022,6338 @@ export default defineComponent({
         ipv6DisableForwarding: false,
         ipv6NhtNoResolveViaDefault: false,
         ipv6Protocols: [],
+        bgpSystemAs: '',
+        bgpTimersHoldtime: '',
+        bgpTimersKeepalive: '',
+        bgpNeighbors: [],
+        bgpPeerGroups: [],
+        bgpListenRanges: [],
+        bgpInterfaces: [],
+        bgpBmpTargets: [],
+        bgpIpv4FlowspecLocalInstallInterface: '',
+        bgpNeighborText: '',
+        bgpPeerGroupText: '',
+        bgpInterfaceText: '',
+        failoverRoutesText: '',
+        failoverRoutes: [],
+        dhcpServerDisable: false,
+        dhcpServerHostfileUpdate: false,
+        dhcpServerListenAddresses: [],
+        dhcpServerListenInterfaces: [],
+        dhcpServerClientClasses: [],
+        dhcpServerSharedNetworks: [],
+        dhcpServerDdns: {
+          conflictResolution: '',
+          forwardDomains: [],
+          generatedPrefix: '',
+          hostnameCharReplacement: '',
+          hostnameCharSet: '',
+          overrideClientUpdate: '',
+          overrideNoUpdate: '',
+          qualifyingSuffix: '',
+          replaceClientName: '',
+          reverseDomains: [],
+          sendUpdates: '',
+          tsigKeys: [],
+          ttlPercent: '',
+          updateOnRenew: '',
+        },
+        dhcpServerHighAvailability: {
+          caCertificate: '',
+          certificate: '',
+          mode: '',
+          name: '',
+          remote: '',
+          sourceAddress: '',
+          status: '',
+        },
+        dhcpv6ServerDisable: false,
+        dhcpv6ServerDisableRouteAutoinstall: false,
+        dhcpv6ServerPreference: '',
+        dhcpv6ServerGlobalNameServers: [],
+        dhcpv6ServerListenInterfaces: [],
+        dhcpv6ServerSharedNetworks: [],
+        bgpCliText: '',
+        failoverCliText: '',
+        isisCliText: '',
+        ospfCliText: '',
+        ospfAccessLists: [],
+        ospfNeighbors: [],
+        ospfSummaryAddresses: [],
+        ospfSegmentRouting: {
+          globalBlockLowLabelValue: '',
+          globalBlockHighLabelValue: '',
+          localBlockLowLabelValue: '',
+          localBlockHighLabelValue: '',
+          maximumLabelDepth: '',
+          prefixes: [],
+        },
+        ospfRedistribute: createOspfRedistributeDraft(),
+        ospfAreas: [],
+        ospfInterfaces: [],
+        ospfv3CliText: '',
+        ospfv3Areas: [],
+        ospfv3Interfaces: [],
+        ospfv3Redistribute: createOspfv3RedistributeDraft(),
+        rpkiCliText: '',
+        rpkiCaches: [],
+        staticCliText: '',
+        staticRoutes: [],
+        staticRoutes6: [],
       };
+    }
+
+    function deepClone(obj) {
+      return JSON.parse(JSON.stringify(obj || {}));
+    }
+
+    function treeToCliLines(node, prefix = []) {
+      const lines = [];
+      if (node === null || node === undefined) return lines;
+
+      if (Array.isArray(node)) {
+        for (const item of node) {
+          if (item && typeof item === 'object' && !Array.isArray(item)) {
+            lines.push(...treeToCliLines(item, prefix));
+          } else {
+            lines.push(`${prefix.join(' ')} = ${String(item)}`.trim());
+          }
+        }
+        return lines;
+      }
+
+      if (typeof node !== 'object') {
+        lines.push(`${prefix.join(' ')} = ${String(node)}`.trim());
+        return lines;
+      }
+
+      const keys = Object.keys(node);
+      if (!keys.length) {
+        if (prefix.length) lines.push(prefix.join(' '));
+        return lines;
+      }
+
+      for (const key of keys.sort((a, b) => a.localeCompare(b))) {
+        lines.push(...treeToCliLines(node[key], [...prefix, key]));
+      }
+      return lines;
+    }
+
+    function protocolTreeToCliText(node) {
+      return treeToCliLines(node).join('\n');
+    }
+
+    function setNodeByPath(root, pathTokens, valueNode) {
+      if (!pathTokens.length) return;
+      let current = root;
+      for (let i = 0; i < pathTokens.length - 1; i += 1) {
+        const key = pathTokens[i];
+        if (!current[key] || typeof current[key] !== 'object' || Array.isArray(current[key])) {
+          current[key] = {};
+        }
+        current = current[key];
+      }
+      current[pathTokens[pathTokens.length - 1]] = valueNode;
+    }
+
+    function parseCliTextToProtocolTree(text) {
+      const result = {};
+      const lines = String(text || '').split('\n').map(v => v.trim()).filter(Boolean);
+
+      for (const line of lines) {
+        const eqPos = line.indexOf('=');
+        if (eqPos >= 0) {
+          const pathPart = line.slice(0, eqPos).trim();
+          const valuePart = line.slice(eqPos + 1).trim();
+          const pathTokens = pathPart.split(/\s+/).filter(Boolean);
+          if (!pathTokens.length) continue;
+          setNodeByPath(result, pathTokens, valuePart);
+        } else {
+          const pathTokens = line.split(/\s+/).filter(Boolean);
+          if (!pathTokens.length) continue;
+          setNodeByPath(result, pathTokens, {});
+        }
+      }
+
+      return result;
+    }
+
+    function getProtocolBranchOptions(protocol) {
+      const list = PROTOCOL_BRANCH_META[protocol] || [];
+      return list.map(item => ({ value: item.key, label: item.label }));
+    }
+
+    function getProtocolBranchHelp(protocol, branch) {
+      const list = PROTOCOL_BRANCH_META[protocol] || [];
+      const found = list.find(item => item.key === branch);
+      return found?.help || '';
+    }
+
+    function getProtocolBranchSnippets(protocol, branch) {
+      const list = PROTOCOL_BRANCH_META[protocol] || [];
+      const found = list.find(item => item.key === branch);
+      return found?.snippets || [];
+    }
+
+    function getProtocolCliFieldKey(protocol) {
+      return `${protocol}CliText`;
+    }
+
+    function lineMatchesBranch(line, branch) {
+      const trimmed = String(line || '').trim();
+      if (!trimmed) return false;
+      return trimmed === branch || trimmed.startsWith(`${branch} `) || trimmed.startsWith(`${branch}=`) || trimmed.startsWith(`${branch} =`);
+    }
+
+    function getProtocolBranchText(protocol, branch) {
+      if (!editingVrf.value) return '';
+      const fieldKey = getProtocolCliFieldKey(protocol);
+      const fullText = String(editingVrf.value[fieldKey] || '');
+      const lines = fullText.split('\n').map(line => line.trim()).filter(Boolean);
+      return lines.filter(line => lineMatchesBranch(line, branch)).join('\n');
+    }
+
+    function setProtocolBranchText(protocol, branch, text) {
+      if (!editingVrf.value) return;
+      const fieldKey = getProtocolCliFieldKey(protocol);
+      const fullText = String(editingVrf.value[fieldKey] || '');
+      const existing = fullText.split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = existing.filter(line => !lineMatchesBranch(line, branch));
+      const incoming = String(text || '').split('\n').map(line => line.trim()).filter(Boolean);
+      editingVrf.value[fieldKey] = [...kept, ...incoming].join('\n');
+    }
+
+    function getProtocolScalarValue(protocol, path) {
+      if (!editingVrf.value || !path) return '';
+      const fieldKey = getProtocolCliFieldKey(protocol);
+      const lines = String(editingVrf.value[fieldKey] || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const prefix = `${path} =`;
+      const found = lines.find(line => line.startsWith(prefix));
+      if (!found) return '';
+      const idx = found.indexOf('=');
+      return idx >= 0 ? found.slice(idx + 1).trim() : '';
+    }
+
+    function setProtocolScalarValue(protocol, path, value) {
+      if (!editingVrf.value || !path) return;
+      const fieldKey = getProtocolCliFieldKey(protocol);
+      const lines = String(editingVrf.value[fieldKey] || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const prefix = `${path} =`;
+      const kept = lines.filter(line => !line.startsWith(prefix));
+      const vv = String(value || '').trim();
+      if (vv) kept.push(`${path} = ${vv}`);
+      editingVrf.value[fieldKey] = kept.join('\n');
+    }
+
+    function getProtocolPresence(protocol, path) {
+      if (!editingVrf.value || !path) return false;
+      const fieldKey = getProtocolCliFieldKey(protocol);
+      const lines = String(editingVrf.value[fieldKey] || '').split('\n').map(line => line.trim()).filter(Boolean);
+      return lines.some(line => line === path || line.startsWith(`${path} `));
+    }
+
+    function setProtocolPresence(protocol, path, enabled) {
+      if (!editingVrf.value || !path) return;
+      const fieldKey = getProtocolCliFieldKey(protocol);
+      const lines = String(editingVrf.value[fieldKey] || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = lines.filter(line => !(line === path || line.startsWith(`${path} `)));
+      if (enabled) kept.push(path);
+      editingVrf.value[fieldKey] = kept.join('\n');
+    }
+
+    function getProtocolLeafSetValue(protocol, path) {
+      if (!editingVrf.value || !path) return '';
+      const fieldKey = getProtocolCliFieldKey(protocol);
+      const lines = String(editingVrf.value[fieldKey] || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const prefix = `${path} `;
+      const found = lines.find(line => line.startsWith(prefix));
+      return found ? found.slice(prefix.length).trim() : '';
+    }
+
+    function setProtocolLeafSetValue(protocol, path, value) {
+      if (!editingVrf.value || !path) return;
+      const fieldKey = getProtocolCliFieldKey(protocol);
+      const lines = String(editingVrf.value[fieldKey] || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const prefix = `${path} `;
+      const kept = lines.filter(line => !line.startsWith(prefix));
+      const vv = String(value || '').trim();
+      if (vv) kept.push(`${path} ${vv}`);
+      editingVrf.value[fieldKey] = kept.join('\n');
+    }
+
+    function getBgpFieldValue(path) {
+      return getProtocolScalarValue('bgp', path);
+    }
+
+    function setBgpFieldValue(path, value) {
+      setProtocolScalarValue('bgp', path, value);
+    }
+
+    function parseBgpVpnNetworkInputLine(line) {
+      const tokens = String(line || '').trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return null;
+      const entry = { network: tokens[0], label: '', rd: '' };
+      for (let i = 1; i < tokens.length; i += 1) {
+        const key = tokens[i];
+        if (key === 'label' && tokens[i + 1]) {
+          entry.label = tokens[i + 1];
+          i += 1;
+        } else if (key === 'rd' && tokens[i + 1]) {
+          entry.rd = tokens[i + 1];
+          i += 1;
+        }
+      }
+      return entry.network ? entry : null;
+    }
+
+    function getBgpVpnNetworkEntriesText(afKey) {
+      if (!afKey) return '';
+      const branch = `address-family ${afKey}`;
+      const networkPrefix = `${branch} network `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const entries = new Map();
+
+      for (const line of rows) {
+        if (!line.startsWith(networkPrefix)) continue;
+        const rest = line.slice(networkPrefix.length).trim();
+        if (!rest) continue;
+
+        const eqPos = rest.indexOf('=');
+        if (eqPos >= 0) {
+          const left = rest.slice(0, eqPos).trim();
+          const value = rest.slice(eqPos + 1).trim();
+          const leftTokens = left.split(/\s+/).filter(Boolean);
+          if (!leftTokens.length) continue;
+          const network = leftTokens[0];
+          const attr = leftTokens.slice(1).join(' ');
+          const current = entries.get(network) || { network, label: '', rd: '' };
+          if (attr === 'label') current.label = value;
+          if (attr === 'rd') current.rd = value;
+          entries.set(network, current);
+          continue;
+        }
+
+        const parsed = parseBgpVpnNetworkInputLine(rest);
+        if (!parsed) continue;
+        const current = entries.get(parsed.network) || { network: parsed.network, label: '', rd: '' };
+        if (parsed.label) current.label = parsed.label;
+        if (parsed.rd) current.rd = parsed.rd;
+        entries.set(parsed.network, current);
+      }
+
+      return Array.from(entries.values())
+        .map((entry) => {
+          const parts = [entry.network];
+          if (entry.label) parts.push('label', entry.label);
+          if (entry.rd) parts.push('rd', entry.rd);
+          return parts.join(' ');
+        })
+        .join('\n');
+    }
+
+    function setBgpVpnNetworkEntriesText(afKey, text) {
+      if (!editingVrf.value || !afKey) return;
+      const branch = `address-family ${afKey}`;
+      const networkPrefix = `${branch} network `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = rows.filter(line => !line.startsWith(networkPrefix));
+      const entries = new Map();
+
+      for (const line of String(text || '').split('\n').map(v => v.trim()).filter(Boolean)) {
+        const parsed = parseBgpVpnNetworkInputLine(line);
+        if (!parsed || !parsed.network) continue;
+        entries.set(parsed.network, parsed);
+      }
+
+      for (const entry of entries.values()) {
+        kept.push(`${networkPrefix}${entry.network}`);
+        if (entry.label) kept.push(`${networkPrefix}${entry.network} label = ${entry.label}`);
+        if (entry.rd) kept.push(`${networkPrefix}${entry.network} rd = ${entry.rd}`);
+      }
+
+      setProtocolBranchText('bgp', branch, kept.join('\n'));
+    }
+
+    function createBgpVpnNetworkRow(source = null) {
+      return {
+        __id: source?.__id || nextBgpRowId('bgp-vpn-network'),
+        network: String(source?.network || ''),
+        label: String(source?.label || ''),
+        rd: String(source?.rd || ''),
+      };
+    }
+
+    function createBgpVpnNetworkDraft(afKey = 'ipv4-vpn', source = null) {
+      return {
+        __id: source?.__id || '',
+        afKey: afKey === 'ipv6-vpn' ? 'ipv6-vpn' : 'ipv4-vpn',
+        network: String(source?.network || ''),
+        label: String(source?.label || ''),
+        rd: String(source?.rd || ''),
+      };
+    }
+
+    function getBgpVpnNetworkRowsForAf(afKey) {
+      if (afKey !== 'ipv4-vpn' && afKey !== 'ipv6-vpn') return [];
+      if (!Array.isArray(bgpVpnNetworkRows.value[afKey])) bgpVpnNetworkRows.value[afKey] = [];
+      return bgpVpnNetworkRows.value[afKey];
+    }
+
+    function syncBgpVpnNetworkRowsFromCli(afKey) {
+      if (afKey !== 'ipv4-vpn' && afKey !== 'ipv6-vpn') return;
+      const lines = String(getBgpVpnNetworkEntriesText(afKey) || '')
+        .split('\n')
+        .map(v => v.trim())
+        .filter(Boolean);
+      const rows = lines.map((line) => createBgpVpnNetworkRow(parseBgpVpnNetworkInputLine(line))).filter(row => row.network);
+      bgpVpnNetworkRows.value[afKey] = rows;
+    }
+
+    function syncAllBgpVpnNetworkRowsFromCli() {
+      syncBgpVpnNetworkRowsFromCli('ipv4-vpn');
+      syncBgpVpnNetworkRowsFromCli('ipv6-vpn');
+    }
+
+    function persistBgpVpnNetworkRowsToCli(afKey) {
+      const rows = getBgpVpnNetworkRowsForAf(afKey)
+        .map(row => createBgpVpnNetworkRow(row))
+        .map((row) => {
+          row.network = String(row.network || '').trim();
+          row.label = String(row.label || '').trim();
+          row.rd = String(row.rd || '').trim();
+          return row;
+        })
+        .filter(row => row.network);
+
+      const text = rows
+        .map((row) => {
+          const parts = [row.network];
+          if (row.label) parts.push('label', row.label);
+          if (row.rd) parts.push('rd', row.rd);
+          return parts.join(' ');
+        })
+        .join('\n');
+
+      setBgpVpnNetworkEntriesText(afKey, text);
+    }
+
+    function addBgpVpnNetworkRow(afKey) {
+      if (!editingVrf.value) return;
+      const rows = getBgpVpnNetworkRowsForAf(afKey);
+      rows.push(createBgpVpnNetworkRow());
+    }
+
+    function openBgpVpnNetworkCreate(afKey) {
+      bgpVpnNetworkModalMode.value = 'create';
+      bgpVpnNetworkEditId.value = '';
+      bgpVpnNetworkDraft.value = createBgpVpnNetworkDraft(afKey);
+      bgpVpnNetworkModalVisible.value = true;
+    }
+
+    function openBgpVpnNetworkEdit(afKey, row) {
+      if (!row || !row.__id) return;
+      bgpVpnNetworkModalMode.value = 'edit';
+      bgpVpnNetworkEditId.value = String(row.__id);
+      bgpVpnNetworkDraft.value = createBgpVpnNetworkDraft(afKey, row);
+      bgpVpnNetworkModalVisible.value = true;
+    }
+
+    function saveBgpVpnNetworkModal() {
+      const draft = createBgpVpnNetworkDraft(bgpVpnNetworkDraft.value?.afKey, bgpVpnNetworkDraft.value);
+      draft.network = String(draft.network || '').trim();
+      draft.label = String(draft.label || '').trim();
+      draft.rd = String(draft.rd || '').trim();
+      if (!draft.network) return;
+
+      const afKey = draft.afKey;
+      const rows = getBgpVpnNetworkRowsForAf(afKey);
+      if (bgpVpnNetworkModalMode.value === 'edit') {
+        const idx = rows.findIndex(item => String(item.__id) === String(bgpVpnNetworkEditId.value));
+        if (idx >= 0) {
+          rows[idx] = {
+            __id: rows[idx].__id,
+            network: draft.network,
+            label: draft.label,
+            rd: draft.rd,
+          };
+        }
+      } else {
+        rows.push(createBgpVpnNetworkRow({ network: draft.network, label: draft.label, rd: draft.rd }));
+      }
+
+      persistBgpVpnNetworkRowsToCli(afKey);
+      bgpVpnNetworkModalVisible.value = false;
+      bgpVpnNetworkEditId.value = '';
+      bgpVpnNetworkDraft.value = {};
+    }
+
+    function updateBgpVpnNetworkRowField(afKey, rowId, field, value) {
+      const rows = getBgpVpnNetworkRowsForAf(afKey);
+      const idx = rows.findIndex(item => String(item.__id) === String(rowId));
+      if (idx < 0) return;
+      if (!['network', 'label', 'rd'].includes(field)) return;
+      rows[idx][field] = String(value || '');
+      persistBgpVpnNetworkRowsToCli(afKey);
+    }
+
+    function removeBgpVpnNetworkRows(afKey, ids) {
+      const rows = getBgpVpnNetworkRowsForAf(afKey);
+      const selected = new Set((ids || []).map(v => String(v)));
+      bgpVpnNetworkRows.value[afKey] = rows.filter(item => !selected.has(String(item.__id)));
+      persistBgpVpnNetworkRowsToCli(afKey);
+    }
+
+    function requestBgpVpnNetworkDelete(afKey, ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingBgpVpnNetworkDeleteAfKey.value = afKey === 'ipv6-vpn' ? 'ipv6-vpn' : 'ipv4-vpn';
+      pendingBgpVpnNetworkDeleteIds.value = selected;
+      bgpVpnNetworkDeleteVisible.value = true;
+    }
+
+    function confirmBgpVpnNetworkDelete() {
+      removeBgpVpnNetworkRows(pendingBgpVpnNetworkDeleteAfKey.value, pendingBgpVpnNetworkDeleteIds.value);
+      pendingBgpVpnNetworkDeleteIds.value = [];
+      bgpVpnNetworkDeleteVisible.value = false;
+    }
+
+    function getAvailableProtocolOptions(list, index, allOptions) {
+      const currentValue = String(list?.[index]?.protocol || '').trim();
+      const selected = new Set(
+        (list || [])
+          .map((item, i) => (i === index ? '' : String(item?.protocol || '').trim()))
+          .filter(Boolean)
+      );
+      return (allOptions || []).filter((opt) => {
+        const value = String(opt?.value || '').trim();
+        if (!value) return true;
+        if (value === currentValue) return true;
+        return !selected.has(value);
+      });
+    }
+
+    function getAvailableIpProtocolOptions(index) {
+      return getAvailableProtocolOptions(editingVrf.value?.ipProtocols || [], index, IP_PROTOCOL_OPTIONS);
+    }
+
+    function getAvailableIpv6ProtocolOptions(index) {
+      return getAvailableProtocolOptions(editingVrf.value?.ipv6Protocols || [], index, IPV6_PROTOCOL_OPTIONS);
+    }
+
+    function normalizeNodeStringValue(node) {
+      if (typeof node === 'string' || typeof node === 'number') return String(node);
+      return '';
+    }
+
+    function normalizeLeafSet(node) {
+      if (!node) return [];
+      if (Array.isArray(node)) return node.map(v => String(v || '').trim()).filter(Boolean);
+      if (typeof node === 'string' || typeof node === 'number') return [String(node).trim()].filter(Boolean);
+      if (typeof node === 'object') return Object.keys(node).filter(Boolean);
+      return [];
+    }
+
+    function parseListField(text) {
+      return String(text || '').split(/[\n,]+/).map(v => v.trim()).filter(Boolean);
+    }
+
+    function parseBgpAfPolicies(addressFamilyNode, afKeys) {
+      const afPolicies = {};
+      for (const afKey of afKeys) {
+        const afNode = addressFamilyNode[afKey] && typeof addressFamilyNode[afKey] === 'object' ? addressFamilyNode[afKey] : {};
+        const capabilityOrfNode = afNode.capability && typeof afNode.capability === 'object' && afNode.capability.orf && typeof afNode.capability.orf === 'object'
+          ? afNode.capability.orf
+          : {};
+        const capabilityOrfPrefixList = capabilityOrfNode['prefix-list'] && typeof capabilityOrfNode['prefix-list'] === 'object'
+          ? capabilityOrfNode['prefix-list']
+          : {};
+        const conditionallyAdvertiseNode = afNode['conditionally-advertise'] && typeof afNode['conditionally-advertise'] === 'object'
+          ? afNode['conditionally-advertise']
+          : {};
+        const defaultOriginateNode = afNode['default-originate'] && typeof afNode['default-originate'] === 'object'
+          ? afNode['default-originate']
+          : {};
+        const disableSendCommunityNode = afNode['disable-send-community'] && typeof afNode['disable-send-community'] === 'object'
+          ? afNode['disable-send-community']
+          : {};
+        const distributeListNode = afNode['distribute-list'] && typeof afNode['distribute-list'] === 'object'
+          ? afNode['distribute-list']
+          : {};
+        const filterListNode = afNode['filter-list'] && typeof afNode['filter-list'] === 'object'
+          ? afNode['filter-list']
+          : {};
+        const nexthopLocalNode = afNode['nexthop-local'] && typeof afNode['nexthop-local'] === 'object'
+          ? afNode['nexthop-local']
+          : {};
+        const nexthopSelfNode = afNode['nexthop-self'] && typeof afNode['nexthop-self'] === 'object'
+          ? afNode['nexthop-self']
+          : null;
+        const prefixListNode = afNode['prefix-list'] && typeof afNode['prefix-list'] === 'object'
+          ? afNode['prefix-list']
+          : {};
+        const removePrivateAsNode = afNode['remove-private-as'] && typeof afNode['remove-private-as'] === 'object'
+          ? afNode['remove-private-as']
+          : {};
+        const routeMapNode = afNode['route-map'] && typeof afNode['route-map'] === 'object'
+          ? afNode['route-map']
+          : {};
+        const softReconfigurationNode = afNode['soft-reconfiguration'] && typeof afNode['soft-reconfiguration'] === 'object'
+          ? afNode['soft-reconfiguration']
+          : null;
+        afPolicies[afKey] = createEmptyBgpNeighborAfPolicy({
+          addpathTxAll: !!(afNode['addpath-tx-all'] && typeof afNode['addpath-tx-all'] === 'object'),
+          addpathTxPerAs: !!(afNode['addpath-tx-per-as'] && typeof afNode['addpath-tx-per-as'] === 'object'),
+          allowasInNumber: normalizeNodeStringValue(afNode['allowas-in']?.number),
+          asOverride: !!(afNode['as-override'] && typeof afNode['as-override'] === 'object'),
+          attributeUnchangedAsPath: !!(afNode['attribute-unchanged'] && typeof afNode['attribute-unchanged'] === 'object' && afNode['attribute-unchanged']['as-path'] && typeof afNode['attribute-unchanged']['as-path'] === 'object'),
+          attributeUnchangedMed: !!(afNode['attribute-unchanged'] && typeof afNode['attribute-unchanged'] === 'object' && afNode['attribute-unchanged'].med && typeof afNode['attribute-unchanged'].med === 'object'),
+          attributeUnchangedNextHop: !!(afNode['attribute-unchanged'] && typeof afNode['attribute-unchanged'] === 'object' && afNode['attribute-unchanged']['next-hop'] && typeof afNode['attribute-unchanged']['next-hop'] === 'object'),
+          capabilityOrfPrefixListReceive: !!(capabilityOrfPrefixList.receive && typeof capabilityOrfPrefixList.receive === 'object'),
+          capabilityOrfPrefixListSend: !!(capabilityOrfPrefixList.send && typeof capabilityOrfPrefixList.send === 'object'),
+          conditionallyAdvertiseAdvertiseMap: normalizeNodeStringValue(conditionallyAdvertiseNode['advertise-map']),
+          conditionallyAdvertiseExistMap: normalizeNodeStringValue(conditionallyAdvertiseNode['exist-map']),
+          conditionallyAdvertiseNonExistMap: normalizeNodeStringValue(conditionallyAdvertiseNode['non-exist-map']),
+          defaultOriginateRouteMap: normalizeNodeStringValue(defaultOriginateNode['route-map']),
+          disableSendCommunityExtended: !!(disableSendCommunityNode.extended && typeof disableSendCommunityNode.extended === 'object'),
+          disableSendCommunityStandard: !!(disableSendCommunityNode.standard && typeof disableSendCommunityNode.standard === 'object'),
+          distributeListExport: normalizeNodeStringValue(distributeListNode.export),
+          distributeListImport: normalizeNodeStringValue(distributeListNode.import),
+          filterListExport: normalizeNodeStringValue(filterListNode.export),
+          filterListImport: normalizeNodeStringValue(filterListNode.import),
+          maximumPrefix: normalizeNodeStringValue(afNode['maximum-prefix']),
+          maximumPrefixOut: normalizeNodeStringValue(afNode['maximum-prefix-out']),
+          nexthopLocalUnchanged: !!(nexthopLocalNode.unchanged && typeof nexthopLocalNode.unchanged === 'object'),
+          nexthopSelf: !!nexthopSelfNode,
+          nexthopSelfForce: !!(nexthopSelfNode && typeof nexthopSelfNode === 'object' && nexthopSelfNode.force && typeof nexthopSelfNode.force === 'object'),
+          prefixListExport: normalizeNodeStringValue(prefixListNode.export),
+          prefixListImport: normalizeNodeStringValue(prefixListNode.import),
+          removePrivateAsAll: !!(removePrivateAsNode.all && typeof removePrivateAsNode.all === 'object'),
+          routeMapExport: normalizeNodeStringValue(routeMapNode.export),
+          routeMapImport: normalizeNodeStringValue(routeMapNode.import),
+          routeReflectorClient: !!(afNode['route-reflector-client'] && typeof afNode['route-reflector-client'] === 'object'),
+          routeServerClient: !!(afNode['route-server-client'] && typeof afNode['route-server-client'] === 'object'),
+          softReconfiguration: !!(softReconfigurationNode || (afNode['soft-reconfiguration'] && typeof afNode['soft-reconfiguration'] === 'object')),
+          unsuppressMap: normalizeNodeStringValue(afNode['unsuppress-map']),
+          weight: normalizeNodeStringValue(afNode.weight),
+        });
+      }
+      return afPolicies;
+    }
+
+    function appendBgpAfPolicyCli(filtered, afPrefix, p) {
+      const allowasInNumber = String(p.allowasInNumber || '').trim();
+      const conditionallyAdvertiseAdvertiseMap = String(p.conditionallyAdvertiseAdvertiseMap || '').trim();
+      const conditionallyAdvertiseExistMap = String(p.conditionallyAdvertiseExistMap || '').trim();
+      const conditionallyAdvertiseNonExistMap = String(p.conditionallyAdvertiseNonExistMap || '').trim();
+      const defaultOriginateRouteMap = String(p.defaultOriginateRouteMap || '').trim();
+      const distributeListExport = String(p.distributeListExport || '').trim();
+      const distributeListImport = String(p.distributeListImport || '').trim();
+      const filterListExport = String(p.filterListExport || '').trim();
+      const filterListImport = String(p.filterListImport || '').trim();
+      const maximumPrefix = String(p.maximumPrefix || '').trim();
+      const maximumPrefixOut = String(p.maximumPrefixOut || '').trim();
+      const prefixListExport = String(p.prefixListExport || '').trim();
+      const prefixListImport = String(p.prefixListImport || '').trim();
+      const routeMapExport = String(p.routeMapExport || '').trim();
+      const routeMapImport = String(p.routeMapImport || '').trim();
+      const unsuppressMap = String(p.unsuppressMap || '').trim();
+      const weight = String(p.weight || '').trim();
+
+      if (p.addpathTxAll) filtered.push(`${afPrefix} addpath-tx-all`);
+      if (p.addpathTxPerAs) filtered.push(`${afPrefix} addpath-tx-per-as`);
+      if (allowasInNumber) filtered.push(`${afPrefix} allowas-in number = ${allowasInNumber}`);
+      if (p.asOverride) filtered.push(`${afPrefix} as-override`);
+      if (p.attributeUnchangedAsPath) filtered.push(`${afPrefix} attribute-unchanged as-path`);
+      if (p.attributeUnchangedMed) filtered.push(`${afPrefix} attribute-unchanged med`);
+      if (p.attributeUnchangedNextHop) filtered.push(`${afPrefix} attribute-unchanged next-hop`);
+      if (p.capabilityOrfPrefixListReceive) filtered.push(`${afPrefix} capability orf prefix-list receive`);
+      if (p.capabilityOrfPrefixListSend) filtered.push(`${afPrefix} capability orf prefix-list send`);
+      if (conditionallyAdvertiseAdvertiseMap) filtered.push(`${afPrefix} conditionally-advertise advertise-map = ${conditionallyAdvertiseAdvertiseMap}`);
+      if (conditionallyAdvertiseExistMap) filtered.push(`${afPrefix} conditionally-advertise exist-map = ${conditionallyAdvertiseExistMap}`);
+      if (conditionallyAdvertiseNonExistMap) filtered.push(`${afPrefix} conditionally-advertise non-exist-map = ${conditionallyAdvertiseNonExistMap}`);
+      if (defaultOriginateRouteMap) filtered.push(`${afPrefix} default-originate route-map = ${defaultOriginateRouteMap}`);
+      if (p.disableSendCommunityExtended) filtered.push(`${afPrefix} disable-send-community extended`);
+      if (p.disableSendCommunityStandard) filtered.push(`${afPrefix} disable-send-community standard`);
+      if (distributeListExport) filtered.push(`${afPrefix} distribute-list export = ${distributeListExport}`);
+      if (distributeListImport) filtered.push(`${afPrefix} distribute-list import = ${distributeListImport}`);
+      if (filterListExport) filtered.push(`${afPrefix} filter-list export = ${filterListExport}`);
+      if (filterListImport) filtered.push(`${afPrefix} filter-list import = ${filterListImport}`);
+      if (maximumPrefix) filtered.push(`${afPrefix} maximum-prefix = ${maximumPrefix}`);
+      if (maximumPrefixOut) filtered.push(`${afPrefix} maximum-prefix-out = ${maximumPrefixOut}`);
+      if (p.nexthopLocalUnchanged) filtered.push(`${afPrefix} nexthop-local unchanged`);
+      if (p.nexthopSelfForce) filtered.push(`${afPrefix} nexthop-self force`);
+      else if (p.nexthopSelf) filtered.push(`${afPrefix} nexthop-self`);
+      if (prefixListExport) filtered.push(`${afPrefix} prefix-list export = ${prefixListExport}`);
+      if (prefixListImport) filtered.push(`${afPrefix} prefix-list import = ${prefixListImport}`);
+      if (p.removePrivateAsAll) filtered.push(`${afPrefix} remove-private-as all`);
+      if (routeMapExport) filtered.push(`${afPrefix} route-map export = ${routeMapExport}`);
+      if (routeMapImport) filtered.push(`${afPrefix} route-map import = ${routeMapImport}`);
+      if (p.routeReflectorClient) filtered.push(`${afPrefix} route-reflector-client`);
+      if (p.routeServerClient) filtered.push(`${afPrefix} route-server-client`);
+      if (p.softReconfiguration) filtered.push(`${afPrefix} soft-reconfiguration inbound`);
+      if (unsuppressMap) filtered.push(`${afPrefix} unsuppress-map = ${unsuppressMap}`);
+      if (weight) filtered.push(`${afPrefix} weight = ${weight}`);
+    }
+
+    function validateBgpAfPolicies(afPolicies, afKeys) {
+      for (const afKey of afKeys) {
+        const af = afPolicies?.[afKey];
+        if (!af || typeof af !== 'object') continue;
+        const allowasInNumber = String(af.allowasInNumber || '').trim();
+        if (allowasInNumber) {
+          const n = Number(allowasInNumber);
+          if (!Number.isInteger(n) || n < 1 || n > 10) return t('vrf.validation.bgpNeighborAfAllowasInInvalid');
+        }
+        const distributeListExport = String(af.distributeListExport || '').trim();
+        if (distributeListExport) {
+          const n = Number(distributeListExport);
+          if (!Number.isInteger(n) || n < 1 || n > 65535) return t('vrf.validation.bgpNeighborAfDistributeListInvalid');
+        }
+        const distributeListImport = String(af.distributeListImport || '').trim();
+        if (distributeListImport) {
+          const n = Number(distributeListImport);
+          if (!Number.isInteger(n) || n < 1 || n > 65535) return t('vrf.validation.bgpNeighborAfDistributeListInvalid');
+        }
+        const maximumPrefix = String(af.maximumPrefix || '').trim();
+        if (maximumPrefix) {
+          const n = Number(maximumPrefix);
+          if (!Number.isInteger(n) || n < 1 || n > 4294967295) return t('vrf.validation.bgpNeighborAfMaximumPrefixInvalid');
+        }
+        const maximumPrefixOut = String(af.maximumPrefixOut || '').trim();
+        if (maximumPrefixOut) {
+          const n = Number(maximumPrefixOut);
+          if (!Number.isInteger(n) || n < 1 || n > 4294967295) return t('vrf.validation.bgpNeighborAfMaximumPrefixInvalid');
+        }
+        const weight = String(af.weight || '').trim();
+        if (weight) {
+          const n = Number(weight);
+          if (!Number.isInteger(n) || n < 1 || n > 65535) return t('vrf.validation.bgpNeighborAfWeightInvalid');
+        }
+      }
+      return '';
+    }
+
+    function getSingleChildKey(node) {
+      if (!node || typeof node !== 'object' || Array.isArray(node)) return '';
+      const keys = Object.keys(node).filter(Boolean);
+      return keys.length ? keys[0] : '';
+    }
+
+    function parseBgpCollectionsFromTree(bgp) {
+      const neighbors = [];
+      const peerGroups = [];
+      const listenRanges = [];
+      const interfaces = [];
+      const bmpTargets = [];
+
+      const neighborNode = bgp?.neighbor || {};
+      for (const [address, attrsRaw] of Object.entries(neighborNode)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const localAsNode = attrs['local-as'];
+        const localAs = typeof localAsNode === 'string' ? localAsNode : getSingleChildKey(localAsNode);
+        const localAsBranch = localAs && localAsNode && typeof localAsNode === 'object' ? (localAsNode[localAs] || {}) : {};
+        const localRoleNode = attrs['local-role'];
+        const localRole = typeof localRoleNode === 'string' ? localRoleNode : getSingleChildKey(localRoleNode);
+        const localRoleBranch = localRole && localRoleNode && typeof localRoleNode === 'object' ? (localRoleNode[localRole] || {}) : {};
+        const timersNode = attrs.timers && typeof attrs.timers === 'object' ? attrs.timers : {};
+        const ttlSecurityNode = attrs['ttl-security'] && typeof attrs['ttl-security'] === 'object' ? attrs['ttl-security'] : {};
+        const bfdNode = attrs.bfd && typeof attrs.bfd === 'object' ? attrs.bfd : null;
+        const capabilityNode = attrs.capability && typeof attrs.capability === 'object' ? attrs.capability : {};
+        const gracefulRestartNode = attrs['graceful-restart'] && typeof attrs['graceful-restart'] === 'object' ? attrs['graceful-restart'] : {};
+        const interfaceNode = attrs.interface && typeof attrs.interface === 'object' ? attrs.interface : {};
+        const pathAttributeNode = attrs['path-attribute'] && typeof attrs['path-attribute'] === 'object' ? attrs['path-attribute'] : {};
+        const interfaceV6OnlyNode = interfaceNode.v6only && typeof interfaceNode.v6only === 'object' ? interfaceNode.v6only : {};
+        const pathAttributeDiscardNode = pathAttributeNode.discard && typeof pathAttributeNode.discard === 'object' ? pathAttributeNode.discard : {};
+        const pathAttributeTreatAsWithdrawNode = pathAttributeNode['treat-as-withdraw'] && typeof pathAttributeNode['treat-as-withdraw'] === 'object'
+          ? pathAttributeNode['treat-as-withdraw']
+          : {};
+        const addressFamilyNode = attrs['address-family'] && typeof attrs['address-family'] === 'object' ? attrs['address-family'] : {};
+        const afPolicies = parseBgpAfPolicies(addressFamilyNode, BGP_NEIGHBOR_AF_KEYS);
+        neighbors.push({
+          __id: nextBgpRowId('neighbor'),
+          address,
+          remoteAs: normalizeNodeStringValue(attrs['remote-as']),
+          peerGroup: normalizeNodeStringValue(attrs['peer-group']),
+          description: normalizeNodeStringValue(attrs.description),
+          localAs: normalizeNodeStringValue(localAs),
+          localAsNoPrepend: !!(localAsBranch && typeof localAsBranch === 'object' && localAsBranch['no-prepend'] && typeof localAsBranch['no-prepend'] === 'object'),
+          localAsReplaceAs: !!(localAsBranch && typeof localAsBranch === 'object' && localAsBranch['no-prepend'] && typeof localAsBranch['no-prepend'] === 'object' && localAsBranch['no-prepend']['replace-as'] && typeof localAsBranch['no-prepend']['replace-as'] === 'object'),
+          localRole: normalizeNodeStringValue(localRole),
+          localRoleStrict: !!(localRoleBranch && typeof localRoleBranch === 'object' && localRoleBranch.strict && typeof localRoleBranch.strict === 'object'),
+          port: normalizeNodeStringValue(attrs.port),
+          advertisementInterval: normalizeNodeStringValue(attrs['advertisement-interval']),
+          ebgpMultihop: normalizeNodeStringValue(attrs['ebgp-multihop']),
+          password: normalizeNodeStringValue(attrs.password),
+          updateSource: normalizeNodeStringValue(attrs['update-source']),
+          ttlSecurityHops: normalizeNodeStringValue(ttlSecurityNode.hops),
+          timersConnect: normalizeNodeStringValue(timersNode.connect),
+          timersHoldtime: normalizeNodeStringValue(timersNode.holdtime),
+          timersKeepalive: normalizeNodeStringValue(timersNode.keepalive),
+          gracefulRestart: normalizeNodeStringValue(getSingleChildKey(gracefulRestartNode)),
+          bfd: !!bfdNode,
+          bfdCheckControlPlaneFailure: !!(bfdNode && bfdNode['check-control-plane-failure'] && typeof bfdNode['check-control-plane-failure'] === 'object'),
+          bfdProfile: normalizeNodeStringValue(bfdNode?.profile),
+          capabilityDynamic: !!(capabilityNode.dynamic && typeof capabilityNode.dynamic === 'object'),
+          capabilityExtendedNexthop: !!(capabilityNode['extended-nexthop'] && typeof capabilityNode['extended-nexthop'] === 'object'),
+          capabilitySoftwareVersion: !!(capabilityNode['software-version'] && typeof capabilityNode['software-version'] === 'object'),
+          passive: !!(attrs.passive && typeof attrs.passive === 'object'),
+          shutdown: !!(attrs.shutdown && typeof attrs.shutdown === 'object'),
+          solo: !!(attrs.solo && typeof attrs.solo === 'object'),
+          disableConnectedCheck: !!(attrs['disable-connected-check'] && typeof attrs['disable-connected-check'] === 'object'),
+          enforceFirstAs: !!(attrs['enforce-first-as'] && typeof attrs['enforce-first-as'] === 'object'),
+          disableCapabilityNegotiation: !!(attrs['disable-capability-negotiation'] && typeof attrs['disable-capability-negotiation'] === 'object'),
+          strictCapabilityMatch: !!(attrs['strict-capability-match'] && typeof attrs['strict-capability-match'] === 'object'),
+          overrideCapability: !!(attrs['override-capability'] && typeof attrs['override-capability'] === 'object'),
+          interfacePeerGroup: normalizeNodeStringValue(interfaceNode['peer-group']),
+          interfaceRemoteAs: normalizeNodeStringValue(interfaceNode['remote-as']),
+          interfaceSourceInterface: normalizeNodeStringValue(interfaceNode['source-interface']),
+          interfaceV6OnlyPeerGroup: normalizeNodeStringValue(interfaceV6OnlyNode['peer-group']),
+          interfaceV6OnlyRemoteAs: normalizeNodeStringValue(interfaceV6OnlyNode['remote-as']),
+          pathAttributeDiscard: Object.keys(pathAttributeDiscardNode).filter(Boolean).sort((a, b) => Number(a) - Number(b)).join(', '),
+          pathAttributeTreatAsWithdraw: Object.keys(pathAttributeTreatAsWithdrawNode).filter(Boolean).sort((a, b) => Number(a) - Number(b)).join(', '),
+          afPolicies,
+        });
+      }
+
+      const peerGroupNode = bgp?.['peer-group'] || {};
+      for (const [name, attrsRaw] of Object.entries(peerGroupNode)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const localAsNode = attrs['local-as'];
+        const localAs = typeof localAsNode === 'string' ? localAsNode : getSingleChildKey(localAsNode);
+        const localAsBranch = localAs && localAsNode && typeof localAsNode === 'object' ? (localAsNode[localAs] || {}) : {};
+        const localRoleNode = attrs['local-role'];
+        const localRole = typeof localRoleNode === 'string' ? localRoleNode : getSingleChildKey(localRoleNode);
+        const localRoleBranch = localRole && localRoleNode && typeof localRoleNode === 'object' ? (localRoleNode[localRole] || {}) : {};
+        const ttlSecurityNode = attrs['ttl-security'] && typeof attrs['ttl-security'] === 'object' ? attrs['ttl-security'] : {};
+        const bfdNode = attrs.bfd && typeof attrs.bfd === 'object' ? attrs.bfd : null;
+        const capabilityNode = attrs.capability && typeof attrs.capability === 'object' ? attrs.capability : {};
+        const gracefulRestartNode = attrs['graceful-restart'] && typeof attrs['graceful-restart'] === 'object' ? attrs['graceful-restart'] : {};
+        const pathAttributeNode = attrs['path-attribute'] && typeof attrs['path-attribute'] === 'object' ? attrs['path-attribute'] : {};
+        const pathAttributeDiscardNode = pathAttributeNode.discard && typeof pathAttributeNode.discard === 'object' ? pathAttributeNode.discard : {};
+        const pathAttributeTreatAsWithdrawNode = pathAttributeNode['treat-as-withdraw'] && typeof pathAttributeNode['treat-as-withdraw'] === 'object'
+          ? pathAttributeNode['treat-as-withdraw']
+          : {};
+        const addressFamilyNode = attrs['address-family'] && typeof attrs['address-family'] === 'object' ? attrs['address-family'] : {};
+        peerGroups.push({
+          __id: nextBgpRowId('peer-group'),
+          name,
+          remoteAs: normalizeNodeStringValue(attrs['remote-as']),
+          description: normalizeNodeStringValue(attrs.description),
+          localAs: normalizeNodeStringValue(localAs),
+          localAsNoPrepend: !!(localAsBranch && typeof localAsBranch === 'object' && localAsBranch['no-prepend'] && typeof localAsBranch['no-prepend'] === 'object'),
+          localAsReplaceAs: !!(localAsBranch && typeof localAsBranch === 'object' && localAsBranch['no-prepend'] && typeof localAsBranch['no-prepend'] === 'object' && localAsBranch['no-prepend']['replace-as'] && typeof localAsBranch['no-prepend']['replace-as'] === 'object'),
+          localRole: normalizeNodeStringValue(localRole),
+          localRoleStrict: !!(localRoleBranch && typeof localRoleBranch === 'object' && localRoleBranch.strict && typeof localRoleBranch.strict === 'object'),
+          port: normalizeNodeStringValue(attrs.port),
+          ebgpMultihop: normalizeNodeStringValue(attrs['ebgp-multihop']),
+          password: normalizeNodeStringValue(attrs.password),
+          updateSource: normalizeNodeStringValue(attrs['update-source']),
+          ttlSecurityHops: normalizeNodeStringValue(ttlSecurityNode.hops),
+          gracefulRestart: normalizeNodeStringValue(getSingleChildKey(gracefulRestartNode)),
+          bfd: !!bfdNode,
+          bfdCheckControlPlaneFailure: !!(bfdNode && bfdNode['check-control-plane-failure'] && typeof bfdNode['check-control-plane-failure'] === 'object'),
+          bfdProfile: normalizeNodeStringValue(bfdNode?.profile),
+          capabilityDynamic: !!(capabilityNode.dynamic && typeof capabilityNode.dynamic === 'object'),
+          capabilityExtendedNexthop: !!(capabilityNode['extended-nexthop'] && typeof capabilityNode['extended-nexthop'] === 'object'),
+          capabilitySoftwareVersion: !!(capabilityNode['software-version'] && typeof capabilityNode['software-version'] === 'object'),
+          passive: !!(attrs.passive && typeof attrs.passive === 'object'),
+          shutdown: !!(attrs.shutdown && typeof attrs.shutdown === 'object'),
+          solo: !!(attrs.solo && typeof attrs.solo === 'object'),
+          disableConnectedCheck: !!(attrs['disable-connected-check'] && typeof attrs['disable-connected-check'] === 'object'),
+          disableCapabilityNegotiation: !!(attrs['disable-capability-negotiation'] && typeof attrs['disable-capability-negotiation'] === 'object'),
+          overrideCapability: !!(attrs['override-capability'] && typeof attrs['override-capability'] === 'object'),
+          pathAttributeDiscard: Object.keys(pathAttributeDiscardNode).filter(Boolean).sort((a, b) => Number(a) - Number(b)).join(', '),
+          pathAttributeTreatAsWithdraw: Object.keys(pathAttributeTreatAsWithdrawNode).filter(Boolean).sort((a, b) => Number(a) - Number(b)).join(', '),
+          afPolicies: parseBgpAfPolicies(addressFamilyNode, BGP_PEER_GROUP_AF_KEYS),
+        });
+      }
+
+      const listenNode = bgp?.listen?.range || {};
+      for (const [range, attrsRaw] of Object.entries(listenNode)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        listenRanges.push({
+          __id: nextBgpRowId('listen'),
+          range,
+          peerGroup: normalizeNodeStringValue(attrs['peer-group']),
+        });
+      }
+
+      const interfaceNode = bgp?.interface || {};
+      for (const [name, attrsRaw] of Object.entries(interfaceNode)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        interfaces.push({
+          __id: nextBgpRowId('interface'),
+          name,
+          peerGroup: normalizeNodeStringValue(attrs['peer-group']),
+          mplsForwarding: !!(attrs?.mpls && typeof attrs.mpls === 'object' && attrs.mpls.forwarding && typeof attrs.mpls.forwarding === 'object'),
+        });
+      }
+
+      const bmpNode = bgp?.bmp?.target || {};
+      for (const [name, attrsRaw] of Object.entries(bmpNode)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const monitorV4 = attrs.monitor && typeof attrs.monitor === 'object' && attrs.monitor['ipv4-unicast'] && typeof attrs.monitor['ipv4-unicast'] === 'object'
+          ? attrs.monitor['ipv4-unicast']
+          : {};
+        const monitorV6 = attrs.monitor && typeof attrs.monitor === 'object' && attrs.monitor['ipv6-unicast'] && typeof attrs.monitor['ipv6-unicast'] === 'object'
+          ? attrs.monitor['ipv6-unicast']
+          : {};
+        bmpTargets.push({
+          __id: nextBgpRowId('bmp-target'),
+          name,
+          address: normalizeNodeStringValue(attrs.address),
+          port: normalizeNodeStringValue(attrs.port),
+          minRetry: normalizeNodeStringValue(attrs['min-retry']),
+          maxRetry: normalizeNodeStringValue(attrs['max-retry']),
+          mirror: !!(attrs.mirror && typeof attrs.mirror === 'object'),
+          monitorV4LocalRib: !!(monitorV4['local-rib'] && typeof monitorV4['local-rib'] === 'object'),
+          monitorV4PostPolicy: !!(monitorV4['post-policy'] && typeof monitorV4['post-policy'] === 'object'),
+          monitorV4PrePolicy: !!(monitorV4['pre-policy'] && typeof monitorV4['pre-policy'] === 'object'),
+          monitorV6LocalRib: !!(monitorV6['local-rib'] && typeof monitorV6['local-rib'] === 'object'),
+          monitorV6PostPolicy: !!(monitorV6['post-policy'] && typeof monitorV6['post-policy'] === 'object'),
+          monitorV6PrePolicy: !!(monitorV6['pre-policy'] && typeof monitorV6['pre-policy'] === 'object'),
+        });
+      }
+
+      return {
+        neighbors: neighbors.sort((a, b) => a.address.localeCompare(b.address)),
+        peerGroups: peerGroups.sort((a, b) => a.name.localeCompare(b.name)),
+        listenRanges: listenRanges.sort((a, b) => a.range.localeCompare(b.range)),
+        interfaces: interfaces.sort((a, b) => a.name.localeCompare(b.name)),
+        bmpTargets: bmpTargets.sort((a, b) => a.name.localeCompare(b.name)),
+      };
+    }
+
+    function buildBgpCliTextFromCollections(v) {
+      const originalLines = String(v.bgpCliText || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const filtered = originalLines.filter(line => !(
+        line.startsWith('neighbor ') ||
+        line.startsWith('peer-group ') ||
+        line.startsWith('listen range ') ||
+        line.startsWith('interface ') ||
+        line.startsWith('bmp target ')
+      ));
+
+      for (const n of (v.bgpNeighbors || [])) {
+        const address = String(n.address || '').trim();
+        if (!address) continue;
+        const remoteAs = String(n.remoteAs || '').trim();
+        const peerGroup = String(n.peerGroup || '').trim();
+        const description = String(n.description || '').trim();
+        const localAs = String(n.localAs || '').trim();
+        const localRole = String(n.localRole || '').trim();
+        const port = String(n.port || '').trim();
+        const advertisementInterval = String(n.advertisementInterval || '').trim();
+        const ebgpMultihop = String(n.ebgpMultihop || '').trim();
+        const password = String(n.password || '').trim();
+        const updateSource = String(n.updateSource || '').trim();
+        const ttlSecurityHops = String(n.ttlSecurityHops || '').trim();
+        const timersConnect = String(n.timersConnect || '').trim();
+        const timersHoldtime = String(n.timersHoldtime || '').trim();
+        const timersKeepalive = String(n.timersKeepalive || '').trim();
+        const gracefulRestart = String(n.gracefulRestart || '').trim();
+        if (remoteAs) filtered.push(`neighbor ${address} remote-as = ${remoteAs}`);
+        if (peerGroup) filtered.push(`neighbor ${address} peer-group = ${peerGroup}`);
+        if (description) filtered.push(`neighbor ${address} description = ${description}`);
+        if (localAs) filtered.push(`neighbor ${address} local-as ${localAs}`);
+        if (localAs && n.localAsReplaceAs) filtered.push(`neighbor ${address} local-as ${localAs} no-prepend replace-as`);
+        else if (localAs && n.localAsNoPrepend) filtered.push(`neighbor ${address} local-as ${localAs} no-prepend`);
+        if (localRole) filtered.push(`neighbor ${address} local-role ${localRole}`);
+        if (localRole && n.localRoleStrict) filtered.push(`neighbor ${address} local-role ${localRole} strict`);
+        if (port) filtered.push(`neighbor ${address} port = ${port}`);
+        if (advertisementInterval) filtered.push(`neighbor ${address} advertisement-interval = ${advertisementInterval}`);
+        if (ebgpMultihop) filtered.push(`neighbor ${address} ebgp-multihop = ${ebgpMultihop}`);
+        if (password) filtered.push(`neighbor ${address} password = ${password}`);
+        if (updateSource) filtered.push(`neighbor ${address} update-source = ${updateSource}`);
+        if (ttlSecurityHops) filtered.push(`neighbor ${address} ttl-security hops = ${ttlSecurityHops}`);
+        if (timersConnect) filtered.push(`neighbor ${address} timers connect = ${timersConnect}`);
+        if (timersHoldtime) filtered.push(`neighbor ${address} timers holdtime = ${timersHoldtime}`);
+        if (timersKeepalive) filtered.push(`neighbor ${address} timers keepalive = ${timersKeepalive}`);
+        if (gracefulRestart) filtered.push(`neighbor ${address} graceful-restart ${gracefulRestart}`);
+        if (n.bfd) filtered.push(`neighbor ${address} bfd`);
+        if (n.bfdCheckControlPlaneFailure) filtered.push(`neighbor ${address} bfd check-control-plane-failure`);
+        if (String(n.bfdProfile || '').trim()) filtered.push(`neighbor ${address} bfd profile = ${String(n.bfdProfile).trim()}`);
+        if (n.capabilityDynamic) filtered.push(`neighbor ${address} capability dynamic`);
+        if (n.capabilityExtendedNexthop) filtered.push(`neighbor ${address} capability extended-nexthop`);
+        if (n.capabilitySoftwareVersion) filtered.push(`neighbor ${address} capability software-version`);
+        if (n.passive) filtered.push(`neighbor ${address} passive`);
+        if (n.shutdown) filtered.push(`neighbor ${address} shutdown`);
+        if (n.solo) filtered.push(`neighbor ${address} solo`);
+        if (n.disableConnectedCheck) filtered.push(`neighbor ${address} disable-connected-check`);
+        if (n.enforceFirstAs) filtered.push(`neighbor ${address} enforce-first-as`);
+        if (n.disableCapabilityNegotiation) filtered.push(`neighbor ${address} disable-capability-negotiation`);
+        if (n.strictCapabilityMatch) filtered.push(`neighbor ${address} strict-capability-match`);
+        if (n.overrideCapability) filtered.push(`neighbor ${address} override-capability`);
+
+        const interfacePeerGroup = String(n.interfacePeerGroup || '').trim();
+        const interfaceRemoteAs = String(n.interfaceRemoteAs || '').trim();
+        const interfaceSourceInterface = String(n.interfaceSourceInterface || '').trim();
+        const interfaceV6OnlyPeerGroup = String(n.interfaceV6OnlyPeerGroup || '').trim();
+        const interfaceV6OnlyRemoteAs = String(n.interfaceV6OnlyRemoteAs || '').trim();
+        if (interfacePeerGroup) filtered.push(`neighbor ${address} interface peer-group = ${interfacePeerGroup}`);
+        if (interfaceRemoteAs) filtered.push(`neighbor ${address} interface remote-as = ${interfaceRemoteAs}`);
+        if (interfaceSourceInterface) filtered.push(`neighbor ${address} interface source-interface = ${interfaceSourceInterface}`);
+        if (interfaceV6OnlyPeerGroup) filtered.push(`neighbor ${address} interface v6only peer-group = ${interfaceV6OnlyPeerGroup}`);
+        if (interfaceV6OnlyRemoteAs) filtered.push(`neighbor ${address} interface v6only remote-as = ${interfaceV6OnlyRemoteAs}`);
+
+        const pathAttributeDiscardList = String(n.pathAttributeDiscard || '').split(/[\s,]+/).map(v => v.trim()).filter(Boolean);
+        for (const attr of pathAttributeDiscardList) {
+          filtered.push(`neighbor ${address} path-attribute discard ${attr}`);
+        }
+        const pathAttributeTreatAsWithdrawList = String(n.pathAttributeTreatAsWithdraw || '').split(/[\s,]+/).map(v => v.trim()).filter(Boolean);
+        for (const attr of pathAttributeTreatAsWithdrawList) {
+          filtered.push(`neighbor ${address} path-attribute treat-as-withdraw ${attr}`);
+        }
+
+        for (const afKey of BGP_NEIGHBOR_AF_KEYS) {
+          const p = n.afPolicies?.[afKey];
+          if (!p || typeof p !== 'object') continue;
+          const afPrefix = `neighbor ${address} address-family ${afKey}`;
+          appendBgpAfPolicyCli(filtered, afPrefix, p);
+        }
+      }
+
+      for (const pg of (v.bgpPeerGroups || [])) {
+        const name = String(pg.name || '').trim();
+        if (!name) continue;
+        const remoteAs = String(pg.remoteAs || '').trim();
+        const description = String(pg.description || '').trim();
+        const localAs = String(pg.localAs || '').trim();
+        const localRole = String(pg.localRole || '').trim();
+        const port = String(pg.port || '').trim();
+        const ebgpMultihop = String(pg.ebgpMultihop || '').trim();
+        const password = String(pg.password || '').trim();
+        const updateSource = String(pg.updateSource || '').trim();
+        const ttlSecurityHops = String(pg.ttlSecurityHops || '').trim();
+        const gracefulRestart = String(pg.gracefulRestart || '').trim();
+        if (remoteAs) filtered.push(`peer-group ${name} remote-as = ${remoteAs}`);
+        if (description) filtered.push(`peer-group ${name} description = ${description}`);
+        if (localAs) filtered.push(`peer-group ${name} local-as ${localAs}`);
+        if (localAs && pg.localAsReplaceAs) filtered.push(`peer-group ${name} local-as ${localAs} no-prepend replace-as`);
+        else if (localAs && pg.localAsNoPrepend) filtered.push(`peer-group ${name} local-as ${localAs} no-prepend`);
+        if (localRole) filtered.push(`peer-group ${name} local-role ${localRole}`);
+        if (localRole && pg.localRoleStrict) filtered.push(`peer-group ${name} local-role ${localRole} strict`);
+        if (port) filtered.push(`peer-group ${name} port = ${port}`);
+        if (ebgpMultihop) filtered.push(`peer-group ${name} ebgp-multihop = ${ebgpMultihop}`);
+        if (password) filtered.push(`peer-group ${name} password = ${password}`);
+        if (updateSource) filtered.push(`peer-group ${name} update-source = ${updateSource}`);
+        if (ttlSecurityHops) filtered.push(`peer-group ${name} ttl-security hops = ${ttlSecurityHops}`);
+        if (gracefulRestart) filtered.push(`peer-group ${name} graceful-restart ${gracefulRestart}`);
+        if (pg.bfd) filtered.push(`peer-group ${name} bfd`);
+        if (pg.bfdCheckControlPlaneFailure) filtered.push(`peer-group ${name} bfd check-control-plane-failure`);
+        if (String(pg.bfdProfile || '').trim()) filtered.push(`peer-group ${name} bfd profile = ${String(pg.bfdProfile).trim()}`);
+        if (pg.capabilityDynamic) filtered.push(`peer-group ${name} capability dynamic`);
+        if (pg.capabilityExtendedNexthop) filtered.push(`peer-group ${name} capability extended-nexthop`);
+        if (pg.capabilitySoftwareVersion) filtered.push(`peer-group ${name} capability software-version`);
+        if (pg.passive) filtered.push(`peer-group ${name} passive`);
+        if (pg.shutdown) filtered.push(`peer-group ${name} shutdown`);
+        if (pg.solo) filtered.push(`peer-group ${name} solo`);
+        if (pg.disableConnectedCheck) filtered.push(`peer-group ${name} disable-connected-check`);
+        if (pg.disableCapabilityNegotiation) filtered.push(`peer-group ${name} disable-capability-negotiation`);
+        if (pg.overrideCapability) filtered.push(`peer-group ${name} override-capability`);
+
+        const pathAttributeDiscardList = String(pg.pathAttributeDiscard || '').split(/[\s,]+/).map(v => v.trim()).filter(Boolean);
+        for (const attr of pathAttributeDiscardList) {
+          filtered.push(`peer-group ${name} path-attribute discard ${attr}`);
+        }
+        const pathAttributeTreatAsWithdrawList = String(pg.pathAttributeTreatAsWithdraw || '').split(/[\s,]+/).map(v => v.trim()).filter(Boolean);
+        for (const attr of pathAttributeTreatAsWithdrawList) {
+          filtered.push(`peer-group ${name} path-attribute treat-as-withdraw ${attr}`);
+        }
+
+        for (const afKey of BGP_PEER_GROUP_AF_KEYS) {
+          const p = pg.afPolicies?.[afKey];
+          if (!p || typeof p !== 'object') continue;
+          appendBgpAfPolicyCli(filtered, `peer-group ${name} address-family ${afKey}`, p);
+        }
+      }
+
+      for (const lr of (v.bgpListenRanges || [])) {
+        const range = String(lr.range || '').trim();
+        if (!range) continue;
+        const peerGroup = String(lr.peerGroup || '').trim();
+        if (peerGroup) filtered.push(`listen range ${range} peer-group = ${peerGroup}`);
+      }
+
+      for (const itf of (v.bgpInterfaces || [])) {
+        const name = String(itf.name || '').trim();
+        if (!name) continue;
+        const peerGroup = String(itf.peerGroup || '').trim();
+        if (peerGroup) filtered.push(`interface ${name} peer-group = ${peerGroup}`);
+        if (itf.mplsForwarding) filtered.push(`interface ${name} mpls forwarding`);
+      }
+
+      for (const bmp of (v.bgpBmpTargets || [])) {
+        const name = String(bmp.name || '').trim();
+        if (!name) continue;
+        const address = String(bmp.address || '').trim();
+        const port = String(bmp.port || '').trim();
+        const minRetry = String(bmp.minRetry || '').trim();
+        const maxRetry = String(bmp.maxRetry || '').trim();
+        if (address) filtered.push(`bmp target ${name} address = ${address}`);
+        if (port) filtered.push(`bmp target ${name} port = ${port}`);
+        if (minRetry) filtered.push(`bmp target ${name} min-retry = ${minRetry}`);
+        if (maxRetry) filtered.push(`bmp target ${name} max-retry = ${maxRetry}`);
+        if (bmp.mirror) filtered.push(`bmp target ${name} mirror`);
+        if (bmp.monitorV4LocalRib) filtered.push(`bmp target ${name} monitor ipv4-unicast local-rib`);
+        if (bmp.monitorV4PostPolicy) filtered.push(`bmp target ${name} monitor ipv4-unicast post-policy`);
+        if (bmp.monitorV4PrePolicy) filtered.push(`bmp target ${name} monitor ipv4-unicast pre-policy`);
+        if (bmp.monitorV6LocalRib) filtered.push(`bmp target ${name} monitor ipv6-unicast local-rib`);
+        if (bmp.monitorV6PostPolicy) filtered.push(`bmp target ${name} monitor ipv6-unicast post-policy`);
+        if (bmp.monitorV6PrePolicy) filtered.push(`bmp target ${name} monitor ipv6-unicast pre-policy`);
+      }
+
+      return filtered.join('\n');
+    }
+
+    function parseOspfAreaRanges(rangeNode) {
+      const rows = [];
+      const node = rangeNode && typeof rangeNode === 'object' ? rangeNode : {};
+      for (const [prefix, attrsRaw] of Object.entries(node)) {
+        if (!prefix) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const cost = normalizeNodeStringValue(attrs.cost);
+        const substitute = normalizeNodeStringValue(attrs.substitute);
+        rows.push({
+          __id: nextBgpRowId('ospf-range'),
+          prefix,
+          cost,
+          notAdvertise: !!(attrs['not-advertise'] && typeof attrs['not-advertise'] === 'object'),
+          substitute,
+        });
+      }
+      return rows.sort((a, b) => String(a.prefix || '').localeCompare(String(b.prefix || '')));
+    }
+
+    function parseOspfAreaRangesText(text) {
+      const rows = [];
+      const lines = String(text || '').split('\n').map(line => line.trim()).filter(Boolean);
+      lines.forEach((line) => {
+        const tokens = line.split(/\s+/).filter(Boolean);
+        const prefix = tokens.shift();
+        if (!prefix) return;
+        const row = {
+          __id: nextBgpRowId('ospf-range'),
+          prefix,
+          cost: '',
+          notAdvertise: false,
+          substitute: '',
+        };
+        tokens.forEach((token) => {
+          if (token === 'not-advertise') {
+            row.notAdvertise = true;
+            return;
+          }
+          const eqPos = token.indexOf('=');
+          if (eqPos <= 0) return;
+          const k = token.slice(0, eqPos).trim();
+          const val = token.slice(eqPos + 1).trim();
+          if (!k || !val) return;
+          if (k === 'cost') row.cost = val;
+          if (k === 'substitute') row.substitute = val;
+        });
+        rows.push(row);
+      });
+      return rows;
+    }
+
+    function parseOspfAreaVirtualLinks(vlNode) {
+      const rows = [];
+      const node = vlNode && typeof vlNode === 'object' ? vlNode : {};
+      for (const [peer, attrsRaw] of Object.entries(node)) {
+        if (!peer) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const deadInterval = normalizeNodeStringValue(attrs['dead-interval']);
+        const helloInterval = normalizeNodeStringValue(attrs['hello-interval']);
+        const retransmitInterval = normalizeNodeStringValue(attrs['retransmit-interval']);
+        const retransmitWindow = normalizeNodeStringValue(attrs['retransmit-window']);
+        const transmitDelay = normalizeNodeStringValue(attrs['transmit-delay']);
+        const authNode = attrs.authentication && typeof attrs.authentication === 'object' ? attrs.authentication : {};
+        const plaintext = normalizeNodeStringValue(authNode['plaintext-password']);
+        const row = {
+          __id: nextBgpRowId('ospf-vl'),
+          peer,
+          authenticationType: '',
+          md5KeyId: '',
+          md5Key: '',
+          plaintextPassword: '',
+          deadInterval,
+          helloInterval,
+          retransmitInterval,
+          retransmitWindow,
+          transmitDelay,
+        };
+        if (plaintext) {
+          row.authenticationType = 'plaintext-password';
+          row.plaintextPassword = plaintext;
+        }
+        const md5KeyIds = authNode?.md5?.['key-id'] && typeof authNode.md5['key-id'] === 'object'
+          ? authNode.md5['key-id']
+          : {};
+        for (const [keyId, md5AttrsRaw] of Object.entries(md5KeyIds)) {
+          const md5Attrs = md5AttrsRaw && typeof md5AttrsRaw === 'object' ? md5AttrsRaw : {};
+          const md5Key = normalizeNodeStringValue(md5Attrs['md5-key']);
+          if (keyId && md5Key) {
+            row.authenticationType = 'md5';
+            row.md5KeyId = keyId;
+            row.md5Key = md5Key;
+            break;
+          }
+        }
+        rows.push(row);
+      }
+      return rows.sort((a, b) => String(a.peer || '').localeCompare(String(b.peer || '')));
+    }
+
+    function parseOspfCollectionsFromTree(ospf) {
+      const areas = [];
+      const interfaces = [];
+      const accessLists = [];
+      const neighbors = [];
+      const summaryAddresses = [];
+      const redistribute = createOspfRedistributeDraft();
+      const segmentRouting = {
+        globalBlockLowLabelValue: '',
+        globalBlockHighLabelValue: '',
+        localBlockLowLabelValue: '',
+        localBlockHighLabelValue: '',
+        maximumLabelDepth: '',
+        prefixes: [],
+      };
+      const areaNode = ospf?.area || {};
+      for (const [area, attrsRaw] of Object.entries(areaNode)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const areaTypeNode = attrs['area-type'] && typeof attrs['area-type'] === 'object' ? attrs['area-type'] : {};
+        const nssaNode = areaTypeNode.nssa && typeof areaTypeNode.nssa === 'object' ? areaTypeNode.nssa : {};
+        const stubNode = areaTypeNode.stub && typeof areaTypeNode.stub === 'object' ? areaTypeNode.stub : {};
+        const authNode = attrs.authentication && typeof attrs.authentication === 'object' ? attrs.authentication : {};
+        const networks = normalizeLeafSet(attrs.network);
+        const authenticationType = authNode['plaintext-password'] ? 'plaintext-password' : (authNode.md5 ? 'md5' : '');
+        areas.push({
+          __id: nextBgpRowId('ospf-area'),
+          area,
+          areaType: areaTypeNode.normal ? 'normal' : (areaTypeNode.nssa ? 'nssa' : (areaTypeNode.stub ? 'stub' : '')),
+          nssaDefaultCost: normalizeNodeStringValue(nssaNode['default-cost']),
+          nssaNoSummary: !!(nssaNode['no-summary'] && typeof nssaNode['no-summary'] === 'object'),
+          nssaTranslate: nssaNode.translate && typeof nssaNode.translate === 'object' ? (Object.keys(nssaNode.translate).find(Boolean) || '') : '',
+          stubDefaultCost: normalizeNodeStringValue(stubNode['default-cost']),
+          stubNoSummary: !!(stubNode['no-summary'] && typeof stubNode['no-summary'] === 'object'),
+          authenticationType,
+          authenticationPlaintextPassword: normalizeNodeStringValue(authNode['plaintext-password']),
+          exportList: normalizeNodeStringValue(attrs['export-list']),
+          importList: normalizeNodeStringValue(attrs['import-list']),
+          shortcut: attrs.shortcut && typeof attrs.shortcut === 'object' ? (Object.keys(attrs.shortcut).find(Boolean) || '') : '',
+          networksText: networks.join(', '),
+          ranges: parseOspfAreaRanges(attrs.range),
+          virtualLinks: parseOspfAreaVirtualLinks(attrs['virtual-link']),
+        });
+      }
+      const intfNode = ospf?.interface || {};
+      for (const [name, attrsRaw] of Object.entries(intfNode)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const authNode = attrs.authentication && typeof attrs.authentication === 'object' ? attrs.authentication : {};
+        const bfdNode = attrs.bfd && typeof attrs.bfd === 'object' ? attrs.bfd : {};
+        const ldpSyncNode = attrs['ldp-sync'] && typeof attrs['ldp-sync'] === 'object' ? attrs['ldp-sync'] : {};
+        const passiveNode = attrs.passive && typeof attrs.passive === 'object' ? attrs.passive : {};
+        let authenticationType = '';
+        let md5KeyId = '';
+        let md5Key = '';
+        let plaintextPassword = '';
+        const authPlaintext = normalizeNodeStringValue(authNode['plaintext-password']);
+        if (authPlaintext) {
+          authenticationType = 'plaintext-password';
+          plaintextPassword = authPlaintext;
+        }
+        const md5KeyIds = authNode?.md5?.['key-id'] && typeof authNode.md5['key-id'] === 'object'
+          ? authNode.md5['key-id']
+          : {};
+        for (const [keyId, md5AttrsRaw] of Object.entries(md5KeyIds)) {
+          const md5Attrs = md5AttrsRaw && typeof md5AttrsRaw === 'object' ? md5AttrsRaw : {};
+          const parsedKey = normalizeNodeStringValue(md5Attrs['md5-key']);
+          if (keyId && parsedKey) {
+            authenticationType = 'md5';
+            md5KeyId = keyId;
+            md5Key = parsedKey;
+            break;
+          }
+        }
+        const ldpSyncHolddown = normalizeNodeStringValue(ldpSyncNode.holddown);
+        const ldpSyncMode = ldpSyncNode.disable && typeof ldpSyncNode.disable === 'object'
+          ? 'disable'
+          : (Object.keys(ldpSyncNode).length ? 'enable' : '');
+        const passiveMode = passiveNode.disable && typeof passiveNode.disable === 'object'
+          ? 'disable'
+          : (Object.keys(passiveNode).length ? 'enable' : '');
+        interfaces.push({
+          __id: nextBgpRowId('ospf-if'),
+          name,
+          area: normalizeNodeStringValue(attrs.area),
+          authenticationType,
+          md5KeyId,
+          md5Key,
+          plaintextPassword,
+          bandwidth: normalizeNodeStringValue(attrs.bandwidth),
+          bfdProfile: normalizeNodeStringValue(bfdNode.profile),
+          cost: normalizeNodeStringValue(attrs.cost),
+          deadInterval: normalizeNodeStringValue(attrs['dead-interval']),
+          helloInterval: normalizeNodeStringValue(attrs['hello-interval']),
+          helloMultiplier: normalizeNodeStringValue(attrs['hello-multiplier']),
+          ldpSyncMode,
+          ldpSyncHolddown,
+          mtuIgnore: !!(attrs['mtu-ignore'] && typeof attrs['mtu-ignore'] === 'object'),
+          network: attrs.network && typeof attrs.network === 'object' ? (Object.keys(attrs.network).find(Boolean) || '') : normalizeNodeStringValue(attrs.network),
+          passiveMode,
+          priority: normalizeNodeStringValue(attrs.priority),
+          retransmitInterval: normalizeNodeStringValue(attrs['retransmit-interval']),
+          retransmitWindow: normalizeNodeStringValue(attrs['retransmit-window']),
+          transmitDelay: normalizeNodeStringValue(attrs['transmit-delay']),
+        });
+      }
+      const accessListNode = ospf?.['access-list'] || {};
+      for (const [number, attrsRaw] of Object.entries(accessListNode)) {
+        if (!number) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const exportNode = attrs.export && typeof attrs.export === 'object' ? attrs.export : {};
+        const exportProtocols = ['bgp', 'connected', 'isis', 'kernel', 'rip', 'static']
+          .filter(protocol => exportNode[protocol] && typeof exportNode[protocol] === 'object');
+        accessLists.push({
+          __id: nextBgpRowId('ospf-acl'),
+          number,
+          exportProtocols,
+        });
+      }
+      const neighborNode = ospf?.neighbor || {};
+      for (const [address, attrsRaw] of Object.entries(neighborNode)) {
+        if (!address) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        neighbors.push({
+          __id: nextBgpRowId('ospf-nbr'),
+          address,
+          pollInterval: normalizeNodeStringValue(attrs['poll-interval']),
+          priority: normalizeNodeStringValue(attrs.priority),
+        });
+      }
+      const summaryAddressNode = ospf?.['summary-address'] || {};
+      for (const [prefix, attrsRaw] of Object.entries(summaryAddressNode)) {
+        if (!prefix) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const tagNode = attrs.tag;
+        let tag = '';
+        if (typeof tagNode === 'string' || typeof tagNode === 'number') {
+          tag = String(tagNode).trim();
+        } else if (tagNode && typeof tagNode === 'object') {
+          tag = Object.keys(tagNode).find(Boolean) || '';
+        }
+        summaryAddresses.push({
+          __id: nextBgpRowId('ospf-sum'),
+          prefix,
+          noAdvertise: !!(attrs['no-advertise'] && typeof attrs['no-advertise'] === 'object'),
+          tag: String(tag || '').trim(),
+        });
+      }
+      const srNode = ospf?.['segment-routing'] && typeof ospf['segment-routing'] === 'object'
+        ? ospf['segment-routing']
+        : {};
+      const globalBlockNode = srNode['global-block'] && typeof srNode['global-block'] === 'object'
+        ? srNode['global-block']
+        : {};
+      const localBlockNode = srNode['local-block'] && typeof srNode['local-block'] === 'object'
+        ? srNode['local-block']
+        : {};
+      segmentRouting.globalBlockLowLabelValue = normalizeNodeStringValue(globalBlockNode['low-label-value']);
+      segmentRouting.globalBlockHighLabelValue = normalizeNodeStringValue(globalBlockNode['high-label-value']);
+      segmentRouting.localBlockLowLabelValue = normalizeNodeStringValue(localBlockNode['low-label-value']);
+      segmentRouting.localBlockHighLabelValue = normalizeNodeStringValue(localBlockNode['high-label-value']);
+      segmentRouting.maximumLabelDepth = normalizeNodeStringValue(srNode['maximum-label-depth']);
+
+      const srPrefixNode = srNode.prefix && typeof srNode.prefix === 'object' ? srNode.prefix : {};
+      for (const [prefix, attrsRaw] of Object.entries(srPrefixNode)) {
+        if (!prefix) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const indexNode = attrs.index && typeof attrs.index === 'object' ? attrs.index : {};
+        const valueNode = indexNode.value;
+        let indexValue = '';
+        if (typeof valueNode === 'string' || typeof valueNode === 'number') {
+          indexValue = String(valueNode).trim();
+        } else if (valueNode && typeof valueNode === 'object') {
+          indexValue = Object.keys(valueNode).find(Boolean) || '';
+        }
+        segmentRouting.prefixes.push({
+          __id: nextBgpRowId('ospf-sr-prefix'),
+          prefix,
+          explicitNull: !!(indexNode['explicit-null'] && typeof indexNode['explicit-null'] === 'object'),
+          noPhpFlag: !!(indexNode['no-php-flag'] && typeof indexNode['no-php-flag'] === 'object'),
+          indexValue: String(indexValue || '').trim(),
+        });
+      }
+      segmentRouting.prefixes = segmentRouting.prefixes.sort((a, b) => String(a.prefix || '').localeCompare(String(b.prefix || '')));
+
+      const redistributeNode = ospf?.redistribute && typeof ospf.redistribute === 'object'
+        ? ospf.redistribute
+        : {};
+      for (const protocol of OSPF_REDISTRIBUTE_PROTOCOLS) {
+        const protoNode = redistributeNode?.[protocol] && typeof redistributeNode[protocol] === 'object'
+          ? redistributeNode[protocol]
+          : null;
+        if (!protoNode) continue;
+        const target = redistribute[protocol];
+        target.enabled = true;
+        target.metric = normalizeNodeStringValue(protoNode.metric);
+        target.metricType = normalizeNodeStringValue(protoNode['metric-type']);
+        target.routeMap = normalizeNodeStringValue(protoNode['route-map']);
+      }
+
+      const tableNode = redistributeNode?.table && typeof redistributeNode.table === 'object'
+        ? redistributeNode.table
+        : {};
+      for (const [tableId, attrsRaw] of Object.entries(tableNode)) {
+        if (!tableId) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        redistribute.tables.push({
+          __id: nextBgpRowId('ospf-redist-table'),
+          table: tableId,
+          metric: normalizeNodeStringValue(attrs.metric),
+          metricType: normalizeNodeStringValue(attrs['metric-type']),
+          routeMap: normalizeNodeStringValue(attrs['route-map']),
+        });
+      }
+      redistribute.tables = redistribute.tables.sort((a, b) => Number(a.table) - Number(b.table));
+
+      return {
+        areas: areas.sort((a, b) => a.area.localeCompare(b.area)),
+        interfaces: interfaces.sort((a, b) => a.name.localeCompare(b.name)),
+        accessLists: accessLists.sort((a, b) => String(a.number || '').localeCompare(String(b.number || ''))),
+        neighbors: neighbors.sort((a, b) => String(a.address || '').localeCompare(String(b.address || ''))),
+        summaryAddresses: summaryAddresses.sort((a, b) => String(a.prefix || '').localeCompare(String(b.prefix || ''))),
+        redistribute,
+        segmentRouting,
+      };
+    }
+
+    function parseOspfv3CollectionsFromTree(ospfv3) {
+      const areas = [];
+      const interfaces = [];
+      const redistribute = createOspfv3RedistributeDraft();
+      const areaNode = ospfv3?.area || {};
+      for (const [area, attrsRaw] of Object.entries(areaNode)) {
+        if (!area) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const areaTypeNode = attrs['area-type'] && typeof attrs['area-type'] === 'object'
+          ? attrs['area-type']
+          : {};
+        const nssaNode = areaTypeNode.nssa && typeof areaTypeNode.nssa === 'object'
+          ? areaTypeNode.nssa
+          : {};
+        const stubNode = areaTypeNode.stub && typeof areaTypeNode.stub === 'object'
+          ? areaTypeNode.stub
+          : {};
+        const rangeNode = attrs.range && typeof attrs.range === 'object' ? attrs.range : {};
+        const ranges = [];
+        for (const [prefix, rangeAttrsRaw] of Object.entries(rangeNode)) {
+          if (!prefix) continue;
+          const rangeAttrs = rangeAttrsRaw && typeof rangeAttrsRaw === 'object' ? rangeAttrsRaw : {};
+          let action = '';
+          if (rangeAttrs['not-advertise'] && typeof rangeAttrs['not-advertise'] === 'object') {
+            action = 'not-advertise';
+          } else if (rangeAttrs.advertise && typeof rangeAttrs.advertise === 'object') {
+            action = 'advertise';
+          }
+          ranges.push({
+            __id: nextBgpRowId('ospfv3-area-range'),
+            prefix,
+            action,
+          });
+        }
+        areas.push({
+          __id: nextBgpRowId('ospfv3-area'),
+          area,
+          areaType: areaTypeNode.nssa ? 'nssa' : (areaTypeNode.stub ? 'stub' : ''),
+          nssaDefaultInformationOriginate: !!(nssaNode['default-information-originate'] && typeof nssaNode['default-information-originate'] === 'object'),
+          nssaNoSummary: !!(nssaNode['no-summary'] && typeof nssaNode['no-summary'] === 'object'),
+          stubNoSummary: !!(stubNode['no-summary'] && typeof stubNode['no-summary'] === 'object'),
+          exportList: normalizeNodeStringValue(attrs['export-list']),
+          importList: normalizeNodeStringValue(attrs['import-list']),
+          ranges: ranges.sort((a, b) => String(a.prefix || '').localeCompare(String(b.prefix || ''))),
+        });
+      }
+      const intfNode = ospfv3?.interface || {};
+      for (const [name, attrsRaw] of Object.entries(intfNode)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const bfdNode = attrs.bfd && typeof attrs.bfd === 'object' ? attrs.bfd : {};
+        let network = '';
+        if (attrs.network && typeof attrs.network === 'object') {
+          network = Object.keys(attrs.network).find(Boolean) || '';
+        } else {
+          network = normalizeNodeStringValue(attrs.network);
+        }
+        interfaces.push({
+          __id: nextBgpRowId('ospfv3-if'),
+          name,
+          area: normalizeNodeStringValue(attrs.area),
+          bfdProfile: normalizeNodeStringValue(bfdNode.profile),
+          cost: normalizeNodeStringValue(attrs.cost),
+          deadInterval: normalizeNodeStringValue(attrs['dead-interval']),
+          helloInterval: normalizeNodeStringValue(attrs['hello-interval']),
+          ifmtu: normalizeNodeStringValue(attrs.ifmtu),
+          instanceId: normalizeNodeStringValue(attrs['instance-id']),
+          mtuIgnore: !!(attrs['mtu-ignore'] && typeof attrs['mtu-ignore'] === 'object'),
+          network: String(network || '').trim(),
+          passive: !!(attrs.passive && typeof attrs.passive === 'object'),
+          priority: normalizeNodeStringValue(attrs.priority),
+          retransmitInterval: normalizeNodeStringValue(attrs['retransmit-interval']),
+          transmitDelay: normalizeNodeStringValue(attrs['transmit-delay']),
+        });
+      }
+
+      const redistributeNode = ospfv3?.redistribute && typeof ospfv3.redistribute === 'object'
+        ? ospfv3.redistribute
+        : {};
+      for (const protocol of OSPFV3_REDISTRIBUTE_PROTOCOLS) {
+        const protoNode = redistributeNode?.[protocol] && typeof redistributeNode[protocol] === 'object'
+          ? redistributeNode[protocol]
+          : null;
+        if (!protoNode) continue;
+        const target = redistribute[protocol];
+        target.enabled = true;
+        target.metric = normalizeNodeStringValue(protoNode.metric);
+        target.metricType = normalizeNodeStringValue(protoNode['metric-type']);
+        target.routeMap = normalizeNodeStringValue(protoNode['route-map']);
+      }
+
+      return {
+        areas: areas.sort((a, b) => String(a.area || '').localeCompare(String(b.area || ''))),
+        interfaces: interfaces.sort((a, b) => a.name.localeCompare(b.name)),
+        redistribute,
+      };
+    }
+
+    function parseRpkiCachesFromTree(rpki) {
+      const caches = [];
+      const cacheNode = rpki?.cache || {};
+      for (const [address, attrsRaw] of Object.entries(cacheNode)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        caches.push({
+          __id: nextBgpRowId('rpki-cache'),
+          address,
+          port: normalizeNodeStringValue(attrs.port),
+          preference: normalizeNodeStringValue(attrs.preference),
+          sourceAddress: normalizeNodeStringValue(attrs['source-address']),
+          sshUsername: normalizeNodeStringValue(attrs?.ssh?.username),
+          sshKey: normalizeNodeStringValue(attrs?.ssh?.key),
+        });
+      }
+      return caches.sort((a, b) => a.address.localeCompare(b.address));
+    }
+
+    function parseStaticRoutesFromTree(staticRoot) {
+      function createStaticNextHopEntry(source = null) {
+        return {
+          __id: nextBgpRowId('static-nh'),
+          address: source?.address || '',
+          distance: source?.distance || '',
+          interface: source?.interface || '',
+          disable: !!source?.disable,
+          vrf: source?.vrf || '',
+          segments: source?.segments || '',
+          bfdProfile: source?.bfdProfile || '',
+          bfdSourceAddress: source?.bfdSourceAddress || '',
+        };
+      }
+
+      function createStaticInterfaceEntry(source = null) {
+        return {
+          __id: nextBgpRowId('static-if'),
+          name: source?.name || '',
+          distance: source?.distance || '',
+          vrf: source?.vrf || '',
+          disable: !!source?.disable,
+        };
+      }
+
+      const routes = [];
+      const routes6 = [];
+      const routeNode = staticRoot?.route || {};
+      for (const [prefix, attrsRaw] of Object.entries(routeNode)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const row = {
+          __id: nextBgpRowId('static4'),
+          prefix,
+          nextHop: '',
+          distance: '',
+          interface: '',
+          description: normalizeNodeStringValue(attrs.description),
+          tag: '',
+          blackhole: false,
+          reject: false,
+          disable: false,
+          vrf: '',
+          bfdProfile: '',
+          bfdSourceAddress: '',
+          nextHops: [],
+          interfaceRows: [],
+          dhcpInterface: '',
+        };
+        const nextHopNode = attrs['next-hop'];
+        if (typeof nextHopNode === 'string') {
+          row.nextHop = nextHopNode;
+          row.nextHops.push(createStaticNextHopEntry({ address: nextHopNode }));
+        } else if (nextHopNode && typeof nextHopNode === 'object') {
+          const entries = Object.entries(nextHopNode).filter(([k]) => !!k);
+          if (entries.length) {
+            for (const [nh, nhAttrsRaw] of entries) {
+              const nhAttrs = nhAttrsRaw && typeof nhAttrsRaw === 'object' ? nhAttrsRaw : {};
+              row.nextHops.push(createStaticNextHopEntry({
+                address: nh,
+                distance: normalizeNodeStringValue(nhAttrs.distance),
+                interface: normalizeNodeStringValue(nhAttrs.interface),
+                disable: !!(nhAttrs.disable && typeof nhAttrs.disable === 'object'),
+                vrf: normalizeNodeStringValue(nhAttrs.vrf),
+                segments: normalizeNodeStringValue(nhAttrs.segments),
+                bfdProfile: normalizeNodeStringValue(nhAttrs?.bfd?.profile),
+                bfdSourceAddress: normalizeNodeStringValue(nhAttrs?.bfd?.['multi-hop']?.['source-address']),
+              }));
+            }
+            const first = row.nextHops[0];
+            row.nextHop = first?.address || '';
+            row.distance = first?.distance || '';
+            row.interface = first?.interface || '';
+            row.disable = !!first?.disable;
+            row.vrf = first?.vrf || '';
+            row.segments = first?.segments || '';
+            row.bfdProfile = first?.bfdProfile || '';
+            row.bfdSourceAddress = first?.bfdSourceAddress || '';
+          }
+        }
+        if (attrs.interface && typeof attrs.interface === 'object') {
+          const entries = Object.entries(attrs.interface).filter(([k]) => !!k);
+          if (entries.length) {
+            row.nextHop = '';
+            row.nextHops = [];
+            for (const [ifName, ifAttrsRaw] of entries) {
+              const ifAttrs = ifAttrsRaw && typeof ifAttrsRaw === 'object' ? ifAttrsRaw : {};
+              row.interfaceRows.push(createStaticInterfaceEntry({
+                name: ifName,
+                distance: normalizeNodeStringValue(ifAttrs.distance),
+                disable: !!(ifAttrs.disable && typeof ifAttrs.disable === 'object'),
+                vrf: normalizeNodeStringValue(ifAttrs.vrf),
+              }));
+            }
+            const firstIf = row.interfaceRows[0];
+            row.interface = firstIf?.name || '';
+            row.distance = firstIf?.distance || '';
+            row.disable = !!firstIf?.disable;
+            row.vrf = firstIf?.vrf || '';
+          }
+        }
+
+        const dhcpInterface = normalizeNodeStringValue(attrs['dhcp-interface']);
+        if (dhcpInterface) {
+          row.dhcpInterface = dhcpInterface;
+          row.nextHop = '';
+          row.interface = '';
+          row.nextHops = [];
+          row.interfaceRows = [];
+          row.distance = '';
+          row.disable = false;
+          row.vrf = '';
+          row.segments = '';
+          row.bfdProfile = '';
+          row.bfdSourceAddress = '';
+          row.tag = '';
+        }
+        if (attrs.blackhole && typeof attrs.blackhole === 'object') {
+          row.blackhole = true;
+          row.reject = false;
+          row.distance = normalizeNodeStringValue(attrs.blackhole.distance);
+          row.tag = normalizeNodeStringValue(attrs.blackhole.tag);
+          row.nextHop = '';
+          row.interface = '';
+          row.disable = false;
+          row.vrf = '';
+          row.segments = '';
+          row.bfdProfile = '';
+          row.bfdSourceAddress = '';
+          row.nextHops = [];
+        } else if (attrs.reject && typeof attrs.reject === 'object') {
+          row.blackhole = false;
+          row.reject = true;
+          row.distance = normalizeNodeStringValue(attrs.reject.distance);
+          row.tag = normalizeNodeStringValue(attrs.reject.tag);
+          row.nextHop = '';
+          row.interface = '';
+          row.disable = false;
+          row.vrf = '';
+          row.segments = '';
+          row.bfdProfile = '';
+          row.bfdSourceAddress = '';
+          row.nextHops = [];
+        }
+        routes.push(row);
+      }
+      const route6Node = staticRoot?.route6 || {};
+      for (const [prefix, attrsRaw] of Object.entries(route6Node)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const row = {
+          __id: nextBgpRowId('static6'),
+          prefix,
+          nextHop: '',
+          distance: '',
+          interface: '',
+          description: normalizeNodeStringValue(attrs.description),
+          tag: '',
+          blackhole: false,
+          reject: false,
+          disable: false,
+          vrf: '',
+          bfdProfile: '',
+          bfdSourceAddress: '',
+          nextHops: [],
+          interfaceRows: [],
+          dhcpInterface: '',
+        };
+        const nextHopNode = attrs['next-hop'];
+        if (typeof nextHopNode === 'string') {
+          row.nextHop = nextHopNode;
+          row.nextHops.push(createStaticNextHopEntry({ address: nextHopNode }));
+        } else if (nextHopNode && typeof nextHopNode === 'object') {
+          const entries = Object.entries(nextHopNode).filter(([k]) => !!k);
+          if (entries.length) {
+            for (const [nh, nhAttrsRaw] of entries) {
+              const nhAttrs = nhAttrsRaw && typeof nhAttrsRaw === 'object' ? nhAttrsRaw : {};
+              row.nextHops.push(createStaticNextHopEntry({
+                address: nh,
+                distance: normalizeNodeStringValue(nhAttrs.distance),
+                interface: normalizeNodeStringValue(nhAttrs.interface),
+                disable: !!(nhAttrs.disable && typeof nhAttrs.disable === 'object'),
+                vrf: normalizeNodeStringValue(nhAttrs.vrf),
+                segments: normalizeNodeStringValue(nhAttrs.segments),
+                bfdProfile: normalizeNodeStringValue(nhAttrs?.bfd?.profile),
+                bfdSourceAddress: normalizeNodeStringValue(nhAttrs?.bfd?.['multi-hop']?.['source-address']),
+              }));
+            }
+            const first = row.nextHops[0];
+            row.nextHop = first?.address || '';
+            row.distance = first?.distance || '';
+            row.interface = first?.interface || '';
+            row.disable = !!first?.disable;
+            row.vrf = first?.vrf || '';
+            row.segments = first?.segments || '';
+            row.bfdProfile = first?.bfdProfile || '';
+            row.bfdSourceAddress = first?.bfdSourceAddress || '';
+          }
+        }
+        if (attrs.interface && typeof attrs.interface === 'object') {
+          const entries = Object.entries(attrs.interface).filter(([k]) => !!k);
+          if (entries.length) {
+            row.nextHop = '';
+            row.nextHops = [];
+            for (const [ifName, ifAttrsRaw] of entries) {
+              const ifAttrs = ifAttrsRaw && typeof ifAttrsRaw === 'object' ? ifAttrsRaw : {};
+              row.interfaceRows.push(createStaticInterfaceEntry({
+                name: ifName,
+                distance: normalizeNodeStringValue(ifAttrs.distance),
+                disable: !!(ifAttrs.disable && typeof ifAttrs.disable === 'object'),
+                vrf: normalizeNodeStringValue(ifAttrs.vrf),
+              }));
+            }
+            const firstIf = row.interfaceRows[0];
+            row.interface = firstIf?.name || '';
+            row.distance = firstIf?.distance || '';
+            row.disable = !!firstIf?.disable;
+            row.vrf = firstIf?.vrf || '';
+          }
+        }
+        if (attrs.blackhole && typeof attrs.blackhole === 'object') {
+          row.blackhole = true;
+          row.reject = false;
+          row.distance = normalizeNodeStringValue(attrs.blackhole.distance);
+          row.tag = normalizeNodeStringValue(attrs.blackhole.tag);
+          row.nextHop = '';
+          row.interface = '';
+          row.disable = false;
+          row.vrf = '';
+          row.segments = '';
+          row.bfdProfile = '';
+          row.bfdSourceAddress = '';
+          row.nextHops = [];
+        } else if (attrs.reject && typeof attrs.reject === 'object') {
+          row.blackhole = false;
+          row.reject = true;
+          row.distance = normalizeNodeStringValue(attrs.reject.distance);
+          row.tag = normalizeNodeStringValue(attrs.reject.tag);
+          row.nextHop = '';
+          row.interface = '';
+          row.disable = false;
+          row.vrf = '';
+          row.segments = '';
+          row.bfdProfile = '';
+          row.bfdSourceAddress = '';
+          row.nextHops = [];
+        }
+        routes6.push(row);
+      }
+      return {
+        routes: routes.sort((a, b) => a.prefix.localeCompare(b.prefix)),
+        routes6: routes6.sort((a, b) => a.prefix.localeCompare(b.prefix)),
+      };
+    }
+
+    function buildOspfCliTextFromCollections(v) {
+      const original = String(v.ospfCliText || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const filtered = original.filter(line => !(line.startsWith('access-list ') || line.startsWith('area ') || line.startsWith('interface ') || line.startsWith('neighbor ') || line.startsWith('summary-address ') || line.startsWith('segment-routing ') || line.startsWith('redistribute ')));
+      for (const row of (v.ospfAccessLists || [])) {
+        const number = String(row.number || '').trim();
+        if (!number) continue;
+        const protocols = Array.isArray(row.exportProtocols)
+          ? row.exportProtocols
+          : [];
+        for (const protocol of protocols) {
+          const p = String(protocol || '').trim();
+          if (!p) continue;
+          filtered.push(`access-list ${number} export ${p}`);
+        }
+      }
+      for (const row of (v.ospfAreas || [])) {
+        const area = String(row.area || '').trim();
+        if (!area) continue;
+        const areaType = String(row.areaType || '').trim();
+        if (areaType === 'normal') {
+          filtered.push(`area ${area} area-type normal`);
+        } else if (areaType === 'nssa') {
+          filtered.push(`area ${area} area-type nssa`);
+          const nssaDefaultCost = String(row.nssaDefaultCost || '').trim();
+          if (nssaDefaultCost) filtered.push(`area ${area} area-type nssa default-cost = ${nssaDefaultCost}`);
+          if (row.nssaNoSummary) filtered.push(`area ${area} area-type nssa no-summary`);
+          const nssaTranslate = String(row.nssaTranslate || '').trim();
+          if (nssaTranslate) filtered.push(`area ${area} area-type nssa translate ${nssaTranslate}`);
+        } else if (areaType === 'stub') {
+          filtered.push(`area ${area} area-type stub`);
+          const stubDefaultCost = String(row.stubDefaultCost || '').trim();
+          if (stubDefaultCost) filtered.push(`area ${area} area-type stub default-cost = ${stubDefaultCost}`);
+          if (row.stubNoSummary) filtered.push(`area ${area} area-type stub no-summary`);
+        }
+
+        const authType = String(row.authenticationType || '').trim();
+        const authPlaintext = String(row.authenticationPlaintextPassword || '').trim();
+        if (authType === 'md5') {
+          filtered.push(`area ${area} authentication md5`);
+        } else if (authType === 'plaintext-password') {
+          if (authPlaintext) filtered.push(`area ${area} authentication plaintext-password = ${authPlaintext}`);
+          else filtered.push(`area ${area} authentication plaintext-password`);
+        }
+
+        const exportList = String(row.exportList || '').trim();
+        const importList = String(row.importList || '').trim();
+        if (exportList) filtered.push(`area ${area} export-list = ${exportList}`);
+        if (importList) filtered.push(`area ${area} import-list = ${importList}`);
+
+        const shortcut = String(row.shortcut || '').trim();
+        if (shortcut) filtered.push(`area ${area} shortcut ${shortcut}`);
+
+        const networks = parseListField(row.networksText);
+        for (const network of networks) {
+          filtered.push(`area ${area} network ${network}`);
+        }
+
+        const ranges = Array.isArray(row.ranges)
+          ? row.ranges
+          : parseOspfAreaRangesText(row.rangeText || '');
+        for (const rangeRaw of ranges) {
+          const range = rangeRaw && typeof rangeRaw === 'object' ? rangeRaw : {};
+          const prefix = String(range.prefix || '').trim();
+          if (!prefix) continue;
+          filtered.push(`area ${area} range ${prefix}`);
+          const cost = String(range.cost || '').trim();
+          const substitute = String(range.substitute || '').trim();
+          if (cost) filtered.push(`area ${area} range ${prefix} cost = ${cost}`);
+          if (range.notAdvertise) filtered.push(`area ${area} range ${prefix} not-advertise`);
+          if (substitute) filtered.push(`area ${area} range ${prefix} substitute = ${substitute}`);
+        }
+
+        const virtualLinks = Array.isArray(row.virtualLinks) ? row.virtualLinks : [];
+        for (const vlRaw of virtualLinks) {
+          const vl = vlRaw && typeof vlRaw === 'object' ? vlRaw : {};
+          const peer = String(vl.peer || '').trim();
+          if (!peer) continue;
+          filtered.push(`area ${area} virtual-link ${peer}`);
+          const authType = String(vl.authenticationType || '').trim();
+          const plaintextPassword = String(vl.plaintextPassword || '').trim();
+          const md5KeyId = String(vl.md5KeyId || '').trim();
+          const md5Key = String(vl.md5Key || '').trim();
+          if (authType === 'plaintext-password' && plaintextPassword) {
+            filtered.push(`area ${area} virtual-link ${peer} authentication plaintext-password = ${plaintextPassword}`);
+          } else if (authType === 'md5' && md5KeyId && md5Key) {
+            filtered.push(`area ${area} virtual-link ${peer} authentication md5 key-id ${md5KeyId} md5-key = ${md5Key}`);
+          }
+
+          const deadInterval = String(vl.deadInterval || '').trim();
+          const helloInterval = String(vl.helloInterval || '').trim();
+          const retransmitInterval = String(vl.retransmitInterval || '').trim();
+          const retransmitWindow = String(vl.retransmitWindow || '').trim();
+          const transmitDelay = String(vl.transmitDelay || '').trim();
+          if (deadInterval) filtered.push(`area ${area} virtual-link ${peer} dead-interval = ${deadInterval}`);
+          if (helloInterval) filtered.push(`area ${area} virtual-link ${peer} hello-interval = ${helloInterval}`);
+          if (retransmitInterval) filtered.push(`area ${area} virtual-link ${peer} retransmit-interval = ${retransmitInterval}`);
+          if (retransmitWindow) filtered.push(`area ${area} virtual-link ${peer} retransmit-window = ${retransmitWindow}`);
+          if (transmitDelay) filtered.push(`area ${area} virtual-link ${peer} transmit-delay = ${transmitDelay}`);
+        }
+      }
+      for (const row of (v.ospfInterfaces || [])) {
+        const name = String(row.name || '').trim();
+        if (!name) continue;
+        filtered.push(`interface ${name}`);
+        const area = String(row.area || '').trim();
+        if (area) filtered.push(`interface ${name} area = ${area}`);
+
+        const authenticationType = String(row.authenticationType || '').trim();
+        const md5KeyId = String(row.md5KeyId || '').trim();
+        const md5Key = String(row.md5Key || '').trim();
+        const plaintextPassword = String(row.plaintextPassword || '').trim();
+        if (authenticationType === 'md5' && md5KeyId && md5Key) {
+          filtered.push(`interface ${name} authentication md5 key-id ${md5KeyId} md5-key = ${md5Key}`);
+        } else if (authenticationType === 'plaintext-password' && plaintextPassword) {
+          filtered.push(`interface ${name} authentication plaintext-password = ${plaintextPassword}`);
+        }
+
+        const bandwidth = String(row.bandwidth || '').trim();
+        const bfdProfile = String(row.bfdProfile || '').trim();
+        const cost = String(row.cost || '').trim();
+        const deadInterval = String(row.deadInterval || '').trim();
+        const helloInterval = String(row.helloInterval || '').trim();
+        const helloMultiplier = String(row.helloMultiplier || '').trim();
+        const network = String(row.network || '').trim();
+        const priority = String(row.priority || '').trim();
+        const retransmitInterval = String(row.retransmitInterval || '').trim();
+        const retransmitWindow = String(row.retransmitWindow || '').trim();
+        const transmitDelay = String(row.transmitDelay || '').trim();
+        const ldpSyncMode = String(row.ldpSyncMode || '').trim();
+        const ldpSyncHolddown = String(row.ldpSyncHolddown || '').trim();
+        const passiveMode = String(row.passiveMode || '').trim();
+
+        if (bandwidth) filtered.push(`interface ${name} bandwidth = ${bandwidth}`);
+        if (bfdProfile) filtered.push(`interface ${name} bfd profile = ${bfdProfile}`);
+        if (cost) filtered.push(`interface ${name} cost = ${cost}`);
+        if (deadInterval) filtered.push(`interface ${name} dead-interval = ${deadInterval}`);
+        if (helloInterval) filtered.push(`interface ${name} hello-interval = ${helloInterval}`);
+        if (helloMultiplier) filtered.push(`interface ${name} hello-multiplier = ${helloMultiplier}`);
+
+        if (ldpSyncMode === 'disable') {
+          filtered.push(`interface ${name} ldp-sync disable`);
+        } else if (ldpSyncMode === 'enable') {
+          filtered.push(`interface ${name} ldp-sync`);
+        }
+        if (ldpSyncHolddown) filtered.push(`interface ${name} ldp-sync holddown = ${ldpSyncHolddown}`);
+
+        if (row.mtuIgnore) filtered.push(`interface ${name} mtu-ignore`);
+        if (network) filtered.push(`interface ${name} network ${network}`);
+
+        if (passiveMode === 'disable') {
+          filtered.push(`interface ${name} passive disable`);
+        } else if (passiveMode === 'enable') {
+          filtered.push(`interface ${name} passive`);
+        }
+
+        if (priority) filtered.push(`interface ${name} priority = ${priority}`);
+        if (retransmitInterval) filtered.push(`interface ${name} retransmit-interval = ${retransmitInterval}`);
+        if (retransmitWindow) filtered.push(`interface ${name} retransmit-window = ${retransmitWindow}`);
+        if (transmitDelay) filtered.push(`interface ${name} transmit-delay = ${transmitDelay}`);
+      }
+      for (const row of (v.ospfNeighbors || [])) {
+        const address = String(row.address || '').trim();
+        if (!address) continue;
+        filtered.push(`neighbor ${address}`);
+        const pollInterval = String(row.pollInterval || '').trim();
+        const priority = String(row.priority || '').trim();
+        if (pollInterval) filtered.push(`neighbor ${address} poll-interval = ${pollInterval}`);
+        if (priority) filtered.push(`neighbor ${address} priority = ${priority}`);
+      }
+      for (const row of (v.ospfSummaryAddresses || [])) {
+        const prefix = String(row.prefix || '').trim();
+        if (!prefix) continue;
+        filtered.push(`summary-address ${prefix}`);
+        if (row.noAdvertise) filtered.push(`summary-address ${prefix} no-advertise`);
+        const tag = String(row.tag || '').trim();
+        if (tag) filtered.push(`summary-address ${prefix} tag ${tag}`);
+      }
+      const sr = v.ospfSegmentRouting && typeof v.ospfSegmentRouting === 'object'
+        ? v.ospfSegmentRouting
+        : {};
+      const globalLow = String(sr.globalBlockLowLabelValue || '').trim();
+      const globalHigh = String(sr.globalBlockHighLabelValue || '').trim();
+      const localLow = String(sr.localBlockLowLabelValue || '').trim();
+      const localHigh = String(sr.localBlockHighLabelValue || '').trim();
+      const maxDepth = String(sr.maximumLabelDepth || '').trim();
+      if (globalLow) filtered.push(`segment-routing global-block low-label-value ${globalLow}`);
+      if (globalHigh) filtered.push(`segment-routing global-block high-label-value ${globalHigh}`);
+      if (localLow) filtered.push(`segment-routing local-block low-label-value ${localLow}`);
+      if (localHigh) filtered.push(`segment-routing local-block high-label-value ${localHigh}`);
+      if (maxDepth) filtered.push(`segment-routing maximum-label-depth ${maxDepth}`);
+
+      const srPrefixes = Array.isArray(sr.prefixes) ? sr.prefixes : [];
+      for (const row of srPrefixes) {
+        const prefix = String(row.prefix || '').trim();
+        if (!prefix) continue;
+        filtered.push(`segment-routing prefix ${prefix}`);
+        const base = `segment-routing prefix ${prefix} index`;
+        if (row.explicitNull) filtered.push(`${base} explicit-null`);
+        if (row.noPhpFlag) filtered.push(`${base} no-php-flag`);
+        const indexValue = String(row.indexValue || '').trim();
+        if (indexValue) filtered.push(`${base} value ${indexValue}`);
+      }
+
+      const redist = v.ospfRedistribute && typeof v.ospfRedistribute === 'object'
+        ? v.ospfRedistribute
+        : {};
+      for (const protocol of OSPF_REDISTRIBUTE_PROTOCOLS) {
+        const item = redist?.[protocol] && typeof redist[protocol] === 'object'
+          ? redist[protocol]
+          : null;
+        if (!item || !item.enabled) continue;
+        filtered.push(`redistribute ${protocol}`);
+        const metric = String(item.metric || '').trim();
+        const metricType = String(item.metricType || '').trim();
+        const routeMap = String(item.routeMap || '').trim();
+        if (metric) filtered.push(`redistribute ${protocol} metric = ${metric}`);
+        if (metricType) filtered.push(`redistribute ${protocol} metric-type ${metricType}`);
+        if (routeMap) filtered.push(`redistribute ${protocol} route-map ${routeMap}`);
+      }
+      for (const row of (redist.tables || [])) {
+        const table = String(row.table || '').trim();
+        if (!table) continue;
+        filtered.push(`redistribute table ${table}`);
+        const metric = String(row.metric || '').trim();
+        const metricType = String(row.metricType || '').trim();
+        const routeMap = String(row.routeMap || '').trim();
+        if (metric) filtered.push(`redistribute table ${table} metric = ${metric}`);
+        if (metricType) filtered.push(`redistribute table ${table} metric-type ${metricType}`);
+        if (routeMap) filtered.push(`redistribute table ${table} route-map ${routeMap}`);
+      }
+      return filtered.join('\n');
+    }
+
+    function buildOspfv3CliTextFromCollections(v) {
+      const original = String(v.ospfv3CliText || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const filtered = original.filter(line => !(line.startsWith('area ') || line.startsWith('interface ') || line.startsWith('redistribute ')));
+      for (const row of (v.ospfv3Areas || [])) {
+        const area = String(row.area || '').trim();
+        if (!area) continue;
+        filtered.push(`area ${area}`);
+        const areaType = String(row.areaType || '').trim();
+        if (areaType === 'nssa') {
+          filtered.push(`area ${area} area-type nssa`);
+          if (row.nssaDefaultInformationOriginate) {
+            filtered.push(`area ${area} area-type nssa default-information-originate`);
+          }
+          if (row.nssaNoSummary) {
+            filtered.push(`area ${area} area-type nssa no-summary`);
+          }
+        } else if (areaType === 'stub') {
+          filtered.push(`area ${area} area-type stub`);
+          if (row.stubNoSummary) {
+            filtered.push(`area ${area} area-type stub no-summary`);
+          }
+        }
+        const exportList = String(row.exportList || '').trim();
+        const importList = String(row.importList || '').trim();
+        if (exportList) filtered.push(`area ${area} export-list ${exportList}`);
+        if (importList) filtered.push(`area ${area} import-list ${importList}`);
+
+        const ranges = Array.isArray(row.ranges) ? row.ranges : [];
+        for (const rangeRow of ranges) {
+          const prefix = String(rangeRow.prefix || '').trim();
+          if (!prefix) continue;
+          filtered.push(`area ${area} range ${prefix}`);
+          const action = String(rangeRow.action || '').trim();
+          if (action === 'advertise') {
+            filtered.push(`area ${area} range ${prefix} advertise`);
+          } else if (action === 'not-advertise') {
+            filtered.push(`area ${area} range ${prefix} not-advertise`);
+          }
+        }
+      }
+      for (const row of (v.ospfv3Interfaces || [])) {
+        const name = String(row.name || '').trim();
+        if (!name) continue;
+        filtered.push(`interface ${name}`);
+        const area = String(row.area || '').trim();
+        if (area) filtered.push(`interface ${name} area = ${area}`);
+        const bfdProfile = String(row.bfdProfile || '').trim();
+        if (bfdProfile) filtered.push(`interface ${name} bfd profile = ${bfdProfile}`);
+        const cost = String(row.cost || '').trim();
+        if (cost) filtered.push(`interface ${name} cost = ${cost}`);
+        const deadInterval = String(row.deadInterval || '').trim();
+        if (deadInterval) filtered.push(`interface ${name} dead-interval = ${deadInterval}`);
+        const helloInterval = String(row.helloInterval || '').trim();
+        if (helloInterval) filtered.push(`interface ${name} hello-interval = ${helloInterval}`);
+        const ifmtu = String(row.ifmtu || '').trim();
+        if (ifmtu) filtered.push(`interface ${name} ifmtu = ${ifmtu}`);
+        const instanceId = String(row.instanceId || '').trim();
+        if (instanceId) filtered.push(`interface ${name} instance-id = ${instanceId}`);
+        if (row.mtuIgnore) filtered.push(`interface ${name} mtu-ignore`);
+        const network = String(row.network || '').trim();
+        if (network) filtered.push(`interface ${name} network ${network}`);
+        if (row.passive) filtered.push(`interface ${name} passive`);
+        const priority = String(row.priority || '').trim();
+        if (priority) filtered.push(`interface ${name} priority = ${priority}`);
+        const retransmitInterval = String(row.retransmitInterval || '').trim();
+        if (retransmitInterval) filtered.push(`interface ${name} retransmit-interval = ${retransmitInterval}`);
+        const transmitDelay = String(row.transmitDelay || '').trim();
+        if (transmitDelay) filtered.push(`interface ${name} transmit-delay = ${transmitDelay}`);
+      }
+      for (const protocol of OSPFV3_REDISTRIBUTE_PROTOCOLS) {
+        const item = v.ospfv3Redistribute?.[protocol];
+        if (!item || !item.enabled) continue;
+        filtered.push(`redistribute ${protocol}`);
+        const metric = String(item.metric || '').trim();
+        const metricType = String(item.metricType || '').trim();
+        const routeMap = String(item.routeMap || '').trim();
+        if (metric) filtered.push(`redistribute ${protocol} metric = ${metric}`);
+        if (metricType) filtered.push(`redistribute ${protocol} metric-type ${metricType}`);
+        if (routeMap) filtered.push(`redistribute ${protocol} route-map ${routeMap}`);
+      }
+      return filtered.join('\n');
+    }
+
+    function buildRpkiCliTextFromCollections(v) {
+      const original = String(v.rpkiCliText || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const filtered = original.filter(line => !line.startsWith('cache '));
+      for (const row of (v.rpkiCaches || [])) {
+        const address = String(row.address || '').trim();
+        if (!address) continue;
+        const port = String(row.port || '').trim();
+        const preference = String(row.preference || '').trim();
+        const sourceAddress = String(row.sourceAddress || '').trim();
+        const sshUsername = String(row.sshUsername || '').trim();
+        const sshKey = String(row.sshKey || '').trim();
+        filtered.push(`cache ${address}`);
+        if (port) filtered.push(`cache ${address} port = ${port}`);
+        if (preference) filtered.push(`cache ${address} preference = ${preference}`);
+        if (sourceAddress) filtered.push(`cache ${address} source-address = ${sourceAddress}`);
+        if (sshUsername) filtered.push(`cache ${address} ssh username = ${sshUsername}`);
+        if (sshKey) filtered.push(`cache ${address} ssh key = ${sshKey}`);
+      }
+      return filtered.join('\n');
+    }
+
+    function buildStaticCliTextFromCollections(v) {
+      const original = String(v.staticCliText || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const filtered = original.filter(line => !(line.startsWith('route ') || line.startsWith('route6 ')));
+      for (const row of (v.staticRoutes || [])) {
+        const prefix = String(row.prefix || '').trim();
+        if (!prefix) continue;
+        const mode = inferStaticRouteBranch(row, 'ipv4');
+        const nextHop = String(row.nextHop || '').trim();
+        const distance = String(row.distance || '').trim();
+        const intf = String(row.interface || '').trim();
+        const description = String(row.description || '').trim();
+        const tag = String(row.tag || '').trim();
+        const disabled = !!row.disable;
+        const vrfName = String(row.vrf || '').trim();
+        const bfdProfile = String(row.bfdProfile || '').trim();
+        const bfdSourceAddress = String(row.bfdSourceAddress || '').trim();
+        const dhcpInterface = String(row.dhcpInterface || '').trim();
+        const nextHopRows = Array.isArray(row.nextHops) && row.nextHops.length
+          ? row.nextHops
+          : [{ address: nextHop, distance, interface: intf, disable: disabled, vrf: vrfName, bfdProfile, bfdSourceAddress }];
+        const interfaceRows = Array.isArray(row.interfaceRows) && row.interfaceRows.length
+          ? row.interfaceRows
+          : [{ name: intf, distance, disable: disabled, vrf: vrfName }];
+        if (description) filtered.push(`route ${prefix} description = ${description}`);
+        if (mode === 'next-hop') {
+          for (const nhRowRaw of nextHopRows) {
+            const nhRow = nhRowRaw && typeof nhRowRaw === 'object' ? nhRowRaw : {};
+            const nh = String(nhRow.address || '').trim();
+            if (!nh) continue;
+            const nhDistance = String(nhRow.distance || '').trim();
+            const nhInterface = String(nhRow.interface || '').trim();
+            const nhDisable = !!nhRow.disable;
+            const nhVrf = String(nhRow.vrf || '').trim();
+            const nhBfdProfile = String(nhRow.bfdProfile || '').trim();
+            const nhBfdSource = String(nhRow.bfdSourceAddress || '').trim();
+            filtered.push(`route ${prefix} next-hop ${nh}`);
+            if (nhDistance) filtered.push(`route ${prefix} next-hop ${nh} distance = ${nhDistance}`);
+            if (nhInterface) filtered.push(`route ${prefix} next-hop ${nh} interface = ${nhInterface}`);
+            if (nhDisable) filtered.push(`route ${prefix} next-hop ${nh} disable`);
+            if (nhVrf) filtered.push(`route ${prefix} next-hop ${nh} vrf = ${nhVrf}`);
+            if (nhBfdProfile) filtered.push(`route ${prefix} next-hop ${nh} bfd profile = ${nhBfdProfile}`);
+            if (nhBfdSource) filtered.push(`route ${prefix} next-hop ${nh} bfd multi-hop source-address = ${nhBfdSource}`);
+          }
+        } else if (mode === 'interface') {
+          for (const ifRowRaw of interfaceRows) {
+            const ifRow = ifRowRaw && typeof ifRowRaw === 'object' ? ifRowRaw : {};
+            const ifName = String(ifRow.name || '').trim();
+            if (!ifName) continue;
+            const ifDistance = String(ifRow.distance || '').trim();
+            const ifDisable = !!ifRow.disable;
+            const ifVrf = String(ifRow.vrf || '').trim();
+            filtered.push(`route ${prefix} interface ${ifName}`);
+            if (ifDistance) filtered.push(`route ${prefix} interface ${ifName} distance = ${ifDistance}`);
+            if (ifDisable) filtered.push(`route ${prefix} interface ${ifName} disable`);
+            if (ifVrf) filtered.push(`route ${prefix} interface ${ifName} vrf = ${ifVrf}`);
+          }
+        } else if (mode === 'dhcp-interface') {
+          if (!dhcpInterface) continue;
+          filtered.push(`route ${prefix} dhcp-interface = ${dhcpInterface}`);
+        } else if (mode === 'blackhole') {
+          filtered.push(`route ${prefix} blackhole`);
+          if (distance) filtered.push(`route ${prefix} blackhole distance = ${distance}`);
+          if (tag) filtered.push(`route ${prefix} blackhole tag = ${tag}`);
+        } else if (mode === 'reject') {
+          filtered.push(`route ${prefix} reject`);
+          if (distance) filtered.push(`route ${prefix} reject distance = ${distance}`);
+          if (tag) filtered.push(`route ${prefix} reject tag = ${tag}`);
+        }
+      }
+      for (const row of (v.staticRoutes6 || [])) {
+        const prefix = String(row.prefix || '').trim();
+        if (!prefix) continue;
+        const mode = inferStaticRouteBranch(row, 'ipv6');
+        const nextHop = String(row.nextHop || '').trim();
+        const distance = String(row.distance || '').trim();
+        const intf = String(row.interface || '').trim();
+        const description = String(row.description || '').trim();
+        const tag = String(row.tag || '').trim();
+        const disabled = !!row.disable;
+        const vrfName = String(row.vrf || '').trim();
+        const segments = String(row.segments || '').trim();
+        const bfdProfile = String(row.bfdProfile || '').trim();
+        const bfdSourceAddress = String(row.bfdSourceAddress || '').trim();
+        const nextHopRows = Array.isArray(row.nextHops) && row.nextHops.length
+          ? row.nextHops
+          : [{ address: nextHop, distance, interface: intf, disable: disabled, vrf: vrfName, segments, bfdProfile, bfdSourceAddress }];
+        if (description) filtered.push(`route6 ${prefix} description = ${description}`);
+        if (mode === 'next-hop') {
+          for (const nhRowRaw of nextHopRows) {
+            const nhRow = nhRowRaw && typeof nhRowRaw === 'object' ? nhRowRaw : {};
+            const nh = String(nhRow.address || '').trim();
+            if (!nh) continue;
+            const nhDistance = String(nhRow.distance || '').trim();
+            const nhInterface = String(nhRow.interface || '').trim();
+            const nhDisable = !!nhRow.disable;
+            const nhVrf = String(nhRow.vrf || '').trim();
+            const nhSegments = String(nhRow.segments || '').trim();
+            const nhBfdProfile = String(nhRow.bfdProfile || '').trim();
+            const nhBfdSource = String(nhRow.bfdSourceAddress || '').trim();
+            filtered.push(`route6 ${prefix} next-hop ${nh}`);
+            if (nhDistance) filtered.push(`route6 ${prefix} next-hop ${nh} distance = ${nhDistance}`);
+            if (nhInterface) filtered.push(`route6 ${prefix} next-hop ${nh} interface = ${nhInterface}`);
+            if (nhDisable) filtered.push(`route6 ${prefix} next-hop ${nh} disable`);
+            if (nhVrf) filtered.push(`route6 ${prefix} next-hop ${nh} vrf = ${nhVrf}`);
+            if (nhSegments) filtered.push(`route6 ${prefix} next-hop ${nh} segments = ${nhSegments}`);
+            if (nhBfdProfile) filtered.push(`route6 ${prefix} next-hop ${nh} bfd profile = ${nhBfdProfile}`);
+            if (nhBfdSource) filtered.push(`route6 ${prefix} next-hop ${nh} bfd multi-hop source-address = ${nhBfdSource}`);
+          }
+        } else if (mode === 'interface') {
+          if (!intf) continue;
+          filtered.push(`route6 ${prefix} interface ${intf}`);
+          if (distance) filtered.push(`route6 ${prefix} interface ${intf} distance = ${distance}`);
+          if (disabled) filtered.push(`route6 ${prefix} interface ${intf} disable`);
+          if (vrfName) filtered.push(`route6 ${prefix} interface ${intf} vrf = ${vrfName}`);
+        } else if (mode === 'blackhole') {
+          filtered.push(`route6 ${prefix} blackhole`);
+          if (distance) filtered.push(`route6 ${prefix} blackhole distance = ${distance}`);
+          if (tag) filtered.push(`route6 ${prefix} blackhole tag = ${tag}`);
+        } else if (mode === 'reject') {
+          filtered.push(`route6 ${prefix} reject`);
+          if (distance) filtered.push(`route6 ${prefix} reject distance = ${distance}`);
+          if (tag) filtered.push(`route6 ${prefix} reject tag = ${tag}`);
+        }
+      }
+      return filtered.join('\n');
+    }
+
+    function isValidIPv4(value) {
+      if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return false;
+      return value.split('.').every(v => Number(v) >= 0 && Number(v) <= 255);
+    }
+
+    function isValidIPv6(value) {
+      return /^[0-9a-fA-F:]+$/.test(value) && value.includes(':');
+    }
+
+    function isValidHostname(value) {
+      const host = String(value || '').trim();
+      if (!host || host.length > 253) return false;
+      if (!/^[A-Za-z0-9.-]+$/.test(host)) return false;
+      const labels = host.split('.').filter(Boolean);
+      if (!labels.length) return false;
+      return labels.every(label => /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/.test(label));
+    }
+
+    function isValidCIDR(value) {
+      const [ip, prefix] = String(value || '').split('/');
+      if (!ip || prefix === undefined) return false;
+      const n = Number(prefix);
+      if (!Number.isInteger(n)) return false;
+      if (isValidIPv4(ip)) return n >= 0 && n <= 32;
+      if (isValidIPv6(ip)) return n >= 0 && n <= 128;
+      return false;
+    }
+
+    function isValidRouteDistinguisher(value) {
+      const rd = String(value || '').trim();
+      if (!rd) return false;
+      return /^(?:\d+|(?:\d{1,3}\.){3}\d{1,3}):\d+$/.test(rd);
+    }
+
+    function validateBgpVpnNetworkLines(lines, afKey) {
+      const prefix = `address-family ${afKey} network `;
+      const isIpv4Af = afKey === 'ipv4-vpn';
+      for (const line of lines) {
+        if (!line.startsWith(prefix)) continue;
+        const bareMatch = line.match(new RegExp(`^address-family\\s+${afKey}\\s+network\\s+(\\S+)\\s*$`));
+        const valueMatch = line.match(new RegExp(`^address-family\\s+${afKey}\\s+network\\s+(\\S+)\\s+(\\S+)\\s*=\\s*(\\S+)\\s*$`));
+
+        if (!bareMatch && !valueMatch) {
+          return `BGP ${afKey} network format invalid: ${line}`;
+        }
+
+        const network = (bareMatch?.[1] || valueMatch?.[1] || '').trim();
+        if (!isValidCIDR(network)) {
+          return `BGP ${afKey} network must be CIDR: ${network}`;
+        }
+
+        const ipPart = network.split('/')[0] || '';
+        if (isIpv4Af && !isValidIPv4(ipPart)) {
+          return `BGP ${afKey} network must be IPv4 CIDR: ${network}`;
+        }
+        if (!isIpv4Af && !isValidIPv6(ipPart)) {
+          return `BGP ${afKey} network must be IPv6 CIDR: ${network}`;
+        }
+
+        if (valueMatch) {
+          const attr = valueMatch[2];
+          const value = valueMatch[3];
+          if (attr === 'label') {
+            const n = Number(value);
+            if (!Number.isInteger(n) || n < 0 || n > 1048575) {
+              return `BGP ${afKey} label out of range (0-1048575): ${value}`;
+            }
+          } else if (attr === 'rd') {
+            if (!isValidRouteDistinguisher(value)) {
+              return `BGP ${afKey} rd invalid: ${value}`;
+            }
+          } else {
+            return `BGP ${afKey} network only supports label/rd attributes`;
+          }
+        }
+      }
+      return '';
+    }
+
+    function validateBgpVpnAddressFamily(v) {
+      const lines = String(v.bgpCliText || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const errV4 = validateBgpVpnNetworkLines(lines, 'ipv4-vpn');
+      if (errV4) return errV4;
+      const errV6 = validateBgpVpnNetworkLines(lines, 'ipv6-vpn');
+      if (errV6) return errV6;
+      return '';
+    }
+
+    function validateBgpCollections(v) {
+      for (const row of (v.bgpNeighbors || [])) {
+        const addr = String(row.address || '').trim();
+        if (!addr) return t('vrf.validation.bgpNeighborAddressRequired');
+        if (!(isValidIPv4(addr) || isValidIPv6(addr))) return t('vrf.validation.bgpNeighborAddressInvalid');
+        const asn = String(row.remoteAs || '').trim();
+        if (asn) {
+          if (!['external', 'internal'].includes(asn)) {
+            const n = Number(asn);
+            if (!Number.isInteger(n) || n < 1 || n > 4294967294) return t('vrf.validation.bgpAsnInvalid');
+          }
+        }
+        const localAs = String(row.localAs || '').trim();
+        if (localAs) {
+          const n = Number(localAs);
+          if (!Number.isInteger(n) || n < 1 || n > 4294967294) return t('vrf.validation.bgpAsnInvalid');
+        }
+        const port = String(row.port || '').trim();
+        if (port) {
+          const n = Number(port);
+          if (!Number.isInteger(n) || n < 1 || n > 65535) return t('vrf.validation.bgpPortInvalid');
+        }
+        const advertisementInterval = String(row.advertisementInterval || '').trim();
+        if (advertisementInterval) {
+          const n = Number(advertisementInterval);
+          if (!Number.isInteger(n) || n < 0 || n > 600) return t('vrf.validation.bgpNeighborAdvertisementIntervalInvalid');
+        }
+        const ebgpMultihop = String(row.ebgpMultihop || '').trim();
+        if (ebgpMultihop) {
+          const n = Number(ebgpMultihop);
+          if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.bgpNeighborEbgpMultihopInvalid');
+        }
+        const ttlSecurityHops = String(row.ttlSecurityHops || '').trim();
+        if (ttlSecurityHops) {
+          const n = Number(ttlSecurityHops);
+          if (!Number.isInteger(n) || n < 1 || n > 254) return t('vrf.validation.bgpNeighborTtlSecurityHopsInvalid');
+        }
+        const timersConnect = String(row.timersConnect || '').trim();
+        if (timersConnect) {
+          const n = Number(timersConnect);
+          if (!Number.isInteger(n) || n < 0 || n > 65535) return t('vrf.validation.bgpNeighborTimerInvalid');
+        }
+        const timersHoldtime = String(row.timersHoldtime || '').trim();
+        if (timersHoldtime) {
+          const n = Number(timersHoldtime);
+          if (!Number.isInteger(n) || n < 0 || n > 65535) return t('vrf.validation.bgpNeighborTimerInvalid');
+        }
+        const timersKeepalive = String(row.timersKeepalive || '').trim();
+        if (timersKeepalive) {
+          const n = Number(timersKeepalive);
+          if (!Number.isInteger(n) || n < 1 || n > 65535) return t('vrf.validation.bgpNeighborTimerInvalid');
+        }
+        const localRole = String(row.localRole || '').trim();
+        if (localRole && !BGP_NEIGHBOR_LOCAL_ROLE_OPTIONS.includes(localRole)) {
+          return t('vrf.validation.bgpNeighborLocalRoleInvalid');
+        }
+        const gracefulRestart = String(row.gracefulRestart || '').trim();
+        if (gracefulRestart && !BGP_NEIGHBOR_GRACEFUL_RESTART_OPTIONS.includes(gracefulRestart)) {
+          return t('vrf.validation.bgpNeighborGracefulRestartInvalid');
+        }
+        const interfaceRemoteAs = String(row.interfaceRemoteAs || '').trim();
+        if (interfaceRemoteAs) {
+          if (!['external', 'internal'].includes(interfaceRemoteAs)) {
+            const n = Number(interfaceRemoteAs);
+            if (!Number.isInteger(n) || n < 1 || n > 4294967294) return t('vrf.validation.bgpAsnInvalid');
+          }
+        }
+        const interfaceV6OnlyRemoteAs = String(row.interfaceV6OnlyRemoteAs || '').trim();
+        if (interfaceV6OnlyRemoteAs) {
+          if (!['external', 'internal'].includes(interfaceV6OnlyRemoteAs)) {
+            const n = Number(interfaceV6OnlyRemoteAs);
+            if (!Number.isInteger(n) || n < 1 || n > 4294967294) return t('vrf.validation.bgpAsnInvalid');
+          }
+        }
+        const pathAttributeDiscardList = String(row.pathAttributeDiscard || '').split(/[\s,]+/).map(v => v.trim()).filter(Boolean);
+        for (const attr of pathAttributeDiscardList) {
+          const n = Number(attr);
+          if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.bgpNeighborPathAttributeInvalid');
+        }
+        const pathAttributeWithdrawList = String(row.pathAttributeTreatAsWithdraw || '').split(/[\s,]+/).map(v => v.trim()).filter(Boolean);
+        for (const attr of pathAttributeWithdrawList) {
+          const n = Number(attr);
+          if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.bgpNeighborPathAttributeInvalid');
+        }
+        const afValidationError = validateBgpAfPolicies(row.afPolicies, BGP_NEIGHBOR_AF_KEYS);
+        if (afValidationError) return afValidationError;
+      }
+
+      for (const row of (v.bgpPeerGroups || [])) {
+        const name = String(row.name || '').trim();
+        if (!name) return t('vrf.validation.bgpPeerGroupNameRequired');
+        const asn = String(row.remoteAs || '').trim();
+        if (asn) {
+          if (!['external', 'internal'].includes(asn)) {
+            const n = Number(asn);
+            if (!Number.isInteger(n) || n < 1 || n > 4294967294) return t('vrf.validation.bgpAsnInvalid');
+          }
+        }
+        const localAs = String(row.localAs || '').trim();
+        if (localAs) {
+          const n = Number(localAs);
+          if (!Number.isInteger(n) || n < 1 || n > 4294967294) return t('vrf.validation.bgpAsnInvalid');
+        }
+        const port = String(row.port || '').trim();
+        if (port) {
+          const n = Number(port);
+          if (!Number.isInteger(n) || n < 1 || n > 65535) return t('vrf.validation.bgpPortInvalid');
+        }
+        const ebgpMultihop = String(row.ebgpMultihop || '').trim();
+        if (ebgpMultihop) {
+          const n = Number(ebgpMultihop);
+          if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.bgpNeighborEbgpMultihopInvalid');
+        }
+        const ttlSecurityHops = String(row.ttlSecurityHops || '').trim();
+        if (ttlSecurityHops) {
+          const n = Number(ttlSecurityHops);
+          if (!Number.isInteger(n) || n < 1 || n > 254) return t('vrf.validation.bgpNeighborTtlSecurityHopsInvalid');
+        }
+        const localRole = String(row.localRole || '').trim();
+        if (localRole && !BGP_NEIGHBOR_LOCAL_ROLE_OPTIONS.includes(localRole)) {
+          return t('vrf.validation.bgpNeighborLocalRoleInvalid');
+        }
+        const gracefulRestart = String(row.gracefulRestart || '').trim();
+        if (gracefulRestart && !BGP_NEIGHBOR_GRACEFUL_RESTART_OPTIONS.includes(gracefulRestart)) {
+          return t('vrf.validation.bgpNeighborGracefulRestartInvalid');
+        }
+        const pathAttributeDiscardList = String(row.pathAttributeDiscard || '').split(/[\s,]+/).map(v => v.trim()).filter(Boolean);
+        for (const attr of pathAttributeDiscardList) {
+          const n = Number(attr);
+          if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.bgpNeighborPathAttributeInvalid');
+        }
+        const pathAttributeWithdrawList = String(row.pathAttributeTreatAsWithdraw || '').split(/[\s,]+/).map(v => v.trim()).filter(Boolean);
+        for (const attr of pathAttributeWithdrawList) {
+          const n = Number(attr);
+          if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.bgpNeighborPathAttributeInvalid');
+        }
+        const afValidationError = validateBgpAfPolicies(row.afPolicies, BGP_PEER_GROUP_AF_KEYS);
+        if (afValidationError) return afValidationError;
+      }
+
+      for (const row of (v.bgpListenRanges || [])) {
+        const range = String(row.range || '').trim();
+        if (!range) return t('vrf.validation.bgpListenRangeRequired');
+        if (!isValidCIDR(range)) return t('vrf.validation.bgpListenRangeInvalid');
+      }
+
+      for (const row of (v.bgpInterfaces || [])) {
+        const name = String(row.name || '').trim();
+        if (!name) return t('vrf.validation.bgpInterfaceNameRequired');
+      }
+
+      for (const row of (v.bgpBmpTargets || [])) {
+        const name = String(row.name || '').trim();
+        if (!name) return t('vrf.validation.bgpBmpTargetNameRequired');
+        const address = String(row.address || '').trim();
+        if (address && !(isValidIPv4(address) || isValidIPv6(address))) return t('vrf.validation.bgpBmpTargetAddressInvalid');
+        const port = String(row.port || '').trim();
+        if (port) {
+          const n = Number(port);
+          if (!Number.isInteger(n) || n < 1 || n > 65535) return t('vrf.validation.bgpPortInvalid');
+        }
+      }
+
+      const vpnNetworkError = validateBgpVpnAddressFamily(v);
+      if (vpnNetworkError) return vpnNetworkError;
+
+      return '';
+    }
+
+    function validateOtherProtocolCollections(v) {
+      for (const row of (v.failoverRoutes || [])) {
+        const prefix = String(row.prefix || '').trim();
+        if (!prefix) return t('vrf.validation.staticRoutePrefixRequired');
+        if (!isValidCIDR(prefix) || !isValidIPv4(prefix.split('/')[0] || '')) return t('vrf.validation.staticRoutePrefixInvalid');
+
+        const gatewayType = String(row.gatewayType || '').trim();
+        const gateway = String(row.gateway || '').trim();
+        if (!gatewayType || !gateway) return t('vrf.validation.staticRouteNextHopInvalid');
+        if (gatewayType !== 'next-hop' && gatewayType !== 'dhcp-interface') return t('vrf.validation.staticRouteNextHopInvalid');
+        if (gatewayType === 'next-hop' && !isValidIPv4(gateway)) return t('vrf.validation.staticRouteNextHopInvalid');
+
+        const metric = String(row.metric || '').trim();
+        if (metric) {
+          const n = Number(metric);
+          if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.staticRouteDistanceInvalid');
+        }
+
+        const checkPort = String(row.checkPort || '').trim();
+        if (checkPort) {
+          const n = Number(checkPort);
+          if (!Number.isInteger(n) || n < 1 || n > 65535) return t('vrf.validation.bgpPortInvalid');
+        }
+
+        const checkTimeout = String(row.checkTimeout || '').trim();
+        if (checkTimeout) {
+          const n = Number(checkTimeout);
+          if (!Number.isInteger(n) || n < 1 || n > 300) return t('vrf.validation.staticRouteDistanceInvalid');
+        }
+
+        const checkPolicy = String(row.checkPolicy || '').trim();
+        if (checkPolicy && checkPolicy !== 'any-available' && checkPolicy !== 'all-available') {
+          return t('vrf.validation.staticRouteNextHopInvalid');
+        }
+
+        const checkType = String(row.checkType || '').trim();
+        if (checkType && checkType !== 'icmp' && checkType !== 'arp' && checkType !== 'tcp') {
+          return t('vrf.validation.staticRouteNextHopInvalid');
+        }
+
+        for (const targetRaw of (row.checkTargets || [])) {
+          const target = targetRaw && typeof targetRaw === 'object' ? targetRaw : {};
+          const address = String(target.address || '').trim();
+          if (!address) continue;
+          if (!isValidIPv4(address)) return t('vrf.validation.staticRouteNextHopInvalid');
+        }
+      }
+
+      const isisTree = parseCliTextToProtocolTree(v.isisCliText || '');
+      const isisSpfInterval = String(normalizeNodeStringValue(isisTree?.['spf-interval']) || '').trim();
+      if (isisSpfInterval) {
+        const n = Number(isisSpfInterval);
+        if (!Number.isInteger(n) || n < 1 || n > 120) return t('vrf.validation.isisSpfIntervalInvalid');
+      }
+
+      const isisTopologyNode = isisTree?.topology && typeof isisTree.topology === 'object' ? isisTree.topology : {};
+      const allowedTopologies = new Set(['ipv4-multicast', 'ipv4-mgmt', 'ipv6-unicast', 'ipv6-multicast', 'ipv6-mgmt', 'ipv6-dstsrc']);
+      for (const topology of Object.keys(isisTopologyNode)) {
+        if (!allowedTopologies.has(String(topology || '').trim())) return t('vrf.validation.isisTopologyInvalid');
+      }
+
+      const isisRedistribute = isisTree?.redistribute && typeof isisTree.redistribute === 'object' ? isisTree.redistribute : {};
+      for (const af of ['ipv4', 'ipv6']) {
+        const afNode = isisRedistribute?.[af] && typeof isisRedistribute[af] === 'object' ? isisRedistribute[af] : {};
+        for (const protocol of Object.keys(afNode)) {
+          const protocolNode = afNode?.[protocol] && typeof afNode[protocol] === 'object' ? afNode[protocol] : {};
+          for (const level of ['level-1', 'level-2']) {
+            const levelNode = protocolNode?.[level] && typeof protocolNode[level] === 'object' ? protocolNode[level] : {};
+            const metric = String(normalizeNodeStringValue(levelNode?.metric) || '').trim();
+            if (!metric) continue;
+            const n = Number(metric);
+            if (!Number.isInteger(n) || n < 0 || n > 16777215) return t('vrf.validation.isisRedistributeMetricInvalid');
+          }
+        }
+      }
+
+      const isisSr = isisTree?.['segment-routing'] && typeof isisTree['segment-routing'] === 'object' ? isisTree['segment-routing'] : {};
+      const isisSrLabelChecks = [
+        isisSr?.['global-block']?.['low-label-value'],
+        isisSr?.['global-block']?.['high-label-value'],
+        isisSr?.['local-block']?.['low-label-value'],
+        isisSr?.['local-block']?.['high-label-value'],
+      ];
+      for (const rawNode of isisSrLabelChecks) {
+        const raw = String(normalizeNodeStringValue(rawNode) || '').trim();
+        if (!raw) continue;
+        const n = Number(raw);
+        if (!Number.isInteger(n) || n < 16 || n > 1048575) return t('vrf.validation.isisSrLabelInvalid');
+      }
+      const isisSrMaxDepth = String(normalizeNodeStringValue(isisSr?.['maximum-label-depth']) || '').trim();
+      if (isisSrMaxDepth) {
+        const n = Number(isisSrMaxDepth);
+        if (!Number.isInteger(n) || n < 1 || n > 16) return t('vrf.validation.isisSrMaxLabelDepthInvalid');
+      }
+
+      const isisSpfDelay = isisTree?.['spf-delay-ietf'] && typeof isisTree['spf-delay-ietf'] === 'object' ? isisTree['spf-delay-ietf'] : {};
+      for (const key of ['holddown', 'init-delay', 'long-delay', 'short-delay', 'time-to-learn']) {
+        const raw = String(normalizeNodeStringValue(isisSpfDelay?.[key]) || '').trim();
+        if (!raw) continue;
+        const n = Number(raw);
+        if (!Number.isInteger(n) || n < 0 || n > 60000) return t('vrf.validation.isisSpfDelayInvalid');
+      }
+
+      const isisTe = isisTree?.['traffic-engineering'] && typeof isisTree['traffic-engineering'] === 'object' ? isisTree['traffic-engineering'] : {};
+      const isisTeAddress = String(normalizeNodeStringValue(isisTe?.address) || '').trim();
+      if (isisTeAddress && !isValidIPv4(isisTeAddress)) return t('vrf.validation.isisTeAddressInvalid');
+
+      for (const row of (v.ospfAreas || [])) {
+        if (!String(row.area || '').trim()) return t('vrf.validation.ospfAreaRequired');
+      }
+      for (const row of (v.ospfAccessLists || [])) {
+        const number = String(row.number || '').trim();
+        if (!number) return t('vrf.validation.ospfAccessListNumberRequired');
+        const n = Number(number);
+        if (!Number.isInteger(n) || n < 0 || n > 4294967295) return t('vrf.validation.ospfAccessListNumberInvalid');
+        const allowed = new Set(['bgp', 'connected', 'isis', 'kernel', 'rip', 'static']);
+        const list = Array.isArray(row.exportProtocols) ? row.exportProtocols : [];
+        for (const item of list) {
+          if (!allowed.has(String(item || '').trim())) return t('vrf.validation.ospfAccessListExportInvalid');
+        }
+      }
+      for (const row of (v.ospfNeighbors || [])) {
+        const address = String(row.address || '').trim();
+        if (!address) return t('vrf.validation.ospfNeighborAddressRequired');
+        if (!isValidIPv4(address)) return t('vrf.validation.ospfNeighborAddressInvalid');
+        const pollInterval = String(row.pollInterval || '').trim();
+        if (pollInterval) {
+          const n = Number(pollInterval);
+          if (!Number.isInteger(n) || n < 1 || n > 65535) return t('vrf.validation.ospfNeighborPollIntervalInvalid');
+        }
+        const priority = String(row.priority || '').trim();
+        if (priority) {
+          const n = Number(priority);
+          if (!Number.isInteger(n) || n < 0 || n > 255) return t('vrf.validation.ospfNeighborPriorityInvalid');
+        }
+      }
+      for (const row of (v.ospfSummaryAddresses || [])) {
+        const prefix = String(row.prefix || '').trim();
+        if (!prefix) return t('vrf.validation.ospfSummaryAddressPrefixRequired');
+        if (!isValidCIDR(prefix) || !isValidIPv4(prefix.split('/')[0] || '')) return t('vrf.validation.ospfSummaryAddressPrefixInvalid');
+        const tag = String(row.tag || '').trim();
+        if (tag) {
+          const n = Number(tag);
+          if (!Number.isInteger(n) || n < 1 || n > 4294967295) return t('vrf.validation.ospfSummaryAddressTagInvalid');
+        }
+      }
+      const sr = v.ospfSegmentRouting && typeof v.ospfSegmentRouting === 'object'
+        ? v.ospfSegmentRouting
+        : {};
+      const labelChecks = [
+        { key: 'globalBlockLowLabelValue', message: 'vrf.validation.ospfSrLabelInvalid' },
+        { key: 'globalBlockHighLabelValue', message: 'vrf.validation.ospfSrLabelInvalid' },
+        { key: 'localBlockLowLabelValue', message: 'vrf.validation.ospfSrLabelInvalid' },
+        { key: 'localBlockHighLabelValue', message: 'vrf.validation.ospfSrLabelInvalid' },
+      ];
+      for (const check of labelChecks) {
+        const raw = String(sr[check.key] || '').trim();
+        if (!raw) continue;
+        const n = Number(raw);
+        if (!Number.isInteger(n) || n < 16 || n > 1048575) return t(check.message);
+      }
+      const maximumLabelDepth = String(sr.maximumLabelDepth || '').trim();
+      if (maximumLabelDepth) {
+        const n = Number(maximumLabelDepth);
+        if (!Number.isInteger(n) || n < 1 || n > 16) return t('vrf.validation.ospfSrMaximumLabelDepthInvalid');
+      }
+      const srPrefixes = Array.isArray(sr.prefixes) ? sr.prefixes : [];
+      for (const row of srPrefixes) {
+        const prefix = String(row.prefix || '').trim();
+        if (!prefix) return t('vrf.validation.ospfSrPrefixRequired');
+        if (!isValidCIDR(prefix) || !isValidIPv4(prefix.split('/')[0] || '')) return t('vrf.validation.ospfSrPrefixInvalid');
+        const indexValue = String(row.indexValue || '').trim();
+        if (indexValue) {
+          const n = Number(indexValue);
+          if (!Number.isInteger(n) || n < 0 || n > 65535) return t('vrf.validation.ospfSrPrefixIndexValueInvalid');
+        }
+      }
+      const redist = v.ospfRedistribute && typeof v.ospfRedistribute === 'object'
+        ? v.ospfRedistribute
+        : {};
+      for (const protocol of OSPF_REDISTRIBUTE_PROTOCOLS) {
+        const item = redist?.[protocol] && typeof redist[protocol] === 'object'
+          ? redist[protocol]
+          : null;
+        if (!item || !item.enabled) continue;
+        const metric = String(item.metric || '').trim();
+        if (metric) {
+          const n = Number(metric);
+          if (!Number.isInteger(n) || n < 0 || n > 16777214) return t('vrf.validation.ospfRedistributeMetricInvalid');
+        }
+        const metricType = String(item.metricType || '').trim();
+        if (metricType) {
+          const n = Number(metricType);
+          if (!Number.isInteger(n) || n < 1 || n > 2) return t('vrf.validation.ospfRedistributeMetricTypeInvalid');
+        }
+      }
+      for (const row of (redist.tables || [])) {
+        const table = String(row.table || '').trim();
+        if (!table) return t('vrf.validation.ospfRedistributeTableRequired');
+        const tableNum = Number(table);
+        if (!Number.isInteger(tableNum) || tableNum < 1 || tableNum > 200) return t('vrf.validation.ospfRedistributeTableInvalid');
+        const metric = String(row.metric || '').trim();
+        if (metric) {
+          const n = Number(metric);
+          if (!Number.isInteger(n) || n < 0 || n > 16777214) return t('vrf.validation.ospfRedistributeMetricInvalid');
+        }
+        const metricType = String(row.metricType || '').trim();
+        if (metricType) {
+          const n = Number(metricType);
+          if (!Number.isInteger(n) || n < 1 || n > 2) return t('vrf.validation.ospfRedistributeMetricTypeInvalid');
+        }
+      }
+      for (const row of (v.ospfInterfaces || [])) {
+        if (!String(row.name || '').trim()) return t('vrf.validation.ospfInterfaceRequired');
+        const area = String(row.area || '').trim();
+        if (area) {
+          const n = Number(area);
+          const isDecimalArea = Number.isInteger(n) && n >= 0 && n <= 4294967295;
+          if (!(isDecimalArea || isValidIPv4(area))) return t('vrf.validation.ospfAreaInvalid');
+        }
+        const authType = String(row.authenticationType || '').trim();
+        const md5KeyId = String(row.md5KeyId || '').trim();
+        const md5Key = String(row.md5Key || '').trim();
+        const plaintextPassword = String(row.plaintextPassword || '').trim();
+        if (authType === 'md5') {
+          const keyIdNum = Number(md5KeyId);
+          if (!Number.isInteger(keyIdNum) || keyIdNum < 1 || keyIdNum > 255 || !md5Key || md5Key.length > 16) {
+            return t('vrf.validation.ospfInterfaceAuthMd5Invalid');
+          }
+        }
+        if (authType === 'plaintext-password' && plaintextPassword.length > 8) {
+          return t('vrf.validation.ospfInterfaceAuthPlaintextInvalid');
+        }
+
+        const numericChecks = [
+          { key: 'bandwidth', min: 1, max: 100000, message: 'vrf.validation.ospfInterfaceBandwidthInvalid' },
+          { key: 'cost', min: 1, max: 65535, message: 'vrf.validation.ospfInterfaceCostInvalid' },
+          { key: 'deadInterval', min: 1, max: 65535, message: 'vrf.validation.ospfInterfaceDeadIntervalInvalid' },
+          { key: 'helloInterval', min: 1, max: 65535, message: 'vrf.validation.ospfInterfaceHelloIntervalInvalid' },
+          { key: 'helloMultiplier', min: 1, max: 10, message: 'vrf.validation.ospfInterfaceHelloMultiplierInvalid' },
+          { key: 'ldpSyncHolddown', min: 0, max: 10000, message: 'vrf.validation.ospfInterfaceLdpSyncHolddownInvalid' },
+          { key: 'priority', min: 0, max: 255, message: 'vrf.validation.ospfInterfacePriorityInvalid' },
+          { key: 'retransmitInterval', min: 1, max: 65535, message: 'vrf.validation.ospfInterfaceRetransmitIntervalInvalid' },
+          { key: 'retransmitWindow', min: 20, max: 1000, message: 'vrf.validation.ospfInterfaceRetransmitWindowInvalid' },
+          { key: 'transmitDelay', min: 1, max: 65535, message: 'vrf.validation.ospfInterfaceTransmitDelayInvalid' },
+        ];
+        for (const check of numericChecks) {
+          const raw = String(row[check.key] || '').trim();
+          if (!raw) continue;
+          const n = Number(raw);
+          if (!Number.isInteger(n) || n < check.min || n > check.max) return t(check.message);
+        }
+
+        const network = String(row.network || '').trim();
+        if (network && !['broadcast', 'non-broadcast', 'point-to-multipoint', 'point-to-point'].includes(network)) {
+          return t('vrf.validation.ospfInterfaceNetworkInvalid');
+        }
+      }
+      for (const row of (v.ospfv3Areas || [])) {
+        const area = String(row.area || '').trim();
+        if (!area) return t('vrf.validation.ospfv3AreaRequired');
+        const n = Number(area);
+        const isDecimalArea = Number.isInteger(n) && n >= 0 && n <= 4294967295;
+        if (!(isDecimalArea || isValidIPv4(area))) return t('vrf.validation.ospfv3AreaInvalid');
+
+        const areaType = String(row.areaType || '').trim();
+        if (areaType && !['nssa', 'stub'].includes(areaType)) return t('vrf.validation.ospfv3AreaTypeInvalid');
+
+        const ranges = Array.isArray(row.ranges) ? row.ranges : [];
+        for (const rangeRow of ranges) {
+          const prefix = String(rangeRow.prefix || '').trim();
+          if (!prefix) return t('vrf.validation.ospfv3AreaRangePrefixRequired');
+          const ipPart = prefix.split('/')[0] || '';
+          if (!isValidCIDR(prefix) || !isValidIPv6(ipPart)) return t('vrf.validation.ospfv3AreaRangePrefixInvalid');
+          const action = String(rangeRow.action || '').trim();
+          if (action && !['advertise', 'not-advertise'].includes(action)) return t('vrf.validation.ospfv3AreaRangeActionInvalid');
+        }
+      }
+      for (const row of (v.ospfv3Interfaces || [])) {
+        if (!String(row.name || '').trim()) return t('vrf.validation.ospfv3InterfaceRequired');
+        const area = String(row.area || '').trim();
+        if (area) {
+          const n = Number(area);
+          const isDecimalArea = Number.isInteger(n) && n >= 0 && n <= 4294967295;
+          if (!(isDecimalArea || isValidIPv4(area))) return t('vrf.validation.ospfv3AreaInvalid');
+        }
+        const network = String(row.network || '').trim();
+        if (network && !['broadcast', 'point-to-point'].includes(network)) return t('vrf.validation.ospfv3InterfaceNetworkInvalid');
+
+        const numericChecks = [
+          { key: 'cost', min: 1, max: 65535, message: 'vrf.validation.ospfv3InterfaceCostInvalid' },
+          { key: 'deadInterval', min: 1, max: 65535, message: 'vrf.validation.ospfv3InterfaceDeadIntervalInvalid' },
+          { key: 'helloInterval', min: 1, max: 65535, message: 'vrf.validation.ospfv3InterfaceHelloIntervalInvalid' },
+          { key: 'ifmtu', min: 1, max: 65535, message: 'vrf.validation.ospfv3InterfaceIfmtuInvalid' },
+          { key: 'instanceId', min: 0, max: 255, message: 'vrf.validation.ospfv3InterfaceInstanceIdInvalid' },
+          { key: 'priority', min: 0, max: 255, message: 'vrf.validation.ospfv3InterfacePriorityInvalid' },
+          { key: 'retransmitInterval', min: 1, max: 65535, message: 'vrf.validation.ospfv3InterfaceRetransmitIntervalInvalid' },
+          { key: 'transmitDelay', min: 1, max: 65535, message: 'vrf.validation.ospfv3InterfaceTransmitDelayInvalid' },
+        ];
+        for (const check of numericChecks) {
+          const raw = String(row[check.key] || '').trim();
+          if (!raw) continue;
+          const n = Number(raw);
+          if (!Number.isInteger(n) || n < check.min || n > check.max) return t(check.message);
+        }
+      }
+      const ospfv3Redist = v.ospfv3Redistribute && typeof v.ospfv3Redistribute === 'object'
+        ? v.ospfv3Redistribute
+        : {};
+      for (const protocol of OSPFV3_REDISTRIBUTE_PROTOCOLS) {
+        const item = ospfv3Redist?.[protocol] && typeof ospfv3Redist[protocol] === 'object'
+          ? ospfv3Redist[protocol]
+          : null;
+        if (!item || !item.enabled) continue;
+        const metric = String(item.metric || '').trim();
+        if (metric) {
+          const n = Number(metric);
+          if (!Number.isInteger(n) || n < 0 || n > 16777214) return t('vrf.validation.ospfv3RedistributeMetricInvalid');
+        }
+        const metricType = String(item.metricType || '').trim();
+        if (metricType) {
+          const n = Number(metricType);
+          if (!Number.isInteger(n) || n < 1 || n > 2) return t('vrf.validation.ospfv3RedistributeMetricTypeInvalid');
+        }
+      }
+
+      const ospfv3Tree = parseCliTextToProtocolTree(buildOspfv3CliTextFromCollections(v));
+      const gracefulRestartNode = ospfv3Tree?.['graceful-restart'] && typeof ospfv3Tree['graceful-restart'] === 'object'
+        ? ospfv3Tree['graceful-restart']
+        : {};
+      const gracePeriod = String(normalizeNodeStringValue(gracefulRestartNode['grace-period']) || '').trim();
+      if (gracePeriod) {
+        const n = Number(gracePeriod);
+        if (!Number.isInteger(n) || n < 1 || n > 1800) return t('vrf.validation.ospfv3GracefulRestartGracePeriodInvalid');
+      }
+      const helperNode = gracefulRestartNode?.helper && typeof gracefulRestartNode.helper === 'object'
+        ? gracefulRestartNode.helper
+        : {};
+      const supportedGraceTime = String(normalizeNodeStringValue(helperNode['supported-grace-time']) || '').trim();
+      if (supportedGraceTime) {
+        const n = Number(supportedGraceTime);
+        if (!Number.isInteger(n) || n < 10 || n > 1800) return t('vrf.validation.ospfv3GracefulRestartSupportedGraceTimeInvalid');
+      }
+      const enableNode = helperNode?.enable && typeof helperNode.enable === 'object'
+        ? helperNode.enable
+        : {};
+      const routerIdNode = enableNode?.['router-id'];
+      if (typeof routerIdNode === 'string' || typeof routerIdNode === 'number') {
+        if (!isValidIPv4(String(routerIdNode).trim())) return t('vrf.validation.ospfv3GracefulRestartRouterIdInvalid');
+      } else if (routerIdNode && typeof routerIdNode === 'object') {
+        const ids = Object.keys(routerIdNode).filter(Boolean);
+        for (const routerId of ids) {
+          if (!isValidIPv4(String(routerId).trim())) return t('vrf.validation.ospfv3GracefulRestartRouterIdInvalid');
+        }
+      }
+      for (const row of (v.rpkiCaches || [])) {
+        const address = String(row.address || '').trim();
+        if (!address) return t('vrf.validation.rpkiCacheAddressRequired');
+        if (!(isValidIPv4(address) || isValidIPv6(address) || isValidHostname(address))) return t('vrf.validation.rpkiCacheAddressInvalid');
+        const port = String(row.port || '').trim();
+        if (port) {
+          const n = Number(port);
+          if (!Number.isInteger(n) || n < 1 || n > 65535) return t('vrf.validation.bgpPortInvalid');
+        }
+        const preference = String(row.preference || '').trim();
+        if (preference) {
+          const n = Number(preference);
+          if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.rpkiPreferenceInvalid');
+        }
+        const sourceAddress = String(row.sourceAddress || '').trim();
+        if (sourceAddress && !isValidIPv4(sourceAddress)) return t('vrf.validation.rpkiSourceAddressInvalid');
+      }
+      for (const row of (v.staticRoutes || [])) {
+        const prefix = String(row.prefix || '').trim();
+        if (!prefix) return t('vrf.validation.staticRoutePrefixRequired');
+        if (!isValidCIDR(prefix)) return t('vrf.validation.staticRoutePrefixInvalid');
+        const mode = inferStaticRouteBranch(row, 'ipv4');
+        const nextHopRows = Array.isArray(row.nextHops) && row.nextHops.length
+          ? row.nextHops
+          : [{ address: row.nextHop, distance: row.distance, bfdSourceAddress: row.bfdSourceAddress, segments: row.segments }];
+        if (mode === 'next-hop') {
+          let hasValidAddress = false;
+          for (const nhRowRaw of nextHopRows) {
+            const nhRow = nhRowRaw && typeof nhRowRaw === 'object' ? nhRowRaw : {};
+            const address = String(nhRow.address || '').trim();
+            if (!address) continue;
+            if (!isValidIPv4(address)) return t('vrf.validation.staticRouteNextHopInvalid');
+            hasValidAddress = true;
+            const nhDistance = String(nhRow.distance || '').trim();
+            if (nhDistance) {
+              const n = Number(nhDistance);
+              if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.staticRouteDistanceInvalid');
+            }
+            const bfdSourceAddress = String(nhRow.bfdSourceAddress || '').trim();
+            if (bfdSourceAddress && !isValidIPv4(bfdSourceAddress)) return t('vrf.validation.staticRouteBfdSourceAddressInvalid');
+          }
+          if (!hasValidAddress) return t('vrf.validation.staticRouteNextHopInvalid');
+        }
+        if (mode === 'interface') {
+          const interfaceRows = Array.isArray(row.interfaceRows) && row.interfaceRows.length
+            ? row.interfaceRows
+            : [{ name: row.interface, distance: row.distance }];
+          let hasInterface = false;
+          for (const ifRowRaw of interfaceRows) {
+            const ifRow = ifRowRaw && typeof ifRowRaw === 'object' ? ifRowRaw : {};
+            const ifName = String(ifRow.name || '').trim();
+            if (!ifName) continue;
+            hasInterface = true;
+            const ifDistance = String(ifRow.distance || '').trim();
+            if (ifDistance) {
+              const n = Number(ifDistance);
+              if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.staticRouteDistanceInvalid');
+            }
+          }
+          if (!hasInterface) return t('vrf.validation.staticRouteInterfaceRequired');
+        }
+        if (mode === 'dhcp-interface' && !String(row.dhcpInterface || '').trim()) return t('vrf.validation.staticRouteInterfaceRequired');
+        const distance = String(row.distance || '').trim();
+        if (distance) {
+          const n = Number(distance);
+          if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.staticRouteDistanceInvalid');
+        }
+        const tag = String(row.tag || '').trim();
+        if (tag) {
+          const n = Number(tag);
+          if (!Number.isInteger(n) || n < 1 || n > 4294967295) return t('vrf.validation.staticRouteTagInvalid');
+        }
+      }
+      for (const row of (v.staticRoutes6 || [])) {
+        const prefix = String(row.prefix || '').trim();
+        if (!prefix) return t('vrf.validation.staticRoute6PrefixRequired');
+        if (!isValidCIDR(prefix)) return t('vrf.validation.staticRoute6PrefixInvalid');
+        const mode = inferStaticRouteBranch(row, 'ipv6');
+        const nextHopRows = Array.isArray(row.nextHops) && row.nextHops.length
+          ? row.nextHops
+          : [{ address: row.nextHop, distance: row.distance, bfdSourceAddress: row.bfdSourceAddress }];
+        if (mode === 'next-hop') {
+          let hasValidAddress = false;
+          for (const nhRowRaw of nextHopRows) {
+            const nhRow = nhRowRaw && typeof nhRowRaw === 'object' ? nhRowRaw : {};
+            const address = String(nhRow.address || '').trim();
+            if (!address) continue;
+            if (!isValidIPv6(address)) return t('vrf.validation.staticRoute6NextHopInvalid');
+            hasValidAddress = true;
+            const nhDistance = String(nhRow.distance || '').trim();
+            if (nhDistance) {
+              const n = Number(nhDistance);
+              if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.staticRouteDistanceInvalid');
+            }
+            const bfdSourceAddress = String(nhRow.bfdSourceAddress || '').trim();
+            if (bfdSourceAddress && !isValidIPv6(bfdSourceAddress)) return t('vrf.validation.staticRoute6BfdSourceAddressInvalid');
+          }
+          if (!hasValidAddress) return t('vrf.validation.staticRoute6NextHopInvalid');
+        }
+        if (mode === 'interface' && !String(row.interface || '').trim()) return t('vrf.validation.staticRouteInterfaceRequired');
+        const distance = String(row.distance || '').trim();
+        if (distance) {
+          const n = Number(distance);
+          if (!Number.isInteger(n) || n < 1 || n > 255) return t('vrf.validation.staticRouteDistanceInvalid');
+        }
+        const tag = String(row.tag || '').trim();
+        if (tag) {
+          const n = Number(tag);
+          if (!Number.isInteger(n) || n < 1 || n > 4294967295) return t('vrf.validation.staticRouteTagInvalid');
+        }
+      }
+      return '';
+    }
+
+    function toLeafSetObject(list) {
+      const obj = {};
+      for (const item of list) {
+        if (item) obj[item] = {};
+      }
+      return obj;
+    }
+
+    function parseFailoverCollectionsFromTree(failoverRoot) {
+      const rows = [];
+      const routeNode = failoverRoot?.route || {};
+
+      const parseCheckTargets = (targetNode) => {
+        const targets = [];
+        const source = targetNode && typeof targetNode === 'object' ? targetNode : {};
+        for (const [address, attrsRaw] of Object.entries(source)) {
+          if (!address) continue;
+          const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+          targets.push({
+            address,
+            interface: normalizeNodeStringValue(attrs.interface),
+            vrf: normalizeNodeStringValue(attrs.vrf),
+          });
+        }
+        return targets;
+      };
+
+      const buildRow = (prefix, gatewayType, gateway, attrsRaw) => {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const check = attrs.check && typeof attrs.check === 'object' ? attrs.check : {};
+        const targets = parseCheckTargets(check.target);
+        if (!targets.length) targets.push({ address: '', interface: '', vrf: '' });
+        return {
+          __id: nextBgpRowId('failover'),
+          prefix,
+          gatewayType,
+          gateway,
+          interface: normalizeNodeStringValue(attrs.interface),
+          metric: normalizeNodeStringValue(attrs.metric),
+          onlink: !!(attrs.onlink && typeof attrs.onlink === 'object'),
+          checkPolicy: normalizeNodeStringValue(check.policy),
+          checkPort: normalizeNodeStringValue(check.port),
+          checkTimeout: normalizeNodeStringValue(check.timeout),
+          checkType: normalizeNodeStringValue(check.type),
+          checkTargets: targets,
+        };
+      };
+
+      for (const [prefix, attrsRaw] of Object.entries(routeNode)) {
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+
+        const nextHopNode = attrs['next-hop'] && typeof attrs['next-hop'] === 'object' ? attrs['next-hop'] : {};
+        for (const [nextHop, nextHopAttrsRaw] of Object.entries(nextHopNode)) {
+          if (!nextHop) continue;
+          rows.push(buildRow(prefix, 'next-hop', nextHop, nextHopAttrsRaw));
+        }
+
+        const dhcpNode = attrs['dhcp-interface'];
+        if (typeof dhcpNode === 'string' && dhcpNode) {
+          rows.push(buildRow(prefix, 'dhcp-interface', dhcpNode, {}));
+        } else if (dhcpNode && typeof dhcpNode === 'object') {
+          for (const [dhcpInterface, dhcpAttrsRaw] of Object.entries(dhcpNode)) {
+            if (!dhcpInterface) continue;
+            rows.push(buildRow(prefix, 'dhcp-interface', dhcpInterface, dhcpAttrsRaw));
+          }
+        }
+      }
+
+      return rows.sort((a, b) => a.prefix.localeCompare(b.prefix) || a.gatewayType.localeCompare(b.gatewayType) || a.gateway.localeCompare(b.gateway));
+    }
+
+    function buildFailoverCliTextFromCollections(v) {
+      const original = String(v.failoverCliText || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const filtered = original.filter(line => !line.startsWith('route '));
+
+      for (const row of (v.failoverRoutes || [])) {
+        const prefix = String(row.prefix || '').trim();
+        const gatewayType = String(row.gatewayType || '').trim();
+        const gateway = String(row.gateway || '').trim();
+        if (!prefix || !gateway || (gatewayType !== 'next-hop' && gatewayType !== 'dhcp-interface')) continue;
+
+        const base = `route ${prefix} ${gatewayType} ${gateway}`;
+        filtered.push(base);
+
+        const intf = String(row.interface || '').trim();
+        const metric = String(row.metric || '').trim();
+        if (intf) filtered.push(`${base} interface ${intf}`);
+        if (metric) filtered.push(`${base} metric ${metric}`);
+        if (row.onlink) filtered.push(`${base} onlink`);
+
+        const checkPolicy = String(row.checkPolicy || '').trim();
+        const checkPort = String(row.checkPort || '').trim();
+        const checkTimeout = String(row.checkTimeout || '').trim();
+        const checkType = String(row.checkType || '').trim();
+        if (checkPolicy) filtered.push(`${base} check policy ${checkPolicy}`);
+        if (checkPort) filtered.push(`${base} check port ${checkPort}`);
+        if (checkTimeout) filtered.push(`${base} check timeout ${checkTimeout}`);
+        if (checkType) filtered.push(`${base} check type ${checkType}`);
+
+        for (const targetRaw of (row.checkTargets || [])) {
+          const target = targetRaw && typeof targetRaw === 'object' ? targetRaw : {};
+          const targetAddress = String(target.address || '').trim();
+          if (!targetAddress) continue;
+          const targetBase = `${base} check target ${targetAddress}`;
+          filtered.push(targetBase);
+          const targetInterface = String(target.interface || '').trim();
+          const targetVrf = String(target.vrf || '').trim();
+          if (targetInterface) filtered.push(`${targetBase} interface ${targetInterface}`);
+          if (targetVrf) filtered.push(`${targetBase} vrf ${targetVrf}`);
+        }
+      }
+
+      return filtered.join('\n');
+    }
+
+    function parseBGPSetToText(node) {
+      if (!node || typeof node !== 'object') return '';
+      return Object.keys(node).filter(Boolean).sort((a, b) => a.localeCompare(b)).join('\n');
+    }
+
+    function parseBGPSetFromText(text) {
+      const obj = {};
+      const lines = String(text || '').split('\n').map(v => v.trim()).filter(Boolean);
+      for (const line of lines) {
+        obj[line] = {};
+      }
+      return obj;
+    }
+
+    function extractChoiceValue(node) {
+      if (!node) return '';
+      if (typeof node === 'string' || typeof node === 'number') return String(node).trim();
+      if (typeof node === 'object') return Object.keys(node).find(Boolean) || '';
+      return '';
+    }
+
+    function toServiceAddressRows(node) {
+      return normalizeLeafSet(node).map((address) => ({
+        __id: nextBgpRowId('svc-addr'),
+        address,
+      }));
+    }
+
+    function toServiceNameRows(node, idPrefix = 'svc-name') {
+      return normalizeLeafSet(node).map((name) => ({
+        __id: nextBgpRowId(idPrefix),
+        name,
+      }));
+    }
+
+    function parseDhcpClientClassRows(node) {
+      if (!node || typeof node !== 'object') return [];
+      const rows = [];
+      const parseRelayAgentValue = (valueNode) => {
+        if (typeof valueNode === 'string' || typeof valueNode === 'number') return String(valueNode).trim();
+        if (valueNode && typeof valueNode === 'object') {
+          const hexValue = normalizeNodeStringValue(valueNode.hex);
+          if (hexValue) return hexValue;
+          return extractChoiceValue(valueNode);
+        }
+        return '';
+      };
+      for (const [name, classNodeRaw] of Object.entries(node)) {
+        if (!name) continue;
+        const classNode = classNodeRaw && typeof classNodeRaw === 'object' ? classNodeRaw : {};
+        const rai = classNode['relay-agent-information'] || classNode.relay_agent_information || {};
+        rows.push({
+          __id: nextBgpRowId('svc-class'),
+          name,
+          disable: !!classNode.disable,
+          circuitId: parseRelayAgentValue(rai['circuit-id'] || rai.circuit_id),
+          remoteId: parseRelayAgentValue(rai['remote-id'] || rai.remote_id),
+        });
+      }
+      return rows.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    }
+
+    function buildDhcpClientClassNode(rows) {
+      const result = {};
+      const buildRelayAgentValue = (value) => {
+        const text = String(value || '').trim();
+        if (!text) return '';
+        if (/^0x[0-9a-fA-F]+$/.test(text)) return { hex: text };
+        return text;
+      };
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const name = String(row.name || '').trim();
+        if (!name) continue;
+        const item = {};
+        if (row.disable) item.disable = {};
+        const circuitId = buildRelayAgentValue(row.circuitId);
+        const remoteId = buildRelayAgentValue(row.remoteId);
+        if (circuitId || remoteId) {
+          item['relay-agent-information'] = {};
+          if (circuitId) item['relay-agent-information']['circuit-id'] = circuitId;
+          if (remoteId) item['relay-agent-information']['remote-id'] = remoteId;
+        }
+        result[name] = item;
+      }
+      return result;
+    }
+
+    function parseDhcpSharedNetworkDdnsSettings(node) {
+      const source = node && typeof node === 'object' ? node : {};
+      return {
+        conflictResolution: extractChoiceValue(source['conflict-resolution']),
+        generatedPrefix: normalizeNodeStringValue(source['generated-prefix']),
+        hostnameCharReplacement: normalizeNodeStringValue(source['hostname-char-replacement']),
+        hostnameCharSet: normalizeNodeStringValue(source['hostname-char-set']),
+        overrideClientUpdate: extractChoiceValue(source['override-client-update']),
+        overrideNoUpdate: extractChoiceValue(source['override-no-update']),
+        qualifyingSuffix: normalizeNodeStringValue(source['qualifying-suffix']),
+        replaceClientName: extractChoiceValue(source['replace-client-name']),
+        sendUpdates: extractChoiceValue(source['send-updates']),
+        ttlPercent: normalizeNodeStringValue(source['ttl-percent']),
+        updateOnRenew: extractChoiceValue(source['update-on-renew']),
+      };
+    }
+
+    function buildDhcpSharedNetworkDdnsSettings(settings) {
+      const source = settings && typeof settings === 'object' ? settings : {};
+      const result = {};
+      const conflictResolution = String(source.conflictResolution || '').trim();
+      if (conflictResolution) result['conflict-resolution'] = { [conflictResolution]: {} };
+      const generatedPrefix = String(source.generatedPrefix || '').trim();
+      if (generatedPrefix) result['generated-prefix'] = generatedPrefix;
+      const hostnameCharReplacement = String(source.hostnameCharReplacement || '').trim();
+      if (hostnameCharReplacement) result['hostname-char-replacement'] = hostnameCharReplacement;
+      const hostnameCharSet = String(source.hostnameCharSet || '').trim();
+      if (hostnameCharSet) result['hostname-char-set'] = hostnameCharSet;
+      const overrideClientUpdate = String(source.overrideClientUpdate || '').trim();
+      if (overrideClientUpdate) result['override-client-update'] = { [overrideClientUpdate]: {} };
+      const overrideNoUpdate = String(source.overrideNoUpdate || '').trim();
+      if (overrideNoUpdate) result['override-no-update'] = { [overrideNoUpdate]: {} };
+      const qualifyingSuffix = String(source.qualifyingSuffix || '').trim();
+      if (qualifyingSuffix) result['qualifying-suffix'] = qualifyingSuffix;
+      const replaceClientName = String(source.replaceClientName || '').trim();
+      if (replaceClientName) result['replace-client-name'] = { [replaceClientName]: {} };
+      const sendUpdates = String(source.sendUpdates || '').trim();
+      if (sendUpdates) result['send-updates'] = { [sendUpdates]: {} };
+      const ttlPercent = String(source.ttlPercent || '').trim();
+      if (ttlPercent) result['ttl-percent'] = ttlPercent;
+      const updateOnRenew = String(source.updateOnRenew || '').trim();
+      if (updateOnRenew) result['update-on-renew'] = { [updateOnRenew]: {} };
+      return result;
+    }
+
+    function hasDhcpSharedNetworkDdnsSettings(settings) {
+      const source = settings && typeof settings === 'object' ? settings : {};
+      return !!(
+        String(source.conflictResolution || '').trim() ||
+        String(source.generatedPrefix || '').trim() ||
+        String(source.hostnameCharReplacement || '').trim() ||
+        String(source.hostnameCharSet || '').trim() ||
+        String(source.overrideClientUpdate || '').trim() ||
+        String(source.overrideNoUpdate || '').trim() ||
+        String(source.qualifyingSuffix || '').trim() ||
+        String(source.replaceClientName || '').trim() ||
+        String(source.sendUpdates || '').trim() ||
+        String(source.ttlPercent || '').trim() ||
+        String(source.updateOnRenew || '').trim()
+      );
+    }
+
+    function parseDhcpSharedNetworkOptionCollections(node) {
+      const options = [];
+      const staticRoutes = [];
+      const source = node && typeof node === 'object' ? node : {};
+      for (const [name, optionRaw] of Object.entries(source)) {
+        if (!name) continue;
+        if (name === 'static-route' && optionRaw && typeof optionRaw === 'object' && !Array.isArray(optionRaw)) {
+          for (const [subnet, routeRaw] of Object.entries(optionRaw)) {
+            if (!subnet) continue;
+            const routeNode = routeRaw && typeof routeRaw === 'object' ? routeRaw : {};
+            const nextHopNode = routeNode['next-hop'];
+            let nextHop = normalizeNodeStringValue(nextHopNode);
+            if (!nextHop) nextHop = extractChoiceValue(nextHopNode);
+            staticRoutes.push({ __id: nextBgpRowId('svc-static-route'), subnet, nextHop });
+          }
+          continue;
+        }
+        if (optionRaw && typeof optionRaw === 'object' && !Array.isArray(optionRaw)) {
+          const childKeys = Object.keys(optionRaw).filter(Boolean);
+          if (!childKeys.length) {
+            options.push({ __id: nextBgpRowId('svc-opt'), name, value: '' });
+            continue;
+          }
+          if (DHCP4_SHARED_MULTI_VALUE_OPTION_NAMES.has(name)) {
+            childKeys.forEach((childKey) => {
+              options.push({ __id: nextBgpRowId('svc-opt'), name, value: childKey });
+            });
+            continue;
+          }
+          childKeys.forEach((childKey) => {
+            const childVal = optionRaw[childKey];
+            let value = '';
+            if (typeof childVal === 'string' || typeof childVal === 'number') value = String(childVal);
+            else if (childVal && typeof childVal === 'object') value = extractChoiceValue(childVal);
+            options.push({ __id: nextBgpRowId('svc-opt'), name: `${name} ${childKey}`, value });
+          });
+          continue;
+        }
+        options.push({ __id: nextBgpRowId('svc-opt'), name, value: normalizeNodeStringValue(optionRaw) });
+      }
+      staticRoutes.sort((a, b) => String(a.subnet || '').localeCompare(String(b.subnet || '')));
+      return { options, staticRoutes };
+    }
+
+    function buildDhcpSharedNetworkOptions(rows, staticRouteRows = []) {
+      const optionNode = {};
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const optionName = String(row.name || '').trim();
+        if (!optionName) continue;
+        const value = String(row.value || '').trim();
+        const parts = optionName.split(/\s+/).filter(Boolean);
+        if (parts.length === 1) {
+          const name = parts[0];
+          if (DHCP4_SHARED_MULTI_VALUE_OPTION_NAMES.has(name)) {
+            if (!value) continue;
+            if (!optionNode[name] || typeof optionNode[name] !== 'object' || Array.isArray(optionNode[name])) optionNode[name] = {};
+            optionNode[name][value] = {};
+          } else {
+            optionNode[name] = value ? value : {};
+          }
+          continue;
+        }
+        const rootName = parts.shift();
+        const childName = parts.join(' ');
+        if (!rootName || !childName) continue;
+        if (!optionNode[rootName] || typeof optionNode[rootName] !== 'object' || Array.isArray(optionNode[rootName])) {
+          optionNode[rootName] = {};
+        }
+        optionNode[rootName][childName] = value ? value : {};
+      }
+
+      const staticRouteNode = {};
+      for (const routeRaw of (staticRouteRows || [])) {
+        const route = routeRaw && typeof routeRaw === 'object' ? routeRaw : {};
+        const subnet = String(route.subnet || '').trim();
+        if (!subnet) continue;
+        const nextHop = String(route.nextHop || '').trim();
+        if (!nextHop) continue;
+        staticRouteNode[subnet] = { 'next-hop': nextHop };
+      }
+      if (Object.keys(staticRouteNode).length) optionNode['static-route'] = staticRouteNode;
+
+      return optionNode;
+    }
+
+    function parseDhcpSharedSubnetRangeRows(node) {
+      const rows = [];
+      const source = node && typeof node === 'object' ? node : {};
+      for (const [name, attrsRaw] of Object.entries(source)) {
+        if (!name) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        rows.push({
+          __id: nextBgpRowId('svc-subnet-range'),
+          name,
+          clientClass: normalizeNodeStringValue(attrs['client-class'] || attrs.client_class),
+          start: normalizeNodeStringValue(attrs.start),
+          stop: normalizeNodeStringValue(attrs.stop),
+          options: parseDhcpSharedSubnetOptionRows(attrs.option),
+        });
+      }
+      return rows.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    }
+
+    function buildDhcpSharedSubnetRangeNode(rows) {
+      const result = {};
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const name = String(row.name || '').trim();
+        if (!name) continue;
+        const item = {};
+        const clientClass = String(row.clientClass || '').trim();
+        const start = String(row.start || '').trim();
+        const stop = String(row.stop || '').trim();
+        if (clientClass) item['client-class'] = clientClass;
+        if (start) item.start = start;
+        if (stop) item.stop = stop;
+        let optionRows = Array.isArray(row.options) ? row.options : [];
+        if (!optionRows.length) {
+          const optionLines = String(row.optionRowsText || '').split(/\n+/).map(v => v.trim()).filter(Boolean);
+          optionRows = optionLines.map((line) => {
+            const parts = line.split(',');
+            return {
+              name: String(parts[0] || '').trim(),
+              value: String(parts.slice(1).join(',') || '').trim(),
+            };
+          }).filter(item => item.name);
+        }
+        const optionNode = buildDhcpSharedSubnetOptionNode(optionRows);
+        if (Object.keys(optionNode).length) item.option = optionNode;
+        result[name] = item;
+      }
+      return result;
+    }
+
+    function parseDhcpSharedSubnetMappingRows(node) {
+      const rows = [];
+      const source = node && typeof node === 'object' ? node : {};
+      for (const [name, attrsRaw] of Object.entries(source)) {
+        if (!name) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        rows.push({
+          __id: nextBgpRowId('svc-subnet-mapping'),
+          name,
+          disable: !!attrs.disable,
+          description: normalizeNodeStringValue(attrs.description),
+          duid: normalizeNodeStringValue(attrs.duid),
+          ipAddress: normalizeNodeStringValue(attrs['ip-address'] || attrs.ip_address),
+          macAddress: normalizeNodeStringValue(attrs.mac || attrs['mac-address'] || attrs.mac_address),
+          options: parseDhcpSharedSubnetOptionRows(attrs.option),
+        });
+      }
+      return rows.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    }
+
+    function buildDhcpSharedSubnetMappingNode(rows) {
+      const result = {};
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const name = String(row.name || '').trim();
+        if (!name) continue;
+        const item = {};
+        if (row.disable) item.disable = {};
+        const description = String(row.description || '').trim();
+        if (description) item.description = description;
+        const duid = String(row.duid || '').trim();
+        if (duid) item.duid = duid;
+        const ipAddress = String(row.ipAddress || '').trim();
+        if (ipAddress) item['ip-address'] = ipAddress;
+        const macAddress = String(row.macAddress || '').trim();
+        if (macAddress) item.mac = macAddress;
+        let optionRows = Array.isArray(row.options) ? row.options : [];
+        if (!optionRows.length) {
+          const optionLines = String(row.optionRowsText || '').split(/\n+/).map(v => v.trim()).filter(Boolean);
+          optionRows = optionLines.map((line) => {
+            const parts = line.split(',');
+            return {
+              name: String(parts[0] || '').trim(),
+              value: String(parts.slice(1).join(',') || '').trim(),
+            };
+          }).filter(item => item.name);
+        }
+        const optionNode = buildDhcpSharedSubnetOptionNode(optionRows);
+        if (Object.keys(optionNode).length) item.option = optionNode;
+        result[name] = item;
+      }
+      return result;
+    }
+
+    function parseDhcpSharedSubnetOptionRows(node) {
+      const rows = [];
+      const source = node && typeof node === 'object' ? node : {};
+      for (const [name, optionRaw] of Object.entries(source)) {
+        if (!name) continue;
+        if (optionRaw && typeof optionRaw === 'object' && !Array.isArray(optionRaw)) {
+          const childKeys = Object.keys(optionRaw).filter(Boolean);
+          if (!childKeys.length) {
+            rows.push({ __id: nextBgpRowId('svc-subnet-opt'), name, value: '' });
+            continue;
+          }
+          childKeys.forEach((childKey) => {
+            const childVal = optionRaw[childKey];
+            let value = '';
+            if (typeof childVal === 'string' || typeof childVal === 'number') value = String(childVal);
+            else if (childVal && typeof childVal === 'object') value = extractChoiceValue(childVal);
+            rows.push({ __id: nextBgpRowId('svc-subnet-opt'), name: `${name} ${childKey}`, value });
+          });
+          continue;
+        }
+        rows.push({ __id: nextBgpRowId('svc-subnet-opt'), name, value: normalizeNodeStringValue(optionRaw) });
+      }
+      return rows;
+    }
+
+    function buildDhcpSharedSubnetOptionNode(rows) {
+      const optionNode = {};
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const optionName = String(row.name || '').trim();
+        if (!optionName) continue;
+        const value = String(row.value || '').trim();
+        const parts = optionName.split(/\s+/).filter(Boolean);
+        if (parts.length === 1) {
+          optionNode[parts[0]] = value ? value : {};
+          continue;
+        }
+        const rootName = parts.shift();
+        const childName = parts.join(' ');
+        if (!rootName || !childName) continue;
+        if (!optionNode[rootName] || typeof optionNode[rootName] !== 'object' || Array.isArray(optionNode[rootName])) {
+          optionNode[rootName] = {};
+        }
+        optionNode[rootName][childName] = value ? value : {};
+      }
+      return optionNode;
+    }
+
+    function parseDhcpSharedNetworkRows(node) {
+      if (!node || typeof node !== 'object') return [];
+      const rows = [];
+      for (const [name, attrsRaw] of Object.entries(node)) {
+        if (!name) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const subnetNode = attrs.subnet && typeof attrs.subnet === 'object' ? attrs.subnet : {};
+        const subnets = [];
+        for (const [prefix, subnetAttrsRaw] of Object.entries(subnetNode)) {
+          if (!prefix) continue;
+          const subnetAttrs = subnetAttrsRaw && typeof subnetAttrsRaw === 'object' ? subnetAttrsRaw : {};
+          subnets.push({
+            __id: nextBgpRowId('svc-subnet'),
+            prefix,
+            description: normalizeNodeStringValue(subnetAttrs.description),
+            disable: !!subnetAttrs.disable,
+            clientClass: normalizeNodeStringValue(subnetAttrs['client-class'] || subnetAttrs.client_class),
+            subnetId: normalizeNodeStringValue(subnetAttrs['subnet-id'] || subnetAttrs.subnet_id),
+            ignoreClientId: !!(subnetAttrs['ignore-client-id'] || subnetAttrs.ignore_client_id),
+            lease: normalizeNodeStringValue(subnetAttrs.lease),
+            pingCheck: !!(subnetAttrs['ping-check'] || subnetAttrs.ping_check),
+            dynamicDnsUpdate: parseDhcpSharedNetworkDdnsSettings(subnetAttrs['dynamic-dns-update'] || subnetAttrs.dynamic_dns_update),
+            excludeText: normalizeLeafSet(subnetAttrs.exclude).join('\n'),
+            defaultRouterText: normalizeLeafSet(subnetAttrs['default-router'] || subnetAttrs.default_router).join('\n'),
+            domainName: normalizeNodeStringValue(subnetAttrs['domain-name'] || subnetAttrs.domain_name),
+            domainSearchText: normalizeLeafSet(subnetAttrs['domain-search'] || subnetAttrs.domain_search).join('\n'),
+            nameServerText: normalizeLeafSet(subnetAttrs['name-server'] || subnetAttrs.name_server).join('\n'),
+            ntpServerText: normalizeLeafSet(subnetAttrs['ntp-server'] || subnetAttrs.ntp_server).join('\n'),
+            ranges: parseDhcpSharedSubnetRangeRows(subnetAttrs.range),
+            staticMappings: parseDhcpSharedSubnetMappingRows(subnetAttrs['static-mapping'] || subnetAttrs.static_mapping),
+            options: parseDhcpSharedSubnetOptionRows(subnetAttrs.option),
+          });
+        }
+        const optionCollections = parseDhcpSharedNetworkOptionCollections(attrs.option);
+        rows.push({
+          __id: nextBgpRowId('svc-shared4'),
+          name,
+          disable: !!attrs.disable,
+          authoritative: !!attrs.authoritative,
+          pingCheck: !!attrs['ping-check'],
+          description: normalizeNodeStringValue(attrs.description),
+          dynamicDnsUpdate: parseDhcpSharedNetworkDdnsSettings(attrs['dynamic-dns-update'] || attrs.dynamic_dns_update),
+          subnets,
+          options: optionCollections.options,
+          staticRoutes: optionCollections.staticRoutes,
+        });
+      }
+      return rows.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    }
+
+    function buildDhcpSharedNetworkNode(rows) {
+      const result = {};
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const name = String(row.name || '').trim();
+        if (!name) continue;
+        const item = {};
+        if (row.disable) item.disable = {};
+        if (row.authoritative) item.authoritative = {};
+        if (row.pingCheck) item['ping-check'] = {};
+        const description = String(row.description || '').trim();
+        if (description) item.description = description;
+        const dynamicDnsUpdateNode = buildDhcpSharedNetworkDdnsSettings(row.dynamicDnsUpdate);
+        if (Object.keys(dynamicDnsUpdateNode).length) item['dynamic-dns-update'] = dynamicDnsUpdateNode;
+        const subnets = Array.isArray(row.subnets) ? row.subnets : [];
+        if (subnets.length) {
+          item.subnet = {};
+          subnets.forEach((subnetRaw) => {
+            const subnet = subnetRaw && typeof subnetRaw === 'object' ? subnetRaw : {};
+            const prefix = String(subnet.prefix || '').trim();
+            if (!prefix) return;
+            const subnetItem = {};
+            const description = String(subnet.description || '').trim();
+            if (description) subnetItem.description = description;
+            if (subnet.disable) subnetItem.disable = {};
+            const clientClass = String(subnet.clientClass || '').trim();
+            if (clientClass) subnetItem['client-class'] = clientClass;
+            const subnetId = String(subnet.subnetId || '').trim();
+            if (subnetId) subnetItem['subnet-id'] = subnetId;
+            if (subnet.ignoreClientId) subnetItem['ignore-client-id'] = {};
+            const lease = String(subnet.lease || '').trim();
+            if (lease) subnetItem.lease = lease;
+            if (subnet.pingCheck) subnetItem['ping-check'] = {};
+            const subnetDdnsNode = buildDhcpSharedNetworkDdnsSettings(subnet.dynamicDnsUpdate);
+            if (Object.keys(subnetDdnsNode).length) subnetItem['dynamic-dns-update'] = subnetDdnsNode;
+            const excludeList = String(subnet.excludeText || '').split(/\n+/).map(v => v.trim()).filter(Boolean);
+            if (excludeList.length) subnetItem.exclude = toLeafSetObject(excludeList);
+            const defaultRouterList = String(subnet.defaultRouterText || '').split(/\n+/).map(v => v.trim()).filter(Boolean);
+            if (defaultRouterList.length) subnetItem['default-router'] = toLeafSetObject(defaultRouterList);
+            const domainName = String(subnet.domainName || '').trim();
+            if (domainName) subnetItem['domain-name'] = domainName;
+            const domainSearchList = String(subnet.domainSearchText || '').split(/\n+/).map(v => v.trim()).filter(Boolean);
+            if (domainSearchList.length) subnetItem['domain-search'] = toLeafSetObject(domainSearchList);
+            const nameServerList = String(subnet.nameServerText || '').split(/\n+/).map(v => v.trim()).filter(Boolean);
+            if (nameServerList.length) subnetItem['name-server'] = toLeafSetObject(nameServerList);
+            const ntpServerList = String(subnet.ntpServerText || '').split(/\n+/).map(v => v.trim()).filter(Boolean);
+            if (ntpServerList.length) subnetItem['ntp-server'] = toLeafSetObject(ntpServerList);
+            const rangeNode = buildDhcpSharedSubnetRangeNode(subnet.ranges);
+            if (Object.keys(rangeNode).length) subnetItem.range = rangeNode;
+            const mappingNode = buildDhcpSharedSubnetMappingNode(subnet.staticMappings);
+            if (Object.keys(mappingNode).length) subnetItem['static-mapping'] = mappingNode;
+            const optionNode = buildDhcpSharedSubnetOptionNode(subnet.options);
+            if (Object.keys(optionNode).length) subnetItem.option = optionNode;
+            item.subnet[prefix] = subnetItem;
+          });
+          if (!Object.keys(item.subnet).length) delete item.subnet;
+        }
+        const optionNode = buildDhcpSharedNetworkOptions(row.options, row.staticRoutes);
+        if (Object.keys(optionNode).length) item.option = optionNode;
+        result[name] = item;
+      }
+      return result;
+    }
+
+    function parseDhcpv6OptionRows(node, idPrefix = 'svc-opt6') {
+      const rows = [];
+      const source = node && typeof node === 'object' ? node : {};
+      for (const [name, optionRaw] of Object.entries(source)) {
+        if (!name) continue;
+        if (name === 'vendor-option' && optionRaw && typeof optionRaw === 'object' && !Array.isArray(optionRaw)) {
+          const ciscoNode = optionRaw.cisco && typeof optionRaw.cisco === 'object' && !Array.isArray(optionRaw.cisco)
+            ? optionRaw.cisco
+            : null;
+          if (ciscoNode && ciscoNode['tftp-server']) {
+            normalizeLeafSet(ciscoNode['tftp-server']).forEach((value) => {
+              rows.push({ __id: nextBgpRowId(idPrefix), name: 'vendor-option cisco tftp-server', value });
+            });
+          }
+          continue;
+        }
+        if (optionRaw && typeof optionRaw === 'object' && !Array.isArray(optionRaw)) {
+          const childKeys = Object.keys(optionRaw).filter(Boolean);
+          if (!childKeys.length) {
+            rows.push({ __id: nextBgpRowId(idPrefix), name, value: '' });
+            continue;
+          }
+          const isLeafSet = childKeys.every((childKey) => {
+            const childVal = optionRaw[childKey];
+            return childVal && typeof childVal === 'object' && !Array.isArray(childVal) && !Object.keys(childVal).length;
+          });
+          if (isLeafSet) {
+            childKeys.forEach((childKey) => {
+              rows.push({ __id: nextBgpRowId(idPrefix), name, value: childKey });
+            });
+            continue;
+          }
+          childKeys.forEach((childKey) => {
+            const childVal = optionRaw[childKey];
+            let value = '';
+            if (typeof childVal === 'string' || typeof childVal === 'number') value = String(childVal);
+            else if (childVal && typeof childVal === 'object') value = extractChoiceValue(childVal);
+            rows.push({ __id: nextBgpRowId(idPrefix), name: `${name} ${childKey}`, value });
+          });
+          continue;
+        }
+        rows.push({ __id: nextBgpRowId(idPrefix), name, value: normalizeNodeStringValue(optionRaw) });
+      }
+      return rows;
+    }
+
+    function buildDhcpv6OptionNode(rows) {
+      const optionNode = {};
+      const leafSetOptionNames = new Set(['domain-search', 'name-server', 'nis-server', 'nisplus-server', 'sip-server', 'sntp-server']);
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const optionName = String(row.name || '').trim();
+        if (!optionName) continue;
+        const value = String(row.value || '').trim();
+        if (!value) continue;
+        if (optionName === 'vendor-option cisco tftp-server') {
+          if (!optionNode['vendor-option'] || typeof optionNode['vendor-option'] !== 'object' || Array.isArray(optionNode['vendor-option'])) {
+            optionNode['vendor-option'] = {};
+          }
+          if (!optionNode['vendor-option'].cisco || typeof optionNode['vendor-option'].cisco !== 'object' || Array.isArray(optionNode['vendor-option'].cisco)) {
+            optionNode['vendor-option'].cisco = {};
+          }
+          if (!optionNode['vendor-option'].cisco['tftp-server'] || typeof optionNode['vendor-option'].cisco['tftp-server'] !== 'object' || Array.isArray(optionNode['vendor-option'].cisco['tftp-server'])) {
+            optionNode['vendor-option'].cisco['tftp-server'] = {};
+          }
+          optionNode['vendor-option'].cisco['tftp-server'][value] = {};
+          continue;
+        }
+        const parts = optionName.split(/\s+/).filter(Boolean);
+        if (parts.length === 1) {
+          const single = parts[0];
+          if (leafSetOptionNames.has(single)) {
+            if (!optionNode[single] || typeof optionNode[single] !== 'object' || Array.isArray(optionNode[single])) optionNode[single] = {};
+            optionNode[single][value] = {};
+          } else {
+            optionNode[single] = value;
+          }
+          continue;
+        }
+        const rootName = parts.shift();
+        const childName = parts.join(' ');
+        if (!rootName || !childName) continue;
+        if (!optionNode[rootName] || typeof optionNode[rootName] !== 'object' || Array.isArray(optionNode[rootName])) {
+          optionNode[rootName] = {};
+        }
+        optionNode[rootName][childName] = value;
+      }
+      return optionNode;
+    }
+
+    function parseDhcpv6SharedNetworkRows(node) {
+      if (!node || typeof node !== 'object') return [];
+      const rows = [];
+
+      const parseSubnetRanges = (rangeNode) => {
+        const ranges = [];
+        const source = rangeNode && typeof rangeNode === 'object' ? rangeNode : {};
+        for (const [name, attrsRaw] of Object.entries(source)) {
+          if (!name) continue;
+          const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+          ranges.push({
+            __id: nextBgpRowId('svc-subnet6-range'),
+            name,
+            prefix: normalizeNodeStringValue(attrs.prefix),
+            start: normalizeNodeStringValue(attrs.start),
+            stop: normalizeNodeStringValue(attrs.stop),
+            options: parseDhcpv6OptionRows(attrs.option, 'svc-subnet6-range-opt'),
+          });
+        }
+        return ranges.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+      };
+
+      const parseSubnetMappings = (mappingNode) => {
+        const mappings = [];
+        const source = mappingNode && typeof mappingNode === 'object' ? mappingNode : {};
+        for (const [name, attrsRaw] of Object.entries(source)) {
+          if (!name) continue;
+          const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+          mappings.push({
+            __id: nextBgpRowId('svc-subnet6-mapping'),
+            name,
+            duid: normalizeNodeStringValue(attrs.duid),
+            ipv6Address: normalizeNodeStringValue(attrs['ipv6-address'] || attrs.ipv6_address),
+            ipv6Prefix: normalizeNodeStringValue(attrs['ipv6-prefix'] || attrs.ipv6_prefix),
+            mac: normalizeNodeStringValue(attrs.mac),
+            disable: !!attrs.disable,
+            options: parseDhcpv6OptionRows(attrs.option, 'svc-subnet6-mapping-opt'),
+          });
+        }
+        return mappings.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+      };
+
+      const parseSubnetDelegations = (delegationNode) => {
+        const delegations = [];
+        const sourceRoot = delegationNode && typeof delegationNode === 'object' ? delegationNode : {};
+        const source = sourceRoot.prefix && typeof sourceRoot.prefix === 'object' ? sourceRoot.prefix : sourceRoot;
+        for (const [prefix, attrsRaw] of Object.entries(source)) {
+          if (!prefix) continue;
+          const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+          delegations.push({
+            __id: nextBgpRowId('svc-subnet6-delegation'),
+            prefix,
+            delegatedLength: normalizeNodeStringValue(attrs['delegated-length'] || attrs.delegated_length),
+            prefixLength: normalizeNodeStringValue(attrs['prefix-length'] || attrs.prefix_length),
+            excludedPrefix: normalizeNodeStringValue(attrs['excluded-prefix'] || attrs.excluded_prefix),
+            excludedPrefixLength: normalizeNodeStringValue(attrs['excluded-prefix-length'] || attrs.excluded_prefix_length),
+          });
+        }
+        return delegations.sort((a, b) => String(a.prefix || '').localeCompare(String(b.prefix || '')));
+      };
+
+      const parseSubnetOptions = (optionNode) => parseDhcpv6OptionRows(optionNode, 'svc-subnet6-opt');
+
+      for (const [name, attrsRaw] of Object.entries(node)) {
+        if (!name) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const subnetNode = attrs.subnet && typeof attrs.subnet === 'object' ? attrs.subnet : {};
+        const subnets = [];
+        for (const [prefix, subnetAttrsRaw] of Object.entries(subnetNode)) {
+          if (!prefix) continue;
+          const subnetAttrs = subnetAttrsRaw && typeof subnetAttrsRaw === 'object' ? subnetAttrsRaw : {};
+          subnets.push({
+            __id: nextBgpRowId('svc-subnet6'),
+            prefix,
+            subnetId: normalizeNodeStringValue(subnetAttrs['subnet-id'] || subnetAttrs.subnet_id),
+            leaseTimeDefault: normalizeNodeStringValue(subnetAttrs['lease-time']?.default || subnetAttrs.lease_time?.default),
+            leaseTimeMaximum: normalizeNodeStringValue(subnetAttrs['lease-time']?.maximum || subnetAttrs.lease_time?.maximum),
+            leaseTimeMinimum: normalizeNodeStringValue(subnetAttrs['lease-time']?.minimum || subnetAttrs.lease_time?.minimum),
+            interface: normalizeNodeStringValue(subnetAttrs.interface),
+            ranges: parseSubnetRanges(subnetAttrs.range),
+            staticMappings: parseSubnetMappings(subnetAttrs['static-mapping'] || subnetAttrs.static_mapping),
+            delegations: parseSubnetDelegations(subnetAttrs['prefix-delegation'] || subnetAttrs.prefix_delegation),
+            options: parseSubnetOptions(subnetAttrs.option),
+          });
+        }
+        rows.push({
+          __id: nextBgpRowId('svc-shared6'),
+          name,
+          disable: !!attrs.disable,
+          interface: normalizeNodeStringValue(attrs.interface),
+          description: normalizeNodeStringValue(attrs.description),
+          options: parseDhcpv6OptionRows(attrs.option, 'svc-shared6-opt'),
+          subnets,
+        });
+      }
+      return rows.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    }
+
+    function buildDhcpv6SharedNetworkNode(rows) {
+      const result = {};
+
+      const buildSubnetRangeNode = (rangeRows) => {
+        const rangeNode = {};
+        for (const rowRaw of (rangeRows || [])) {
+          const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+          const name = String(row.name || '').trim();
+          if (!name) continue;
+          const item = {};
+          const prefix = String(row.prefix || '').trim();
+          const start = String(row.start || '').trim();
+          const stop = String(row.stop || '').trim();
+          if (prefix) item.prefix = prefix;
+          if (start) item.start = start;
+          if (stop) item.stop = stop;
+          const optionNode = buildDhcpv6OptionNode(row.options);
+          if (Object.keys(optionNode).length) item.option = optionNode;
+          rangeNode[name] = item;
+        }
+        return rangeNode;
+      };
+
+      const buildSubnetMappingNode = (mappingRows) => {
+        const mappingNode = {};
+        for (const rowRaw of (mappingRows || [])) {
+          const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+          const name = String(row.name || '').trim();
+          if (!name) continue;
+          const item = {};
+          const duid = String(row.duid || '').trim();
+          const ipv6Address = String(row.ipv6Address || '').trim();
+          const ipv6Prefix = String(row.ipv6Prefix || '').trim();
+          const mac = String(row.mac || '').trim();
+          if (duid) item.duid = duid;
+          if (ipv6Address) item['ipv6-address'] = ipv6Address;
+          if (ipv6Prefix) item['ipv6-prefix'] = ipv6Prefix;
+          if (mac) item.mac = mac;
+          if (row.disable) item.disable = {};
+          const optionNode = buildDhcpv6OptionNode(row.options);
+          if (Object.keys(optionNode).length) item.option = optionNode;
+          mappingNode[name] = item;
+        }
+        return mappingNode;
+      };
+
+      const buildSubnetDelegationNode = (delegationRows) => {
+        const delegationNode = {};
+        for (const rowRaw of (delegationRows || [])) {
+          const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+          const prefix = String(row.prefix || '').trim();
+          if (!prefix) continue;
+          const item = {};
+          const delegatedLength = String(row.delegatedLength || '').trim();
+          const prefixLength = String(row.prefixLength || '').trim();
+          const excludedPrefix = String(row.excludedPrefix || '').trim();
+          const excludedPrefixLength = String(row.excludedPrefixLength || '').trim();
+          if (delegatedLength) item['delegated-length'] = delegatedLength;
+          if (prefixLength) item['prefix-length'] = prefixLength;
+          if (excludedPrefix) item['excluded-prefix'] = excludedPrefix;
+          if (excludedPrefixLength) item['excluded-prefix-length'] = excludedPrefixLength;
+          delegationNode[prefix] = item;
+        }
+        if (!Object.keys(delegationNode).length) return {};
+        return { prefix: delegationNode };
+      };
+
+      const buildSubnetOptionNode = (optionRows) => buildDhcpv6OptionNode(optionRows);
+
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const name = String(row.name || '').trim();
+        if (!name) continue;
+        const item = {};
+        if (row.disable) item.disable = {};
+        const iface = String(row.interface || '').trim();
+        if (iface) item.interface = iface;
+        const description = String(row.description || '').trim();
+        if (description) item.description = description;
+        const sharedOptionNode = buildDhcpv6OptionNode(row.options);
+        if (Object.keys(sharedOptionNode).length) item.option = sharedOptionNode;
+        const subnets = Array.isArray(row.subnets) ? row.subnets : [];
+        if (subnets.length) {
+          item.subnet = {};
+          subnets.forEach((subnetRaw) => {
+            const subnet = subnetRaw && typeof subnetRaw === 'object' ? subnetRaw : {};
+            const prefix = String(subnet.prefix || '').trim();
+            if (!prefix) return;
+            const subnetItem = {};
+            const subnetId = String(subnet.subnetId || '').trim();
+            if (subnetId) subnetItem['subnet-id'] = subnetId;
+            const leaseTimeDefault = String(subnet.leaseTimeDefault || '').trim();
+            const leaseTimeMaximum = String(subnet.leaseTimeMaximum || '').trim();
+            const leaseTimeMinimum = String(subnet.leaseTimeMinimum || '').trim();
+            if (leaseTimeDefault || leaseTimeMaximum || leaseTimeMinimum) {
+              subnetItem['lease-time'] = {};
+              if (leaseTimeDefault) subnetItem['lease-time'].default = leaseTimeDefault;
+              if (leaseTimeMaximum) subnetItem['lease-time'].maximum = leaseTimeMaximum;
+              if (leaseTimeMinimum) subnetItem['lease-time'].minimum = leaseTimeMinimum;
+            }
+            const subnetIface = String(subnet.interface || '').trim();
+            if (subnetIface) subnetItem.interface = subnetIface;
+            const rangeNode = buildSubnetRangeNode(subnet.ranges);
+            if (Object.keys(rangeNode).length) subnetItem.range = rangeNode;
+            const mappingNode = buildSubnetMappingNode(subnet.staticMappings);
+            if (Object.keys(mappingNode).length) subnetItem['static-mapping'] = mappingNode;
+            const delegationNode = buildSubnetDelegationNode(subnet.delegations);
+            if (Object.keys(delegationNode).length) subnetItem['prefix-delegation'] = delegationNode;
+            const optionNode = buildSubnetOptionNode(subnet.options);
+            if (Object.keys(optionNode).length) subnetItem.option = optionNode;
+            item.subnet[prefix] = subnetItem;
+          });
+          if (!Object.keys(item.subnet).length) delete item.subnet;
+        }
+        result[name] = item;
+      }
+      return result;
+    }
+
+    function parseDhcpDdnsDomainRows(node) {
+      const rows = [];
+      const source = node && typeof node === 'object' ? node : {};
+      for (const [name, attrsRaw] of Object.entries(source)) {
+        if (!name) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        const dnsServers = [];
+        const dnsServerNode = attrs['dns-server'] && typeof attrs['dns-server'] === 'object' ? attrs['dns-server'] : {};
+        for (const [id, dnsAttrsRaw] of Object.entries(dnsServerNode)) {
+          if (!id) continue;
+          const dnsAttrs = dnsAttrsRaw && typeof dnsAttrsRaw === 'object' ? dnsAttrsRaw : {};
+          dnsServers.push({
+            id: String(id),
+            address: normalizeNodeStringValue(dnsAttrs.address),
+            port: normalizeNodeStringValue(dnsAttrs.port),
+          });
+        }
+        const dnsServersText = dnsServers
+          .sort((a, b) => Number(a.id) - Number(b.id))
+          .map(item => `${item.id},${item.address || ''},${item.port || ''}`)
+          .join('\n');
+        rows.push({
+          __id: nextBgpRowId('svc-ddns-domain'),
+          name,
+          keyName: normalizeNodeStringValue(attrs['key-name'] || attrs.key_name),
+          dnsServersText,
+        });
+      }
+      return rows.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    }
+
+    function buildDhcpDdnsDomainNode(rows) {
+      const result = {};
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const name = String(row.name || '').trim();
+        if (!name) continue;
+        const item = {};
+        const keyName = String(row.keyName || '').trim();
+        if (keyName) item['key-name'] = keyName;
+        const dnsLines = String(row.dnsServersText || '').split(/\n+/).map(v => v.trim()).filter(Boolean);
+        dnsLines.forEach((line) => {
+          const parts = line.split(',').map(v => v.trim());
+          const id = String(parts[0] || '').trim();
+          if (!id) return;
+          if (!item['dns-server']) item['dns-server'] = {};
+          const dnsItem = {};
+          const address = String(parts[1] || '').trim();
+          const port = String(parts[2] || '').trim();
+          if (address) dnsItem.address = address;
+          if (port) dnsItem.port = port;
+          item['dns-server'][id] = dnsItem;
+        });
+        result[name] = item;
+      }
+      return result;
+    }
+
+    function parseDhcpDdnsTsigRows(node) {
+      const rows = [];
+      const source = node && typeof node === 'object' ? node : {};
+      for (const [name, attrsRaw] of Object.entries(source)) {
+        if (!name) continue;
+        const attrs = attrsRaw && typeof attrsRaw === 'object' ? attrsRaw : {};
+        rows.push({
+          __id: nextBgpRowId('svc-tsig'),
+          name,
+          algorithm: extractChoiceValue(attrs.algorithm),
+          secret: normalizeNodeStringValue(attrs.secret),
+        });
+      }
+      return rows.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    }
+
+    function buildDhcpDdnsTsigNode(rows) {
+      const result = {};
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const name = String(row.name || '').trim();
+        if (!name) continue;
+        const item = {};
+        const algorithm = String(row.algorithm || '').trim();
+        const secret = String(row.secret || '').trim();
+        if (algorithm) item.algorithm = { [algorithm]: {} };
+        if (secret) item.secret = secret;
+        result[name] = item;
+      }
+      return result;
+    }
+
+    function parseDhcpDdnsSettings(node) {
+      const source = node && typeof node === 'object' ? node : {};
+      return {
+        conflictResolution: extractChoiceValue(source['conflict-resolution']),
+        generatedPrefix: normalizeNodeStringValue(source['generated-prefix']),
+        hostnameCharReplacement: normalizeNodeStringValue(source['hostname-char-replacement']),
+        hostnameCharSet: normalizeNodeStringValue(source['hostname-char-set']),
+        overrideClientUpdate: extractChoiceValue(source['override-client-update']),
+        overrideNoUpdate: extractChoiceValue(source['override-no-update']),
+        qualifyingSuffix: normalizeNodeStringValue(source['qualifying-suffix']),
+        replaceClientName: extractChoiceValue(source['replace-client-name']),
+        sendUpdates: extractChoiceValue(source['send-updates']),
+        ttlPercent: normalizeNodeStringValue(source['ttl-percent']),
+        updateOnRenew: extractChoiceValue(source['update-on-renew']),
+        forwardDomains: parseDhcpDdnsDomainRows(source['forward-domain'] || source.forward_domain),
+        reverseDomains: parseDhcpDdnsDomainRows(source['reverse-domain'] || source.reverse_domain),
+        tsigKeys: parseDhcpDdnsTsigRows(source['tsig-key'] || source.tsig_key),
+      };
+    }
+
+    function buildDhcpDdnsSettings(settings) {
+      const source = settings && typeof settings === 'object' ? settings : {};
+      const result = {};
+      const conflictResolution = String(source.conflictResolution || '').trim();
+      if (conflictResolution) result['conflict-resolution'] = { [conflictResolution]: {} };
+      const generatedPrefix = String(source.generatedPrefix || '').trim();
+      if (generatedPrefix) result['generated-prefix'] = generatedPrefix;
+      const hostnameCharReplacement = String(source.hostnameCharReplacement || '').trim();
+      if (hostnameCharReplacement) result['hostname-char-replacement'] = hostnameCharReplacement;
+      const hostnameCharSet = String(source.hostnameCharSet || '').trim();
+      if (hostnameCharSet) result['hostname-char-set'] = hostnameCharSet;
+      const overrideClientUpdate = String(source.overrideClientUpdate || '').trim();
+      if (overrideClientUpdate) result['override-client-update'] = { [overrideClientUpdate]: {} };
+      const overrideNoUpdate = String(source.overrideNoUpdate || '').trim();
+      if (overrideNoUpdate) result['override-no-update'] = { [overrideNoUpdate]: {} };
+      const qualifyingSuffix = String(source.qualifyingSuffix || '').trim();
+      if (qualifyingSuffix) result['qualifying-suffix'] = qualifyingSuffix;
+      const replaceClientName = String(source.replaceClientName || '').trim();
+      if (replaceClientName) result['replace-client-name'] = { [replaceClientName]: {} };
+      const sendUpdates = String(source.sendUpdates || '').trim();
+      if (sendUpdates) result['send-updates'] = { [sendUpdates]: {} };
+      const ttlPercent = String(source.ttlPercent || '').trim();
+      if (ttlPercent) result['ttl-percent'] = ttlPercent;
+      const updateOnRenew = String(source.updateOnRenew || '').trim();
+      if (updateOnRenew) result['update-on-renew'] = { [updateOnRenew]: {} };
+      const forwardDomainNode = buildDhcpDdnsDomainNode(source.forwardDomains);
+      if (Object.keys(forwardDomainNode).length) result['forward-domain'] = forwardDomainNode;
+      const reverseDomainNode = buildDhcpDdnsDomainNode(source.reverseDomains);
+      if (Object.keys(reverseDomainNode).length) result['reverse-domain'] = reverseDomainNode;
+      const tsigKeyNode = buildDhcpDdnsTsigNode(source.tsigKeys);
+      if (Object.keys(tsigKeyNode).length) result['tsig-key'] = tsigKeyNode;
+      return result;
+    }
+
+    function parseDhcpHighAvailabilitySettings(node) {
+      const source = node && typeof node === 'object' ? node : {};
+      return {
+        caCertificate: normalizeNodeStringValue(source['ca-certificate'] || source.ca_certificate),
+        certificate: normalizeNodeStringValue(source.certificate),
+        mode: extractChoiceValue(source.mode),
+        name: normalizeNodeStringValue(source.name),
+        remote: normalizeNodeStringValue(source.remote),
+        sourceAddress: normalizeNodeStringValue(source['source-address'] || source.source_address),
+        status: extractChoiceValue(source.status),
+      };
+    }
+
+    function buildDhcpHighAvailabilitySettings(settings) {
+      const source = settings && typeof settings === 'object' ? settings : {};
+      const result = {};
+      const caCertificate = String(source.caCertificate || '').trim();
+      if (caCertificate) result['ca-certificate'] = caCertificate;
+      const certificate = String(source.certificate || '').trim();
+      if (certificate) result.certificate = certificate;
+      const mode = String(source.mode || '').trim();
+      if (mode) result.mode = { [mode]: {} };
+      const name = String(source.name || '').trim();
+      if (name) result.name = name;
+      const remote = String(source.remote || '').trim();
+      if (remote) result.remote = remote;
+      const sourceAddress = String(source.sourceAddress || '').trim();
+      if (sourceAddress) result['source-address'] = sourceAddress;
+      const status = String(source.status || '').trim();
+      if (status) result.status = { [status]: {} };
+      return result;
+    }
+
+    function createServiceCollectionDraft(type, source = null) {
+      if (type === 'dhcp4-listen-address') {
+        return { __id: source?.__id || '', address: source?.address || '' };
+      }
+      if (type === 'dhcp4-listen-interface' || type === 'dhcp6-listen-interface') {
+        return { __id: source?.__id || '', name: source?.name || '' };
+      }
+      if (type === 'dhcp4-client-class') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          disable: !!source?.disable,
+          circuitId: source?.circuitId || '',
+          remoteId: source?.remoteId || '',
+        };
+      }
+      if (type === 'dhcp4-shared-network') {
+        const parsedOptions = parseDhcp4SharedNetworkOptionDraftData(source?.options);
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          disable: !!source?.disable,
+          authoritative: !!source?.authoritative,
+          pingCheck: !!source?.pingCheck,
+          description: source?.description || '',
+          dynamicDnsUpdate: {
+            conflictResolution: source?.dynamicDnsUpdate?.conflictResolution || '',
+            generatedPrefix: source?.dynamicDnsUpdate?.generatedPrefix || '',
+            hostnameCharReplacement: source?.dynamicDnsUpdate?.hostnameCharReplacement || '',
+            hostnameCharSet: source?.dynamicDnsUpdate?.hostnameCharSet || '',
+            overrideClientUpdate: source?.dynamicDnsUpdate?.overrideClientUpdate || '',
+            overrideNoUpdate: source?.dynamicDnsUpdate?.overrideNoUpdate || '',
+            qualifyingSuffix: source?.dynamicDnsUpdate?.qualifyingSuffix || '',
+            replaceClientName: source?.dynamicDnsUpdate?.replaceClientName || '',
+            sendUpdates: source?.dynamicDnsUpdate?.sendUpdates || '',
+            ttlPercent: source?.dynamicDnsUpdate?.ttlPercent || '',
+            updateOnRenew: source?.dynamicDnsUpdate?.updateOnRenew || '',
+          },
+          subnets: Array.isArray(source?.subnets) ? source.subnets : [],
+          options: Array.isArray(source?.options) ? source.options : [],
+          optionValues: parsedOptions.values,
+          optionExtraRows: parsedOptions.extras,
+          staticRoutes: Array.isArray(source?.staticRoutes) ? source.staticRoutes : [],
+        };
+      }
+      if (type === 'dhcp6-shared-network') {
+        const parsedOptions = parseDhcp6SharedNetworkOptionDraftData(source?.options);
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          disable: !!source?.disable,
+          interface: source?.interface || '',
+          description: source?.description || '',
+          options: Array.isArray(source?.options) ? source.options : [],
+          optionValues: parsedOptions.values,
+          optionExtraRows: parsedOptions.extras,
+          subnets: Array.isArray(source?.subnets) ? source.subnets : [],
+        };
+      }
+      if (type === 'dhcp6-global-name-server') {
+        return {
+          __id: source?.__id || '',
+          address: source?.address || '',
+        };
+      }
+      if (type === 'dhcp6-shared-option') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          value: source?.value || '',
+        };
+      }
+      if (type === 'dhcp6-shared-subnet') {
+        const parsedOptions = parseDhcp6SharedNetworkOptionDraftData(source?.options);
+        return {
+          __id: source?.__id || '',
+          prefix: source?.prefix || '',
+          subnetId: source?.subnetId || '',
+          leaseTimeDefault: source?.leaseTimeDefault || '',
+          leaseTimeMaximum: source?.leaseTimeMaximum || '',
+          leaseTimeMinimum: source?.leaseTimeMinimum || '',
+          interface: source?.interface || '',
+          ranges: Array.isArray(source?.ranges) ? source.ranges : [],
+          staticMappings: Array.isArray(source?.staticMappings) ? source.staticMappings : [],
+          delegations: Array.isArray(source?.delegations) ? source.delegations : [],
+          options: Array.isArray(source?.options) ? source.options : [],
+          optionValues: parsedOptions.values,
+          optionExtraRows: parsedOptions.extras,
+        };
+      }
+      if (type === 'dhcp6-shared-subnet-range') {
+        const parsedOptions = parseDhcp6SharedNetworkOptionDraftData(source?.options);
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          prefix: source?.prefix || '',
+          start: source?.start || '',
+          stop: source?.stop || '',
+          options: Array.isArray(source?.options) ? source.options : [],
+          optionValues: parsedOptions.values,
+          optionExtraRows: parsedOptions.extras,
+        };
+      }
+      if (type === 'dhcp6-shared-subnet-mapping') {
+        const parsedOptions = parseDhcp6SharedNetworkOptionDraftData(source?.options);
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          duid: source?.duid || '',
+          ipv6Address: source?.ipv6Address || '',
+          ipv6Prefix: source?.ipv6Prefix || '',
+          mac: source?.mac || '',
+          disable: !!source?.disable,
+          options: Array.isArray(source?.options) ? source.options : [],
+          optionValues: parsedOptions.values,
+          optionExtraRows: parsedOptions.extras,
+        };
+      }
+      if (type === 'dhcp6-shared-subnet-delegation') {
+        return {
+          __id: source?.__id || '',
+          prefix: source?.prefix || '',
+          delegatedLength: source?.delegatedLength || '',
+          prefixLength: source?.prefixLength || '',
+          excludedPrefix: source?.excludedPrefix || '',
+          excludedPrefixLength: source?.excludedPrefixLength || '',
+        };
+      }
+      if (type === 'dhcp6-shared-subnet-option') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          value: source?.value || '',
+        };
+      }
+      if (type === 'dhcp6-shared-subnet-range-option' || type === 'dhcp6-shared-subnet-mapping-option') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          value: source?.value || '',
+        };
+      }
+      if (type === 'dhcp4-shared-subnet') {
+        return {
+          __id: source?.__id || '',
+          prefix: source?.prefix || '',
+          description: source?.description || '',
+          disable: !!source?.disable,
+          clientClass: source?.clientClass || '',
+          subnetId: source?.subnetId || '',
+          ignoreClientId: !!source?.ignoreClientId,
+          lease: source?.lease || '',
+          pingCheck: !!source?.pingCheck,
+          dynamicDnsUpdate: {
+            conflictResolution: source?.dynamicDnsUpdate?.conflictResolution || '',
+            generatedPrefix: source?.dynamicDnsUpdate?.generatedPrefix || '',
+            hostnameCharReplacement: source?.dynamicDnsUpdate?.hostnameCharReplacement || '',
+            hostnameCharSet: source?.dynamicDnsUpdate?.hostnameCharSet || '',
+            overrideClientUpdate: source?.dynamicDnsUpdate?.overrideClientUpdate || '',
+            overrideNoUpdate: source?.dynamicDnsUpdate?.overrideNoUpdate || '',
+            qualifyingSuffix: source?.dynamicDnsUpdate?.qualifyingSuffix || '',
+            replaceClientName: source?.dynamicDnsUpdate?.replaceClientName || '',
+            sendUpdates: source?.dynamicDnsUpdate?.sendUpdates || '',
+            ttlPercent: source?.dynamicDnsUpdate?.ttlPercent || '',
+            updateOnRenew: source?.dynamicDnsUpdate?.updateOnRenew || '',
+          },
+          excludeText: source?.excludeText || '',
+          defaultRouterText: source?.defaultRouterText || '',
+          domainName: source?.domainName || '',
+          domainSearchText: source?.domainSearchText || '',
+          nameServerText: source?.nameServerText || '',
+          ntpServerText: source?.ntpServerText || '',
+          ranges: Array.isArray(source?.ranges) ? source.ranges : [],
+          staticMappings: Array.isArray(source?.staticMappings) ? source.staticMappings : [],
+          options: Array.isArray(source?.options) ? source.options : [],
+        };
+      }
+      if (type === 'dhcp4-shared-option') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          value: source?.value || '',
+        };
+      }
+      if (type === 'dhcp4-shared-static-route') {
+        return {
+          __id: source?.__id || '',
+          subnet: source?.subnet || '',
+          nextHop: source?.nextHop || '',
+        };
+      }
+      if (type === 'dhcp4-shared-subnet-range') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          clientClass: source?.clientClass || '',
+          start: source?.start || '',
+          stop: source?.stop || '',
+          options: Array.isArray(source?.options) ? source.options : [],
+        };
+      }
+      if (type === 'dhcp4-shared-subnet-mapping') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          duid: source?.duid || '',
+          ipAddress: source?.ipAddress || '',
+          macAddress: source?.macAddress || '',
+          disable: !!source?.disable,
+          description: source?.description || '',
+          options: Array.isArray(source?.options) ? source.options : [],
+        };
+      }
+      if (type === 'dhcp4-shared-subnet-option') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          value: source?.value || '',
+        };
+      }
+      if (type === 'dhcp4-shared-subnet-range-option' || type === 'dhcp4-shared-subnet-mapping-option') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          value: source?.value || '',
+        };
+      }
+      if (type === 'ddns-forward-domain' || type === 'ddns-reverse-domain') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          keyName: source?.keyName || '',
+          dnsServersText: source?.dnsServersText || '',
+        };
+      }
+      if (type === 'ddns-tsig-key') {
+        return {
+          __id: source?.__id || '',
+          name: source?.name || '',
+          algorithm: source?.algorithm || '',
+          secret: source?.secret || '',
+        };
+      }
+      return { __id: '' };
+    }
+
+    function getServiceCollectionTarget(type) {
+      if (!editingVrf.value) return [];
+      if (type === 'dhcp4-listen-address') return editingVrf.value.dhcpServerListenAddresses;
+      if (type === 'dhcp4-listen-interface') return editingVrf.value.dhcpServerListenInterfaces;
+      if (type === 'dhcp4-client-class') return editingVrf.value.dhcpServerClientClasses;
+      if (type === 'dhcp4-shared-network') return editingVrf.value.dhcpServerSharedNetworks;
+      if (type === 'dhcp6-global-name-server') return editingVrf.value.dhcpv6ServerGlobalNameServers;
+      if (type === 'dhcp6-listen-interface') return editingVrf.value.dhcpv6ServerListenInterfaces;
+      if (type === 'dhcp6-shared-network') return editingVrf.value.dhcpv6ServerSharedNetworks;
+      if (type === 'ddns-forward-domain') return editingVrf.value.dhcpServerDdns.forwardDomains;
+      if (type === 'ddns-reverse-domain') return editingVrf.value.dhcpServerDdns.reverseDomains;
+      if (type === 'ddns-tsig-key') return editingVrf.value.dhcpServerDdns.tsigKeys;
+      return [];
+    }
+
+    const serviceCollectionModalTitle = computed(() => {
+      const mode = serviceCollectionModalMode.value === 'edit' ? t('app.edit') : t('app.create');
+      const typeTitles = {
+        'dhcp4-listen-address': 'DHCP listen-address',
+        'dhcp4-listen-interface': 'DHCP listen-interface',
+        'dhcp4-client-class': 'DHCP client-class',
+        'dhcp4-shared-network': 'DHCP shared-network',
+        'dhcp4-shared-subnet': 'DHCP shared-network subnet',
+        'dhcp4-shared-static-route': 'DHCP shared-network static-route',
+        'dhcp4-shared-subnet-range': 'DHCP subnet range',
+        'dhcp4-shared-subnet-mapping': 'DHCP subnet static-mapping',
+        'dhcp4-shared-subnet-option': 'DHCP subnet option',
+        'dhcp4-shared-subnet-range-option': 'DHCP subnet range option',
+        'dhcp4-shared-subnet-mapping-option': 'DHCP subnet static-mapping option',
+        'dhcp6-global-name-server': 'DHCPv6 global name-server',
+        'dhcp6-listen-interface': 'DHCPv6 listen-interface',
+        'dhcp6-shared-network': 'DHCPv6 shared-network',
+        'dhcp6-shared-option': 'DHCPv6 shared-network option',
+        'dhcp6-shared-subnet': 'DHCPv6 shared-network subnet',
+        'dhcp6-shared-subnet-range': 'DHCPv6 subnet range',
+        'dhcp6-shared-subnet-mapping': 'DHCPv6 subnet static-mapping',
+        'dhcp6-shared-subnet-delegation': 'DHCPv6 subnet prefix-delegation',
+        'dhcp6-shared-subnet-option': 'DHCPv6 subnet option',
+        'dhcp6-shared-subnet-range-option': 'DHCPv6 subnet range option',
+        'dhcp6-shared-subnet-mapping-option': 'DHCPv6 subnet static-mapping option',
+        'ddns-forward-domain': 'DDNS forward-domain',
+        'ddns-reverse-domain': 'DDNS reverse-domain',
+        'ddns-tsig-key': 'DDNS tsig-key',
+      };
+      return `${mode} ${typeTitles[serviceCollectionType.value] || 'service item'}`;
+    });
+
+    function buildServiceCollectionTabStateSnapshot() {
+      return {
+        dhcpSharedNetworkModalTab: dhcpSharedNetworkModalTab.value,
+        dhcp4SharedSubnetModalTab: dhcp4SharedSubnetModalTab.value,
+        dhcpv6SharedNetworkModalTab: dhcpv6SharedNetworkModalTab.value,
+        dhcp6SharedSubnetModalTab: dhcp6SharedSubnetModalTab.value,
+        dhcp6SharedSubnetRangeModalTab: dhcp6SharedSubnetRangeModalTab.value,
+        dhcp6SharedSubnetMappingModalTab: dhcp6SharedSubnetMappingModalTab.value,
+      };
+    }
+
+    function restoreServiceCollectionTabStateSnapshot(tabState) {
+      const state = tabState && typeof tabState === 'object' ? tabState : {};
+      if (state.dhcpSharedNetworkModalTab) dhcpSharedNetworkModalTab.value = state.dhcpSharedNetworkModalTab;
+      if (state.dhcp4SharedSubnetModalTab) dhcp4SharedSubnetModalTab.value = state.dhcp4SharedSubnetModalTab;
+      if (state.dhcpv6SharedNetworkModalTab) dhcpv6SharedNetworkModalTab.value = state.dhcpv6SharedNetworkModalTab;
+      if (state.dhcp6SharedSubnetModalTab) dhcp6SharedSubnetModalTab.value = state.dhcp6SharedSubnetModalTab;
+      if (state.dhcp6SharedSubnetRangeModalTab) dhcp6SharedSubnetRangeModalTab.value = state.dhcp6SharedSubnetRangeModalTab;
+      if (state.dhcp6SharedSubnetMappingModalTab) dhcp6SharedSubnetMappingModalTab.value = state.dhcp6SharedSubnetMappingModalTab;
+    }
+
+    function pushServiceCollectionModalContextSnapshot() {
+      serviceCollectionContextStack.value.push({
+        type: serviceCollectionType.value,
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        draft: deepClone(serviceCollectionDraft.value || {}),
+        tabState: buildServiceCollectionTabStateSnapshot(),
+      });
+    }
+
+    function popServiceCollectionModalContextSnapshot() {
+      if (!Array.isArray(serviceCollectionContextStack.value) || !serviceCollectionContextStack.value.length) return null;
+      return serviceCollectionContextStack.value.pop();
+    }
+
+    function openServiceCollectionCreate(type) {
+      if (serviceCollectionModalVisible.value && !serviceCollectionRestoringContext.value && serviceCollectionType.value !== type) {
+        pushServiceCollectionModalContextSnapshot();
+      }
+      serviceCollectionType.value = type;
+      serviceCollectionModalMode.value = 'create';
+      serviceCollectionEditId.value = '';
+      serviceCollectionDraft.value = createServiceCollectionDraft(type);
+      if (type === 'dhcp4-shared-network') dhcpSharedNetworkModalTab.value = 'basic';
+      if (type === 'dhcp4-shared-subnet') dhcp4SharedSubnetModalTab.value = 'basic';
+      if (type === 'dhcp6-shared-network') dhcpv6SharedNetworkModalTab.value = 'basic';
+      if (type === 'dhcp6-shared-subnet') dhcp6SharedSubnetModalTab.value = 'basic';
+      if (type === 'dhcp6-shared-subnet-range') dhcp6SharedSubnetRangeModalTab.value = 'basic';
+      if (type === 'dhcp6-shared-subnet-mapping') dhcp6SharedSubnetMappingModalTab.value = 'basic';
+      serviceCollectionModalVisible.value = true;
+    }
+
+    function openServiceCollectionEdit(type, row) {
+      if (!row || !row.__id) return;
+      if (serviceCollectionModalVisible.value && !serviceCollectionRestoringContext.value && serviceCollectionType.value !== type) {
+        pushServiceCollectionModalContextSnapshot();
+      }
+      serviceCollectionType.value = type;
+      serviceCollectionModalMode.value = 'edit';
+      serviceCollectionEditId.value = String(row.__id);
+      serviceCollectionDraft.value = createServiceCollectionDraft(type, row);
+      if (type === 'dhcp4-shared-network') dhcpSharedNetworkModalTab.value = 'basic';
+      if (type === 'dhcp4-shared-subnet') dhcp4SharedSubnetModalTab.value = 'basic';
+      if (type === 'dhcp6-shared-network') dhcpv6SharedNetworkModalTab.value = 'basic';
+      if (type === 'dhcp6-shared-subnet') dhcp6SharedSubnetModalTab.value = 'basic';
+      if (type === 'dhcp6-shared-subnet-range') dhcp6SharedSubnetRangeModalTab.value = 'basic';
+      if (type === 'dhcp6-shared-subnet-mapping') dhcp6SharedSubnetMappingModalTab.value = 'basic';
+      if (row.parentId) serviceCollectionDraft.value.parentId = row.parentId;
+      if (row.parentSubnetId) serviceCollectionDraft.value.parentSubnetId = row.parentSubnetId;
+      if (row.parentRangeId) serviceCollectionDraft.value.parentRangeId = row.parentRangeId;
+      if (row.parentMappingId) serviceCollectionDraft.value.parentMappingId = row.parentMappingId;
+      serviceCollectionModalVisible.value = true;
+    }
+
+    function openDhcp4SharedStaticRouteCreateFromSharedNetwork() {
+      const parentId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (parentId) {
+        openServiceCollectionCreate('dhcp4-shared-static-route');
+        serviceCollectionDraft.value.parentId = parentId;
+        return;
+      }
+      const parentName = String(serviceCollectionDraft.value?.name || '').trim();
+      if (!parentName) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp4-shared-network',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcpSharedNetworkModalTab.value,
+        draft: createServiceCollectionDraft('dhcp4-shared-network', serviceCollectionDraft.value),
+      };
+      openServiceCollectionCreate('dhcp4-shared-static-route');
+      serviceCollectionDraft.value.parentId = '__draft__';
+    }
+
+    function openDhcp4SharedStaticRouteEditFromSharedNetwork(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (parentId) {
+        openServiceCollectionEdit('dhcp4-shared-static-route', { ...row, parentId });
+        return;
+      }
+      const parentName = String(serviceCollectionDraft.value?.name || '').trim();
+      if (!parentName) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp4-shared-network',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcpSharedNetworkModalTab.value,
+        draft: createServiceCollectionDraft('dhcp4-shared-network', serviceCollectionDraft.value),
+      };
+      openServiceCollectionEdit('dhcp4-shared-static-route', { ...row, parentId: '__draft__' });
+    }
+
+    function removeDhcp4SharedStaticRouteFromSharedNetwork(ids) {
+      const parentId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (parentId) {
+        removeServiceCollectionByIds('dhcp4-shared-static-route', ids);
+        return;
+      }
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const rows = Array.isArray(serviceCollectionDraft.value?.staticRoutes) ? serviceCollectionDraft.value.staticRoutes : [];
+      serviceCollectionDraft.value.staticRoutes = rows.filter(item => !idSet.has(String(item?.__id || '')));
+    }
+
+    function openDhcp4SharedSubnetCreateFromSharedNetwork() {
+      const parentId = String(serviceCollectionDraft.value?.__id || '').trim();
+      serviceCollectionParentContext.value = {
+        type: 'dhcp4-shared-network',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value || parentId,
+        tab: dhcpSharedNetworkModalTab.value,
+        draft: createServiceCollectionDraft('dhcp4-shared-network', serviceCollectionDraft.value),
+      };
+      if (parentId) {
+        openServiceCollectionCreate('dhcp4-shared-subnet');
+        serviceCollectionDraft.value.parentId = parentId;
+        return;
+      }
+      openServiceCollectionCreate('dhcp4-shared-subnet');
+      serviceCollectionDraft.value.parentId = '__draft__';
+    }
+
+    function openDhcp4SharedSubnetEditFromSharedNetwork(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.__id || '').trim();
+      serviceCollectionParentContext.value = {
+        type: 'dhcp4-shared-network',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value || parentId,
+        tab: dhcpSharedNetworkModalTab.value,
+        draft: createServiceCollectionDraft('dhcp4-shared-network', serviceCollectionDraft.value),
+      };
+      if (parentId) {
+        openServiceCollectionEdit('dhcp4-shared-subnet', { ...row, parentId });
+        return;
+      }
+      openServiceCollectionEdit('dhcp4-shared-subnet', { ...row, parentId: '__draft__' });
+    }
+
+    function removeDhcp4SharedSubnetFromSharedNetwork(ids) {
+      const parentId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (parentId) {
+        removeServiceCollectionByIds('dhcp4-shared-subnet', ids);
+        return;
+      }
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const rows = Array.isArray(serviceCollectionDraft.value?.subnets) ? serviceCollectionDraft.value.subnets : [];
+      serviceCollectionDraft.value.subnets = rows.filter(item => !idSet.has(String(item?.__id || '')));
+    }
+
+    function createDhcp4SubnetModalDraftContext() {
+      const draft = createServiceCollectionDraft('dhcp4-shared-subnet', serviceCollectionDraft.value);
+      draft.parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      return {
+        type: 'dhcp4-shared-subnet',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcp4SharedSubnetModalTab.value,
+        draft,
+      };
+    }
+
+    function openDhcp4SharedSubnetRangeCreateFromSubnet() {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId) return;
+      if (parentId === '__draft__') serviceCollectionParentContext.value = createDhcp4SubnetModalDraftContext();
+      dhcp4SharedSubnetModalTab.value = 'range';
+      openServiceCollectionCreate('dhcp4-shared-subnet-range');
+      serviceCollectionDraft.value.parentId = parentId;
+      serviceCollectionDraft.value.parentSubnetId = parentSubnetId;
+    }
+
+    function openDhcp4SharedSubnetRangeEditFromSubnet(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId) return;
+      if (parentId === '__draft__') serviceCollectionParentContext.value = createDhcp4SubnetModalDraftContext();
+      dhcp4SharedSubnetModalTab.value = 'range';
+      openServiceCollectionEdit('dhcp4-shared-subnet-range', { ...row, parentId, parentSubnetId });
+    }
+
+    function removeDhcp4SharedSubnetRangeFromSubnet(ids) {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      if (parentId !== '__draft__') {
+        removeServiceCollectionByIds('dhcp4-shared-subnet-range', ids);
+        return;
+      }
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const rows = Array.isArray(serviceCollectionDraft.value?.ranges) ? serviceCollectionDraft.value.ranges : [];
+      serviceCollectionDraft.value.ranges = rows.filter(item => !idSet.has(String(item?.__id || '')));
+    }
+
+    function openDhcp4SharedSubnetMappingCreateFromSubnet() {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId) return;
+      if (parentId === '__draft__') serviceCollectionParentContext.value = createDhcp4SubnetModalDraftContext();
+      dhcp4SharedSubnetModalTab.value = 'static-mapping';
+      openServiceCollectionCreate('dhcp4-shared-subnet-mapping');
+      serviceCollectionDraft.value.parentId = parentId;
+      serviceCollectionDraft.value.parentSubnetId = parentSubnetId;
+    }
+
+    function openDhcp4SharedSubnetMappingEditFromSubnet(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId) return;
+      if (parentId === '__draft__') serviceCollectionParentContext.value = createDhcp4SubnetModalDraftContext();
+      dhcp4SharedSubnetModalTab.value = 'static-mapping';
+      openServiceCollectionEdit('dhcp4-shared-subnet-mapping', { ...row, parentId, parentSubnetId });
+    }
+
+    function removeDhcp4SharedSubnetMappingFromSubnet(ids) {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      if (parentId !== '__draft__') {
+        removeServiceCollectionByIds('dhcp4-shared-subnet-mapping', ids);
+        return;
+      }
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const rows = Array.isArray(serviceCollectionDraft.value?.staticMappings) ? serviceCollectionDraft.value.staticMappings : [];
+      serviceCollectionDraft.value.staticMappings = rows.filter(item => !idSet.has(String(item?.__id || '')));
+    }
+
+    function openDhcp4SharedSubnetOptionCreateFromSubnet() {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId) return;
+      if (parentId === '__draft__') serviceCollectionParentContext.value = createDhcp4SubnetModalDraftContext();
+      dhcp4SharedSubnetModalTab.value = 'option';
+      openServiceCollectionCreate('dhcp4-shared-subnet-option');
+      serviceCollectionDraft.value.parentId = parentId;
+      serviceCollectionDraft.value.parentSubnetId = parentSubnetId;
+    }
+
+    function openDhcp4SharedSubnetOptionEditFromSubnet(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId) return;
+      if (parentId === '__draft__') serviceCollectionParentContext.value = createDhcp4SubnetModalDraftContext();
+      dhcp4SharedSubnetModalTab.value = 'option';
+      openServiceCollectionEdit('dhcp4-shared-subnet-option', { ...row, parentId, parentSubnetId });
+    }
+
+    function removeDhcp4SharedSubnetOptionFromSubnet(ids) {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      if (parentId !== '__draft__') {
+        removeServiceCollectionByIds('dhcp4-shared-subnet-option', ids);
+        return;
+      }
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const rows = Array.isArray(serviceCollectionDraft.value?.options) ? serviceCollectionDraft.value.options : [];
+      serviceCollectionDraft.value.options = rows.filter(item => !idSet.has(String(item?.__id || '')));
+    }
+
+    function openDhcp6SharedSubnetCreateFromSharedNetwork() {
+      const parentId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (parentId) {
+        openServiceCollectionCreate('dhcp6-shared-subnet');
+        serviceCollectionDraft.value.parentId = parentId;
+        return;
+      }
+      const parentName = String(serviceCollectionDraft.value?.name || '').trim();
+      if (!parentName) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp6-shared-network',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcpv6SharedNetworkModalTab.value,
+        draft: createServiceCollectionDraft('dhcp6-shared-network', serviceCollectionDraft.value),
+      };
+      openServiceCollectionCreate('dhcp6-shared-subnet');
+      serviceCollectionDraft.value.parentId = '__draft6__';
+    }
+
+    function openDhcp6SharedSubnetEditFromSharedNetwork(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (parentId) {
+        openServiceCollectionEdit('dhcp6-shared-subnet', { ...row, parentId });
+        return;
+      }
+      const parentName = String(serviceCollectionDraft.value?.name || '').trim();
+      if (!parentName) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp6-shared-network',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcpv6SharedNetworkModalTab.value,
+        draft: createServiceCollectionDraft('dhcp6-shared-network', serviceCollectionDraft.value),
+      };
+      openServiceCollectionEdit('dhcp6-shared-subnet', { ...row, parentId: '__draft6__' });
+    }
+
+    function removeDhcp6SharedSubnetFromSharedNetwork(ids) {
+      const parentId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (parentId) {
+        removeServiceCollectionByIds('dhcp6-shared-subnet', ids);
+        return;
+      }
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const rows = Array.isArray(serviceCollectionDraft.value?.subnets) ? serviceCollectionDraft.value.subnets : [];
+      serviceCollectionDraft.value.subnets = rows.filter(item => !idSet.has(String(item?.__id || '')));
+    }
+
+    function ensureDhcp6SubnetDraftId() {
+      const draft = serviceCollectionDraft.value || {};
+      const existingId = String(draft.__id || '').trim();
+      if (existingId) return existingId;
+      const prefix = String(draft.prefix || '').trim();
+      if (!prefix) return '';
+      const nextId = nextBgpRowId('svc-subnet6-draft');
+      draft.__id = nextId;
+      serviceCollectionDraft.value = draft;
+      return nextId;
+    }
+
+    function openDhcp6SharedSubnetRangeCreateFromSubnet() {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = ensureDhcp6SubnetDraftId();
+      if (!parentId || !parentSubnetId) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp6-shared-subnet',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcp6SharedSubnetModalTab.value,
+        draft: createServiceCollectionDraft('dhcp6-shared-subnet', serviceCollectionDraft.value),
+      };
+      openServiceCollectionCreate('dhcp6-shared-subnet-range');
+      serviceCollectionDraft.value.parentId = parentId;
+      serviceCollectionDraft.value.parentSubnetId = parentSubnetId;
+      dhcp6SharedSubnetModalTab.value = 'range';
+    }
+
+    function openDhcp6SharedSubnetRangeEditFromSubnet(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp6-shared-subnet',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcp6SharedSubnetModalTab.value,
+        draft: createServiceCollectionDraft('dhcp6-shared-subnet', serviceCollectionDraft.value),
+      };
+      openServiceCollectionEdit('dhcp6-shared-subnet-range', { ...row, parentId, parentSubnetId });
+      dhcp6SharedSubnetModalTab.value = 'range';
+    }
+
+    function removeDhcp6SharedSubnetRangeFromSubnet(ids) {
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const rows = Array.isArray(serviceCollectionDraft.value?.ranges) ? serviceCollectionDraft.value.ranges : [];
+      serviceCollectionDraft.value.ranges = rows.filter(item => !idSet.has(String(item?.__id || '')));
+    }
+
+    function openDhcp6SharedSubnetMappingCreateFromSubnet() {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = ensureDhcp6SubnetDraftId();
+      if (!parentId || !parentSubnetId) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp6-shared-subnet',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcp6SharedSubnetModalTab.value,
+        draft: createServiceCollectionDraft('dhcp6-shared-subnet', serviceCollectionDraft.value),
+      };
+      openServiceCollectionCreate('dhcp6-shared-subnet-mapping');
+      serviceCollectionDraft.value.parentId = parentId;
+      serviceCollectionDraft.value.parentSubnetId = parentSubnetId;
+      dhcp6SharedSubnetModalTab.value = 'static-mapping';
+    }
+
+    function openDhcp6SharedSubnetMappingEditFromSubnet(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp6-shared-subnet',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcp6SharedSubnetModalTab.value,
+        draft: createServiceCollectionDraft('dhcp6-shared-subnet', serviceCollectionDraft.value),
+      };
+      openServiceCollectionEdit('dhcp6-shared-subnet-mapping', { ...row, parentId, parentSubnetId });
+      dhcp6SharedSubnetModalTab.value = 'static-mapping';
+    }
+
+    function removeDhcp6SharedSubnetMappingFromSubnet(ids) {
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const rows = Array.isArray(serviceCollectionDraft.value?.staticMappings) ? serviceCollectionDraft.value.staticMappings : [];
+      serviceCollectionDraft.value.staticMappings = rows.filter(item => !idSet.has(String(item?.__id || '')));
+    }
+
+    function openDhcp6SharedSubnetDelegationCreateFromSubnet() {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = ensureDhcp6SubnetDraftId();
+      if (!parentId || !parentSubnetId) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp6-shared-subnet',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcp6SharedSubnetModalTab.value,
+        draft: createServiceCollectionDraft('dhcp6-shared-subnet', serviceCollectionDraft.value),
+      };
+      openServiceCollectionCreate('dhcp6-shared-subnet-delegation');
+      serviceCollectionDraft.value.parentId = parentId;
+      serviceCollectionDraft.value.parentSubnetId = parentSubnetId;
+      dhcp6SharedSubnetModalTab.value = 'prefix-delegation';
+    }
+
+    function openDhcp6SharedSubnetDelegationEditFromSubnet(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp6-shared-subnet',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcp6SharedSubnetModalTab.value,
+        draft: createServiceCollectionDraft('dhcp6-shared-subnet', serviceCollectionDraft.value),
+      };
+      openServiceCollectionEdit('dhcp6-shared-subnet-delegation', { ...row, parentId, parentSubnetId });
+      dhcp6SharedSubnetModalTab.value = 'prefix-delegation';
+    }
+
+    function removeDhcp6SharedSubnetDelegationFromSubnet(ids) {
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const rows = Array.isArray(serviceCollectionDraft.value?.delegations) ? serviceCollectionDraft.value.delegations : [];
+      serviceCollectionDraft.value.delegations = rows.filter(item => !idSet.has(String(item?.__id || '')));
+    }
+
+    function openDhcp6SharedSubnetOptionCreateFromSubnet() {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = ensureDhcp6SubnetDraftId();
+      if (!parentId || !parentSubnetId) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp6-shared-subnet',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcp6SharedSubnetModalTab.value,
+        draft: createServiceCollectionDraft('dhcp6-shared-subnet', serviceCollectionDraft.value),
+      };
+      openServiceCollectionCreate('dhcp6-shared-subnet-option');
+      serviceCollectionDraft.value.parentId = parentId;
+      serviceCollectionDraft.value.parentSubnetId = parentSubnetId;
+      dhcp6SharedSubnetModalTab.value = 'option';
+    }
+
+    function openDhcp6SharedSubnetOptionEditFromSubnet(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId) return;
+      serviceCollectionParentContext.value = {
+        type: 'dhcp6-shared-subnet',
+        mode: serviceCollectionModalMode.value,
+        editId: serviceCollectionEditId.value,
+        tab: dhcp6SharedSubnetModalTab.value,
+        draft: createServiceCollectionDraft('dhcp6-shared-subnet', serviceCollectionDraft.value),
+      };
+      openServiceCollectionEdit('dhcp6-shared-subnet-option', { ...row, parentId, parentSubnetId });
+      dhcp6SharedSubnetModalTab.value = 'option';
+    }
+
+    function removeDhcp6SharedSubnetOptionFromSubnet(ids) {
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const rows = Array.isArray(serviceCollectionDraft.value?.options) ? serviceCollectionDraft.value.options : [];
+      serviceCollectionDraft.value.options = rows.filter(item => !idSet.has(String(item?.__id || '')));
+    }
+
+    function openDhcp4SharedSubnetRangeOptionCreateFromRange() {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.parentSubnetId || '').trim();
+      const parentRangeId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId || !parentRangeId) return;
+      openServiceCollectionCreate('dhcp4-shared-subnet-range-option');
+      serviceCollectionDraft.value.parentId = parentId;
+      serviceCollectionDraft.value.parentSubnetId = parentSubnetId;
+      serviceCollectionDraft.value.parentRangeId = parentRangeId;
+    }
+
+    function openDhcp4SharedSubnetRangeOptionEditFromRange(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.parentSubnetId || '').trim();
+      const parentRangeId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId || !parentRangeId) return;
+      openServiceCollectionEdit('dhcp4-shared-subnet-range-option', { ...row, parentId, parentSubnetId, parentRangeId });
+    }
+
+    function openDhcp4SharedSubnetMappingOptionCreateFromMapping() {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.parentSubnetId || '').trim();
+      const parentMappingId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId || !parentMappingId) return;
+      openServiceCollectionCreate('dhcp4-shared-subnet-mapping-option');
+      serviceCollectionDraft.value.parentId = parentId;
+      serviceCollectionDraft.value.parentSubnetId = parentSubnetId;
+      serviceCollectionDraft.value.parentMappingId = parentMappingId;
+    }
+
+    function openDhcp4SharedSubnetMappingOptionEditFromMapping(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.parentSubnetId || '').trim();
+      const parentMappingId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId || !parentMappingId) return;
+      openServiceCollectionEdit('dhcp4-shared-subnet-mapping-option', { ...row, parentId, parentSubnetId, parentMappingId });
+    }
+
+    function openDhcp6SharedSubnetRangeOptionCreateFromRange() {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.parentSubnetId || '').trim();
+      const parentRangeId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId || !parentRangeId) return;
+      openServiceCollectionCreate('dhcp6-shared-subnet-range-option');
+      serviceCollectionDraft.value.parentId = parentId;
+      serviceCollectionDraft.value.parentSubnetId = parentSubnetId;
+      serviceCollectionDraft.value.parentRangeId = parentRangeId;
+    }
+
+    function openDhcp6SharedSubnetRangeOptionEditFromRange(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.parentSubnetId || '').trim();
+      const parentRangeId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId || !parentRangeId) return;
+      openServiceCollectionEdit('dhcp6-shared-subnet-range-option', { ...row, parentId, parentSubnetId, parentRangeId });
+    }
+
+    function openDhcp6SharedSubnetMappingOptionCreateFromMapping() {
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.parentSubnetId || '').trim();
+      const parentMappingId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId || !parentMappingId) return;
+      openServiceCollectionCreate('dhcp6-shared-subnet-mapping-option');
+      serviceCollectionDraft.value.parentId = parentId;
+      serviceCollectionDraft.value.parentSubnetId = parentSubnetId;
+      serviceCollectionDraft.value.parentMappingId = parentMappingId;
+    }
+
+    function openDhcp6SharedSubnetMappingOptionEditFromMapping(row) {
+      if (!row || !row.__id) return;
+      const parentId = String(serviceCollectionDraft.value?.parentId || '').trim();
+      const parentSubnetId = String(serviceCollectionDraft.value?.parentSubnetId || '').trim();
+      const parentMappingId = String(serviceCollectionDraft.value?.__id || '').trim();
+      if (!parentId || !parentSubnetId || !parentMappingId) return;
+      openServiceCollectionEdit('dhcp6-shared-subnet-mapping-option', { ...row, parentId, parentSubnetId, parentMappingId });
+    }
+
+    watch(serviceCollectionModalVisible, (visible, previousVisible) => {
+      if (visible || !previousVisible) return;
+      const snapshot = popServiceCollectionModalContextSnapshot();
+      if (!snapshot) return;
+      serviceCollectionRestoringContext.value = true;
+      serviceCollectionType.value = snapshot.type || 'dhcp4-listen-address';
+      serviceCollectionModalMode.value = snapshot.mode || 'create';
+      serviceCollectionEditId.value = snapshot.editId || '';
+      serviceCollectionDraft.value = deepClone(snapshot.draft || {});
+      restoreServiceCollectionTabStateSnapshot(snapshot.tabState);
+      serviceCollectionModalVisible.value = true;
+      nextTick(() => {
+        serviceCollectionRestoringContext.value = false;
+      });
+    });
+
+    function isValidMacAddress(value) {
+      return /^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(String(value || '').trim());
+    }
+
+    function isLikelyIpv6Address(value) {
+      const text = String(value || '').trim();
+      if (!text) return false;
+      if (!text.includes(':')) return false;
+      return /^[0-9a-fA-F:]+$/.test(text);
+    }
+
+    function isLikelyIpv6Prefix(value) {
+      const text = String(value || '').trim();
+      const match = text.match(/^(.+)\/(\d{1,3})$/);
+      if (!match) return false;
+      const plen = Number(match[2]);
+      if (!Number.isInteger(plen) || plen < 0 || plen > 128) return false;
+      return isLikelyIpv6Address(match[1]);
+    }
+
+    function isIntegerInRange(value, min, max) {
+      const text = String(value || '').trim();
+      if (!text) return true;
+      const num = Number(text);
+      return Number.isInteger(num) && num >= min && num <= max;
+    }
+
+    function parseIpv6ForComparison(value) {
+      const text = String(value || '').trim();
+      if (!isLikelyIpv6Address(text)) return null;
+      const [headRaw, tailRaw = ''] = text.split('::');
+      if (text.split('::').length > 2) return null;
+      const head = headRaw ? headRaw.split(':').filter(Boolean) : [];
+      const tail = tailRaw ? tailRaw.split(':').filter(Boolean) : [];
+      const hasCompression = text.includes('::');
+      if (!hasCompression && (head.length + tail.length) !== 8) return null;
+      const missing = hasCompression ? (8 - (head.length + tail.length)) : 0;
+      if (missing < 0) return null;
+      const groups = [
+        ...head,
+        ...new Array(missing).fill('0'),
+        ...tail,
+      ];
+      if (groups.length !== 8) return null;
+      const bytes = [];
+      for (let i = 0; i < groups.length; i += 1) {
+        const g = groups[i];
+        if (!/^[0-9a-fA-F]{1,4}$/.test(g)) return null;
+        const num = Number.parseInt(g, 16);
+        bytes.push((num >> 8) & 0xff, num & 0xff);
+      }
+      return bytes;
+    }
+
+    function compareIpv6Address(a, b) {
+      const ab = parseIpv6ForComparison(a);
+      const bb = parseIpv6ForComparison(b);
+      if (!ab || !bb) return null;
+      for (let i = 0; i < 16; i += 1) {
+        if (ab[i] < bb[i]) return -1;
+        if (ab[i] > bb[i]) return 1;
+      }
+      return 0;
+    }
+
+    function collectionPrimaryValue(type, rowRaw) {
+      const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+      if (type === 'dhcp4-listen-address') return String(row.address || '').trim();
+      if (type === 'dhcp6-global-name-server') return String(row.address || '').trim();
+      if (type === 'dhcp4-listen-interface' || type === 'dhcp6-listen-interface') return String(row.name || '').trim();
+      if (type === 'dhcp4-client-class') return String(row.name || '').trim();
+      if (type === 'dhcp4-shared-option') return `${String(row.name || '').trim()}::${String(row.value || '').trim()}`;
+      if (type === 'dhcp4-shared-subnet-option' || type === 'dhcp4-shared-subnet-range-option' || type === 'dhcp4-shared-subnet-mapping-option') return `${String(row.name || '').trim()}::${String(row.value || '').trim()}`;
+      if (type === 'dhcp6-shared-option' || type === 'dhcp6-shared-subnet-option' || type === 'dhcp6-shared-subnet-range-option' || type === 'dhcp6-shared-subnet-mapping-option') return `${String(row.name || '').trim()}::${String(row.value || '').trim()}`;
+      if (type === 'dhcp4-shared-network' || type === 'dhcp6-shared-network') return String(row.name || '').trim();
+      if (type === 'dhcp4-shared-subnet' || type === 'dhcp6-shared-subnet' || type === 'dhcp4-shared-static-route' || type === 'dhcp6-shared-subnet-delegation') return String(row.prefix || row.subnet || '').trim();
+      return String(row.name || '').trim();
+    }
+
+    function normalizeCollectionRows(type, rows) {
+      const source = Array.isArray(rows) ? rows : [];
+      const seen = new Set();
+      const normalized = [];
+      source.forEach((item) => {
+        const key = collectionPrimaryValue(type, item);
+        if (key) {
+          const low = key.toLowerCase();
+          if (seen.has(low)) return;
+          seen.add(low);
+        }
+        normalized.push(item);
+      });
+      normalized.sort((a, b) => collectionPrimaryValue(type, a).localeCompare(collectionPrimaryValue(type, b)));
+      return normalized;
+    }
+
+    function hasDuplicatePrimary(type, rows, draft, editId = '') {
+      const value = collectionPrimaryValue(type, draft);
+      if (!value) return false;
+      return (rows || []).some((item) => {
+        if (editId && String(item?.__id || '') === String(editId)) return false;
+        return collectionPrimaryValue(type, item).toLowerCase() === value.toLowerCase();
+      });
+    }
+
+    function validateServiceDraft(type, draft) {
+      if (type === 'dhcp4-shared-network') {
+        const options = Array.isArray(draft.options) ? draft.options : [];
+        for (let i = 0; i < options.length; i += 1) {
+          const err = validateServiceDraft('dhcp4-shared-option', options[i]);
+          if (err) return `option ${i + 1}: ${err}`;
+        }
+      }
+      if (type === 'dhcp6-shared-network') {
+        const options = Array.isArray(draft.options) ? draft.options : [];
+        for (let i = 0; i < options.length; i += 1) {
+          const err = validateServiceDraft('dhcp6-shared-option', options[i]);
+          if (err) return `option ${i + 1}: ${err}`;
+        }
+      }
+      if (type === 'dhcp4-shared-static-route') {
+        const subnet = String(draft.subnet || '').trim();
+        const nextHop = String(draft.nextHop || '').trim();
+        if (subnet && !isValidCIDR(subnet)) return 'static-route subnet must be a valid CIDR.';
+        if (nextHop && !isValidIPv4(nextHop)) return 'static-route next-hop must be a valid IPv4 address.';
+      }
+      if (type === 'dhcp4-shared-subnet') {
+        const prefix = String(draft.prefix || '').trim();
+        const subnetId = String(draft.subnetId || '').trim();
+        const lease = String(draft.lease || '').trim();
+        if (prefix && !isValidCIDR(prefix)) return 'DHCPv4 subnet must be a valid IPv4 CIDR.';
+        if (subnetId) {
+          const n = Number(subnetId);
+          if (!Number.isInteger(n) || n < 1 || n > 4294967294) return 'subnet-id must be between 1 and 4294967294.';
+        }
+        if (lease) {
+          const n = Number(lease);
+          if (!Number.isInteger(n) || n < 0 || n > 4294967295) return 'lease must be between 0 and 4294967295.';
+        }
+      }
+      if (type === 'dhcp4-shared-subnet-range') {
+        const start = String(draft.start || '').trim();
+        const stop = String(draft.stop || '').trim();
+        if (start && !isValidIPv4(start)) return 'range start must be a valid IPv4 address.';
+        if (stop && !isValidIPv4(stop)) return 'range stop must be a valid IPv4 address.';
+      }
+      if (type === 'dhcp4-shared-subnet-mapping') {
+        const ipAddress = String(draft.ipAddress || '').trim();
+        const macAddress = String(draft.macAddress || '').trim();
+        if (ipAddress && !isValidIPv4(ipAddress)) return 'ip-address must be a valid IPv4 address.';
+        if (macAddress && !isValidMacAddress(macAddress)) return 'mac must be a valid MAC address.';
+      }
+      if (type === 'dhcp4-shared-option') {
+        const optionName = String(draft.name || '').trim();
+        const value = String(draft.value || '').trim();
+        const ipv4OnlyNames = new Set([
+          'capwap-controller',
+          'default-router',
+          'name-server',
+          'ntp-server',
+          'pop-server',
+          'server-identifier',
+          'smtp-server',
+          'time-server',
+          'wins-server',
+          'vendor-option ubiquiti unifi-controller',
+        ]);
+        if (optionName === 'ip-forwarding' && value) return 'ip-forwarding should not have a value.';
+        if (optionName === 'bootfile-size' && value) {
+          const n = Number(value);
+          if (!Number.isInteger(n) || n < 1 || n > 16) return 'bootfile-size must be between 1 and 16.';
+        }
+        if (optionName === 'client-prefix-length' && value) {
+          const n = Number(value);
+          if (!Number.isInteger(n) || n < 0 || n > 32) return 'client-prefix-length must be between 0 and 32.';
+        }
+        if (optionName === 'interface-mtu' && value) {
+          const n = Number(value);
+          if (!Number.isInteger(n) || n < 576 || n > 9000) return 'interface-mtu must be between 576 and 9000.';
+        }
+        if (optionName === 'ipv6-only-preferred' && value) {
+          const n = Number(value);
+          if (!Number.isInteger(n) || n < 0 || n > 4294967295) return 'ipv6-only-preferred must be between 0 and 4294967295.';
+        }
+        if (optionName === 'time-offset' && value) {
+          if (!/^-?\d+$/.test(value)) return 'time-offset must be an integer.';
+        }
+        if (optionName === 'bootfile-server' && value && !(isValidIPv4(value) || isValidHostname(value))) {
+          return 'bootfile-server must be an IPv4 address or hostname.';
+        }
+        if (optionName === 'tftp-server-name' && value && !(isValidIPv4(value) || isValidHostname(value))) {
+          return 'tftp-server-name must be an IPv4 address or hostname.';
+        }
+        if (ipv4OnlyNames.has(optionName) && value && !isValidIPv4(value)) return `${optionName} must be a valid IPv4 address.`;
+      }
+      if (type === 'dhcp4-shared-subnet-option' || type === 'dhcp4-shared-subnet-range-option' || type === 'dhcp4-shared-subnet-mapping-option') {
+        return validateServiceDraft('dhcp4-shared-option', draft);
+      }
+      if (type === 'dhcp6-shared-option' || type === 'dhcp6-shared-subnet-option' || type === 'dhcp6-shared-subnet-range-option' || type === 'dhcp6-shared-subnet-mapping-option') {
+        const optionName = String(draft.name || '').trim();
+        const value = String(draft.value || '').trim();
+        if (optionName && !DHCP6_SHARED_OPTION_NAMES.includes(optionName)) {
+          return 'Unsupported DHCPv6 option name.';
+        }
+        const ipv6OnlyNames = new Set([
+          'capwap-controller',
+          'name-server',
+          'nis-server',
+          'nisplus-server',
+          'sntp-server',
+          'vendor-option cisco tftp-server',
+        ]);
+        if (optionName === 'info-refresh-time' && value) {
+          const n = Number(value);
+          if (!Number.isInteger(n) || n < 1 || n > 4294967295) return 'info-refresh-time must be between 1 and 4294967295.';
+        }
+        if (optionName === 'sip-server' && value && !(isLikelyIpv6Address(value) || isValidHostname(value))) {
+          return 'sip-server must be a valid IPv6 address or hostname.';
+        }
+        if (ipv6OnlyNames.has(optionName) && value && !isLikelyIpv6Address(value)) {
+          return `${optionName} must be a valid IPv6 address.`;
+        }
+      }
+      if (type === 'dhcp6-shared-subnet') {
+        if (!isLikelyIpv6Prefix(draft.prefix)) return 'DHCPv6 subnet must be a valid IPv6 prefix.';
+        if (draft.subnetId) {
+          const n = Number(String(draft.subnetId || '').trim());
+          if (!Number.isInteger(n) || n < 1 || n > 4294967294) return 'subnet-id must be between 1 and 4294967294.';
+        }
+        const leaseFields = [
+          { key: 'leaseTimeDefault', label: 'lease-time default' },
+          { key: 'leaseTimeMaximum', label: 'lease-time maximum' },
+          { key: 'leaseTimeMinimum', label: 'lease-time minimum' },
+        ];
+        for (const item of leaseFields) {
+          const text = String(draft[item.key] || '').trim();
+          if (!text) continue;
+          const n = Number(text);
+          if (!Number.isInteger(n) || n < 1 || n > 4294967295) return `${item.label} must be between 1 and 4294967295.`;
+        }
+      }
+      if (type === 'dhcp6-shared-subnet-range') {
+        if (draft.prefix && !isLikelyIpv6Prefix(draft.prefix)) return 'DHCPv6 range prefix must be a valid IPv6 prefix.';
+        if (draft.start && !isLikelyIpv6Address(draft.start)) return 'DHCPv6 range start must be a valid IPv6 address.';
+        if (draft.stop && !isLikelyIpv6Address(draft.stop)) return 'DHCPv6 range stop must be a valid IPv6 address.';
+        const options = Array.isArray(draft.options) ? draft.options : [];
+        for (let i = 0; i < options.length; i += 1) {
+          const err = validateServiceDraft('dhcp6-shared-subnet-range-option', options[i]);
+          if (err) return `option ${i + 1}: ${err}`;
+        }
+        if (draft.start && draft.stop) {
+          const order = compareIpv6Address(draft.start, draft.stop);
+          if (order === null) return 'DHCPv6 range start/stop cannot be compared.';
+          if (order > 0) return 'DHCPv6 range start must be less than or equal to stop.';
+        }
+      }
+      if (type === 'dhcp6-shared-subnet-mapping') {
+        if (draft.ipv6Address && !isLikelyIpv6Address(draft.ipv6Address)) return 'IPv6 address is invalid.';
+        if (draft.ipv6Prefix && !isLikelyIpv6Prefix(draft.ipv6Prefix)) return 'IPv6 prefix is invalid.';
+        if (draft.mac && !isValidMacAddress(draft.mac)) return 'MAC address is invalid.';
+        const options = Array.isArray(draft.options) ? draft.options : [];
+        for (let i = 0; i < options.length; i += 1) {
+          const err = validateServiceDraft('dhcp6-shared-subnet-mapping-option', options[i]);
+          if (err) return `option ${i + 1}: ${err}`;
+        }
+      }
+      if (type === 'dhcp6-shared-subnet-delegation') {
+        if (!isLikelyIpv6Prefix(draft.prefix)) return 'Delegation prefix must be a valid IPv6 prefix.';
+        if (!isIntegerInRange(draft.delegatedLength, 32, 64)) return 'delegated-length must be between 32 and 64.';
+        if (!isIntegerInRange(draft.prefixLength, 32, 64)) return 'prefix-length must be between 32 and 64.';
+        if (draft.excludedPrefix && !isLikelyIpv6Prefix(draft.excludedPrefix)) return 'excluded-prefix must be a valid IPv6 prefix.';
+        if (draft.excludedPrefixLength && !isIntegerInRange(draft.excludedPrefixLength, 33, 128)) return 'excluded-prefix-length must be between 33 and 128.';
+        const delegatedLength = Number(String(draft.delegatedLength || '').trim());
+        const prefixLength = Number(String(draft.prefixLength || '').trim());
+        if (Number.isInteger(delegatedLength) && Number.isInteger(prefixLength) && delegatedLength < prefixLength) {
+          return 'delegated-length must be greater than or equal to prefix-length.';
+        }
+        const excludedPrefixLength = Number(String(draft.excludedPrefixLength || '').trim());
+        if (Number.isInteger(excludedPrefixLength) && Number.isInteger(prefixLength) && excludedPrefixLength < prefixLength) {
+          return 'excluded-prefix-length must be greater than or equal to prefix-length.';
+        }
+      }
+      return '';
+    }
+
+    function getDhcp4SharedOptionHint(optionName) {
+      const name = String(optionName || '').trim();
+      if (!name) return 'Select an option first.';
+      return DHCP4_SHARED_OPTION_HINTS[name] || 'Option value';
+    }
+
+    function getDhcp6SubnetOptionNameChoices(currentName) {
+      const current = String(currentName || '').trim();
+      const names = [...DHCP6_SHARED_OPTION_NAMES];
+      if (current && !names.includes(current)) names.unshift(current);
+      return names;
+    }
+
+    function getDhcp6SharedOptionHint(optionName) {
+      const name = String(optionName || '').trim();
+      if (!name) return 'Select an option first.';
+      const field = DHCP6_SHARED_OPTION_FIELDS.find(item => item.name === name);
+      if (!field) return 'Option value';
+      if (name === 'info-refresh-time') return 'Range 1-4294967295 seconds. Default: unset.';
+      if (name === 'sip-server') return 'IPv6 address or FQDN. Repeat by adding rows.';
+      if (name === 'domain-search' || name === 'nis-domain' || name === 'nisplus-domain' || name === 'captive-portal') {
+        return 'Text value. Default: unset.';
+      }
+      if (field.type === 'textarea') return 'One value per line. Repeat by adding rows if needed.';
+      if (field.placeholder) return `Expected: ${field.placeholder}`;
+      return 'Option value';
+    }
+
+    function getDhcp6OptionFieldHint(optionName) {
+      const name = String(optionName || '').trim();
+      const keyMap = {
+        'captive-portal': 'dhcpv6OptionCaptivePortal',
+        'capwap-controller': 'dhcpv6OptionCapwapController',
+        'domain-search': 'dhcpv6OptionDomainSearch',
+        'info-refresh-time': 'dhcpv6OptionInfoRefreshTime',
+        'name-server': 'dhcpv6OptionNameServer',
+        'nis-domain': 'dhcpv6OptionNisDomain',
+        'nis-server': 'dhcpv6OptionNisServer',
+        'nisplus-domain': 'dhcpv6OptionNisplusDomain',
+        'nisplus-server': 'dhcpv6OptionNisplusServer',
+        'sip-server': 'dhcpv6OptionSipServer',
+        'sntp-server': 'dhcpv6OptionSntpServer',
+        'vendor-option cisco tftp-server': 'dhcpv6OptionVendorCiscoTftpServer',
+      };
+      const key = keyMap[name];
+      if (!key) return getDhcp6SharedOptionHint(name);
+      const text = t(`vrf.protocolHints.${key}`);
+      if (text && text !== `vrf.protocolHints.${key}`) return text;
+      return getDhcp6SharedOptionHint(name);
+    }
+
+    function getDhcp4SubnetOptionNameChoices(currentName) {
+      const current = String(currentName || '').trim();
+      const names = [...DHCP4_SHARED_OPTION_NAMES];
+      if (current && !names.includes(current)) names.unshift(current);
+      return names;
+    }
+
+    function getDhcp4SharedOptionInputType(optionName) {
+      const name = String(optionName || '').trim();
+      if (name === 'bootfile-size' || name === 'client-prefix-length' || name === 'interface-mtu' || name === 'ipv6-only-preferred' || name === 'time-offset') return 'number';
+      return 'text';
+    }
+
+    function getDhcp4SharedOptionInputMin(optionName) {
+      const name = String(optionName || '').trim();
+      if (name === 'bootfile-size') return '1';
+      if (name === 'client-prefix-length') return '0';
+      if (name === 'interface-mtu') return '576';
+      if (name === 'ipv6-only-preferred') return '0';
+      return '';
+    }
+
+    function getDhcp4SharedOptionInputMax(optionName) {
+      const name = String(optionName || '').trim();
+      if (name === 'bootfile-size') return '16';
+      if (name === 'client-prefix-length') return '32';
+      if (name === 'interface-mtu') return '9000';
+      if (name === 'ipv6-only-preferred') return '4294967295';
+      return '';
+    }
+
+    function getDhcp4SharedOptionValuePlaceholder(optionName) {
+      const name = String(optionName || '').trim();
+      if (!name) return 'value';
+      if (name === 'ip-forwarding') return '(no value)';
+      if (name === 'bootfile-server' || name === 'tftp-server-name') return '192.0.2.10 or host.example.com';
+      if (name === 'bootfile-size') return '1-16';
+      if (name === 'client-prefix-length') return '0-32';
+      if (name === 'interface-mtu') return '576-9000';
+      if (name === 'ipv6-only-preferred') return '0-4294967295';
+      if (name === 'time-offset') return '-3600';
+      if (DHCP4_SHARED_MULTI_VALUE_OPTION_NAMES.has(name)) return 'IPv4 address (repeat by adding rows)';
+      if (name === 'vendor-option ubiquiti unifi-controller') return 'IPv4 address';
+      return 'value';
+    }
+
+    function getEvpnHint(key) {
+      const lang = String(locale?.value || '').toLowerCase();
+      const zh = lang.startsWith('zh');
+      const map = {
+        rd: {
+          zh: '格式: x.x.x.x:nn 或 asn:nn。默认: 无。',
+          en: 'Format: x.x.x.x:nn or asn:nn. Default: unset.',
+        },
+        advertiseIpv4RouteMap: {
+          zh: 'route-map 名称。默认: 无。',
+          en: 'Route-map name. Default: unset.',
+        },
+        advertiseIpv6RouteMap: {
+          zh: 'route-map 名称。默认: 无。',
+          en: 'Route-map name. Default: unset.',
+        },
+        advertiseAllVni: {
+          zh: '布尔开关。默认: 关闭。',
+          en: 'Boolean flag. Default: disabled.',
+        },
+        advertiseDefaultGw: {
+          zh: '布尔开关。默认: 关闭。',
+          en: 'Boolean flag. Default: disabled.',
+        },
+        advertiseSviIp: {
+          zh: '布尔开关。默认: 关闭。',
+          en: 'Boolean flag. Default: disabled.',
+        },
+        advertisePip: {
+          zh: 'IPv4 地址。默认: 无。',
+          en: 'IPv4 address. Default: unset.',
+        },
+        defaultOriginateIpv4: {
+          zh: '布尔开关。默认: 关闭。',
+          en: 'Boolean flag. Default: disabled.',
+        },
+        defaultOriginateIpv6: {
+          zh: '布尔开关。默认: 关闭。',
+          en: 'Boolean flag. Default: disabled.',
+        },
+        disableEadEviRx: {
+          zh: '布尔开关。默认: 关闭。',
+          en: 'Boolean flag. Default: disabled.',
+        },
+        disableEadEviTx: {
+          zh: '布尔开关。默认: 关闭。',
+          en: 'Boolean flag. Default: disabled.',
+        },
+        eviLimit: {
+          zh: '范围: 1-1000。默认: 无。',
+          en: 'Range: 1-1000. Default: unset.',
+        },
+        eadEsRouteTargetExport: {
+          zh: '格式: A.B.C.D:MN / EF:OPQR / GHJK:MN。默认: 无。',
+          en: 'Format: A.B.C.D:MN / EF:OPQR / GHJK:MN. Default: unset.',
+        },
+        floodingDisable: {
+          zh: '布尔开关。默认: 关闭。',
+          en: 'Boolean flag. Default: disabled.',
+        },
+        floodingHer: {
+          zh: '布尔开关。默认: 关闭。',
+          en: 'Boolean flag. Default: disabled.',
+        },
+        macVrfSoo: {
+          zh: '格式: ASN:NN 或 IP:NN。默认: 无。',
+          en: 'Format: ASN:NN or IP:NN. Default: unset.',
+        },
+        routeTarget: {
+          zh: '格式: A.B.C.D:MN / EF:OPQR / GHJK:MN。默认: 无。',
+          en: 'Format: A.B.C.D:MN / EF:OPQR / GHJK:MN. Default: unset.',
+        },
+        rtAutoDerive: {
+          zh: '布尔开关。默认: 关闭。',
+          en: 'Boolean flag. Default: disabled.',
+        },
+        vniNote: {
+          zh: 'VNI 范围: 1-16777215。可在后续版本补充逐 VNI 可视化编辑。',
+          en: 'VNI range: 1-16777215. Per-VNI visual editor can be added in a follow-up.',
+        },
+      };
+      return map[key]?.[zh ? 'zh' : 'en'] || '';
+    }
+
+    function parseEvpnVniRowsFromBgpCli(text) {
+      const rowsMap = new Map();
+      const lines = String(text || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const prefix = 'address-family l2vpn-evpn vni ';
+      lines.forEach((line) => {
+        if (!line.startsWith(prefix)) return;
+        const rest = line.slice(prefix.length).trim();
+        const match = rest.match(/^(\d+)(?:\s+(.*))?$/);
+        if (!match) return;
+        const vni = match[1];
+        const tail = String(match[2] || '').trim();
+        if (!rowsMap.has(vni)) {
+          rowsMap.set(vni, {
+            __id: `evpn-vni-${vni}`,
+            vni,
+            rd: '',
+            routeTargetBoth: '',
+            routeTargetExport: '',
+            routeTargetImport: '',
+            advertiseDefaultGw: false,
+            advertiseSviIp: false,
+          });
+        }
+        const row = rowsMap.get(vni);
+        if (!tail) return;
+        if (tail === 'advertise-default-gw') row.advertiseDefaultGw = true;
+        else if (tail === 'advertise-svi-ip') row.advertiseSviIp = true;
+        else if (tail.startsWith('rd =')) row.rd = tail.slice(4).trim();
+        else if (tail.startsWith('route-target both =')) row.routeTargetBoth = tail.slice('route-target both ='.length).trim();
+        else if (tail.startsWith('route-target export =')) row.routeTargetExport = tail.slice('route-target export ='.length).trim();
+        else if (tail.startsWith('route-target import =')) row.routeTargetImport = tail.slice('route-target import ='.length).trim();
+      });
+      return Array.from(rowsMap.values()).sort((a, b) => Number(a.vni) - Number(b.vni));
+    }
+
+    function buildBgpCliWithEvpnVniRows(rows) {
+      if (!editingVrf.value) return;
+      const lines = String(editingVrf.value.bgpCliText || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const prefix = 'address-family l2vpn-evpn vni ';
+      const kept = lines.filter(line => !line.startsWith(prefix));
+      (Array.isArray(rows) ? rows : []).forEach((row) => {
+        const vni = String(row?.vni || '').trim();
+        if (!/^\d+$/.test(vni)) return;
+        kept.push(`${prefix}${vni}`);
+        const rd = String(row?.rd || '').trim();
+        const rtBoth = String(row?.routeTargetBoth || '').trim();
+        const rtExport = String(row?.routeTargetExport || '').trim();
+        const rtImport = String(row?.routeTargetImport || '').trim();
+        if (row?.advertiseDefaultGw) kept.push(`${prefix}${vni} advertise-default-gw`);
+        if (row?.advertiseSviIp) kept.push(`${prefix}${vni} advertise-svi-ip`);
+        if (rd) kept.push(`${prefix}${vni} rd = ${rd}`);
+        if (rtBoth) kept.push(`${prefix}${vni} route-target both = ${rtBoth}`);
+        if (rtExport) kept.push(`${prefix}${vni} route-target export = ${rtExport}`);
+        if (rtImport) kept.push(`${prefix}${vni} route-target import = ${rtImport}`);
+      });
+      editingVrf.value.bgpCliText = kept.join('\n');
+    }
+
+    const evpnVniRows = computed(() => parseEvpnVniRowsFromBgpCli(editingVrf.value?.bgpCliText || ''));
+
+    function createEmptyEvpnVniDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        vni: String(source?.vni || ''),
+        rd: String(source?.rd || ''),
+        routeTargetBoth: String(source?.routeTargetBoth || ''),
+        routeTargetExport: String(source?.routeTargetExport || ''),
+        routeTargetImport: String(source?.routeTargetImport || ''),
+        advertiseDefaultGw: !!source?.advertiseDefaultGw,
+        advertiseSviIp: !!source?.advertiseSviIp,
+      };
+    }
+
+    function openEvpnVniCreate() {
+      evpnVniModalMode.value = 'create';
+      evpnVniEditId.value = '';
+      evpnVniDraft.value = createEmptyEvpnVniDraft();
+      evpnVniModalVisible.value = true;
+    }
+
+    function openEvpnVniEdit(row) {
+      if (!row) return;
+      evpnVniModalMode.value = 'edit';
+      evpnVniEditId.value = String(row.__id || '');
+      evpnVniDraft.value = createEmptyEvpnVniDraft(row);
+      evpnVniModalVisible.value = true;
+    }
+
+    function saveEvpnVniModal() {
+      const draft = evpnVniDraft.value || {};
+      const vni = String(draft.vni || '').trim();
+      if (!/^\d+$/.test(vni)) {
+        showError({ message: 'VNI must be an integer.' });
+        return;
+      }
+      const vniNum = Number(vni);
+      if (!Number.isInteger(vniNum) || vniNum < 1 || vniNum > 16777215) {
+        showError({ message: 'VNI must be in range 1-16777215.' });
+        return;
+      }
+
+      const current = evpnVniRows.value.map(item => ({ ...item }));
+      const duplicate = current.some(item => {
+        if (evpnVniModalMode.value === 'edit' && String(item.__id || '') === String(evpnVniEditId.value || '')) return false;
+        return String(item.vni || '') === vni;
+      });
+      if (duplicate) {
+        showError({ message: 'Duplicate VNI is not allowed.' });
+        return;
+      }
+
+      const nextRow = {
+        __id: `evpn-vni-${vni}`,
+        vni,
+        rd: String(draft.rd || '').trim(),
+        routeTargetBoth: String(draft.routeTargetBoth || '').trim(),
+        routeTargetExport: String(draft.routeTargetExport || '').trim(),
+        routeTargetImport: String(draft.routeTargetImport || '').trim(),
+        advertiseDefaultGw: !!draft.advertiseDefaultGw,
+        advertiseSviIp: !!draft.advertiseSviIp,
+      };
+
+      if (evpnVniModalMode.value === 'edit') {
+        const idx = current.findIndex(item => String(item.__id || '') === String(evpnVniEditId.value || ''));
+        if (idx >= 0) current.splice(idx, 1, nextRow);
+      } else {
+        current.push(nextRow);
+      }
+
+      current.sort((a, b) => Number(a.vni) - Number(b.vni));
+      buildBgpCliWithEvpnVniRows(current);
+      evpnVniModalVisible.value = false;
+      evpnVniEditId.value = '';
+      evpnVniDraft.value = {};
+    }
+
+    function removeEvpnVniByIds(ids) {
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const kept = evpnVniRows.value.filter(item => !idSet.has(String(item.__id || '')));
+      buildBgpCliWithEvpnVniRows(kept);
+    }
+
+    function getDhcpServerListenAddressText() {
+      return dhcpServerListenAddressText.value;
+    }
+
+    function setDhcpServerListenAddressText(text) {
+      dhcpServerListenAddressText.value = String(text || '');
+      const seen = new Set();
+      const rows = [];
+      parseListField(text).forEach((address) => {
+        const low = address.toLowerCase();
+        if (seen.has(low)) return;
+        seen.add(low);
+        rows.push({
+          __id: nextBgpRowId('svc-dhcp-listen-address'),
+          address,
+        });
+      });
+      editingVrf.value.dhcpServerListenAddresses = rows;
+    }
+
+    function getDhcpServerListenInterfaceText() {
+      return dhcpServerListenInterfaceText.value;
+    }
+
+    function setDhcpServerListenInterfaceText(text) {
+      dhcpServerListenInterfaceText.value = String(text || '');
+      const seen = new Set();
+      const rows = [];
+      parseListField(text).forEach((name) => {
+        const low = name.toLowerCase();
+        if (seen.has(low)) return;
+        seen.add(low);
+        rows.push({
+          __id: nextBgpRowId('svc-dhcp-listen-interface'),
+          name,
+        });
+      });
+      editingVrf.value.dhcpServerListenInterfaces = rows;
+    }
+
+    function getDhcpv6ServerListenInterfaceText() {
+      return dhcpv6ServerListenInterfaceText.value;
+    }
+
+    function setDhcpv6ServerListenInterfaceText(text) {
+      dhcpv6ServerListenInterfaceText.value = String(text || '');
+      const seen = new Set();
+      const rows = [];
+      parseListField(text).forEach((name) => {
+        const low = name.toLowerCase();
+        if (seen.has(low)) return;
+        seen.add(low);
+        rows.push({
+          __id: nextBgpRowId('svc-dhcpv6-listen-interface'),
+          name,
+        });
+      });
+      editingVrf.value.dhcpv6ServerListenInterfaces = rows;
+    }
+
+    function getDhcpv6GlobalNameServerText() {
+      return dhcpv6GlobalNameServerText.value;
+    }
+
+    function setDhcpv6GlobalNameServerText(text) {
+      dhcpv6GlobalNameServerText.value = String(text || '');
+      const seen = new Set();
+      const rows = [];
+      parseListField(text).forEach((address) => {
+        const low = address.toLowerCase();
+        if (seen.has(low)) return;
+        seen.add(low);
+        rows.push({
+          __id: nextBgpRowId('svc-dhcpv6-global-name-server'),
+          address,
+        });
+      });
+      editingVrf.value.dhcpv6ServerGlobalNameServers = rows;
+    }
+
+    function syncDhcpListenTextFromRows() {
+      dhcpServerListenAddressText.value = (editingVrf.value?.dhcpServerListenAddresses || [])
+        .map(item => String(item?.address || '').trim())
+        .filter(Boolean)
+        .join('\n');
+      dhcpServerListenInterfaceText.value = (editingVrf.value?.dhcpServerListenInterfaces || [])
+        .map(item => String(item?.name || '').trim())
+        .filter(Boolean)
+        .join('\n');
+      dhcpv6ServerListenInterfaceText.value = (editingVrf.value?.dhcpv6ServerListenInterfaces || [])
+        .map(item => String(item?.name || '').trim())
+        .filter(Boolean)
+        .join('\n');
+      dhcpv6GlobalNameServerText.value = (editingVrf.value?.dhcpv6ServerGlobalNameServers || [])
+        .map(item => String(item?.address || '').trim())
+        .filter(Boolean)
+        .join('\n');
+    }
+
+    function parseDhcp4SharedNetworkOptionDraftData(optionRows) {
+      const values = {};
+      DHCP4_SHARED_OPTION_NAMES.forEach((name) => {
+        values[name] = name === 'ip-forwarding' ? false : '';
+      });
+      const extras = [];
+      const multiBuckets = {};
+      (Array.isArray(optionRows) ? optionRows : []).forEach((row) => {
+        const name = String(row?.name || '').trim();
+        const value = String(row?.value || '').trim();
+        if (!name) return;
+        if (!DHCP4_SHARED_OPTION_NAME_SET.has(name)) {
+          extras.push({ ...row });
+          return;
+        }
+        if (name === 'ip-forwarding') {
+          values[name] = true;
+          return;
+        }
+        if (DHCP4_SHARED_MULTI_VALUE_OPTION_NAMES.has(name)) {
+          if (!value) return;
+          if (!Array.isArray(multiBuckets[name])) multiBuckets[name] = [];
+          multiBuckets[name].push(value);
+          return;
+        }
+        if (!values[name] && value) values[name] = value;
+      });
+      Object.keys(multiBuckets).forEach((name) => {
+        values[name] = multiBuckets[name].join('\n');
+      });
+      return { values, extras };
+    }
+
+    function buildDhcp4SharedNetworkOptionRows(optionValues, extraRows) {
+      const values = optionValues && typeof optionValues === 'object' ? optionValues : {};
+      const rows = [];
+      DHCP4_SHARED_OPTION_NAMES.forEach((name) => {
+        if (name === 'ip-forwarding') {
+          if (values[name]) {
+            rows.push({ __id: nextBgpRowId('svc-dhcp4-shared-option'), name, value: '' });
+          }
+          return;
+        }
+        if (DHCP4_SHARED_MULTI_VALUE_OPTION_NAMES.has(name)) {
+          parseListField(values[name]).forEach((item) => {
+            rows.push({ __id: nextBgpRowId('svc-dhcp4-shared-option'), name, value: item });
+          });
+          return;
+        }
+        const value = String(values[name] || '').trim();
+        if (value) rows.push({ __id: nextBgpRowId('svc-dhcp4-shared-option'), name, value });
+      });
+      (Array.isArray(extraRows) ? extraRows : []).forEach((row) => {
+        if (!row || typeof row !== 'object') return;
+        rows.push({
+          __id: row.__id || nextBgpRowId('svc-dhcp4-shared-option'),
+          name: String(row.name || '').trim(),
+          value: String(row.value || '').trim(),
+        });
+      });
+      return normalizeCollectionRows('dhcp4-shared-option', rows);
+    }
+
+    function parseDhcp6SharedNetworkOptionDraftData(optionRows) {
+      const values = {};
+      DHCP6_SHARED_OPTION_FIELDS.forEach((item) => {
+        values[item.name] = '';
+      });
+      const extras = [];
+      const multiBuckets = {};
+      (Array.isArray(optionRows) ? optionRows : []).forEach((row) => {
+        const name = String(row?.name || '').trim();
+        const value = String(row?.value || '').trim();
+        if (!name) return;
+        if (!DHCP6_SHARED_OPTION_FIELD_NAME_SET.has(name)) {
+          extras.push({ ...row });
+          return;
+        }
+        if (DHCP6_SHARED_OPTION_MULTI_VALUE_NAMES.has(name)) {
+          if (!value) return;
+          if (!Array.isArray(multiBuckets[name])) multiBuckets[name] = [];
+          multiBuckets[name].push(value);
+          return;
+        }
+        if (!values[name] && value) values[name] = value;
+      });
+      Object.keys(multiBuckets).forEach((name) => {
+        values[name] = multiBuckets[name].join('\n');
+      });
+      return { values, extras };
+    }
+
+    function buildDhcp6SharedNetworkOptionRows(optionValues, extraRows) {
+      const values = optionValues && typeof optionValues === 'object' ? optionValues : {};
+      const rows = [];
+      DHCP6_SHARED_OPTION_FIELDS.forEach((item) => {
+        const name = item.name;
+        if (DHCP6_SHARED_OPTION_MULTI_VALUE_NAMES.has(name)) {
+          parseListField(values[name]).forEach((value) => {
+            rows.push({ __id: nextBgpRowId('svc-shared6-option'), name, value });
+          });
+          return;
+        }
+        const value = String(values[name] || '').trim();
+        if (value) rows.push({ __id: nextBgpRowId('svc-shared6-option'), name, value });
+      });
+      (Array.isArray(extraRows) ? extraRows : []).forEach((row) => {
+        if (!row || typeof row !== 'object') return;
+        rows.push({
+          __id: row.__id || nextBgpRowId('svc-shared6-option'),
+          name: String(row.name || '').trim(),
+          value: String(row.value || '').trim(),
+        });
+      });
+      return normalizeCollectionRows('dhcp6-shared-option', rows);
+    }
+
+    function saveServiceCollectionModal() {
+      const type = serviceCollectionType.value;
+      const list = getServiceCollectionTarget(type);
+      if (!Array.isArray(list)) return;
+      const draft = createServiceCollectionDraft(type, serviceCollectionDraft.value);
+      if (type === 'dhcp4-shared-network') {
+        draft.options = buildDhcp4SharedNetworkOptionRows(draft.optionValues, draft.optionExtraRows);
+      }
+      if (type === 'dhcp6-shared-network') {
+        draft.options = buildDhcp6SharedNetworkOptionRows(draft.optionValues, draft.optionExtraRows);
+      }
+      if (type === 'dhcp6-shared-subnet') {
+        draft.options = buildDhcp6SharedNetworkOptionRows(draft.optionValues, draft.optionExtraRows);
+      }
+      if (type === 'dhcp6-shared-subnet-range' || type === 'dhcp6-shared-subnet-mapping') {
+        draft.options = buildDhcp6SharedNetworkOptionRows(draft.optionValues, draft.optionExtraRows);
+      }
+      if (type === 'dhcp4-listen-address' && !String(draft.address || '').trim()) return;
+      if (type === 'dhcp6-global-name-server' && !String(draft.address || '').trim()) return;
+      if (type === 'dhcp4-shared-subnet' && !String(draft.prefix || '').trim()) return;
+      if (type === 'dhcp6-shared-subnet' && !String(draft.prefix || '').trim()) return;
+      if (type === 'dhcp6-shared-subnet-range' && !String(draft.name || '').trim()) return;
+      if (type === 'dhcp6-shared-subnet-delegation' && !String(draft.prefix || '').trim()) return;
+      if (type === 'dhcp4-shared-static-route' && (!String(draft.subnet || '').trim() || !String(draft.nextHop || '').trim())) return;
+      if (type === 'dhcp4-shared-subnet-range' && (!String(draft.name || '').trim() || !String(draft.start || '').trim() || !String(draft.stop || '').trim())) return;
+      if ((type === 'dhcp4-listen-interface' || type === 'dhcp6-listen-interface' || type === 'dhcp4-client-class' || type === 'dhcp4-shared-network' || type === 'dhcp6-shared-network' || type === 'ddns-forward-domain' || type === 'ddns-reverse-domain' || type === 'ddns-tsig-key' || type === 'dhcp4-shared-option' || type === 'dhcp4-shared-subnet-mapping' || type === 'dhcp4-shared-subnet-option' || type === 'dhcp4-shared-subnet-range-option' || type === 'dhcp4-shared-subnet-mapping-option' || type === 'dhcp6-shared-option' || type === 'dhcp6-shared-subnet-mapping' || type === 'dhcp6-shared-subnet-option' || type === 'dhcp6-shared-subnet-range-option' || type === 'dhcp6-shared-subnet-mapping-option') && !String(draft.name || '').trim()) return;
+      if (type === 'dhcp4-shared-option' && !String(draft.value || '').trim() && String(draft.name || '').trim() !== 'ip-forwarding') return;
+
+      const validationError = validateServiceDraft(type, draft);
+      if (validationError) {
+        showError({ message: validationError });
+        return;
+      }
+
+      const rowDraft = (type === 'dhcp4-shared-network' || type === 'dhcp6-shared-network' || type === 'dhcp6-shared-subnet' || type === 'dhcp6-shared-subnet-range' || type === 'dhcp6-shared-subnet-mapping')
+        ? {
+          ...draft,
+          optionValues: undefined,
+          optionExtraRows: undefined,
+        }
+        : draft;
+
+      const row = {
+        ...rowDraft,
+        __id: serviceCollectionModalMode.value === 'edit' ? String(serviceCollectionEditId.value) : nextBgpRowId(`svc-${type}`),
+      };
+      if (type === 'dhcp4-shared-subnet-range-option') row.parentRangeId = String(serviceCollectionDraft.value?.parentRangeId || '');
+      if (type === 'dhcp4-shared-subnet-mapping-option') row.parentMappingId = String(serviceCollectionDraft.value?.parentMappingId || '');
+      if (type === 'dhcp6-shared-subnet-range-option') row.parentRangeId = String(serviceCollectionDraft.value?.parentRangeId || '');
+      if (type === 'dhcp6-shared-subnet-mapping-option') row.parentMappingId = String(serviceCollectionDraft.value?.parentMappingId || '');
+
+      if (hasDuplicatePrimary(type, list, row, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+        showError({ message: 'Duplicate entry is not allowed.' });
+        return;
+      }
+
+      if (type === 'dhcp4-shared-subnet' || type === 'dhcp4-shared-option' || type === 'dhcp4-shared-static-route' || type === 'dhcp4-shared-subnet-range' || type === 'dhcp4-shared-subnet-mapping' || type === 'dhcp4-shared-subnet-option' || type === 'dhcp4-shared-subnet-range-option' || type === 'dhcp4-shared-subnet-mapping-option') {
+        const targetSharedId = String(serviceCollectionDraft.value?.parentId || '').trim();
+        if (!targetSharedId) return;
+        if (targetSharedId === '__draft__' && type === 'dhcp4-shared-subnet') {
+          const context = serviceCollectionParentContext.value;
+          if (!context || context.type !== 'dhcp4-shared-network' || !context.draft) return;
+          const parent = context.draft;
+          const targetList = Array.isArray(parent.subnets) ? parent.subnets : [];
+          if (hasDuplicatePrimary(type, targetList, row, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+            showError({ message: 'Duplicate entry is not allowed.' });
+            return;
+          }
+          if (serviceCollectionModalMode.value === 'edit') {
+            const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+            if (idx >= 0) targetList.splice(idx, 1, row);
+          } else {
+            targetList.push(row);
+          }
+          parent.subnets = normalizeCollectionRows(type, targetList);
+          popServiceCollectionModalContextSnapshot();
+          serviceCollectionType.value = 'dhcp4-shared-network';
+          serviceCollectionModalMode.value = context.mode || 'create';
+          serviceCollectionEditId.value = context.editId || '';
+          serviceCollectionDraft.value = parent;
+          dhcpSharedNetworkModalTab.value = 'subnet';
+          serviceCollectionModalVisible.value = true;
+          return;
+        }
+        if (targetSharedId === '__draft__' && type === 'dhcp4-shared-static-route') {
+          const context = serviceCollectionParentContext.value;
+          if (!context || context.type !== 'dhcp4-shared-network' || !context.draft) return;
+          const parent = context.draft;
+          const targetList = Array.isArray(parent.staticRoutes) ? parent.staticRoutes : [];
+          if (hasDuplicatePrimary(type, targetList, row, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+            showError({ message: 'Duplicate entry is not allowed.' });
+            return;
+          }
+          if (serviceCollectionModalMode.value === 'edit') {
+            const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+            if (idx >= 0) targetList.splice(idx, 1, row);
+          } else {
+            targetList.push(row);
+          }
+          parent.staticRoutes = normalizeCollectionRows(type, targetList);
+          popServiceCollectionModalContextSnapshot();
+          serviceCollectionType.value = 'dhcp4-shared-network';
+          serviceCollectionModalMode.value = context.mode || 'create';
+          serviceCollectionEditId.value = context.editId || '';
+          serviceCollectionDraft.value = parent;
+          dhcpSharedNetworkModalTab.value = 'option';
+          serviceCollectionModalVisible.value = true;
+          return;
+        }
+        if (targetSharedId === '__draft__' && (type === 'dhcp4-shared-subnet-range' || type === 'dhcp4-shared-subnet-mapping' || type === 'dhcp4-shared-subnet-option' || type === 'dhcp4-shared-subnet-range-option' || type === 'dhcp4-shared-subnet-mapping-option')) {
+          const context = serviceCollectionParentContext.value;
+          if (!context || context.type !== 'dhcp4-shared-subnet' || !context.draft) return;
+          const subnetDraft = context.draft;
+
+          const isRangeOption = type === 'dhcp4-shared-subnet-range-option';
+          const isMappingOption = type === 'dhcp4-shared-subnet-mapping-option';
+
+          if (isRangeOption || isMappingOption) {
+            const nestedId = String(isRangeOption ? serviceCollectionDraft.value?.parentRangeId : serviceCollectionDraft.value?.parentMappingId).trim();
+            if (!nestedId) return;
+            const nestedListKey = isRangeOption ? 'ranges' : 'staticMappings';
+            const nestedCollection = Array.isArray(subnetDraft[nestedListKey]) ? subnetDraft[nestedListKey] : [];
+            const nestedItem = nestedCollection.find(item => String(item?.__id || '') === nestedId);
+            if (!nestedItem) return;
+            const targetList = Array.isArray(nestedItem.options) ? nestedItem.options : [];
+            const optionRow = { ...row, __id: row.__id, name: row.name, value: row.value };
+            if (hasDuplicatePrimary('dhcp4-shared-subnet-option', targetList, optionRow, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+              showError({ message: 'Duplicate entry is not allowed.' });
+              return;
+            }
+            if (serviceCollectionModalMode.value === 'edit') {
+              const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+              if (idx >= 0) targetList.splice(idx, 1, optionRow);
+            } else {
+              targetList.push(optionRow);
+            }
+            nestedItem.options = normalizeCollectionRows('dhcp4-shared-subnet-option', targetList);
+          } else {
+            const subnetListKey = type === 'dhcp4-shared-subnet-range'
+              ? 'ranges'
+              : (type === 'dhcp4-shared-subnet-mapping' ? 'staticMappings' : 'options');
+            const targetList = Array.isArray(subnetDraft[subnetListKey]) ? subnetDraft[subnetListKey] : [];
+            if (hasDuplicatePrimary(type, targetList, row, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+              showError({ message: 'Duplicate entry is not allowed.' });
+              return;
+            }
+            if (serviceCollectionModalMode.value === 'edit') {
+              const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+              if (idx >= 0) targetList.splice(idx, 1, row);
+            } else {
+              targetList.push(row);
+            }
+            subnetDraft[subnetListKey] = normalizeCollectionRows(type, targetList);
+          }
+
+          popServiceCollectionModalContextSnapshot();
+          serviceCollectionType.value = 'dhcp4-shared-subnet';
+          serviceCollectionModalMode.value = context.mode || 'edit';
+          serviceCollectionEditId.value = context.editId || '';
+          serviceCollectionDraft.value = subnetDraft;
+          if (type === 'dhcp4-shared-subnet-range' || type === 'dhcp4-shared-subnet-range-option') dhcp4SharedSubnetModalTab.value = 'range';
+          else if (type === 'dhcp4-shared-subnet-mapping' || type === 'dhcp4-shared-subnet-mapping-option') dhcp4SharedSubnetModalTab.value = 'static-mapping';
+          else if (type === 'dhcp4-shared-subnet-option') dhcp4SharedSubnetModalTab.value = 'option';
+          else dhcp4SharedSubnetModalTab.value = context.tab || 'basic';
+          serviceCollectionModalVisible.value = true;
+          return;
+        }
+        const parent = (editingVrf.value?.dhcpServerSharedNetworks || []).find(item => String(item?.__id || '') === targetSharedId);
+        if (!parent) return;
+        if (type === 'dhcp4-shared-subnet-range' || type === 'dhcp4-shared-subnet-mapping' || type === 'dhcp4-shared-subnet-option' || type === 'dhcp4-shared-subnet-range-option' || type === 'dhcp4-shared-subnet-mapping-option') {
+          const targetSubnetId = String(serviceCollectionDraft.value?.parentSubnetId || '').trim();
+          if (!targetSubnetId) return;
+          const subnetList = Array.isArray(parent.subnets) ? parent.subnets : [];
+          const subnet = subnetList.find(item => String(item?.__id || '') === targetSubnetId);
+          if (!subnet) return;
+          const isRangeOption = type === 'dhcp4-shared-subnet-range-option';
+          const isMappingOption = type === 'dhcp4-shared-subnet-mapping-option';
+          if (isRangeOption || isMappingOption) {
+            const nestedId = String(isRangeOption ? serviceCollectionDraft.value?.parentRangeId : serviceCollectionDraft.value?.parentMappingId).trim();
+            if (!nestedId) return;
+            const nestedListKey = isRangeOption ? 'ranges' : 'staticMappings';
+            const nestedCollection = Array.isArray(subnet[nestedListKey]) ? subnet[nestedListKey] : [];
+            const nestedItem = nestedCollection.find(item => String(item?.__id || '') === nestedId);
+            if (!nestedItem) return;
+            const targetList = Array.isArray(nestedItem.options) ? nestedItem.options : [];
+            const optionRow = { ...row, __id: row.__id, name: row.name, value: row.value };
+            if (hasDuplicatePrimary('dhcp4-shared-subnet-option', targetList, optionRow, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+              showError({ message: 'Duplicate entry is not allowed.' });
+              return;
+            }
+            if (serviceCollectionModalMode.value === 'edit') {
+              const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+              if (idx >= 0) targetList.splice(idx, 1, optionRow);
+            } else {
+              targetList.push(optionRow);
+            }
+            nestedItem.options = normalizeCollectionRows('dhcp4-shared-subnet-option', targetList);
+            serviceCollectionModalVisible.value = false;
+            serviceCollectionEditId.value = '';
+            serviceCollectionDraft.value = {};
+            return;
+          }
+          const subnetListKey = type === 'dhcp4-shared-subnet-range'
+            ? 'ranges'
+            : (type === 'dhcp4-shared-subnet-mapping' ? 'staticMappings' : 'options');
+          const targetList = Array.isArray(subnet[subnetListKey]) ? subnet[subnetListKey] : [];
+          if (hasDuplicatePrimary(type, targetList, row, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+            showError({ message: 'Duplicate entry is not allowed.' });
+            return;
+          }
+          if (serviceCollectionModalMode.value === 'edit') {
+            const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+            if (idx >= 0) targetList.splice(idx, 1, row);
+          } else {
+            targetList.push(row);
+          }
+          subnet[subnetListKey] = normalizeCollectionRows(type, targetList);
+          serviceCollectionModalVisible.value = false;
+          serviceCollectionEditId.value = '';
+          serviceCollectionDraft.value = {};
+          return;
+        }
+        const listKey = type === 'dhcp4-shared-subnet'
+          ? 'subnets'
+          : (type === 'dhcp4-shared-option' ? 'options' : 'staticRoutes');
+        const targetList = Array.isArray(parent[listKey]) ? parent[listKey] : [];
+        if (hasDuplicatePrimary(type, targetList, row, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+          showError({ message: 'Duplicate entry is not allowed.' });
+          return;
+        }
+        if (serviceCollectionModalMode.value === 'edit') {
+          const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+          if (idx >= 0) targetList.splice(idx, 1, row);
+        } else {
+          targetList.push(row);
+        }
+        parent[listKey] = normalizeCollectionRows(type, targetList);
+        if (type === 'dhcp4-shared-subnet') {
+          const context = serviceCollectionParentContext.value;
+          if (context && context.type === 'dhcp4-shared-network' && context.draft) {
+            const parentDraft = createServiceCollectionDraft('dhcp4-shared-network', context.draft);
+            parentDraft.__id = String(parent.__id || parentDraft.__id || '');
+            parentDraft.subnets = Array.isArray(parent.subnets) ? normalizeCollectionRows('dhcp4-shared-subnet', parent.subnets) : [];
+            popServiceCollectionModalContextSnapshot();
+            serviceCollectionType.value = 'dhcp4-shared-network';
+            serviceCollectionModalMode.value = context.mode || 'edit';
+            serviceCollectionEditId.value = context.editId || String(parent.__id || '');
+            serviceCollectionDraft.value = parentDraft;
+            dhcpSharedNetworkModalTab.value = 'subnet';
+            serviceCollectionModalVisible.value = true;
+            return;
+          }
+        }
+        serviceCollectionModalVisible.value = false;
+        serviceCollectionEditId.value = '';
+        serviceCollectionDraft.value = {};
+        return;
+      }
+
+      if (type === 'dhcp6-shared-option' || type === 'dhcp6-shared-subnet' || type === 'dhcp6-shared-subnet-range' || type === 'dhcp6-shared-subnet-mapping' || type === 'dhcp6-shared-subnet-delegation' || type === 'dhcp6-shared-subnet-option' || type === 'dhcp6-shared-subnet-range-option' || type === 'dhcp6-shared-subnet-mapping-option') {
+        const targetSharedId = String(serviceCollectionDraft.value?.parentId || '').trim();
+        if (!targetSharedId) return;
+        if (targetSharedId === '__draft6__' && type === 'dhcp6-shared-subnet') {
+          const context = serviceCollectionParentContext.value;
+          if (!context || context.type !== 'dhcp6-shared-network' || !context.draft) return;
+          const parent = context.draft;
+          const targetList = Array.isArray(parent.subnets) ? parent.subnets : [];
+          if (hasDuplicatePrimary(type, targetList, row, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+            showError({ message: 'Duplicate entry is not allowed.' });
+            return;
+          }
+          if (serviceCollectionModalMode.value === 'edit') {
+            const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+            if (idx >= 0) targetList.splice(idx, 1, row);
+          } else {
+            targetList.push(row);
+          }
+          parent.subnets = normalizeCollectionRows(type, targetList);
+          popServiceCollectionModalContextSnapshot();
+          serviceCollectionType.value = 'dhcp6-shared-network';
+          serviceCollectionModalMode.value = context.mode || 'create';
+          serviceCollectionEditId.value = context.editId || '';
+          serviceCollectionDraft.value = parent;
+          dhcpv6SharedNetworkModalTab.value = 'subnet';
+          serviceCollectionModalVisible.value = true;
+          return;
+        }
+        const context = serviceCollectionParentContext.value;
+        if (context && context.type === 'dhcp6-shared-subnet' && context.draft && (type === 'dhcp6-shared-subnet-range' || type === 'dhcp6-shared-subnet-mapping' || type === 'dhcp6-shared-subnet-delegation' || type === 'dhcp6-shared-subnet-option' || type === 'dhcp6-shared-subnet-range-option' || type === 'dhcp6-shared-subnet-mapping-option')) {
+          const subnetDraft = context.draft;
+          const isRangeOption = type === 'dhcp6-shared-subnet-range-option';
+          const isMappingOption = type === 'dhcp6-shared-subnet-mapping-option';
+          if (isRangeOption || isMappingOption) {
+            const nestedId = String(isRangeOption ? serviceCollectionDraft.value?.parentRangeId : serviceCollectionDraft.value?.parentMappingId).trim();
+            if (!nestedId) return;
+            const nestedListKey = isRangeOption ? 'ranges' : 'staticMappings';
+            const nestedCollection = Array.isArray(subnetDraft[nestedListKey]) ? subnetDraft[nestedListKey] : [];
+            const nestedItem = nestedCollection.find(item => String(item?.__id || '') === nestedId);
+            if (!nestedItem) return;
+            const targetList = Array.isArray(nestedItem.options) ? nestedItem.options : [];
+            const optionRow = { ...row, __id: row.__id, name: row.name, value: row.value };
+            if (hasDuplicatePrimary('dhcp6-shared-subnet-option', targetList, optionRow, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+              showError({ message: 'Duplicate entry is not allowed.' });
+              return;
+            }
+            if (serviceCollectionModalMode.value === 'edit') {
+              const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+              if (idx >= 0) targetList.splice(idx, 1, optionRow);
+            } else {
+              targetList.push(optionRow);
+            }
+            nestedItem.options = normalizeCollectionRows('dhcp6-shared-subnet-option', targetList);
+          } else {
+            const subnetListKey = type === 'dhcp6-shared-subnet-range'
+              ? 'ranges'
+              : (type === 'dhcp6-shared-subnet-mapping'
+                ? 'staticMappings'
+                : (type === 'dhcp6-shared-subnet-delegation' ? 'delegations' : 'options'));
+            const targetList = Array.isArray(subnetDraft[subnetListKey]) ? subnetDraft[subnetListKey] : [];
+            if (hasDuplicatePrimary(type, targetList, row, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+              showError({ message: 'Duplicate entry is not allowed.' });
+              return;
+            }
+            if (serviceCollectionModalMode.value === 'edit') {
+              const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+              if (idx >= 0) targetList.splice(idx, 1, row);
+            } else {
+              targetList.push(row);
+            }
+            subnetDraft[subnetListKey] = normalizeCollectionRows(type, targetList);
+          }
+          popServiceCollectionModalContextSnapshot();
+          serviceCollectionType.value = 'dhcp6-shared-subnet';
+          serviceCollectionModalMode.value = context.mode || 'edit';
+          serviceCollectionEditId.value = context.editId || '';
+          serviceCollectionDraft.value = subnetDraft;
+          if (type === 'dhcp6-shared-subnet-range' || type === 'dhcp6-shared-subnet-range-option') dhcp6SharedSubnetModalTab.value = 'range';
+          else if (type === 'dhcp6-shared-subnet-mapping' || type === 'dhcp6-shared-subnet-mapping-option') dhcp6SharedSubnetModalTab.value = 'static-mapping';
+          else if (type === 'dhcp6-shared-subnet-delegation') dhcp6SharedSubnetModalTab.value = 'prefix-delegation';
+          else if (type === 'dhcp6-shared-subnet-option') dhcp6SharedSubnetModalTab.value = 'option';
+          else dhcp6SharedSubnetModalTab.value = context.tab || 'basic';
+          serviceCollectionModalVisible.value = true;
+          return;
+        }
+        const parent = (editingVrf.value?.dhcpv6ServerSharedNetworks || []).find(item => String(item?.__id || '') === targetSharedId);
+        if (!parent) return;
+        if (type === 'dhcp6-shared-option') {
+          const targetList = Array.isArray(parent.options) ? parent.options : [];
+          if (hasDuplicatePrimary(type, targetList, row, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+            showError({ message: 'Duplicate entry is not allowed.' });
+            return;
+          }
+          if (serviceCollectionModalMode.value === 'edit') {
+            const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+            if (idx >= 0) targetList.splice(idx, 1, row);
+          } else {
+            targetList.push(row);
+          }
+          parent.options = normalizeCollectionRows(type, targetList);
+          serviceCollectionModalVisible.value = false;
+          serviceCollectionEditId.value = '';
+          serviceCollectionDraft.value = {};
+          return;
+        }
+        if (type === 'dhcp6-shared-subnet-range' || type === 'dhcp6-shared-subnet-mapping' || type === 'dhcp6-shared-subnet-delegation' || type === 'dhcp6-shared-subnet-option' || type === 'dhcp6-shared-subnet-range-option' || type === 'dhcp6-shared-subnet-mapping-option') {
+          const targetSubnetId = String(serviceCollectionDraft.value?.parentSubnetId || '').trim();
+          if (!targetSubnetId) return;
+          const subnetList = Array.isArray(parent.subnets) ? parent.subnets : [];
+          const subnet = subnetList.find(item => String(item?.__id || '') === targetSubnetId);
+          if (!subnet) return;
+          const isRangeOption = type === 'dhcp6-shared-subnet-range-option';
+          const isMappingOption = type === 'dhcp6-shared-subnet-mapping-option';
+          if (isRangeOption || isMappingOption) {
+            const nestedId = String(isRangeOption ? serviceCollectionDraft.value?.parentRangeId : serviceCollectionDraft.value?.parentMappingId).trim();
+            if (!nestedId) return;
+            const nestedListKey = isRangeOption ? 'ranges' : 'staticMappings';
+            const nestedCollection = Array.isArray(subnet[nestedListKey]) ? subnet[nestedListKey] : [];
+            const nestedItem = nestedCollection.find(item => String(item?.__id || '') === nestedId);
+            if (!nestedItem) return;
+            const targetList = Array.isArray(nestedItem.options) ? nestedItem.options : [];
+            const optionRow = { ...row, __id: row.__id, name: row.name, value: row.value };
+            if (hasDuplicatePrimary('dhcp6-shared-subnet-option', targetList, optionRow, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+              showError({ message: 'Duplicate entry is not allowed.' });
+              return;
+            }
+            if (serviceCollectionModalMode.value === 'edit') {
+              const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+              if (idx >= 0) targetList.splice(idx, 1, optionRow);
+            } else {
+              targetList.push(optionRow);
+            }
+            nestedItem.options = normalizeCollectionRows('dhcp6-shared-subnet-option', targetList);
+            serviceCollectionModalVisible.value = false;
+            serviceCollectionEditId.value = '';
+            serviceCollectionDraft.value = {};
+            return;
+          }
+          const subnetListKey = type === 'dhcp6-shared-subnet-range'
+            ? 'ranges'
+            : (type === 'dhcp6-shared-subnet-mapping'
+              ? 'staticMappings'
+              : (type === 'dhcp6-shared-subnet-delegation' ? 'delegations' : 'options'));
+          const targetList = Array.isArray(subnet[subnetListKey]) ? subnet[subnetListKey] : [];
+          if (hasDuplicatePrimary(type, targetList, row, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+            showError({ message: 'Duplicate entry is not allowed.' });
+            return;
+          }
+          if (serviceCollectionModalMode.value === 'edit') {
+            const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+            if (idx >= 0) targetList.splice(idx, 1, row);
+          } else {
+            targetList.push(row);
+          }
+          subnet[subnetListKey] = normalizeCollectionRows(type, targetList);
+        } else {
+          const targetList = Array.isArray(parent.subnets) ? parent.subnets : [];
+          if (hasDuplicatePrimary(type, targetList, row, serviceCollectionModalMode.value === 'edit' ? serviceCollectionEditId.value : '')) {
+            showError({ message: 'Duplicate entry is not allowed.' });
+            return;
+          }
+          if (serviceCollectionModalMode.value === 'edit') {
+            const idx = targetList.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+            if (idx >= 0) targetList.splice(idx, 1, row);
+          } else {
+            targetList.push(row);
+          }
+          parent.subnets = normalizeCollectionRows(type, targetList);
+        }
+        serviceCollectionModalVisible.value = false;
+        serviceCollectionEditId.value = '';
+        serviceCollectionDraft.value = {};
+        return;
+      }
+
+      if (serviceCollectionModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(serviceCollectionEditId.value));
+        if (idx >= 0) list.splice(idx, 1, row);
+      } else {
+        list.push(row);
+      }
+
+      const normalizedTopList = normalizeCollectionRows(type, list);
+      if (type === 'dhcp4-listen-address') editingVrf.value.dhcpServerListenAddresses = normalizedTopList;
+      else if (type === 'dhcp4-listen-interface') editingVrf.value.dhcpServerListenInterfaces = normalizedTopList;
+      else if (type === 'dhcp4-client-class') editingVrf.value.dhcpServerClientClasses = normalizedTopList;
+      else if (type === 'dhcp4-shared-network') editingVrf.value.dhcpServerSharedNetworks = normalizedTopList;
+      else if (type === 'dhcp6-global-name-server') editingVrf.value.dhcpv6ServerGlobalNameServers = normalizedTopList;
+      else if (type === 'dhcp6-listen-interface') editingVrf.value.dhcpv6ServerListenInterfaces = normalizedTopList;
+      else if (type === 'dhcp6-shared-network') editingVrf.value.dhcpv6ServerSharedNetworks = normalizedTopList;
+      else if (type === 'ddns-forward-domain') editingVrf.value.dhcpServerDdns.forwardDomains = normalizedTopList;
+      else if (type === 'ddns-reverse-domain') editingVrf.value.dhcpServerDdns.reverseDomains = normalizedTopList;
+      else if (type === 'ddns-tsig-key') editingVrf.value.dhcpServerDdns.tsigKeys = normalizedTopList;
+
+      serviceCollectionModalVisible.value = false;
+      serviceCollectionEditId.value = '';
+      serviceCollectionDraft.value = {};
+    }
+
+    function removeServiceCollectionByIds(type, ids) {
+      if (type === 'dhcp4-shared-subnet' || type === 'dhcp4-shared-option' || type === 'dhcp4-shared-static-route' || type === 'dhcp4-shared-subnet-range' || type === 'dhcp4-shared-subnet-mapping' || type === 'dhcp4-shared-subnet-option' || type === 'dhcp4-shared-subnet-range-option' || type === 'dhcp4-shared-subnet-mapping-option') {
+        const idSet = new Set((ids || []).map(v => String(v)));
+        (editingVrf.value?.dhcpServerSharedNetworks || []).forEach((item) => {
+          if (type === 'dhcp4-shared-subnet-range' || type === 'dhcp4-shared-subnet-mapping' || type === 'dhcp4-shared-subnet-option' || type === 'dhcp4-shared-subnet-range-option' || type === 'dhcp4-shared-subnet-mapping-option') {
+            const subnets = Array.isArray(item?.subnets) ? item.subnets : [];
+            subnets.forEach((subnet) => {
+              if (type === 'dhcp4-shared-subnet-range-option' || type === 'dhcp4-shared-subnet-mapping-option') {
+                const nestedListKey = type === 'dhcp4-shared-subnet-range-option' ? 'ranges' : 'staticMappings';
+                const nestedRows = Array.isArray(subnet?.[nestedListKey]) ? subnet[nestedListKey] : [];
+                nestedRows.forEach((nestedItem) => {
+                  const optionRows = Array.isArray(nestedItem?.options) ? nestedItem.options : [];
+                  nestedItem.options = optionRows.filter(row => !idSet.has(String(row.__id)));
+                });
+                return;
+              }
+              const subnetListKey = type === 'dhcp4-shared-subnet-range'
+                ? 'ranges'
+                : (type === 'dhcp4-shared-subnet-mapping' ? 'staticMappings' : 'options');
+              const target = Array.isArray(subnet?.[subnetListKey]) ? subnet[subnetListKey] : [];
+              subnet[subnetListKey] = target.filter(row => !idSet.has(String(row.__id)));
+            });
+            return;
+          }
+          const listKey = type === 'dhcp4-shared-subnet'
+            ? 'subnets'
+            : (type === 'dhcp4-shared-option' ? 'options' : 'staticRoutes');
+          const target = Array.isArray(item?.[listKey]) ? item[listKey] : [];
+          item[listKey] = target.filter(row => !idSet.has(String(row.__id)));
+        });
+        return;
+      }
+      if (type === 'dhcp6-shared-option' || type === 'dhcp6-shared-subnet' || type === 'dhcp6-shared-subnet-range' || type === 'dhcp6-shared-subnet-mapping' || type === 'dhcp6-shared-subnet-delegation' || type === 'dhcp6-shared-subnet-option' || type === 'dhcp6-shared-subnet-range-option' || type === 'dhcp6-shared-subnet-mapping-option') {
+        const idSet = new Set((ids || []).map(v => String(v)));
+        (editingVrf.value?.dhcpv6ServerSharedNetworks || []).forEach((item) => {
+          if (type === 'dhcp6-shared-option') {
+            const target = Array.isArray(item?.options) ? item.options : [];
+            item.options = target.filter(row => !idSet.has(String(row.__id)));
+            return;
+          }
+          if (type === 'dhcp6-shared-subnet-range' || type === 'dhcp6-shared-subnet-mapping' || type === 'dhcp6-shared-subnet-delegation' || type === 'dhcp6-shared-subnet-option' || type === 'dhcp6-shared-subnet-range-option' || type === 'dhcp6-shared-subnet-mapping-option') {
+            const subnets = Array.isArray(item?.subnets) ? item.subnets : [];
+            subnets.forEach((subnet) => {
+              if (type === 'dhcp6-shared-subnet-range-option' || type === 'dhcp6-shared-subnet-mapping-option') {
+                const nestedListKey = type === 'dhcp6-shared-subnet-range-option' ? 'ranges' : 'staticMappings';
+                const nestedRows = Array.isArray(subnet?.[nestedListKey]) ? subnet[nestedListKey] : [];
+                nestedRows.forEach((nestedItem) => {
+                  const optionRows = Array.isArray(nestedItem?.options) ? nestedItem.options : [];
+                  nestedItem.options = optionRows.filter(row => !idSet.has(String(row.__id)));
+                });
+                return;
+              }
+              const subnetListKey = type === 'dhcp6-shared-subnet-range'
+                ? 'ranges'
+                : (type === 'dhcp6-shared-subnet-mapping'
+                  ? 'staticMappings'
+                  : (type === 'dhcp6-shared-subnet-delegation' ? 'delegations' : 'options'));
+              const target = Array.isArray(subnet?.[subnetListKey]) ? subnet[subnetListKey] : [];
+              subnet[subnetListKey] = target.filter(row => !idSet.has(String(row.__id)));
+            });
+            return;
+          }
+          const target = Array.isArray(item?.subnets) ? item.subnets : [];
+          item.subnets = target.filter(row => !idSet.has(String(row.__id)));
+        });
+        return;
+      }
+      const list = getServiceCollectionTarget(type);
+      if (!Array.isArray(list)) return;
+      const idSet = new Set((ids || []).map(v => String(v)));
+      const kept = list.filter(item => !idSet.has(String(item.__id)));
+      if (type === 'dhcp4-listen-address') editingVrf.value.dhcpServerListenAddresses = kept;
+      else if (type === 'dhcp4-listen-interface') editingVrf.value.dhcpServerListenInterfaces = kept;
+      else if (type === 'dhcp4-client-class') editingVrf.value.dhcpServerClientClasses = kept;
+      else if (type === 'dhcp4-shared-network') editingVrf.value.dhcpServerSharedNetworks = kept;
+      else if (type === 'dhcp6-global-name-server') editingVrf.value.dhcpv6ServerGlobalNameServers = kept;
+      else if (type === 'dhcp6-listen-interface') editingVrf.value.dhcpv6ServerListenInterfaces = kept;
+      else if (type === 'dhcp6-shared-network') editingVrf.value.dhcpv6ServerSharedNetworks = kept;
+      else if (type === 'ddns-forward-domain') editingVrf.value.dhcpServerDdns.forwardDomains = kept;
+      else if (type === 'ddns-reverse-domain') editingVrf.value.dhcpServerDdns.reverseDomains = kept;
+      else if (type === 'ddns-tsig-key') editingVrf.value.dhcpServerDdns.tsigKeys = kept;
     }
 
     function flattenVrfData(name, attrs) {
       const ip = attrs.ip || {};
       const ipv6 = attrs.ipv6 || {};
+      const protocolsRoot = attrs.protocols || {};
+      const bgp = protocolsRoot.bgp || {};
+      const failover = protocolsRoot.failover || {};
+      const bgpCollections = parseBgpCollectionsFromTree(bgp);
+      const failoverCollections = parseFailoverCollectionsFromTree(failover);
+      const ospfCollections = parseOspfCollectionsFromTree(protocolsRoot.ospf || {});
+      const ospfv3Collections = parseOspfv3CollectionsFromTree(protocolsRoot.ospfv3 || {});
+      const staticCollections = parseStaticRoutesFromTree(protocolsRoot.static || {});
+
+      const serviceRoot = attrs.service || {};
+      const dhcpServer = serviceRoot['dhcp-server'] || serviceRoot.dhcp_server || {};
+      const dhcpv6Server = serviceRoot['dhcpv6-server'] || serviceRoot.dhcpv6_server || {};
       const ipProtocols = [];
       const ipv6Protocols = [];
       
@@ -166,6 +8387,46 @@ export default defineComponent({
         ipv6DisableForwarding: !!ipv6['disable-forwarding'],
         ipv6NhtNoResolveViaDefault: !!(ipv6.nht && ipv6.nht['no-resolve-via-default']),
         ipv6Protocols,
+        bgpCliText: protocolTreeToCliText(bgp),
+        bgpNeighbors: bgpCollections.neighbors,
+        bgpPeerGroups: bgpCollections.peerGroups,
+        bgpListenRanges: bgpCollections.listenRanges,
+        bgpInterfaces: bgpCollections.interfaces,
+        bgpBmpTargets: bgpCollections.bmpTargets,
+        failoverCliText: protocolTreeToCliText(failover),
+        failoverRoutes: failoverCollections,
+        dhcpServerDisable: !!dhcpServer.disable,
+        dhcpServerHostfileUpdate: !!dhcpServer['hostfile-update'],
+        dhcpServerListenAddresses: toServiceAddressRows(dhcpServer['listen-address'] || dhcpServer.listen_address),
+        dhcpServerListenInterfaces: toServiceNameRows(dhcpServer['listen-interface'] || dhcpServer.listen_interface, 'svc-if4'),
+        dhcpServerClientClasses: parseDhcpClientClassRows(dhcpServer['client-class'] || dhcpServer.client_class),
+        dhcpServerSharedNetworks: parseDhcpSharedNetworkRows(dhcpServer['shared-network-name'] || dhcpServer.shared_network_name),
+        dhcpServerDdns: parseDhcpDdnsSettings(dhcpServer['dynamic-dns-update'] || dhcpServer.dynamic_dns_update),
+        dhcpServerHighAvailability: parseDhcpHighAvailabilitySettings(dhcpServer['high-availability'] || dhcpServer.high_availability),
+        dhcpv6ServerDisable: !!dhcpv6Server.disable,
+        dhcpv6ServerDisableRouteAutoinstall: !!dhcpv6Server['disable-route-autoinstall'],
+        dhcpv6ServerPreference: normalizeNodeStringValue(dhcpv6Server.preference),
+        dhcpv6ServerGlobalNameServers: toServiceAddressRows(((dhcpv6Server['global-parameters'] || dhcpv6Server.global_parameters || {})['name-server']) || ((dhcpv6Server['global-parameters'] || dhcpv6Server.global_parameters || {}).name_server)),
+        dhcpv6ServerListenInterfaces: toServiceNameRows(dhcpv6Server['listen-interface'] || dhcpv6Server.listen_interface, 'svc-if6'),
+        dhcpv6ServerSharedNetworks: parseDhcpv6SharedNetworkRows(dhcpv6Server['shared-network-name'] || dhcpv6Server.shared_network_name),
+        isisCliText: protocolTreeToCliText(protocolsRoot.isis || {}),
+        ospfCliText: protocolTreeToCliText(protocolsRoot.ospf || {}),
+        ospfAccessLists: ospfCollections.accessLists,
+        ospfNeighbors: ospfCollections.neighbors,
+        ospfSummaryAddresses: ospfCollections.summaryAddresses,
+        ospfRedistribute: ospfCollections.redistribute,
+        ospfSegmentRouting: ospfCollections.segmentRouting,
+        ospfAreas: ospfCollections.areas,
+        ospfInterfaces: ospfCollections.interfaces,
+        ospfv3CliText: protocolTreeToCliText(protocolsRoot.ospfv3 || {}),
+        ospfv3Areas: ospfv3Collections.areas,
+        ospfv3Interfaces: ospfv3Collections.interfaces,
+        ospfv3Redistribute: ospfv3Collections.redistribute,
+        rpkiCliText: protocolTreeToCliText(protocolsRoot.rpki || {}),
+        rpkiCaches: parseRpkiCachesFromTree(protocolsRoot.rpki || {}),
+        staticCliText: protocolTreeToCliText(protocolsRoot.static || {}),
+        staticRoutes: staticCollections.routes,
+        staticRoutes6: staticCollections.routes6,
       };
     }
 
@@ -210,13 +8471,114 @@ export default defineComponent({
       }
       if (Object.keys(ipv6).length) result.ipv6 = ipv6;
 
+      const protocolsRoot = deepClone(editingProtocolsBase.value);
+      const bgp = parseCliTextToProtocolTree(buildBgpCliTextFromCollections(v));
+      const failover = parseCliTextToProtocolTree(buildFailoverCliTextFromCollections(v));
+      const isis = parseCliTextToProtocolTree(v.isisCliText);
+      const ospf = parseCliTextToProtocolTree(buildOspfCliTextFromCollections(v));
+      const ospfv3 = parseCliTextToProtocolTree(buildOspfv3CliTextFromCollections(v));
+      const rpki = parseCliTextToProtocolTree(buildRpkiCliTextFromCollections(v));
+      const staticProto = parseCliTextToProtocolTree(buildStaticCliTextFromCollections(v));
+
+      if (Object.keys(bgp).length) protocolsRoot.bgp = bgp; else delete protocolsRoot.bgp;
+      if (Object.keys(failover).length) protocolsRoot.failover = failover; else delete protocolsRoot.failover;
+      if (Object.keys(isis).length) protocolsRoot.isis = isis; else delete protocolsRoot.isis;
+      if (Object.keys(ospf).length) protocolsRoot.ospf = ospf; else delete protocolsRoot.ospf;
+      if (Object.keys(ospfv3).length) protocolsRoot.ospfv3 = ospfv3; else delete protocolsRoot.ospfv3;
+      if (Object.keys(rpki).length) protocolsRoot.rpki = rpki; else delete protocolsRoot.rpki;
+      if (Object.keys(staticProto).length) protocolsRoot.static = staticProto; else delete protocolsRoot.static;
+
+      if (Object.keys(protocolsRoot).length) result.protocols = protocolsRoot;
+
+      const serviceRoot = deepClone(editingServiceBase.value);
+      const dhcpServer = deepClone(serviceRoot['dhcp-server'] || {});
+      const dhcpv6Server = deepClone(serviceRoot['dhcpv6-server'] || {});
+      if (v.dhcpServerDisable) dhcpServer.disable = {};
+      else delete dhcpServer.disable;
+
+      if (v.dhcpServerHostfileUpdate) dhcpServer['hostfile-update'] = {};
+      else delete dhcpServer['hostfile-update'];
+
+      const listenAddresses = (v.dhcpServerListenAddresses || []).map(item => String(item?.address || '').trim()).filter(Boolean);
+      const listenInterfaces = (v.dhcpServerListenInterfaces || []).map(item => String(item?.name || '').trim()).filter(Boolean);
+
+      if (listenAddresses.length) dhcpServer['listen-address'] = toLeafSetObject(listenAddresses);
+      else delete dhcpServer['listen-address'];
+      if (listenInterfaces.length) dhcpServer['listen-interface'] = toLeafSetObject(listenInterfaces);
+      else delete dhcpServer['listen-interface'];
+
+      const clientClass = buildDhcpClientClassNode(v.dhcpServerClientClasses);
+      if (Object.keys(clientClass).length) dhcpServer['client-class'] = clientClass;
+      else delete dhcpServer['client-class'];
+
+      const sharedNetwork = buildDhcpSharedNetworkNode(v.dhcpServerSharedNetworks);
+      if (Object.keys(sharedNetwork).length) dhcpServer['shared-network-name'] = sharedNetwork;
+      else delete dhcpServer['shared-network-name'];
+
+      const ddns = buildDhcpDdnsSettings(v.dhcpServerDdns);
+      if (Object.keys(ddns).length) dhcpServer['dynamic-dns-update'] = ddns;
+      else delete dhcpServer['dynamic-dns-update'];
+
+      const highAvailability = buildDhcpHighAvailabilitySettings(v.dhcpServerHighAvailability);
+      if (Object.keys(highAvailability).length) dhcpServer['high-availability'] = highAvailability;
+      else delete dhcpServer['high-availability'];
+
+      if (Object.keys(dhcpServer).length) {
+        serviceRoot['dhcp-server'] = dhcpServer;
+      } else {
+        delete serviceRoot['dhcp-server'];
+      }
+
+      if (v.dhcpv6ServerDisable) dhcpv6Server.disable = {};
+      else delete dhcpv6Server.disable;
+      if (v.dhcpv6ServerDisableRouteAutoinstall) dhcpv6Server['disable-route-autoinstall'] = {};
+      else delete dhcpv6Server['disable-route-autoinstall'];
+
+      const dhcpv6Preference = String(v.dhcpv6ServerPreference || '').trim();
+      if (dhcpv6Preference) dhcpv6Server.preference = dhcpv6Preference;
+      else delete dhcpv6Server.preference;
+
+      const dhcpv6GlobalNameServers = (v.dhcpv6ServerGlobalNameServers || []).map(item => String(item?.address || '').trim()).filter(Boolean);
+      if (dhcpv6GlobalNameServers.length) {
+        dhcpv6Server['global-parameters'] = {
+          'name-server': toLeafSetObject(dhcpv6GlobalNameServers),
+        };
+      } else {
+        delete dhcpv6Server['global-parameters'];
+      }
+
+      const dhcpv6ListenInterfaces = (v.dhcpv6ServerListenInterfaces || []).map(item => String(item?.name || '').trim()).filter(Boolean);
+      if (dhcpv6ListenInterfaces.length) dhcpv6Server['listen-interface'] = toLeafSetObject(dhcpv6ListenInterfaces);
+      else delete dhcpv6Server['listen-interface'];
+
+      const dhcpv6SharedNetwork = buildDhcpv6SharedNetworkNode(v.dhcpv6ServerSharedNetworks);
+      if (Object.keys(dhcpv6SharedNetwork).length) dhcpv6Server['shared-network-name'] = dhcpv6SharedNetwork;
+      else delete dhcpv6Server['shared-network-name'];
+
+      if (Object.keys(dhcpv6Server).length) {
+        serviceRoot['dhcpv6-server'] = dhcpv6Server;
+      } else {
+        delete serviceRoot['dhcpv6-server'];
+      }
+
+      if (Object.keys(serviceRoot).length) result.service = serviceRoot;
+
       return result;
     }
 
     function create() {
       editingVrf.value = emptyVrf();
       editingOriginalName.value = '';
+      editingProtocolsBase.value = {};
+      editingServiceBase.value = {};
+      resetProtocolBranchState();
+      refreshOspfAdvancedItems();
       activeTab.value = 'basic';
+      activeProtocolTab.value = 'bgp';
+      dhcpServerSubTab.value = 'basic';
+      dhcpv6ServerSubTab.value = 'basic';
+      syncDhcpListenTextFromRows();
+      syncAllBgpVpnNetworkRowsFromCli();
       modalVisible.value = true;
     }
 
@@ -226,8 +8588,17 @@ export default defineComponent({
       const vrf = vrfList.value.find(n => n.name === selectedNames.value[0]);
       if (!vrf) return;
       editingVrf.value = flattenVrfData(vrf.name, vrf._raw || {});
+      editingProtocolsBase.value = deepClone(vrf._raw?.protocols || {});
+      editingServiceBase.value = deepClone(vrf._raw?.service || {});
+      resetProtocolBranchState();
+      refreshOspfAdvancedItems();
       editingOriginalName.value = vrf.name;
       activeTab.value = 'basic';
+      activeProtocolTab.value = 'bgp';
+      dhcpServerSubTab.value = 'basic';
+      dhcpv6ServerSubTab.value = 'basic';
+      syncDhcpListenTextFromRows();
+      syncAllBgpVpnNetworkRowsFromCli();
       modalVisible.value = true;
     }
 
@@ -250,22 +8621,20 @@ export default defineComponent({
     }
 
     async function save() {
-      if (!editingVrf.value.name) return showError({ message: t('vrf.messages.enterName') });
       const original = editingOriginalName.value;
-      if (!original && vrfList.value.some(n => n.name === editingVrf.value.name)) {
+      const targetName = original || editingVrf.value.name;
+      if (!targetName) return showError({ message: t('vrf.messages.enterName') });
+      if (!original && vrfList.value.some(n => n.name === targetName)) {
         return showError({ message: t('vrf.messages.nameExists') });
       }
+      const validationError = validateBgpCollections(editingVrf.value);
+      if (validationError) return showError({ message: validationError });
+      const protocolValidationError = validateOtherProtocolCollections(editingVrf.value);
+      if (protocolValidationError) return showError({ message: protocolValidationError });
       const value = unflattenVrfData(editingVrf.value);
       try {
-        if (original && original !== editingVrf.value.name) {
-          await configStore.deleteConfig(`${path.value} ${original}`);
-          configStore.markPending();
-          await configStore.setConfig(`${path.value} ${editingVrf.value.name}`, value);
-          configStore.markPending();
-        } else {
-          await configStore.setConfig(`${path.value} ${editingVrf.value.name}`, value);
-          configStore.markPending();
-        }
+        await configStore.setConfig(`${path.value} ${targetName}`, value);
+        configStore.markPending();
         modalVisible.value = false;
         await configStore.checkSessionChanged();
         await load();
@@ -292,18 +8661,2594 @@ export default defineComponent({
       editingVrf.value.ipv6Protocols.splice(index, 1);
     }
 
+    function addBgpNeighbor() {
+      if (!editingVrf.value) return;
+      editingVrf.value.bgpNeighbors.push({ __id: nextBgpRowId('neighbor'), address: '', remoteAs: '', peerGroup: '', description: '' });
+    }
+
+    function removeBgpNeighbor(index) {
+      if (!editingVrf.value) return;
+      editingVrf.value.bgpNeighbors.splice(index, 1);
+    }
+
+    function addBgpPeerGroup() {
+      if (!editingVrf.value) return;
+      editingVrf.value.bgpPeerGroups.push({ __id: nextBgpRowId('peer-group'), name: '', remoteAs: '', description: '' });
+    }
+
+    function removeBgpPeerGroup(index) {
+      if (!editingVrf.value) return;
+      editingVrf.value.bgpPeerGroups.splice(index, 1);
+    }
+
+    function addBgpListenRange() {
+      if (!editingVrf.value) return;
+      editingVrf.value.bgpListenRanges.push({ __id: nextBgpRowId('listen'), range: '', peerGroup: '' });
+    }
+
+    function removeBgpListenRange(index) {
+      if (!editingVrf.value) return;
+      editingVrf.value.bgpListenRanges.splice(index, 1);
+    }
+
+    function addBgpInterface() {
+      if (!editingVrf.value) return;
+      editingVrf.value.bgpInterfaces.push({ __id: nextBgpRowId('interface'), name: '', peerGroup: '', mplsForwarding: false });
+    }
+
+    function removeBgpInterface(index) {
+      if (!editingVrf.value) return;
+      editingVrf.value.bgpInterfaces.splice(index, 1);
+    }
+
+    function addBgpBmpTarget() {
+      if (!editingVrf.value) return;
+      editingVrf.value.bgpBmpTargets.push({
+        __id: nextBgpRowId('bmp-target'),
+        name: '',
+        address: '',
+        port: '',
+        minRetry: '',
+        maxRetry: '',
+        mirror: false,
+        monitorV4LocalRib: false,
+        monitorV4PostPolicy: false,
+        monitorV4PrePolicy: false,
+        monitorV6LocalRib: false,
+        monitorV6PostPolicy: false,
+        monitorV6PrePolicy: false,
+      });
+    }
+
+    function removeBgpBmpTarget(index) {
+      if (!editingVrf.value) return;
+      editingVrf.value.bgpBmpTargets.splice(index, 1);
+    }
+
+    function removeBgpRowsByIds(listKey, keys) {
+      if (!editingVrf.value) return;
+      const keySet = new Set((keys || []).map(k => String(k)));
+      editingVrf.value[listKey] = (editingVrf.value[listKey] || []).filter(row => !keySet.has(String(row.__id)));
+    }
+
+    function openBgpCollectionCreate(type) {
+      if (!editingVrf.value) return;
+      bgpCollectionType.value = type;
+      bgpCollectionMode.value = 'create';
+      bgpCollectionEditId.value = '';
+      bgpCollectionDraft.value = createBgpCollectionDraft(type);
+      if (type === 'neighbor') {
+        bgpNeighborModalTab.value = 'basic';
+        bgpNeighborModalAfTab.value = 'ipv4-unicast';
+      } else if (type === 'peer-group') {
+        bgpPeerGroupModalTab.value = 'basic';
+        bgpPeerGroupModalAfTab.value = 'ipv4-unicast';
+      }
+      bgpCollectionModalVisible.value = true;
+    }
+
+    function openBgpCollectionEdit(type, row) {
+      if (!editingVrf.value) return;
+      if (!row || !row.__id) return showError({ message: t('vrf.messages.selectOne') });
+      bgpCollectionType.value = type;
+      bgpCollectionMode.value = 'edit';
+      bgpCollectionEditId.value = String(row.__id);
+      bgpCollectionDraft.value = createBgpCollectionDraft(type, row);
+      if (type === 'neighbor') {
+        bgpNeighborModalTab.value = 'basic';
+        bgpNeighborModalAfTab.value = 'ipv4-unicast';
+      } else if (type === 'peer-group') {
+        bgpPeerGroupModalTab.value = 'basic';
+        bgpPeerGroupModalAfTab.value = 'ipv4-unicast';
+      }
+      bgpCollectionModalVisible.value = true;
+    }
+
+    function saveBgpCollectionModal() {
+      if (!editingVrf.value) return;
+      const type = bgpCollectionType.value;
+      const listKey = getBgpCollectionListKey(type);
+      const list = editingVrf.value[listKey] || [];
+      const draft = deepClone(bgpCollectionDraft.value || {});
+
+      if (bgpCollectionMode.value === 'create') {
+        draft.__id = nextBgpRowId(type);
+        list.push(draft);
+      } else {
+        const idx = list.findIndex(r => String(r.__id) === String(bgpCollectionEditId.value));
+        if (idx >= 0) list[idx] = { ...draft, __id: list[idx].__id };
+      }
+
+      editingVrf.value[listKey] = list;
+      bgpCollectionModalVisible.value = false;
+    }
+
+    function requestBgpCollectionDelete(type, keys) {
+      if (!editingVrf.value) return;
+      if (!keys || !keys.length) return showError({ message: t('vrf.messages.selectOne') });
+      bgpCollectionType.value = type;
+      pendingBgpDeleteIds.value = [...keys];
+      bgpCollectionDeleteVisible.value = true;
+    }
+
+    function confirmBgpCollectionDelete() {
+      const listKey = getBgpCollectionListKey(bgpCollectionType.value);
+      removeBgpRowsByIds(listKey, pendingBgpDeleteIds.value);
+      pendingBgpDeleteIds.value = [];
+      bgpCollectionDeleteVisible.value = false;
+    }
+
+    function createOspfAreaDraft(source = null) {
+      const ranges = Array.isArray(source?.ranges)
+        ? source.ranges.map(item => ({
+          __id: item?.__id || nextBgpRowId('ospf-range'),
+          prefix: item?.prefix || '',
+          cost: item?.cost || '',
+          notAdvertise: !!item?.notAdvertise,
+          substitute: item?.substitute || '',
+        }))
+        : parseOspfAreaRangesText(source?.rangeText || '');
+      const virtualLinks = Array.isArray(source?.virtualLinks)
+        ? source.virtualLinks.map(item => ({
+          __id: item?.__id || nextBgpRowId('ospf-vl'),
+          peer: item?.peer || '',
+          authenticationType: item?.authenticationType || '',
+          md5KeyId: item?.md5KeyId || '',
+          md5Key: item?.md5Key || '',
+          plaintextPassword: item?.plaintextPassword || '',
+          deadInterval: item?.deadInterval || '',
+          helloInterval: item?.helloInterval || '',
+          retransmitInterval: item?.retransmitInterval || '',
+          retransmitWindow: item?.retransmitWindow || '',
+          transmitDelay: item?.transmitDelay || '',
+        }))
+        : [];
+      return {
+        __id: source?.__id || '',
+        area: source?.area || '',
+        areaType: source?.areaType || '',
+        nssaDefaultCost: source?.nssaDefaultCost || '',
+        nssaNoSummary: !!source?.nssaNoSummary,
+        nssaTranslate: source?.nssaTranslate || '',
+        stubDefaultCost: source?.stubDefaultCost || '',
+        stubNoSummary: !!source?.stubNoSummary,
+        authenticationType: source?.authenticationType || '',
+        authenticationPlaintextPassword: source?.authenticationPlaintextPassword || '',
+        exportList: source?.exportList || '',
+        importList: source?.importList || '',
+        shortcut: source?.shortcut || '',
+        networksText: source?.networksText || '',
+        ranges,
+        virtualLinks,
+      };
+    }
+
+    function createOspfRangeDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        prefix: source?.prefix || '',
+        cost: source?.cost || '',
+        notAdvertise: !!source?.notAdvertise,
+        substitute: source?.substitute || '',
+      };
+    }
+
+    function createOspfVirtualLinkDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        peer: source?.peer || '',
+        authenticationType: source?.authenticationType || '',
+        md5KeyId: source?.md5KeyId || '',
+        md5Key: source?.md5Key || '',
+        plaintextPassword: source?.plaintextPassword || '',
+        deadInterval: source?.deadInterval || '',
+        helloInterval: source?.helloInterval || '',
+        retransmitInterval: source?.retransmitInterval || '',
+        retransmitWindow: source?.retransmitWindow || '',
+        transmitDelay: source?.transmitDelay || '',
+      };
+    }
+
+    function createOspfAccessListDraft(source = null) {
+      const exportProtocols = Array.isArray(source?.exportProtocols)
+        ? source.exportProtocols.map(v => String(v || '').trim()).filter(Boolean)
+        : [];
+      return {
+        __id: source?.__id || '',
+        number: source?.number || '',
+        exportProtocols,
+      };
+    }
+
+    function createOspfNeighborDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        address: source?.address || '',
+        pollInterval: source?.pollInterval || '',
+        priority: source?.priority || '',
+      };
+    }
+
+    function createOspfSummaryAddressDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        prefix: source?.prefix || '',
+        noAdvertise: !!source?.noAdvertise,
+        tag: source?.tag || '',
+      };
+    }
+
+    function createOspfSrPrefixDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        prefix: source?.prefix || '',
+        explicitNull: !!source?.explicitNull,
+        noPhpFlag: !!source?.noPhpFlag,
+        indexValue: source?.indexValue || '',
+      };
+    }
+
+    function createOspfRedistributeProtocolDraft(source = null) {
+      return {
+        enabled: !!source?.enabled,
+        metric: source?.metric || '',
+        metricType: source?.metricType || '',
+        routeMap: source?.routeMap || '',
+      };
+    }
+
+    function createOspfRedistributeTableDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        table: source?.table || '',
+        metric: source?.metric || '',
+        metricType: source?.metricType || '',
+        routeMap: source?.routeMap || '',
+      };
+    }
+
+    function createOspfRedistributeDraft(source = null) {
+      const draft = { tables: [] };
+      for (const protocol of OSPF_REDISTRIBUTE_PROTOCOLS) {
+        draft[protocol] = createOspfRedistributeProtocolDraft(source?.[protocol]);
+      }
+      draft.tables = Array.isArray(source?.tables)
+        ? source.tables.map(row => ({
+          __id: row?.__id || nextBgpRowId('ospf-redist-table'),
+          table: row?.table || '',
+          metric: row?.metric || '',
+          metricType: row?.metricType || '',
+          routeMap: row?.routeMap || '',
+        }))
+        : [];
+      return draft;
+    }
+
+    function createOspfv3RedistributeProtocolDraft(source = null) {
+      return {
+        enabled: !!source?.enabled,
+        metric: source?.metric || '',
+        metricType: source?.metricType || '',
+        routeMap: source?.routeMap || '',
+      };
+    }
+
+    function createOspfv3RedistributeDraft(source = null) {
+      const draft = {};
+      for (const protocol of OSPFV3_REDISTRIBUTE_PROTOCOLS) {
+        draft[protocol] = createOspfv3RedistributeProtocolDraft(source?.[protocol]);
+      }
+      return draft;
+    }
+
+    function createOspfv3RedistributeRowDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        protocol: source?.protocol || '',
+        metric: source?.metric || '',
+        metricType: source?.metricType || '',
+        routeMap: source?.routeMap || '',
+      };
+    }
+
+    function createOspfInterfaceDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        name: source?.name || '',
+        area: source?.area || '',
+        authenticationType: source?.authenticationType || '',
+        md5KeyId: source?.md5KeyId || '',
+        md5Key: source?.md5Key || '',
+        plaintextPassword: source?.plaintextPassword || '',
+        bandwidth: source?.bandwidth || '',
+        bfdProfile: source?.bfdProfile || '',
+        cost: source?.cost || '',
+        deadInterval: source?.deadInterval || '',
+        helloInterval: source?.helloInterval || '',
+        helloMultiplier: source?.helloMultiplier || '',
+        ldpSyncMode: source?.ldpSyncMode || '',
+        ldpSyncHolddown: source?.ldpSyncHolddown || '',
+        mtuIgnore: !!source?.mtuIgnore,
+        network: source?.network || '',
+        passiveMode: source?.passiveMode || '',
+        priority: source?.priority || '',
+        retransmitInterval: source?.retransmitInterval || '',
+        retransmitWindow: source?.retransmitWindow || '',
+        transmitDelay: source?.transmitDelay || '',
+      };
+    }
+
+    function parseIsisInterfaceBranchRows() {
+      const text = getProtocolBranchText('isis', 'interface');
+      const lines = String(text || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const rowMap = new Map();
+      const passthrough = [];
+
+      for (const line of lines) {
+        if (!line.startsWith('interface ')) {
+          passthrough.push(line);
+          continue;
+        }
+        const rest = line.slice('interface '.length).trim();
+        if (!rest) continue;
+        const parts = rest.split(/\s+/);
+        const name = String(parts.shift() || '').trim();
+        if (!name) continue;
+        const suffix = parts.join(' ').trim();
+        if (!rowMap.has(name)) {
+          rowMap.set(name, { __id: name, name, passive: false, metric: '', network: '', extrasText: '' });
+        }
+        const row = rowMap.get(name);
+        if (!suffix) continue;
+        if (suffix === 'passive') {
+          row.passive = true;
+          continue;
+        }
+        if (suffix.startsWith('metric =')) {
+          row.metric = suffix.slice('metric ='.length).trim();
+          continue;
+        }
+        if (suffix.startsWith('network =')) {
+          row.network = suffix.slice('network ='.length).trim();
+          continue;
+        }
+        row.extrasText = row.extrasText ? `${row.extrasText}\n${suffix}` : suffix;
+      }
+
+      const rows = Array.from(rowMap.values()).sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+      return { rows, passthrough };
+    }
+
+    function buildIsisInterfaceBranchText(rows, passthrough = []) {
+      const output = [];
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const name = String(row.name || '').trim();
+        if (!name) continue;
+        output.push(`interface ${name}`);
+        if (row.passive) output.push(`interface ${name} passive`);
+        const metric = String(row.metric || '').trim();
+        if (metric) output.push(`interface ${name} metric = ${metric}`);
+        const network = String(row.network || '').trim();
+        if (network) output.push(`interface ${name} network = ${network}`);
+        const extras = String(row.extrasText || '').split('\n').map(v => v.trim()).filter(Boolean);
+        for (const extra of extras) output.push(`interface ${name} ${extra}`);
+      }
+      for (const line of (passthrough || [])) {
+        const vv = String(line || '').trim();
+        if (vv) output.push(vv);
+      }
+      return output.join('\n');
+    }
+
+    function createIsisInterfaceDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        name: source?.name || '',
+        passive: !!source?.passive,
+        metric: source?.metric || '',
+        network: source?.network || '',
+        extrasText: source?.extrasText || '',
+      };
+    }
+
+    const isisInterfaceRows = computed(() => parseIsisInterfaceBranchRows().rows);
+    const isisInterfaceModalTitle = computed(() => `${isisInterfaceModalMode.value === 'edit' ? t('app.edit') : t('app.create')} ${t('vrf.protocols.isisInterfaceTitle')}`);
+
+    function openIsisInterfaceCreate() {
+      isisInterfaceModalMode.value = 'create';
+      isisInterfaceEditId.value = '';
+      isisInterfaceDraft.value = createIsisInterfaceDraft();
+      isisInterfaceModalVisible.value = true;
+    }
+
+    function openIsisInterfaceEdit(row) {
+      if (!row) return;
+      isisInterfaceModalMode.value = 'edit';
+      isisInterfaceEditId.value = String(row.__id || row.name || '');
+      isisInterfaceDraft.value = createIsisInterfaceDraft(row);
+      isisInterfaceModalVisible.value = true;
+    }
+
+    function saveIsisInterfaceModal() {
+      const { rows, passthrough } = parseIsisInterfaceBranchRows();
+      const draft = createIsisInterfaceDraft(isisInterfaceDraft.value);
+      draft.name = String(draft.name || '').trim();
+      draft.metric = String(draft.metric || '').trim();
+      draft.network = String(draft.network || '').trim();
+      draft.extrasText = String(draft.extrasText || '').trim();
+      if (!draft.name) return;
+
+      const oldName = String(isisInterfaceEditId.value || '').trim();
+      const filtered = rows.filter(item => String(item.name || '').trim() !== draft.name && String(item.name || '').trim() !== oldName);
+      draft.__id = draft.name;
+      filtered.push(draft);
+      setProtocolBranchText('isis', 'interface', buildIsisInterfaceBranchText(filtered, passthrough));
+
+      isisInterfaceModalVisible.value = false;
+      isisInterfaceEditId.value = '';
+      isisInterfaceDraft.value = createIsisInterfaceDraft();
+    }
+
+    function requestIsisInterfaceDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingIsisInterfaceDeleteIds.value = selected;
+      isisInterfaceDeleteVisible.value = true;
+    }
+
+    function confirmIsisInterfaceDelete() {
+      const idSet = new Set((pendingIsisInterfaceDeleteIds.value || []).map(v => String(v)));
+      const { rows, passthrough } = parseIsisInterfaceBranchRows();
+      const kept = rows.filter(item => !idSet.has(String(item.__id || item.name || '')));
+      setProtocolBranchText('isis', 'interface', buildIsisInterfaceBranchText(kept, passthrough));
+      isisInterfaceDeleteVisible.value = false;
+      pendingIsisInterfaceDeleteIds.value = [];
+    }
+
+    function parseIsisFastRerouteRows() {
+      const text = getProtocolBranchText('isis', 'fast-reroute');
+      const lines = String(text || '').split('\n').map(line => line.trim()).filter(Boolean);
+      const rows = [];
+      lines.forEach((line, idx) => {
+        if (!line.startsWith('fast-reroute ')) return;
+        const body = line.slice('fast-reroute '.length).trim();
+        if (!body) return;
+        const eq = body.indexOf('=');
+        if (eq >= 0) {
+          const command = body.slice(0, eq).trim();
+          const value = body.slice(eq + 1).trim();
+          rows.push({ __id: `${idx}:${command}:${value}`, command, value });
+        } else {
+          rows.push({ __id: `${idx}:${body}:`, command: body, value: '' });
+        }
+      });
+      return rows;
+    }
+
+    function buildIsisFastRerouteText(rows) {
+      const lines = [];
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const command = String(row.command || '').trim();
+        if (!command) continue;
+        const value = String(row.value || '').trim();
+        if (value) lines.push(`fast-reroute ${command} = ${value}`);
+        else lines.push(`fast-reroute ${command}`);
+      }
+      return lines.join('\n');
+    }
+
+    function createIsisFastRerouteDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        command: source?.command || '',
+        value: source?.value || '',
+      };
+    }
+
+    const isisFastRerouteRows = computed(() => parseIsisFastRerouteRows());
+    const isisFastRerouteModalTitle = computed(() => `${isisFastRerouteModalMode.value === 'edit' ? t('app.edit') : t('app.create')} ${t('vrf.protocols.isisFastRerouteTitle')}`);
+
+    function openIsisFastRerouteCreate() {
+      isisFastRerouteModalMode.value = 'create';
+      isisFastRerouteEditId.value = '';
+      isisFastRerouteDraft.value = createIsisFastRerouteDraft();
+      isisFastRerouteModalVisible.value = true;
+    }
+
+    function openIsisFastRerouteEdit(row) {
+      if (!row) return;
+      isisFastRerouteModalMode.value = 'edit';
+      isisFastRerouteEditId.value = String(row.__id || '');
+      isisFastRerouteDraft.value = createIsisFastRerouteDraft(row);
+      isisFastRerouteModalVisible.value = true;
+    }
+
+    function saveIsisFastRerouteModal() {
+      const rows = parseIsisFastRerouteRows();
+      const draft = createIsisFastRerouteDraft(isisFastRerouteDraft.value);
+      draft.command = String(draft.command || '').trim();
+      draft.value = String(draft.value || '').trim();
+      if (!draft.command) return;
+      if (isisFastRerouteModalMode.value === 'edit') {
+        const id = String(isisFastRerouteEditId.value || '');
+        const idx = rows.findIndex(item => String(item.__id) === id);
+        if (idx >= 0) rows[idx] = { ...rows[idx], ...draft, __id: id };
+      } else {
+        rows.push({ ...draft, __id: `new:${draft.command}:${draft.value}` });
+      }
+      setProtocolBranchText('isis', 'fast-reroute', buildIsisFastRerouteText(rows));
+      isisFastRerouteModalVisible.value = false;
+      isisFastRerouteEditId.value = '';
+      isisFastRerouteDraft.value = createIsisFastRerouteDraft();
+    }
+
+    function requestIsisFastRerouteDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingIsisFastRerouteDeleteIds.value = selected;
+      isisFastRerouteDeleteVisible.value = true;
+    }
+
+    function confirmIsisFastRerouteDelete() {
+      const idSet = new Set((pendingIsisFastRerouteDeleteIds.value || []).map(v => String(v)));
+      const rows = parseIsisFastRerouteRows().filter(item => !idSet.has(String(item.__id)));
+      setProtocolBranchText('isis', 'fast-reroute', buildIsisFastRerouteText(rows));
+      isisFastRerouteDeleteVisible.value = false;
+      pendingIsisFastRerouteDeleteIds.value = [];
+    }
+
+    function parseIsisRedistributeBranchRows() {
+      const text = getProtocolBranchText('isis', 'redistribute');
+      const lines = String(text || '').split('\n').map(v => v.trim()).filter(Boolean);
+      const rowMap = new Map();
+      const passthrough = [];
+      const allowedProtocols = new Set(ISIS_REDISTRIBUTE_PROTOCOLS);
+      const allowedAfs = new Set(['ipv4', 'ipv6']);
+      const allowedLevels = new Set(['level-1', 'level-2']);
+
+      for (const line of lines) {
+        const match = line.match(/^redistribute\s+(ipv4|ipv6)\s+(\S+)\s+(level-1|level-2)(?:\s+(.*))?$/);
+        if (!match) {
+          passthrough.push(line);
+          continue;
+        }
+        const af = String(match[1] || '').trim();
+        const protocol = String(match[2] || '').trim();
+        const level = String(match[3] || '').trim();
+        const suffix = String(match[4] || '').trim();
+        if (!allowedAfs.has(af) || !allowedProtocols.has(protocol) || !allowedLevels.has(level)) {
+          passthrough.push(line);
+          continue;
+        }
+
+        const id = `${af}:${protocol}:${level}`;
+        const row = rowMap.get(id) || {
+          __id: id,
+          af,
+          protocol,
+          level,
+          metric: '',
+          routeMap: '',
+        };
+
+        if (!suffix) {
+          rowMap.set(id, row);
+          continue;
+        }
+
+        if (suffix.startsWith('metric =')) {
+          row.metric = suffix.slice('metric ='.length).trim();
+          rowMap.set(id, row);
+          continue;
+        }
+        if (suffix.startsWith('route-map =')) {
+          row.routeMap = suffix.slice('route-map ='.length).trim();
+          rowMap.set(id, row);
+          continue;
+        }
+        passthrough.push(line);
+      }
+
+      const rows = Array.from(rowMap.values()).sort((a, b) => {
+        const ak = `${a.af}:${a.protocol}:${a.level}`;
+        const bk = `${b.af}:${b.protocol}:${b.level}`;
+        return ak.localeCompare(bk);
+      });
+      return { rows, passthrough };
+    }
+
+    function buildIsisRedistributeBranchText(rows, passthrough = []) {
+      const lines = [];
+      for (const rowRaw of (rows || [])) {
+        const row = rowRaw && typeof rowRaw === 'object' ? rowRaw : {};
+        const af = String(row.af || '').trim();
+        const protocol = String(row.protocol || '').trim();
+        const level = String(row.level || '').trim();
+        if (!af || !protocol || !level) continue;
+        const base = `redistribute ${af} ${protocol} ${level}`;
+        lines.push(base);
+        const metric = String(row.metric || '').trim();
+        if (metric) lines.push(`${base} metric = ${metric}`);
+        const routeMap = String(row.routeMap || '').trim();
+        if (routeMap) lines.push(`${base} route-map = ${routeMap}`);
+      }
+      for (const line of (passthrough || [])) {
+        const vv = String(line || '').trim();
+        if (vv) lines.push(vv);
+      }
+      return lines.join('\n');
+    }
+
+    function createIsisRedistributeDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        af: source?.af || 'ipv4',
+        protocol: source?.protocol || ISIS_REDISTRIBUTE_PROTOCOLS[0] || '',
+        level: source?.level || 'level-1',
+        metric: source?.metric || '',
+        routeMap: source?.routeMap || '',
+      };
+    }
+
+    const isisRedistributeRows = computed(() => parseIsisRedistributeBranchRows().rows);
+    const isisRedistributeModalTitle = computed(() => `${isisRedistributeModalMode.value === 'edit' ? t('app.edit') : t('app.create')} ${t('vrf.protocols.isisRedistributeTitle')}`);
+
+    function openIsisRedistributeCreate() {
+      isisRedistributeModalMode.value = 'create';
+      isisRedistributeEditId.value = '';
+      isisRedistributeDraft.value = createIsisRedistributeDraft();
+      isisRedistributeModalVisible.value = true;
+    }
+
+    function openIsisRedistributeEdit(row) {
+      if (!row) return;
+      isisRedistributeModalMode.value = 'edit';
+      isisRedistributeEditId.value = String(row.__id || '');
+      isisRedistributeDraft.value = createIsisRedistributeDraft(row);
+      isisRedistributeModalVisible.value = true;
+    }
+
+    function saveIsisRedistributeModal() {
+      const { rows, passthrough } = parseIsisRedistributeBranchRows();
+      const draft = createIsisRedistributeDraft(isisRedistributeDraft.value);
+      draft.af = String(draft.af || '').trim();
+      draft.protocol = String(draft.protocol || '').trim();
+      draft.level = String(draft.level || '').trim();
+      draft.metric = String(draft.metric || '').trim();
+      draft.routeMap = String(draft.routeMap || '').trim();
+      if (!draft.af || !draft.protocol || !draft.level) return;
+
+      const oldId = String(isisRedistributeEditId.value || '').trim();
+      draft.__id = `${draft.af}:${draft.protocol}:${draft.level}`;
+      const filtered = rows.filter(item => String(item.__id || '') !== oldId && String(item.__id || '') !== draft.__id);
+      filtered.push(draft);
+      setProtocolBranchText('isis', 'redistribute', buildIsisRedistributeBranchText(filtered, passthrough));
+
+      isisRedistributeModalVisible.value = false;
+      isisRedistributeEditId.value = '';
+      isisRedistributeDraft.value = createIsisRedistributeDraft();
+    }
+
+    function requestIsisRedistributeDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingIsisRedistributeDeleteIds.value = selected;
+      isisRedistributeDeleteVisible.value = true;
+    }
+
+    function confirmIsisRedistributeDelete() {
+      const idSet = new Set((pendingIsisRedistributeDeleteIds.value || []).map(v => String(v)));
+      const { rows, passthrough } = parseIsisRedistributeBranchRows();
+      const kept = rows.filter(item => !idSet.has(String(item.__id || '')));
+      setProtocolBranchText('isis', 'redistribute', buildIsisRedistributeBranchText(kept, passthrough));
+      isisRedistributeDeleteVisible.value = false;
+      pendingIsisRedistributeDeleteIds.value = [];
+    }
+
+    function createOspfv3AreaRangeDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        prefix: source?.prefix || '',
+        action: source?.action || '',
+      };
+    }
+
+    function createOspfv3AreaDraft(source = null) {
+      const ranges = Array.isArray(source?.ranges)
+        ? source.ranges.map(item => ({
+          __id: item?.__id || nextBgpRowId('ospfv3-area-range'),
+          prefix: item?.prefix || '',
+          action: item?.action || '',
+        }))
+        : [];
+      return {
+        __id: source?.__id || '',
+        area: source?.area || '',
+        areaType: source?.areaType || '',
+        nssaDefaultInformationOriginate: !!source?.nssaDefaultInformationOriginate,
+        nssaNoSummary: !!source?.nssaNoSummary,
+        stubNoSummary: !!source?.stubNoSummary,
+        exportList: source?.exportList || '',
+        importList: source?.importList || '',
+        ranges,
+      };
+    }
+
+    function createOspfv3InterfaceDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        name: source?.name || '',
+        area: source?.area || '',
+        bfdProfile: source?.bfdProfile || '',
+        cost: source?.cost || '',
+        deadInterval: source?.deadInterval || '',
+        helloInterval: source?.helloInterval || '',
+        ifmtu: source?.ifmtu || '',
+        instanceId: source?.instanceId || '',
+        mtuIgnore: !!source?.mtuIgnore,
+        network: source?.network || '',
+        passive: !!source?.passive,
+        priority: source?.priority || '',
+        retransmitInterval: source?.retransmitInterval || '',
+        transmitDelay: source?.transmitDelay || '',
+      };
+    }
+
+    function openOspfAreaCreate() {
+      ospfAreaModalMode.value = 'create';
+      ospfAreaEditId.value = '';
+      ospfAreaDraft.value = createOspfAreaDraft();
+      ospfAreaModalVisible.value = true;
+    }
+
+    function openOspfAreaEdit(row) {
+      if (!row || !row.__id) return;
+      ospfAreaModalMode.value = 'edit';
+      ospfAreaEditId.value = String(row.__id);
+      ospfAreaDraft.value = createOspfAreaDraft(row);
+      ospfAreaModalVisible.value = true;
+    }
+
+    function saveOspfAreaModal() {
+      if (!editingVrf.value) return;
+      const area = String(ospfAreaDraft.value?.area || '').trim();
+      if (!area) return;
+      const row = createOspfAreaDraft(ospfAreaDraft.value);
+      row.__id = ospfAreaModalMode.value === 'edit' ? String(ospfAreaEditId.value) : nextBgpRowId('ospf-area');
+      row.area = area;
+      row.areaType = String(row.areaType || '').trim();
+      row.nssaDefaultCost = String(row.nssaDefaultCost || '').trim();
+      row.nssaTranslate = String(row.nssaTranslate || '').trim();
+      row.stubDefaultCost = String(row.stubDefaultCost || '').trim();
+      row.authenticationType = String(row.authenticationType || '').trim();
+      row.authenticationPlaintextPassword = String(row.authenticationPlaintextPassword || '').trim();
+      row.exportList = String(row.exportList || '').trim();
+      row.importList = String(row.importList || '').trim();
+      row.shortcut = String(row.shortcut || '').trim();
+      row.networksText = String(row.networksText || '').trim();
+      row.ranges = (row.ranges || []).map((item) => {
+        const d = createOspfRangeDraft(item);
+        d.__id = d.__id || nextBgpRowId('ospf-range');
+        d.prefix = String(d.prefix || '').trim();
+        d.cost = String(d.cost || '').trim();
+        d.substitute = String(d.substitute || '').trim();
+        d.notAdvertise = !!d.notAdvertise;
+        return d;
+      }).filter(item => item.prefix);
+      row.virtualLinks = (row.virtualLinks || []).map(item => {
+        const d = createOspfVirtualLinkDraft(item);
+        d.__id = d.__id || nextBgpRowId('ospf-vl');
+        d.peer = String(d.peer || '').trim();
+        d.authenticationType = String(d.authenticationType || '').trim();
+        d.md5KeyId = String(d.md5KeyId || '').trim();
+        d.md5Key = String(d.md5Key || '').trim();
+        d.plaintextPassword = String(d.plaintextPassword || '').trim();
+        d.deadInterval = String(d.deadInterval || '').trim();
+        d.helloInterval = String(d.helloInterval || '').trim();
+        d.retransmitInterval = String(d.retransmitInterval || '').trim();
+        d.retransmitWindow = String(d.retransmitWindow || '').trim();
+        d.transmitDelay = String(d.transmitDelay || '').trim();
+        return d;
+      }).filter(item => item.peer);
+
+      if (!Array.isArray(editingVrf.value.ospfAreas)) editingVrf.value.ospfAreas = [];
+      if (ospfAreaModalMode.value === 'edit') {
+        const idx = editingVrf.value.ospfAreas.findIndex(item => String(item.__id) === String(ospfAreaEditId.value));
+        if (idx >= 0) editingVrf.value.ospfAreas[idx] = row;
+      } else {
+        editingVrf.value.ospfAreas.push(row);
+      }
+
+      ospfAreaModalVisible.value = false;
+      ospfAreaEditId.value = '';
+      ospfAreaDraft.value = createOspfAreaDraft();
+    }
+
+    function requestOspfAreaDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfAreaDeleteIds.value = selected;
+      ospfAreaDeleteVisible.value = true;
+    }
+
+    function confirmOspfAreaDelete() {
+      if (!editingVrf.value || !Array.isArray(editingVrf.value.ospfAreas)) return;
+      const idSet = new Set((pendingOspfAreaDeleteIds.value || []).map(v => String(v)));
+      editingVrf.value.ospfAreas = editingVrf.value.ospfAreas.filter(item => !idSet.has(String(item.__id)));
+      ospfAreaDeleteVisible.value = false;
+      pendingOspfAreaDeleteIds.value = [];
+    }
+
+    function getOspfAreaNetworksPreview(row) {
+      const list = parseListField(row?.networksText || '');
+      return list.join(', ');
+    }
+
+    function getOspfAreaRangesPreview(row) {
+      const list = Array.isArray(row?.ranges)
+        ? row.ranges
+        : parseOspfAreaRangesText(row?.rangeText || '');
+      return list.map((item) => {
+        const prefix = String(item?.prefix || '').trim();
+        if (!prefix) return '';
+        const parts = [prefix];
+        const cost = String(item?.cost || '').trim();
+        const substitute = String(item?.substitute || '').trim();
+        if (cost) parts.push(`cost=${cost}`);
+        if (item?.notAdvertise) parts.push('not-advertise');
+        if (substitute) parts.push(`substitute=${substitute}`);
+        return parts.join(' ');
+      }).filter(Boolean).join(' | ');
+    }
+
+    function getOspfAreaVirtualLinksPreview(row) {
+      const list = Array.isArray(row?.virtualLinks) ? row.virtualLinks : [];
+      return list.map(item => String(item?.peer || '').trim()).filter(Boolean).join(', ');
+    }
+
+    function getOspfAccessListExportPreview(row) {
+      const list = Array.isArray(row?.exportProtocols)
+        ? row.exportProtocols
+        : [];
+      return list.map(v => String(v || '').trim()).filter(Boolean).join(', ');
+    }
+
+    function openOspfAccessListCreate() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfAccessLists)) editingVrf.value.ospfAccessLists = [];
+      ospfAccessListModalMode.value = 'create';
+      ospfAccessListEditId.value = '';
+      ospfAccessListDraft.value = createOspfAccessListDraft();
+      ospfAccessListModalVisible.value = true;
+    }
+
+    function openOspfAccessListEdit(row) {
+      if (!editingVrf.value || !row || !row.__id) return;
+      ospfAccessListModalMode.value = 'edit';
+      ospfAccessListEditId.value = String(row.__id);
+      ospfAccessListDraft.value = createOspfAccessListDraft(row);
+      ospfAccessListModalVisible.value = true;
+    }
+
+    function saveOspfAccessListModal() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfAccessLists)) editingVrf.value.ospfAccessLists = [];
+      const row = createOspfAccessListDraft(ospfAccessListDraft.value);
+      row.__id = ospfAccessListModalMode.value === 'edit' ? String(ospfAccessListEditId.value) : nextBgpRowId('ospf-acl');
+      row.number = String(row.number || '').trim();
+      row.exportProtocols = (row.exportProtocols || []).map(v => String(v || '').trim()).filter(Boolean);
+      if (!row.number) return;
+
+      const list = editingVrf.value.ospfAccessLists;
+      if (ospfAccessListModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(ospfAccessListEditId.value));
+        if (idx >= 0) list[idx] = row;
+      } else {
+        list.push(row);
+      }
+
+      ospfAccessListModalVisible.value = false;
+      ospfAccessListEditId.value = '';
+      ospfAccessListDraft.value = createOspfAccessListDraft();
+    }
+
+    function requestOspfAccessListDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfAccessListDeleteIds.value = selected;
+      ospfAccessListDeleteVisible.value = true;
+    }
+
+    function confirmOspfAccessListDelete() {
+      if (!editingVrf.value || !Array.isArray(editingVrf.value.ospfAccessLists)) return;
+      const idSet = new Set((pendingOspfAccessListDeleteIds.value || []).map(v => String(v)));
+      editingVrf.value.ospfAccessLists = editingVrf.value.ospfAccessLists.filter(item => !idSet.has(String(item.__id)));
+      ospfAccessListDeleteVisible.value = false;
+      pendingOspfAccessListDeleteIds.value = [];
+    }
+
+    function openOspfNeighborCreate() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfNeighbors)) editingVrf.value.ospfNeighbors = [];
+      ospfNeighborModalMode.value = 'create';
+      ospfNeighborEditId.value = '';
+      ospfNeighborDraft.value = createOspfNeighborDraft();
+      ospfNeighborModalVisible.value = true;
+    }
+
+    function openOspfNeighborEdit(row) {
+      if (!editingVrf.value || !row || !row.__id) return;
+      ospfNeighborModalMode.value = 'edit';
+      ospfNeighborEditId.value = String(row.__id);
+      ospfNeighborDraft.value = createOspfNeighborDraft(row);
+      ospfNeighborModalVisible.value = true;
+    }
+
+    function saveOspfNeighborModal() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfNeighbors)) editingVrf.value.ospfNeighbors = [];
+      const row = createOspfNeighborDraft(ospfNeighborDraft.value);
+      row.__id = ospfNeighborModalMode.value === 'edit' ? String(ospfNeighborEditId.value) : nextBgpRowId('ospf-nbr');
+      row.address = String(row.address || '').trim();
+      row.pollInterval = String(row.pollInterval || '').trim();
+      row.priority = String(row.priority || '').trim();
+      if (!row.address) return;
+
+      const list = editingVrf.value.ospfNeighbors;
+      if (ospfNeighborModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(ospfNeighborEditId.value));
+        if (idx >= 0) list[idx] = row;
+      } else {
+        list.push(row);
+      }
+
+      ospfNeighborModalVisible.value = false;
+      ospfNeighborEditId.value = '';
+      ospfNeighborDraft.value = createOspfNeighborDraft();
+    }
+
+    function requestOspfNeighborDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfNeighborDeleteIds.value = selected;
+      ospfNeighborDeleteVisible.value = true;
+    }
+
+    function confirmOspfNeighborDelete() {
+      if (!editingVrf.value || !Array.isArray(editingVrf.value.ospfNeighbors)) return;
+      const idSet = new Set((pendingOspfNeighborDeleteIds.value || []).map(v => String(v)));
+      editingVrf.value.ospfNeighbors = editingVrf.value.ospfNeighbors.filter(item => !idSet.has(String(item.__id)));
+      ospfNeighborDeleteVisible.value = false;
+      pendingOspfNeighborDeleteIds.value = [];
+    }
+
+    function openOspfSummaryAddressCreate() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfSummaryAddresses)) editingVrf.value.ospfSummaryAddresses = [];
+      ospfSummaryAddressModalMode.value = 'create';
+      ospfSummaryAddressEditId.value = '';
+      ospfSummaryAddressDraft.value = createOspfSummaryAddressDraft();
+      ospfSummaryAddressModalVisible.value = true;
+    }
+
+    function openOspfSummaryAddressEdit(row) {
+      if (!editingVrf.value || !row || !row.__id) return;
+      ospfSummaryAddressModalMode.value = 'edit';
+      ospfSummaryAddressEditId.value = String(row.__id);
+      ospfSummaryAddressDraft.value = createOspfSummaryAddressDraft(row);
+      ospfSummaryAddressModalVisible.value = true;
+    }
+
+    function saveOspfSummaryAddressModal() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfSummaryAddresses)) editingVrf.value.ospfSummaryAddresses = [];
+      const row = createOspfSummaryAddressDraft(ospfSummaryAddressDraft.value);
+      row.__id = ospfSummaryAddressModalMode.value === 'edit' ? String(ospfSummaryAddressEditId.value) : nextBgpRowId('ospf-sum');
+      row.prefix = String(row.prefix || '').trim();
+      row.tag = String(row.tag || '').trim();
+      row.noAdvertise = !!row.noAdvertise;
+      if (!row.prefix) return;
+
+      const list = editingVrf.value.ospfSummaryAddresses;
+      if (ospfSummaryAddressModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(ospfSummaryAddressEditId.value));
+        if (idx >= 0) list[idx] = row;
+      } else {
+        list.push(row);
+      }
+
+      ospfSummaryAddressModalVisible.value = false;
+      ospfSummaryAddressEditId.value = '';
+      ospfSummaryAddressDraft.value = createOspfSummaryAddressDraft();
+    }
+
+    function requestOspfSummaryAddressDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfSummaryAddressDeleteIds.value = selected;
+      ospfSummaryAddressDeleteVisible.value = true;
+    }
+
+    function confirmOspfSummaryAddressDelete() {
+      if (!editingVrf.value || !Array.isArray(editingVrf.value.ospfSummaryAddresses)) return;
+      const idSet = new Set((pendingOspfSummaryAddressDeleteIds.value || []).map(v => String(v)));
+      editingVrf.value.ospfSummaryAddresses = editingVrf.value.ospfSummaryAddresses.filter(item => !idSet.has(String(item.__id)));
+      ospfSummaryAddressDeleteVisible.value = false;
+      pendingOspfSummaryAddressDeleteIds.value = [];
+    }
+
+    function getOspfSrPrefixFlagsPreview(row) {
+      const flags = [];
+      if (row?.explicitNull) flags.push('explicit-null');
+      if (row?.noPhpFlag) flags.push('no-php-flag');
+      return flags.join(', ');
+    }
+
+    function openOspfSrPrefixCreate() {
+      if (!editingVrf.value) return;
+      if (!editingVrf.value.ospfSegmentRouting || typeof editingVrf.value.ospfSegmentRouting !== 'object') {
+        editingVrf.value.ospfSegmentRouting = {
+          globalBlockLowLabelValue: '',
+          globalBlockHighLabelValue: '',
+          localBlockLowLabelValue: '',
+          localBlockHighLabelValue: '',
+          maximumLabelDepth: '',
+          prefixes: [],
+        };
+      }
+      if (!Array.isArray(editingVrf.value.ospfSegmentRouting.prefixes)) editingVrf.value.ospfSegmentRouting.prefixes = [];
+      ospfSrPrefixModalMode.value = 'create';
+      ospfSrPrefixEditId.value = '';
+      ospfSrPrefixDraft.value = createOspfSrPrefixDraft();
+      ospfSrPrefixModalVisible.value = true;
+    }
+
+    function openOspfSrPrefixEdit(row) {
+      if (!editingVrf.value || !row || !row.__id) return;
+      ospfSrPrefixModalMode.value = 'edit';
+      ospfSrPrefixEditId.value = String(row.__id);
+      ospfSrPrefixDraft.value = createOspfSrPrefixDraft(row);
+      ospfSrPrefixModalVisible.value = true;
+    }
+
+    function saveOspfSrPrefixModal() {
+      if (!editingVrf.value) return;
+      if (!editingVrf.value.ospfSegmentRouting || typeof editingVrf.value.ospfSegmentRouting !== 'object') {
+        editingVrf.value.ospfSegmentRouting = {
+          globalBlockLowLabelValue: '',
+          globalBlockHighLabelValue: '',
+          localBlockLowLabelValue: '',
+          localBlockHighLabelValue: '',
+          maximumLabelDepth: '',
+          prefixes: [],
+        };
+      }
+      if (!Array.isArray(editingVrf.value.ospfSegmentRouting.prefixes)) editingVrf.value.ospfSegmentRouting.prefixes = [];
+      const row = createOspfSrPrefixDraft(ospfSrPrefixDraft.value);
+      row.__id = ospfSrPrefixModalMode.value === 'edit' ? String(ospfSrPrefixEditId.value) : nextBgpRowId('ospf-sr-prefix');
+      row.prefix = String(row.prefix || '').trim();
+      row.indexValue = String(row.indexValue || '').trim();
+      row.explicitNull = !!row.explicitNull;
+      row.noPhpFlag = !!row.noPhpFlag;
+      if (!row.prefix) return;
+
+      const list = editingVrf.value.ospfSegmentRouting.prefixes;
+      if (ospfSrPrefixModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(ospfSrPrefixEditId.value));
+        if (idx >= 0) list[idx] = row;
+      } else {
+        list.push(row);
+      }
+
+      ospfSrPrefixModalVisible.value = false;
+      ospfSrPrefixEditId.value = '';
+      ospfSrPrefixDraft.value = createOspfSrPrefixDraft();
+    }
+
+    function requestOspfSrPrefixDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfSrPrefixDeleteIds.value = selected;
+      ospfSrPrefixDeleteVisible.value = true;
+    }
+
+    function confirmOspfSrPrefixDelete() {
+      const list = editingVrf.value?.ospfSegmentRouting?.prefixes;
+      if (!Array.isArray(list)) return;
+      const idSet = new Set((pendingOspfSrPrefixDeleteIds.value || []).map(v => String(v)));
+      editingVrf.value.ospfSegmentRouting.prefixes = list.filter(item => !idSet.has(String(item.__id)));
+      ospfSrPrefixDeleteVisible.value = false;
+      pendingOspfSrPrefixDeleteIds.value = [];
+    }
+
+    function ensureOspfRedistribute() {
+      if (!editingVrf.value) return null;
+      if (!editingVrf.value.ospfRedistribute || typeof editingVrf.value.ospfRedistribute !== 'object') {
+        editingVrf.value.ospfRedistribute = createOspfRedistributeDraft();
+      }
+      for (const protocol of OSPF_REDISTRIBUTE_PROTOCOLS) {
+        if (!editingVrf.value.ospfRedistribute[protocol] || typeof editingVrf.value.ospfRedistribute[protocol] !== 'object') {
+          editingVrf.value.ospfRedistribute[protocol] = createOspfRedistributeProtocolDraft();
+        }
+      }
+      if (!Array.isArray(editingVrf.value.ospfRedistribute.tables)) editingVrf.value.ospfRedistribute.tables = [];
+      return editingVrf.value.ospfRedistribute;
+    }
+
+    function openOspfRedistributeTableCreate() {
+      if (!ensureOspfRedistribute()) return;
+      ospfRedistributeTableModalMode.value = 'create';
+      ospfRedistributeTableEditId.value = '';
+      ospfRedistributeTableDraft.value = createOspfRedistributeTableDraft();
+      ospfRedistributeTableModalVisible.value = true;
+    }
+
+    function openOspfRedistributeTableEdit(row) {
+      if (!ensureOspfRedistribute() || !row || !row.__id) return;
+      ospfRedistributeTableModalMode.value = 'edit';
+      ospfRedistributeTableEditId.value = String(row.__id);
+      ospfRedistributeTableDraft.value = createOspfRedistributeTableDraft(row);
+      ospfRedistributeTableModalVisible.value = true;
+    }
+
+    function saveOspfRedistributeTableModal() {
+      const redist = ensureOspfRedistribute();
+      if (!redist) return;
+      const row = createOspfRedistributeTableDraft(ospfRedistributeTableDraft.value);
+      row.__id = ospfRedistributeTableModalMode.value === 'edit'
+        ? String(ospfRedistributeTableEditId.value)
+        : nextBgpRowId('ospf-redist-table');
+      row.table = String(row.table || '').trim();
+      row.metric = String(row.metric || '').trim();
+      row.metricType = String(row.metricType || '').trim();
+      row.routeMap = String(row.routeMap || '').trim();
+      if (!row.table) return;
+
+      const list = redist.tables;
+      if (ospfRedistributeTableModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(ospfRedistributeTableEditId.value));
+        if (idx >= 0) list[idx] = row;
+      } else {
+        list.push(row);
+      }
+      redist.tables = list.sort((a, b) => Number(a.table) - Number(b.table));
+
+      ospfRedistributeTableModalVisible.value = false;
+      ospfRedistributeTableEditId.value = '';
+      ospfRedistributeTableDraft.value = createOspfRedistributeTableDraft();
+    }
+
+    function requestOspfRedistributeTableDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfRedistributeTableDeleteIds.value = selected;
+      ospfRedistributeTableDeleteVisible.value = true;
+    }
+
+    function confirmOspfRedistributeTableDelete() {
+      const list = editingVrf.value?.ospfRedistribute?.tables;
+      if (!Array.isArray(list)) return;
+      const idSet = new Set((pendingOspfRedistributeTableDeleteIds.value || []).map(v => String(v)));
+      editingVrf.value.ospfRedistribute.tables = list.filter(item => !idSet.has(String(item.__id)));
+      ospfRedistributeTableDeleteVisible.value = false;
+      pendingOspfRedistributeTableDeleteIds.value = [];
+    }
+
+    function getOspfVirtualLinkAuthPreview(row) {
+      const authType = String(row?.authenticationType || '').trim();
+      if (authType === 'plaintext-password') return 'plaintext-password';
+      if (authType === 'md5') {
+        const keyId = String(row?.md5KeyId || '').trim();
+        return keyId ? `md5 key-id ${keyId}` : 'md5';
+      }
+      return '-';
+    }
+
+    function openOspfRangeCreate() {
+      if (!ospfAreaDraft.value) return;
+      if (!Array.isArray(ospfAreaDraft.value.ranges)) ospfAreaDraft.value.ranges = [];
+      ospfRangeModalMode.value = 'create';
+      ospfRangeEditId.value = '';
+      ospfRangeDraft.value = createOspfRangeDraft();
+      ospfRangeModalVisible.value = true;
+    }
+
+    function openOspfRangeEdit(row) {
+      if (!row || !row.__id || !ospfAreaDraft.value) return;
+      ospfRangeModalMode.value = 'edit';
+      ospfRangeEditId.value = String(row.__id);
+      ospfRangeDraft.value = createOspfRangeDraft(row);
+      ospfRangeModalVisible.value = true;
+    }
+
+    function saveOspfRangeModal() {
+      if (!ospfAreaDraft.value) return;
+      if (!Array.isArray(ospfAreaDraft.value.ranges)) ospfAreaDraft.value.ranges = [];
+      const row = createOspfRangeDraft(ospfRangeDraft.value);
+      row.__id = ospfRangeModalMode.value === 'edit' ? String(ospfRangeEditId.value) : nextBgpRowId('ospf-range');
+      row.prefix = String(row.prefix || '').trim();
+      row.cost = String(row.cost || '').trim();
+      row.substitute = String(row.substitute || '').trim();
+      row.notAdvertise = !!row.notAdvertise;
+      if (!row.prefix) return;
+
+      const list = ospfAreaDraft.value.ranges;
+      if (ospfRangeModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(ospfRangeEditId.value));
+        if (idx >= 0) list[idx] = row;
+      } else {
+        list.push(row);
+      }
+
+      ospfRangeModalVisible.value = false;
+      ospfRangeEditId.value = '';
+      ospfRangeDraft.value = createOspfRangeDraft();
+    }
+
+    function requestOspfRangeDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfRangeDeleteIds.value = selected;
+      ospfRangeDeleteVisible.value = true;
+    }
+
+    function confirmOspfRangeDelete() {
+      if (!ospfAreaDraft.value || !Array.isArray(ospfAreaDraft.value.ranges)) return;
+      const idSet = new Set((pendingOspfRangeDeleteIds.value || []).map(v => String(v)));
+      ospfAreaDraft.value.ranges = ospfAreaDraft.value.ranges.filter(item => !idSet.has(String(item.__id)));
+      ospfRangeDeleteVisible.value = false;
+      pendingOspfRangeDeleteIds.value = [];
+    }
+
+    function openOspfVirtualLinkCreate() {
+      if (!ospfAreaDraft.value) return;
+      if (!Array.isArray(ospfAreaDraft.value.virtualLinks)) ospfAreaDraft.value.virtualLinks = [];
+      ospfVirtualLinkModalMode.value = 'create';
+      ospfVirtualLinkEditId.value = '';
+      ospfVirtualLinkDraft.value = createOspfVirtualLinkDraft();
+      ospfVirtualLinkModalVisible.value = true;
+    }
+
+    function openOspfVirtualLinkEdit(row) {
+      if (!row || !row.__id || !ospfAreaDraft.value) return;
+      ospfVirtualLinkModalMode.value = 'edit';
+      ospfVirtualLinkEditId.value = String(row.__id);
+      ospfVirtualLinkDraft.value = createOspfVirtualLinkDraft(row);
+      ospfVirtualLinkModalVisible.value = true;
+    }
+
+    function saveOspfVirtualLinkModal() {
+      if (!ospfAreaDraft.value) return;
+      if (!Array.isArray(ospfAreaDraft.value.virtualLinks)) ospfAreaDraft.value.virtualLinks = [];
+      const row = createOspfVirtualLinkDraft(ospfVirtualLinkDraft.value);
+      row.__id = ospfVirtualLinkModalMode.value === 'edit' ? String(ospfVirtualLinkEditId.value) : nextBgpRowId('ospf-vl');
+      row.peer = String(row.peer || '').trim();
+      if (!row.peer) return;
+      row.authenticationType = String(row.authenticationType || '').trim();
+      row.md5KeyId = String(row.md5KeyId || '').trim();
+      row.md5Key = String(row.md5Key || '').trim();
+      row.plaintextPassword = String(row.plaintextPassword || '').trim();
+      row.deadInterval = String(row.deadInterval || '').trim();
+      row.helloInterval = String(row.helloInterval || '').trim();
+      row.retransmitInterval = String(row.retransmitInterval || '').trim();
+      row.retransmitWindow = String(row.retransmitWindow || '').trim();
+      row.transmitDelay = String(row.transmitDelay || '').trim();
+
+      if (row.authenticationType !== 'md5') {
+        row.md5KeyId = '';
+        row.md5Key = '';
+      }
+      if (row.authenticationType !== 'plaintext-password') {
+        row.plaintextPassword = '';
+      }
+
+      const list = ospfAreaDraft.value.virtualLinks;
+      if (ospfVirtualLinkModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(ospfVirtualLinkEditId.value));
+        if (idx >= 0) list[idx] = row;
+      } else {
+        list.push(row);
+      }
+
+      ospfVirtualLinkModalVisible.value = false;
+      ospfVirtualLinkEditId.value = '';
+      ospfVirtualLinkDraft.value = createOspfVirtualLinkDraft();
+    }
+
+    function requestOspfVirtualLinkDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfVirtualLinkDeleteIds.value = selected;
+      ospfVirtualLinkDeleteVisible.value = true;
+    }
+
+    function confirmOspfVirtualLinkDelete() {
+      if (!ospfAreaDraft.value || !Array.isArray(ospfAreaDraft.value.virtualLinks)) return;
+      const idSet = new Set((pendingOspfVirtualLinkDeleteIds.value || []).map(v => String(v)));
+      ospfAreaDraft.value.virtualLinks = ospfAreaDraft.value.virtualLinks.filter(item => !idSet.has(String(item.__id)));
+      ospfVirtualLinkDeleteVisible.value = false;
+      pendingOspfVirtualLinkDeleteIds.value = [];
+    }
+
+    function getOspfInterfaceAuthPreview(row) {
+      const authType = String(row?.authenticationType || '').trim();
+      if (authType === 'plaintext-password') return 'plaintext-password';
+      if (authType === 'md5') {
+        const keyId = String(row?.md5KeyId || '').trim();
+        return keyId ? `md5 key-id ${keyId}` : 'md5';
+      }
+      return '-';
+    }
+
+    function getOspfInterfaceTimersPreview(row) {
+      const parts = [];
+      const dead = String(row?.deadInterval || '').trim();
+      const hello = String(row?.helloInterval || '').trim();
+      const retransmit = String(row?.retransmitInterval || '').trim();
+      const transmitDelay = String(row?.transmitDelay || '').trim();
+      if (dead) parts.push(`dead=${dead}`);
+      if (hello) parts.push(`hello=${hello}`);
+      if (retransmit) parts.push(`rx=${retransmit}`);
+      if (transmitDelay) parts.push(`tx=${transmitDelay}`);
+      return parts.join(', ');
+    }
+
+    function getOspfInterfaceFlagsPreview(row) {
+      const parts = [];
+      if (row?.mtuIgnore) parts.push('mtu-ignore');
+      const passiveMode = String(row?.passiveMode || '').trim();
+      if (passiveMode === 'enable') parts.push('passive');
+      if (passiveMode === 'disable') parts.push('passive disable');
+      const ldpSyncMode = String(row?.ldpSyncMode || '').trim();
+      const ldpSyncHolddown = String(row?.ldpSyncHolddown || '').trim();
+      if (ldpSyncMode === 'enable') parts.push('ldp-sync');
+      if (ldpSyncMode === 'disable') parts.push('ldp-sync disable');
+      if (ldpSyncHolddown) parts.push(`ldp-sync holddown=${ldpSyncHolddown}`);
+      return parts.join(', ');
+    }
+
+    function openOspfInterfaceCreate() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfInterfaces)) editingVrf.value.ospfInterfaces = [];
+      ospfInterfaceModalMode.value = 'create';
+      ospfInterfaceEditId.value = '';
+      ospfInterfaceDraft.value = createOspfInterfaceDraft();
+      ospfInterfaceModalVisible.value = true;
+    }
+
+    function openOspfInterfaceEdit(row) {
+      if (!editingVrf.value || !row || !row.__id) return;
+      ospfInterfaceModalMode.value = 'edit';
+      ospfInterfaceEditId.value = String(row.__id);
+      ospfInterfaceDraft.value = createOspfInterfaceDraft(row);
+      ospfInterfaceModalVisible.value = true;
+    }
+
+    function saveOspfInterfaceModal() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfInterfaces)) editingVrf.value.ospfInterfaces = [];
+      const row = createOspfInterfaceDraft(ospfInterfaceDraft.value);
+      row.__id = ospfInterfaceModalMode.value === 'edit' ? String(ospfInterfaceEditId.value) : nextBgpRowId('ospf-if');
+      row.name = String(row.name || '').trim();
+      if (!row.name) return;
+      row.area = String(row.area || '').trim();
+      row.authenticationType = String(row.authenticationType || '').trim();
+      row.md5KeyId = String(row.md5KeyId || '').trim();
+      row.md5Key = String(row.md5Key || '').trim();
+      row.plaintextPassword = String(row.plaintextPassword || '').trim();
+      row.bandwidth = String(row.bandwidth || '').trim();
+      row.bfdProfile = String(row.bfdProfile || '').trim();
+      row.cost = String(row.cost || '').trim();
+      row.deadInterval = String(row.deadInterval || '').trim();
+      row.helloInterval = String(row.helloInterval || '').trim();
+      row.helloMultiplier = String(row.helloMultiplier || '').trim();
+      row.ldpSyncMode = String(row.ldpSyncMode || '').trim();
+      row.ldpSyncHolddown = String(row.ldpSyncHolddown || '').trim();
+      row.network = String(row.network || '').trim();
+      row.passiveMode = String(row.passiveMode || '').trim();
+      row.priority = String(row.priority || '').trim();
+      row.retransmitInterval = String(row.retransmitInterval || '').trim();
+      row.retransmitWindow = String(row.retransmitWindow || '').trim();
+      row.transmitDelay = String(row.transmitDelay || '').trim();
+      row.mtuIgnore = !!row.mtuIgnore;
+
+      if (row.authenticationType !== 'md5') {
+        row.md5KeyId = '';
+        row.md5Key = '';
+      }
+      if (row.authenticationType !== 'plaintext-password') {
+        row.plaintextPassword = '';
+      }
+
+      const list = editingVrf.value.ospfInterfaces;
+      if (ospfInterfaceModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(ospfInterfaceEditId.value));
+        if (idx >= 0) list[idx] = row;
+      } else {
+        list.push(row);
+      }
+
+      ospfInterfaceModalVisible.value = false;
+      ospfInterfaceEditId.value = '';
+      ospfInterfaceDraft.value = createOspfInterfaceDraft();
+    }
+
+    function requestOspfInterfaceDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfInterfaceDeleteIds.value = selected;
+      ospfInterfaceDeleteVisible.value = true;
+    }
+
+    function confirmOspfInterfaceDelete() {
+      if (!editingVrf.value || !Array.isArray(editingVrf.value.ospfInterfaces)) return;
+      const idSet = new Set((pendingOspfInterfaceDeleteIds.value || []).map(v => String(v)));
+      editingVrf.value.ospfInterfaces = editingVrf.value.ospfInterfaces.filter(item => !idSet.has(String(item.__id)));
+      ospfInterfaceDeleteVisible.value = false;
+      pendingOspfInterfaceDeleteIds.value = [];
+    }
+
+    function getOspfv3AreaTypePreview(row) {
+      const areaType = String(row?.areaType || '').trim();
+      if (areaType === 'nssa') {
+        const parts = ['nssa'];
+        if (row?.nssaDefaultInformationOriginate) parts.push('default-information-originate');
+        if (row?.nssaNoSummary) parts.push('no-summary');
+        return parts.join(', ');
+      }
+      if (areaType === 'stub') {
+        const parts = ['stub'];
+        if (row?.stubNoSummary) parts.push('no-summary');
+        return parts.join(', ');
+      }
+      return '-';
+    }
+
+    function getOspfv3AreaRangesPreview(row) {
+      const ranges = Array.isArray(row?.ranges) ? row.ranges : [];
+      return ranges.map((item) => {
+        const prefix = String(item?.prefix || '').trim();
+        if (!prefix) return '';
+        const action = String(item?.action || '').trim();
+        return action ? `${prefix} ${action}` : prefix;
+      }).filter(Boolean).join(' | ');
+    }
+
+    function getOspfv3InterfaceTimersPreview(row) {
+      const parts = [];
+      const dead = String(row?.deadInterval || '').trim();
+      const hello = String(row?.helloInterval || '').trim();
+      const retransmit = String(row?.retransmitInterval || '').trim();
+      const transmitDelay = String(row?.transmitDelay || '').trim();
+      if (dead) parts.push(`dead=${dead}`);
+      if (hello) parts.push(`hello=${hello}`);
+      if (retransmit) parts.push(`rx=${retransmit}`);
+      if (transmitDelay) parts.push(`tx=${transmitDelay}`);
+      return parts.join(', ');
+    }
+
+    function getOspfv3InterfaceFlagsPreview(row) {
+      const parts = [];
+      if (row?.mtuIgnore) parts.push('mtu-ignore');
+      if (row?.passive) parts.push('passive');
+      const instanceId = String(row?.instanceId || '').trim();
+      if (instanceId) parts.push(`instance-id=${instanceId}`);
+      const ifmtu = String(row?.ifmtu || '').trim();
+      if (ifmtu) parts.push(`ifmtu=${ifmtu}`);
+      const priority = String(row?.priority || '').trim();
+      if (priority) parts.push(`priority=${priority}`);
+      return parts.join(', ');
+    }
+
+    function openOspfv3AreaCreate() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfv3Areas)) editingVrf.value.ospfv3Areas = [];
+      ospfv3AreaModalMode.value = 'create';
+      ospfv3AreaEditId.value = '';
+      ospfv3AreaDraft.value = createOspfv3AreaDraft();
+      ospfv3AreaModalVisible.value = true;
+    }
+
+    function openOspfv3AreaEdit(row) {
+      if (!editingVrf.value || !row || !row.__id) return;
+      ospfv3AreaModalMode.value = 'edit';
+      ospfv3AreaEditId.value = String(row.__id);
+      ospfv3AreaDraft.value = createOspfv3AreaDraft(row);
+      ospfv3AreaModalVisible.value = true;
+    }
+
+    function saveOspfv3AreaModal() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfv3Areas)) editingVrf.value.ospfv3Areas = [];
+      const row = createOspfv3AreaDraft(ospfv3AreaDraft.value);
+      row.__id = ospfv3AreaModalMode.value === 'edit' ? String(ospfv3AreaEditId.value) : nextBgpRowId('ospfv3-area');
+      row.area = String(row.area || '').trim();
+      row.areaType = String(row.areaType || '').trim();
+      row.exportList = String(row.exportList || '').trim();
+      row.importList = String(row.importList || '').trim();
+      row.nssaDefaultInformationOriginate = !!row.nssaDefaultInformationOriginate;
+      row.nssaNoSummary = !!row.nssaNoSummary;
+      row.stubNoSummary = !!row.stubNoSummary;
+      row.ranges = (row.ranges || []).map((item) => {
+        const range = createOspfv3AreaRangeDraft(item);
+        range.__id = range.__id || nextBgpRowId('ospfv3-area-range');
+        range.prefix = String(range.prefix || '').trim();
+        range.action = String(range.action || '').trim();
+        return range;
+      }).filter(item => item.prefix);
+      if (!row.area) return;
+
+      if (row.areaType !== 'nssa') {
+        row.nssaDefaultInformationOriginate = false;
+        row.nssaNoSummary = false;
+      }
+      if (row.areaType !== 'stub') {
+        row.stubNoSummary = false;
+      }
+
+      const list = editingVrf.value.ospfv3Areas;
+      if (ospfv3AreaModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(ospfv3AreaEditId.value));
+        if (idx >= 0) list[idx] = row;
+      } else {
+        list.push(row);
+      }
+
+      ospfv3AreaModalVisible.value = false;
+      ospfv3AreaEditId.value = '';
+      ospfv3AreaDraft.value = createOspfv3AreaDraft();
+    }
+
+    function requestOspfv3AreaDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfv3AreaDeleteIds.value = selected;
+      ospfv3AreaDeleteVisible.value = true;
+    }
+
+    function confirmOspfv3AreaDelete() {
+      if (!editingVrf.value || !Array.isArray(editingVrf.value.ospfv3Areas)) return;
+      const idSet = new Set((pendingOspfv3AreaDeleteIds.value || []).map(v => String(v)));
+      editingVrf.value.ospfv3Areas = editingVrf.value.ospfv3Areas.filter(item => !idSet.has(String(item.__id)));
+      ospfv3AreaDeleteVisible.value = false;
+      pendingOspfv3AreaDeleteIds.value = [];
+    }
+
+    function openOspfv3AreaRangeCreate() {
+      if (!ospfv3AreaDraft.value) return;
+      if (!Array.isArray(ospfv3AreaDraft.value.ranges)) ospfv3AreaDraft.value.ranges = [];
+      ospfv3AreaRangeModalMode.value = 'create';
+      ospfv3AreaRangeEditId.value = '';
+      ospfv3AreaRangeDraft.value = createOspfv3AreaRangeDraft();
+      ospfv3AreaRangeModalVisible.value = true;
+    }
+
+    function openOspfv3AreaRangeEdit(row) {
+      if (!ospfv3AreaDraft.value || !row || !row.__id) return;
+      ospfv3AreaRangeModalMode.value = 'edit';
+      ospfv3AreaRangeEditId.value = String(row.__id);
+      ospfv3AreaRangeDraft.value = createOspfv3AreaRangeDraft(row);
+      ospfv3AreaRangeModalVisible.value = true;
+    }
+
+    function saveOspfv3AreaRangeModal() {
+      if (!ospfv3AreaDraft.value) return;
+      if (!Array.isArray(ospfv3AreaDraft.value.ranges)) ospfv3AreaDraft.value.ranges = [];
+      const row = createOspfv3AreaRangeDraft(ospfv3AreaRangeDraft.value);
+      row.__id = ospfv3AreaRangeModalMode.value === 'edit' ? String(ospfv3AreaRangeEditId.value) : nextBgpRowId('ospfv3-area-range');
+      row.prefix = String(row.prefix || '').trim();
+      row.action = String(row.action || '').trim();
+      if (!row.prefix) return;
+
+      const list = ospfv3AreaDraft.value.ranges;
+      if (ospfv3AreaRangeModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(ospfv3AreaRangeEditId.value));
+        if (idx >= 0) list[idx] = row;
+      } else {
+        list.push(row);
+      }
+      ospfv3AreaDraft.value.ranges = list.sort((a, b) => String(a.prefix || '').localeCompare(String(b.prefix || '')));
+      ospfv3AreaRangeModalVisible.value = false;
+      ospfv3AreaRangeEditId.value = '';
+      ospfv3AreaRangeDraft.value = createOspfv3AreaRangeDraft();
+    }
+
+    function requestOspfv3AreaRangeDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfv3AreaRangeDeleteIds.value = selected;
+      ospfv3AreaRangeDeleteVisible.value = true;
+    }
+
+    function confirmOspfv3AreaRangeDelete() {
+      if (!ospfv3AreaDraft.value || !Array.isArray(ospfv3AreaDraft.value.ranges)) return;
+      const idSet = new Set((pendingOspfv3AreaRangeDeleteIds.value || []).map(v => String(v)));
+      ospfv3AreaDraft.value.ranges = ospfv3AreaDraft.value.ranges.filter(item => !idSet.has(String(item.__id)));
+      ospfv3AreaRangeDeleteVisible.value = false;
+      pendingOspfv3AreaRangeDeleteIds.value = [];
+    }
+
+    function openOspfv3InterfaceCreate() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfv3Interfaces)) editingVrf.value.ospfv3Interfaces = [];
+      ospfv3InterfaceModalMode.value = 'create';
+      ospfv3InterfaceEditId.value = '';
+      ospfv3InterfaceDraft.value = createOspfv3InterfaceDraft();
+      ospfv3InterfaceModalVisible.value = true;
+    }
+
+    function openOspfv3InterfaceEdit(row) {
+      if (!editingVrf.value || !row || !row.__id) return;
+      ospfv3InterfaceModalMode.value = 'edit';
+      ospfv3InterfaceEditId.value = String(row.__id);
+      ospfv3InterfaceDraft.value = createOspfv3InterfaceDraft(row);
+      ospfv3InterfaceModalVisible.value = true;
+    }
+
+    function saveOspfv3InterfaceModal() {
+      if (!editingVrf.value) return;
+      if (!Array.isArray(editingVrf.value.ospfv3Interfaces)) editingVrf.value.ospfv3Interfaces = [];
+      const row = createOspfv3InterfaceDraft(ospfv3InterfaceDraft.value);
+      row.__id = ospfv3InterfaceModalMode.value === 'edit' ? String(ospfv3InterfaceEditId.value) : nextBgpRowId('ospfv3-if');
+      row.name = String(row.name || '').trim();
+      if (!row.name) return;
+      row.area = String(row.area || '').trim();
+      row.bfdProfile = String(row.bfdProfile || '').trim();
+      row.cost = String(row.cost || '').trim();
+      row.deadInterval = String(row.deadInterval || '').trim();
+      row.helloInterval = String(row.helloInterval || '').trim();
+      row.ifmtu = String(row.ifmtu || '').trim();
+      row.instanceId = String(row.instanceId || '').trim();
+      row.network = String(row.network || '').trim();
+      row.priority = String(row.priority || '').trim();
+      row.retransmitInterval = String(row.retransmitInterval || '').trim();
+      row.transmitDelay = String(row.transmitDelay || '').trim();
+      row.mtuIgnore = !!row.mtuIgnore;
+      row.passive = !!row.passive;
+
+      const list = editingVrf.value.ospfv3Interfaces;
+      if (ospfv3InterfaceModalMode.value === 'edit') {
+        const idx = list.findIndex(item => String(item.__id) === String(ospfv3InterfaceEditId.value));
+        if (idx >= 0) list[idx] = row;
+      } else {
+        list.push(row);
+      }
+
+      ospfv3InterfaceModalVisible.value = false;
+      ospfv3InterfaceEditId.value = '';
+      ospfv3InterfaceDraft.value = createOspfv3InterfaceDraft();
+    }
+
+    function requestOspfv3InterfaceDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfv3InterfaceDeleteIds.value = selected;
+      ospfv3InterfaceDeleteVisible.value = true;
+    }
+
+    function confirmOspfv3InterfaceDelete() {
+      if (!editingVrf.value || !Array.isArray(editingVrf.value.ospfv3Interfaces)) return;
+      const idSet = new Set((pendingOspfv3InterfaceDeleteIds.value || []).map(v => String(v)));
+      editingVrf.value.ospfv3Interfaces = editingVrf.value.ospfv3Interfaces.filter(item => !idSet.has(String(item.__id)));
+      ospfv3InterfaceDeleteVisible.value = false;
+      pendingOspfv3InterfaceDeleteIds.value = [];
+    }
+
+    function openOspfv3RedistributeCreate() {
+      if (!editingVrf.value) return;
+      if (!editingVrf.value.ospfv3Redistribute || typeof editingVrf.value.ospfv3Redistribute !== 'object') {
+        editingVrf.value.ospfv3Redistribute = createOspfv3RedistributeDraft();
+      }
+      const available = OSPFV3_REDISTRIBUTE_PROTOCOLS.find(protocol => !editingVrf.value.ospfv3Redistribute?.[protocol]?.enabled) || '';
+      ospfv3RedistributeModalMode.value = 'create';
+      ospfv3RedistributeEditId.value = '';
+      ospfv3RedistributeDraft.value = createOspfv3RedistributeRowDraft({ protocol: available });
+      ospfv3RedistributeModalVisible.value = true;
+    }
+
+    function openOspfv3RedistributeEdit(row) {
+      if (!editingVrf.value || !row || !row.__id) return;
+      const protocol = String(row.__id || '').trim();
+      if (!protocol) return;
+      const source = editingVrf.value.ospfv3Redistribute?.[protocol] || {};
+      ospfv3RedistributeModalMode.value = 'edit';
+      ospfv3RedistributeEditId.value = protocol;
+      ospfv3RedistributeDraft.value = createOspfv3RedistributeRowDraft({
+        __id: protocol,
+        protocol,
+        metric: source.metric,
+        metricType: source.metricType,
+        routeMap: source.routeMap,
+      });
+      ospfv3RedistributeModalVisible.value = true;
+    }
+
+    function saveOspfv3RedistributeModal() {
+      if (!editingVrf.value) return;
+      if (!editingVrf.value.ospfv3Redistribute || typeof editingVrf.value.ospfv3Redistribute !== 'object') {
+        editingVrf.value.ospfv3Redistribute = createOspfv3RedistributeDraft();
+      }
+      const row = createOspfv3RedistributeRowDraft(ospfv3RedistributeDraft.value);
+      const protocol = String(row.protocol || '').trim();
+      if (!OSPFV3_REDISTRIBUTE_PROTOCOLS.includes(protocol)) return;
+
+      const metric = String(row.metric || '').trim();
+      const metricType = String(row.metricType || '').trim();
+      const routeMap = String(row.routeMap || '').trim();
+
+      const target = editingVrf.value.ospfv3Redistribute[protocol] || createOspfv3RedistributeProtocolDraft();
+      target.enabled = true;
+      target.metric = metric;
+      target.metricType = metricType;
+      target.routeMap = routeMap;
+      editingVrf.value.ospfv3Redistribute[protocol] = target;
+
+      ospfv3RedistributeModalVisible.value = false;
+      ospfv3RedistributeEditId.value = '';
+      ospfv3RedistributeDraft.value = createOspfv3RedistributeRowDraft();
+    }
+
+    function requestOspfv3RedistributeDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingOspfv3RedistributeDeleteIds.value = selected;
+      ospfv3RedistributeDeleteVisible.value = true;
+    }
+
+    function confirmOspfv3RedistributeDelete() {
+      if (!editingVrf.value || !editingVrf.value.ospfv3Redistribute || typeof editingVrf.value.ospfv3Redistribute !== 'object') return;
+      const idSet = new Set((pendingOspfv3RedistributeDeleteIds.value || []).map(v => String(v)));
+      for (const protocol of OSPFV3_REDISTRIBUTE_PROTOCOLS) {
+        if (!idSet.has(String(protocol))) continue;
+        editingVrf.value.ospfv3Redistribute[protocol] = createOspfv3RedistributeProtocolDraft();
+      }
+      ospfv3RedistributeDeleteVisible.value = false;
+      pendingOspfv3RedistributeDeleteIds.value = [];
+    }
+
+    function createRpkiCacheDraft(source = null) {
+      return {
+        __id: source?.__id || '',
+        address: source?.address || '',
+        port: source?.port || '',
+        preference: source?.preference || '',
+        sourceAddress: source?.sourceAddress || '',
+        sshUsername: source?.sshUsername || '',
+        sshKey: source?.sshKey || '',
+      };
+    }
+
+    const rpkiCacheModalTitle = computed(() => `${rpkiCacheModalMode.value === 'edit' ? t('app.edit') : t('app.create')} ${t('vrf.protocols.rpkiCacheTitle')}`);
+
+    const rpkiCacheDeletePreview = computed(() => {
+      const idSet = new Set((pendingRpkiCacheDeleteIds.value || []).map(v => String(v)));
+      return (editingVrf.value?.rpkiCaches || [])
+        .filter(item => idSet.has(String(item.__id || '')))
+        .map(item => String(item?.address || '').trim() || '(empty)');
+    });
+
+    function openRpkiCacheCreate() {
+      if (!editingVrf.value) return;
+      rpkiCacheModalMode.value = 'create';
+      rpkiCacheEditId.value = '';
+      rpkiCacheDraft.value = createRpkiCacheDraft();
+      rpkiCacheModalVisible.value = true;
+    }
+
+    function openRpkiCacheEdit(row) {
+      if (!editingVrf.value || !row) return;
+      rpkiCacheModalMode.value = 'edit';
+      rpkiCacheEditId.value = String(row.__id || '');
+      rpkiCacheDraft.value = createRpkiCacheDraft(row);
+      rpkiCacheModalVisible.value = true;
+    }
+
+    function saveRpkiCacheModal() {
+      if (!editingVrf.value) return;
+      const draft = createRpkiCacheDraft(rpkiCacheDraft.value);
+      draft.address = String(draft.address || '').trim();
+      draft.port = String(draft.port || '').trim();
+      draft.preference = String(draft.preference || '').trim();
+      draft.sourceAddress = String(draft.sourceAddress || '').trim();
+      draft.sshUsername = String(draft.sshUsername || '').trim();
+      draft.sshKey = String(draft.sshKey || '').trim();
+      if (!draft.address) return;
+
+      if (!Array.isArray(editingVrf.value.rpkiCaches)) editingVrf.value.rpkiCaches = [];
+      const rows = editingVrf.value.rpkiCaches;
+      if (rpkiCacheModalMode.value === 'edit') {
+        const id = String(rpkiCacheEditId.value || '');
+        const idx = rows.findIndex(item => String(item?.__id || '') === id);
+        if (idx >= 0) {
+          rows[idx] = { ...rows[idx], ...draft, __id: id };
+        } else {
+          rows.push({ ...draft, __id: nextBgpRowId('rpki-cache') });
+        }
+      } else {
+        rows.push({ ...draft, __id: nextBgpRowId('rpki-cache') });
+      }
+
+      rpkiCacheModalVisible.value = false;
+      rpkiCacheEditId.value = '';
+      rpkiCacheDraft.value = createRpkiCacheDraft();
+    }
+
+    function requestRpkiCacheDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingRpkiCacheDeleteIds.value = selected;
+      rpkiCacheDeleteVisible.value = true;
+    }
+
+    function confirmRpkiCacheDelete() {
+      if (!editingVrf.value || !Array.isArray(editingVrf.value.rpkiCaches)) return;
+      const idSet = new Set((pendingRpkiCacheDeleteIds.value || []).map(v => String(v)));
+      editingVrf.value.rpkiCaches = editingVrf.value.rpkiCaches.filter(item => !idSet.has(String(item?.__id || '')));
+      rpkiCacheDeleteVisible.value = false;
+      pendingRpkiCacheDeleteIds.value = [];
+    }
+
+    function openFailoverRouteCreate() {
+      if (!editingVrf.value) return;
+      failoverRouteModalMode.value = 'create';
+      failoverRouteEditId.value = '';
+      failoverRouteDraft.value = createFailoverRouteDraft();
+      failoverRouteModalVisible.value = true;
+    }
+
+    function openFailoverRouteEdit(row) {
+      if (!editingVrf.value) return;
+      if (!row || !row.__id) return showError({ message: t('vrf.messages.selectOne') });
+      failoverRouteModalMode.value = 'edit';
+      failoverRouteEditId.value = String(row.__id);
+      failoverRouteDraft.value = createFailoverRouteDraft(row);
+      failoverRouteModalVisible.value = true;
+    }
+
+    function saveFailoverRouteModal() {
+      if (!editingVrf.value) return;
+      const list = editingVrf.value.failoverRoutes || [];
+      const draft = deepClone(failoverRouteDraft.value || {});
+      if (failoverRouteModalMode.value === 'create') {
+        draft.__id = nextBgpRowId('failover');
+        list.push(draft);
+      } else {
+        const idx = list.findIndex(item => String(item.__id) === String(failoverRouteEditId.value));
+        if (idx >= 0) list[idx] = { ...draft, __id: list[idx].__id };
+      }
+      editingVrf.value.failoverRoutes = list;
+      failoverRouteModalVisible.value = false;
+    }
+
+    function removeFailoverRoutesByIds(ids) {
+      if (!editingVrf.value || !Array.isArray(ids) || !ids.length) return;
+      const selected = new Set(ids);
+      editingVrf.value.failoverRoutes = (editingVrf.value.failoverRoutes || []).filter(row => !selected.has(row.__id));
+    }
+
+    function addFailoverCheckTarget(route) {
+      if (!route) return;
+      if (!Array.isArray(route.checkTargets)) route.checkTargets = [];
+      route.checkTargets.push({ __id: nextBgpRowId('failover-target'), address: '', interface: '', vrf: '' });
+    }
+
+    function removeFailoverCheckTarget(route, targetIndex) {
+      if (!route || !Array.isArray(route.checkTargets)) return;
+      route.checkTargets.splice(targetIndex, 1);
+      if (!route.checkTargets.length) route.checkTargets.push({ __id: nextBgpRowId('failover-target'), address: '', interface: '', vrf: '' });
+    }
+
+    function openFailoverCheckTargetCreate() {
+      if (!failoverRouteDraft.value) return;
+      failoverCheckTargetModalMode.value = 'create';
+      failoverCheckTargetEditId.value = '';
+      failoverCheckTargetDraft.value = createFailoverCheckTargetDraft();
+      failoverCheckTargetModalVisible.value = true;
+    }
+
+    function openFailoverCheckTargetEdit(row) {
+      if (!row) return;
+      failoverCheckTargetModalMode.value = 'edit';
+      failoverCheckTargetEditId.value = String(row.__id || '');
+      failoverCheckTargetDraft.value = createFailoverCheckTargetDraft(row);
+      failoverCheckTargetModalVisible.value = true;
+    }
+
+    function saveFailoverCheckTargetModal() {
+      if (!failoverRouteDraft.value) return;
+      if (!Array.isArray(failoverRouteDraft.value.checkTargets)) failoverRouteDraft.value.checkTargets = [];
+      const rows = failoverRouteDraft.value.checkTargets;
+      const draft = createFailoverCheckTargetDraft(failoverCheckTargetDraft.value);
+      draft.address = String(draft.address || '').trim();
+      draft.interface = String(draft.interface || '').trim();
+      draft.vrf = String(draft.vrf || '').trim();
+      if (!draft.address) return;
+
+      if (failoverCheckTargetModalMode.value === 'edit') {
+        const id = String(failoverCheckTargetEditId.value || '');
+        const idx = rows.findIndex(item => String(item?.__id || '') === id);
+        if (idx >= 0) {
+          rows[idx] = { ...rows[idx], ...draft, __id: id };
+        }
+      } else {
+        rows.push({ ...draft, __id: nextBgpRowId('failover-target') });
+      }
+
+      failoverCheckTargetModalVisible.value = false;
+      failoverCheckTargetEditId.value = '';
+      failoverCheckTargetDraft.value = createFailoverCheckTargetDraft();
+    }
+
+    function requestFailoverCheckTargetDelete(ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      pendingFailoverCheckTargetDeleteIds.value = selected;
+      failoverCheckTargetDeleteVisible.value = true;
+    }
+
+    function confirmFailoverCheckTargetDelete() {
+      if (!failoverRouteDraft.value || !Array.isArray(failoverRouteDraft.value.checkTargets)) return;
+      const idSet = new Set((pendingFailoverCheckTargetDeleteIds.value || []).map(v => String(v)));
+      failoverRouteDraft.value.checkTargets = failoverRouteDraft.value.checkTargets.filter(item => !idSet.has(String(item?.__id || '')));
+      if (!failoverRouteDraft.value.checkTargets.length) {
+        failoverRouteDraft.value.checkTargets = [{ __id: nextBgpRowId('failover-target'), address: '', interface: '', vrf: '' }];
+      }
+      failoverCheckTargetDeleteVisible.value = false;
+      pendingFailoverCheckTargetDeleteIds.value = [];
+    }
+
+    function addStaticRoute() {
+      if (!editingVrf.value) return;
+      editingVrf.value.staticRoutes.push({ __id: nextBgpRowId('static4'), prefix: '', nextHop: '', distance: '', interface: '', description: '', tag: '', blackhole: false, reject: false, disable: false, vrf: '', bfdProfile: '', bfdSourceAddress: '', nextHops: [{ address: '', distance: '', interface: '', disable: false, vrf: '', bfdProfile: '', bfdSourceAddress: '' }], interfaceRows: [], dhcpInterface: '' });
+    }
+
+    function removeStaticRoute(index) {
+      if (!editingVrf.value) return;
+      editingVrf.value.staticRoutes.splice(index, 1);
+    }
+
+    function addStaticRoute6() {
+      if (!editingVrf.value) return;
+      editingVrf.value.staticRoutes6.push({ __id: nextBgpRowId('static6'), prefix: '', nextHop: '', distance: '', interface: '', description: '', tag: '', blackhole: false, reject: false, disable: false, vrf: '', segments: '', bfdProfile: '', bfdSourceAddress: '', nextHops: [{ address: '', distance: '', interface: '', disable: false, vrf: '', segments: '', bfdProfile: '', bfdSourceAddress: '' }], interfaceRows: [], dhcpInterface: '' });
+    }
+
+    function addStaticNextHop(routeOrIndex) {
+      if (!editingVrf.value) return;
+      const routeIndex = typeof routeOrIndex === 'number'
+        ? routeOrIndex
+        : editingVrf.value.staticRoutes.findIndex(item => item.__id === routeOrIndex?.__id);
+      const row = editingVrf.value.staticRoutes?.[routeIndex];
+      if (!row) return;
+      if (!Array.isArray(row.nextHops)) row.nextHops = [];
+      row.nextHops.push({ address: '', distance: '', interface: '', disable: false, vrf: '', segments: '', bfdProfile: '', bfdSourceAddress: '' });
+    }
+
+    function removeStaticNextHop(routeOrIndex, nextHopIndex) {
+      if (!editingVrf.value) return;
+      const routeIndex = typeof routeOrIndex === 'number'
+        ? routeOrIndex
+        : editingVrf.value.staticRoutes.findIndex(item => item.__id === routeOrIndex?.__id);
+      const row = editingVrf.value.staticRoutes?.[routeIndex];
+      if (!row || !Array.isArray(row.nextHops)) return;
+      row.nextHops.splice(nextHopIndex, 1);
+      if (!row.nextHops.length) row.nextHops.push({ address: '', distance: '', interface: '', disable: false, vrf: '', segments: '', bfdProfile: '', bfdSourceAddress: '' });
+    }
+
+    function addStaticNextHop6(routeOrIndex) {
+      if (!editingVrf.value) return;
+      const routeIndex = typeof routeOrIndex === 'number'
+        ? routeOrIndex
+        : editingVrf.value.staticRoutes6.findIndex(item => item.__id === routeOrIndex?.__id);
+      const row = editingVrf.value.staticRoutes6?.[routeIndex];
+      if (!row) return;
+      if (!Array.isArray(row.nextHops)) row.nextHops = [];
+      row.nextHops.push({ address: '', distance: '', interface: '', disable: false, vrf: '', bfdProfile: '', bfdSourceAddress: '' });
+    }
+
+    function removeStaticNextHop6(routeOrIndex, nextHopIndex) {
+      if (!editingVrf.value) return;
+      const routeIndex = typeof routeOrIndex === 'number'
+        ? routeOrIndex
+        : editingVrf.value.staticRoutes6.findIndex(item => item.__id === routeOrIndex?.__id);
+      const row = editingVrf.value.staticRoutes6?.[routeIndex];
+      if (!row || !Array.isArray(row.nextHops)) return;
+      row.nextHops.splice(nextHopIndex, 1);
+      if (!row.nextHops.length) row.nextHops.push({ address: '', distance: '', interface: '', disable: false, vrf: '', bfdProfile: '', bfdSourceAddress: '' });
+    }
+
+    function removeStaticRoutesByIds(ids) {
+      if (!editingVrf.value || !Array.isArray(ids) || !ids.length) return;
+      const selected = new Set(ids);
+      editingVrf.value.staticRoutes = (editingVrf.value.staticRoutes || []).filter(row => !selected.has(row.__id));
+    }
+
+    function removeStaticRoutes6ByIds(ids) {
+      if (!editingVrf.value || !Array.isArray(ids) || !ids.length) return;
+      const selected = new Set(ids);
+      editingVrf.value.staticRoutes6 = (editingVrf.value.staticRoutes6 || []).filter(row => !selected.has(row.__id));
+    }
+
+    function requestStaticRouteDelete(kind, ids) {
+      const selected = Array.isArray(ids) ? ids.map(v => String(v)).filter(Boolean) : [];
+      if (!selected.length) return;
+      staticRouteDeleteKind.value = kind === 'ipv6' ? 'ipv6' : 'ipv4';
+      pendingStaticRouteDeleteIds.value = selected;
+      staticRouteDeleteVisible.value = true;
+    }
+
+    function confirmStaticRouteDelete() {
+      if (staticRouteDeleteKind.value === 'ipv6') {
+        removeStaticRoutes6ByIds(pendingStaticRouteDeleteIds.value);
+      } else {
+        removeStaticRoutesByIds(pendingStaticRouteDeleteIds.value);
+      }
+      staticRouteDeleteVisible.value = false;
+      pendingStaticRouteDeleteIds.value = [];
+    }
+
+    function openStaticRouteCreate(kind) {
+      if (!editingVrf.value) return;
+      staticRouteModalMode.value = 'create';
+      staticRouteModalKind.value = kind === 'ipv6' ? 'ipv6' : 'ipv4';
+      staticRouteEditId.value = '';
+      staticRouteDraft.value = createStaticRouteDraft(staticRouteModalKind.value);
+      staticRouteDraft.value.routeType = staticRouteDraft.value.routeType || 'next-hop';
+      setStaticRouteDraftType(staticRouteDraft.value.routeType);
+      staticRouteModalVisible.value = true;
+    }
+
+    function openStaticRouteEdit(kind, row) {
+      if (!editingVrf.value) return;
+      if (!row || !row.__id) return showError({ message: t('vrf.messages.selectOne') });
+      staticRouteModalMode.value = 'edit';
+      staticRouteModalKind.value = kind === 'ipv6' ? 'ipv6' : 'ipv4';
+      staticRouteEditId.value = String(row.__id);
+      staticRouteDraft.value = createStaticRouteDraft(staticRouteModalKind.value, row);
+      staticRouteDraft.value.routeType = staticRouteDraft.value.routeType || inferStaticRouteBranch(row, staticRouteModalKind.value);
+      setStaticRouteDraftType(staticRouteDraft.value.routeType);
+      staticRouteModalVisible.value = true;
+    }
+
+    function openStaticRouteCollectionCreate(type) {
+      if (!staticRouteDraft.value) return;
+      staticRouteCollectionModalMode.value = 'create';
+      staticRouteCollectionType.value = type === 'interface' ? 'interface' : 'next-hop';
+      staticRouteCollectionEditId.value = '';
+      staticRouteCollectionDraft.value = staticRouteCollectionType.value === 'interface'
+        ? { __id: '', name: '', distance: '', vrf: '', disable: false }
+        : { __id: '', address: '', distance: '', interface: '', disable: false, vrf: '', segments: '', bfdProfile: '', bfdSourceAddress: '' };
+      staticRouteCollectionModalVisible.value = true;
+    }
+
+    function openStaticRouteCollectionEdit(type, row) {
+      if (!staticRouteDraft.value || !row || !row.__id) return;
+      staticRouteCollectionModalMode.value = 'edit';
+      staticRouteCollectionType.value = type === 'interface' ? 'interface' : 'next-hop';
+      staticRouteCollectionEditId.value = String(row.__id);
+      staticRouteCollectionDraft.value = deepClone(row);
+      staticRouteCollectionModalVisible.value = true;
+    }
+
+    function saveStaticRouteCollectionModal() {
+      if (!staticRouteDraft.value) return;
+      const isInterface = staticRouteCollectionType.value === 'interface';
+      const listKey = isInterface ? 'interfaceRows' : 'nextHops';
+      if (!Array.isArray(staticRouteDraft.value[listKey])) staticRouteDraft.value[listKey] = [];
+      const row = deepClone(staticRouteCollectionDraft.value || {});
+      if (isInterface) {
+        row.__id = row.__id || nextBgpRowId('static-modal-if');
+        row.name = String(row.name || '').trim();
+        row.distance = String(row.distance || '').trim();
+        row.vrf = String(row.vrf || '').trim();
+        row.disable = !!row.disable;
+      } else {
+        row.__id = row.__id || nextBgpRowId('static-modal-nh');
+        row.address = String(row.address || '').trim();
+        row.distance = String(row.distance || '').trim();
+        row.interface = String(row.interface || '').trim();
+        row.vrf = String(row.vrf || '').trim();
+        row.segments = String(row.segments || '').trim();
+        row.bfdProfile = String(row.bfdProfile || '').trim();
+        row.bfdSourceAddress = String(row.bfdSourceAddress || '').trim();
+        row.disable = !!row.disable;
+      }
+
+      const list = staticRouteDraft.value[listKey];
+      if (staticRouteCollectionModalMode.value === 'create') {
+        list.push(row);
+      } else {
+        const targetId = String(staticRouteCollectionEditId.value || row.__id);
+        const idx = list.findIndex(item => String(item.__id) === targetId);
+        if (idx >= 0) list[idx] = row;
+      }
+
+      staticRouteCollectionModalVisible.value = false;
+      staticRouteCollectionEditId.value = '';
+      staticRouteCollectionDraft.value = {};
+    }
+
+    function requestStaticRouteCollectionDelete(type, ids) {
+      if (!staticRouteDraft.value || !Array.isArray(ids) || !ids.length) return;
+      staticRouteCollectionDeleteType.value = type === 'interface' ? 'interface' : 'next-hop';
+      pendingStaticRouteCollectionDeleteIds.value = ids.map(v => String(v));
+      staticRouteCollectionDeleteVisible.value = true;
+    }
+
+    function confirmStaticRouteCollectionDelete() {
+      if (!staticRouteDraft.value) return;
+      const listKey = staticRouteCollectionDeleteType.value === 'interface' ? 'interfaceRows' : 'nextHops';
+      if (!Array.isArray(staticRouteDraft.value[listKey])) staticRouteDraft.value[listKey] = [];
+      const selected = new Set((pendingStaticRouteCollectionDeleteIds.value || []).map(v => String(v)));
+      staticRouteDraft.value[listKey] = staticRouteDraft.value[listKey].filter(item => !selected.has(String(item.__id)));
+      staticRouteCollectionDeleteVisible.value = false;
+      pendingStaticRouteCollectionDeleteIds.value = [];
+    }
+
+    function addStaticRouteDraftNextHop() {
+      openStaticRouteCollectionCreate('next-hop');
+    }
+
+    function openStaticRouteDraftNextHopEdit(row) {
+      openStaticRouteCollectionEdit('next-hop', row);
+    }
+
+    function removeStaticRouteDraftNextHopsByIds(ids) {
+      requestStaticRouteCollectionDelete('next-hop', ids);
+    }
+
+    function addStaticRouteDraftInterfaceRow() {
+      openStaticRouteCollectionCreate('interface');
+    }
+
+    function openStaticRouteDraftInterfaceRowEdit(row) {
+      openStaticRouteCollectionEdit('interface', row);
+    }
+
+    function removeStaticRouteDraftInterfaceRowsByIds(ids) {
+      requestStaticRouteCollectionDelete('interface', ids);
+    }
+
+    function saveStaticRouteModal() {
+      if (!editingVrf.value) return;
+      const listKey = staticRouteModalKind.value === 'ipv6' ? 'staticRoutes6' : 'staticRoutes';
+      const list = editingVrf.value[listKey] || [];
+      const draft = deepClone(staticRouteDraft.value || {});
+      const routeMode = String(draft.routeType || inferStaticRouteBranch(draft, staticRouteModalKind.value)).trim();
+
+      if (routeMode === 'next-hop') {
+        const first = (draft.nextHops || [])[0] || {};
+        draft.nextHop = first.address || '';
+        draft.distance = first.distance || '';
+        draft.interface = first.interface || '';
+        draft.disable = !!first.disable;
+        draft.vrf = first.vrf || '';
+        draft.segments = first.segments || '';
+        draft.bfdProfile = first.bfdProfile || '';
+        draft.bfdSourceAddress = first.bfdSourceAddress || '';
+        draft.interfaceRows = [];
+        draft.dhcpInterface = '';
+        draft.blackhole = false;
+        draft.reject = false;
+      } else if (routeMode === 'interface') {
+        const first = (draft.interfaceRows || [])[0] || {};
+        draft.interface = first.name || '';
+        draft.distance = first.distance || '';
+        draft.vrf = first.vrf || '';
+        draft.disable = !!first.disable;
+        draft.nextHop = '';
+        draft.nextHops = [];
+        draft.dhcpInterface = '';
+        draft.blackhole = false;
+        draft.reject = false;
+      } else if (routeMode === 'dhcp-interface') {
+        draft.nextHop = '';
+        draft.nextHops = [];
+        draft.interface = '';
+        draft.interfaceRows = [];
+        draft.distance = '';
+        draft.vrf = '';
+        draft.disable = false;
+        draft.blackhole = false;
+        draft.reject = false;
+      } else if (routeMode === 'reject') {
+        draft.nextHop = '';
+        draft.nextHops = [];
+        draft.interface = '';
+        draft.interfaceRows = [];
+        draft.dhcpInterface = '';
+        draft.vrf = '';
+        draft.disable = false;
+        draft.blackhole = false;
+        draft.reject = true;
+      } else {
+        draft.nextHop = '';
+        draft.nextHops = [];
+        draft.interface = '';
+        draft.interfaceRows = [];
+        draft.dhcpInterface = '';
+        draft.vrf = '';
+        draft.disable = false;
+        draft.blackhole = true;
+        draft.reject = false;
+      }
+
+      if (staticRouteModalMode.value === 'create') {
+        draft.__id = nextBgpRowId(staticRouteModalKind.value === 'ipv6' ? 'static6' : 'static4');
+        list.push(draft);
+      } else {
+        const idx = list.findIndex(item => String(item.__id) === String(staticRouteEditId.value));
+        if (idx >= 0) list[idx] = { ...draft, __id: list[idx].__id };
+      }
+
+      editingVrf.value[listKey] = list;
+      staticRouteModalVisible.value = false;
+    }
+
+    function removeStaticRoute6(index) {
+      if (!editingVrf.value) return;
+      editingVrf.value.staticRoutes6.splice(index, 1);
+    }
+
+    function appendCliLine(fieldKey, value) {
+      if (!editingVrf.value || !value) return;
+      const line = String(value || '').trim();
+      if (!line) return;
+      const current = String(editingVrf.value[fieldKey] || '').trimEnd();
+      editingVrf.value[fieldKey] = current ? `${current}\n${line}` : line;
+    }
+
+    function appendProtocolBranchSnippet(protocol) {
+      if (!editingVrf.value) return;
+      const branch = protocolBranchState.value[protocol];
+      const snippets = getProtocolBranchSnippets(protocol, branch);
+      if (!snippets.length) return;
+      const current = getProtocolBranchText(protocol, branch);
+      const merged = current ? `${current}\n${snippets[0]}` : snippets[0];
+      setProtocolBranchText(protocol, branch, merged);
+    }
+
+    function appendProtocolBranchSnippetFor(protocol, branch) {
+      if (!editingVrf.value || !branch) return;
+      const snippets = getProtocolBranchSnippets(protocol, branch);
+      if (!snippets.length) return;
+      const current = getProtocolBranchText(protocol, branch);
+      const merged = current ? `${current}\n${snippets[0]}` : snippets[0];
+      setProtocolBranchText(protocol, branch, merged);
+    }
+
+    function clearCliField(fieldKey) {
+      if (!editingVrf.value) return;
+      editingVrf.value[fieldKey] = '';
+    }
+
+    function clearProtocolBranch(protocol) {
+      const branch = protocolBranchState.value[protocol];
+      setProtocolBranchText(protocol, branch, '');
+    }
+
+    function clearProtocolBranchFor(protocol, branch) {
+      if (!branch) return;
+      setProtocolBranchText(protocol, branch, '');
+    }
+
+    function getActiveBgpBranch() {
+      if (activeBgpBranchTab.value === 'address-family') {
+        return `address-family ${activeBgpAfBranchTab.value}`;
+      }
+      return activeBgpBranchTab.value;
+    }
+
+    function getActiveBgpBranchHelp() {
+      if (activeBgpBranchTab.value === 'address-family') {
+        return t(`vrf.bgp.help.address-family.${activeBgpAfBranchTab.value}`);
+      }
+      return t(`vrf.bgp.help.${activeBgpBranchTab.value}`);
+    }
+
+    function resetProtocolBranchState() {
+      protocolBranchState.value = {
+        bgp: 'system-as',
+        failover: 'route',
+        isis: 'net',
+        ospf: 'parameters',
+        ospfv3: 'parameters',
+        rpki: 'cache',
+        static: 'route',
+      };
+      activeBgpBranchTab.value = 'system-as';
+      activeBgpAfBranchTab.value = 'ipv4-unicast';
+      refreshOspfAdvancedItems();
+    }
+
+    function selectOspfBranch(branch) {
+      protocolBranchState.value.ospf = branch;
+      refreshOspfAdvancedItems();
+    }
+
     return {
       t,
       vrfList, loading, selectedNames,
       modalVisible, editingVrf, editingOriginalName, activeTab,
+      vrfModalTabsRoot, protocolIndicatorStyle, serviceIndicatorStyle,
+      activeProtocolTab,
+      activeBgpBranchTab, activeBgpAfBranchTab,
+      failoverSubTab, isisSubTab, ospfSubTab, ospfv3SubTab, rpkiSubTab, staticSubTab,
+      dhcpServerSubTab, dhcpv6ServerSubTab,
+      dhcpSharedNetworkInnerTab,
+      dhcpv6SharedNetworkInnerTab,
+      dhcpSharedNetworkModalTab,
+      dhcp4SharedSubnetModalTab,
+      dhcp6SharedSubnetModalTab,
+      dhcp6SharedSubnetRangeModalTab,
+      dhcp6SharedSubnetMappingModalTab,
+      protocolBranchState,
       deleteModalVisible, pendingDeleteNames,
-      columns, tabSchemas, path, writeDisabled, PROTOCOL_OPTIONS, TABS,
+      dhcpv6SharedNetworkModalTab,
+      bgpCollectionModalVisible, bgpCollectionDeleteVisible,
+      bgpVpnNetworkModalVisible, bgpVpnNetworkDeleteVisible,
+      bgpCollectionModalTitle, bgpCollectionType, bgpCollectionDraft, bgpCollectionDeletePreview,
+      bgpVpnNetworkModalTitle, bgpVpnNetworkDraft, bgpVpnNetworkDeletePreview,
+      failoverRouteModalVisible, failoverRouteModalTitle, failoverRouteDraft,
+      DHCPV6_SHARED_NETWORK_MODAL_TABS,
+      failoverCheckTargetModalVisible, failoverCheckTargetModalTitle, failoverCheckTargetDraft,
+      failoverCheckTargetDeleteVisible, failoverCheckTargetDeletePreview,
+      serviceCollectionModalVisible, serviceCollectionModalTitle, serviceCollectionType, serviceCollectionDraft,
+      staticRouteModalVisible, staticRouteModalTitle, staticRouteDraft, staticRouteModalKind, staticRouteModalMode,
+      staticRouteCollectionModalVisible, staticRouteCollectionModalTitle, staticRouteCollectionType, staticRouteCollectionDraft,
+      staticRouteCollectionDeleteVisible, staticRouteCollectionDeletePreview,
+      staticRouteDeleteVisible, staticRouteDeleteKind, staticRouteDeletePreview,
+      ospfAreaModalVisible, ospfAreaModalTitle, ospfAreaDraft,
+      ospfAreaDeleteVisible, ospfAreaDeletePreview,
+      ospfAccessListModalVisible, ospfAccessListModalTitle, ospfAccessListDraft,
+      ospfAccessListDeleteVisible, ospfAccessListDeletePreview,
+      ospfNeighborModalVisible, ospfNeighborModalTitle, ospfNeighborDraft,
+      ospfNeighborDeleteVisible, ospfNeighborDeletePreview,
+      ospfSummaryAddressModalVisible, ospfSummaryAddressModalTitle, ospfSummaryAddressDraft,
+      ospfSummaryAddressDeleteVisible, ospfSummaryAddressDeletePreview,
+      ospfSrPrefixModalVisible, ospfSrPrefixModalTitle, ospfSrPrefixDraft,
+      ospfSrPrefixDeleteVisible, ospfSrPrefixDeletePreview,
+      ospfRedistributeTableModalVisible, ospfRedistributeTableModalTitle, ospfRedistributeTableDraft,
+      ospfRedistributeTableDeleteVisible, ospfRedistributeTableDeletePreview,
+      ospfInterfaceModalVisible, ospfInterfaceModalTitle, ospfInterfaceDraft,
+      ospfInterfaceDeleteVisible, ospfInterfaceDeletePreview,
+      ospfRangeModalVisible, ospfRangeModalTitle, ospfRangeDraft,
+      ospfRangeDeleteVisible, ospfRangeDeletePreview,
+      ospfVirtualLinkModalVisible, ospfVirtualLinkModalTitle, ospfVirtualLinkDraft,
+      ospfVirtualLinkDeleteVisible, ospfVirtualLinkDeletePreview,
+      ospfv3AreaModalVisible, ospfv3AreaModalTitle, ospfv3AreaDraft,
+      ospfv3AreaDeleteVisible, ospfv3AreaDeletePreview,
+      ospfv3AreaRangeModalVisible, ospfv3AreaRangeModalTitle, ospfv3AreaRangeDraft,
+      ospfv3AreaRangeDeleteVisible, ospfv3AreaRangeDeletePreview,
+      ospfv3InterfaceModalVisible, ospfv3InterfaceModalTitle, ospfv3InterfaceDraft,
+      ospfv3InterfaceDeleteVisible, ospfv3InterfaceDeletePreview,
+      ospfv3RedistributeModalVisible, ospfv3RedistributeModalTitle, ospfv3RedistributeDraft,
+      ospfv3RedistributeDeleteVisible, ospfv3RedistributeDeletePreview,
+      isisInterfaceModalVisible, isisInterfaceModalTitle, isisInterfaceDraft,
+      isisInterfaceDeleteVisible, isisInterfaceDeletePreview,
+      isisFastRerouteModalVisible, isisFastRerouteModalTitle, isisFastRerouteDraft,
+      isisFastRerouteDeleteVisible, isisFastRerouteDeletePreview,
+      isisRedistributeModalVisible, isisRedistributeModalTitle, isisRedistributeDraft,
+      isisRedistributeDeleteVisible, isisRedistributeDeletePreview,
+      rpkiCacheModalVisible, rpkiCacheModalTitle, rpkiCacheDraft,
+      rpkiCacheDeleteVisible, rpkiCacheDeletePreview,
+      ospfItemModalVisible, ospfItemModalTitle, ospfItemDraft,
+      ospfItemDeleteVisible, ospfItemDeletePreview,
+      bgpNeighborModalTab, bgpNeighborModalAfTab, bgpPeerGroupModalTab, bgpPeerGroupModalAfTab,
+      evpnVniModalVisible, evpnVniDraft,
+      columns, tabSchemas, path, writeDisabled, TABS, PROTOCOL_TABS, BGP_BRANCH_TABS, BGP_AF_TABS,
+      BGP_NEIGHBOR_MODAL_TABS, BGP_PEER_GROUP_MODAL_TABS, BGP_PEER_GROUP_AF_TABS,
+      FAILOVER_SUB_TABS, ISIS_SUB_TABS, OSPF_SUB_TABS, OSPFV3_SUB_TABS, RPKI_SUB_TABS, STATIC_SUB_TABS,
+      DHCP_SERVER_SUB_TABS, DHCPV6_SERVER_SUB_TABS,
+      DHCP_SHARED_NETWORK_INNER_TABS,
+      DHCP_SHARED_NETWORK_MODAL_TABS,
+      DHCP4_SHARED_SUBNET_MODAL_TABS,
+      DHCPV6_SHARED_SUBNET_MODAL_TABS,
+      DHCPV6_SHARED_SUBNET_NESTED_MODAL_TABS,
+      DHCPV6_SHARED_NETWORK_INNER_TABS,
+      BGP_NEIGHBOR_TABLE_COLUMNS, BGP_PEER_GROUP_TABLE_COLUMNS, BGP_INTERFACE_TABLE_COLUMNS, BGP_LISTEN_TABLE_COLUMNS, BGP_BMP_TABLE_COLUMNS, EVPN_VNI_TABLE_COLUMNS,
+      evpnVniRows, openEvpnVniCreate, openEvpnVniEdit, saveEvpnVniModal, removeEvpnVniByIds,
+      OSPF_ADVANCED_ITEM_TABLE_COLUMNS, OSPF_AREA_TABLE_COLUMNS, OSPF_ACCESS_LIST_TABLE_COLUMNS, OSPF_NEIGHBOR_TABLE_COLUMNS, OSPF_SUMMARY_ADDRESS_TABLE_COLUMNS, OSPF_SR_PREFIX_TABLE_COLUMNS, OSPF_REDISTRIBUTE_PROTOCOLS, OSPF_REDISTRIBUTE_TABLE_COLUMNS, OSPF_INTERFACE_TABLE_COLUMNS, OSPF_AREA_RANGE_TABLE_COLUMNS, OSPF_AREA_VIRTUAL_LINK_TABLE_COLUMNS,
+      OSPFV3_REDISTRIBUTE_PROTOCOLS, OSPFV3_REDISTRIBUTE_TABLE_COLUMNS,
+      ISIS_REDISTRIBUTE_PROTOCOLS, ISIS_TOPOLOGY_OPTIONS,
+      ISIS_INTERFACE_TABLE_COLUMNS, ISIS_FAST_REROUTE_TABLE_COLUMNS, ISIS_REDISTRIBUTE_TABLE_COLUMNS,
+      RPKI_CACHE_TABLE_COLUMNS,
+      OSPFV3_AREA_TABLE_COLUMNS, OSPFV3_AREA_RANGE_TABLE_COLUMNS, OSPFV3_INTERFACE_TABLE_COLUMNS,
+      FAILOVER_ROUTE_TABLE_COLUMNS,
+      FAILOVER_CHECK_TARGET_TABLE_COLUMNS,
+      DHCP_LISTEN_ADDRESS_TABLE_COLUMNS, DHCP_LISTEN_INTERFACE_TABLE_COLUMNS,
+      DHCP_CLIENT_CLASS_TABLE_COLUMNS, DHCP_SHARED_NETWORK_TABLE_COLUMNS, DHCPV6_SHARED_NETWORK_TABLE_COLUMNS,
+      DHCPV6_GLOBAL_NAME_SERVER_TABLE_COLUMNS, DHCPV6_SHARED_OPTION_TABLE_COLUMNS,
+      DHCPV6_SHARED_SUBNET_TABLE_COLUMNS,
+      DHCPV6_SUBNET_RANGE_TABLE_COLUMNS, DHCPV6_SUBNET_MAPPING_TABLE_COLUMNS,
+      DHCPV6_SUBNET_DELEGATION_TABLE_COLUMNS, DHCPV6_SUBNET_OPTION_TABLE_COLUMNS,
+      DHCP_DDNS_DOMAIN_TABLE_COLUMNS, DHCP_DDNS_TSIG_TABLE_COLUMNS,
+      DHCP_SHARED_NETWORK_SUBNET_TABLE_COLUMNS, DHCP_SHARED_NETWORK_OPTION_TABLE_COLUMNS, DHCP_SHARED_NETWORK_STATIC_ROUTE_TABLE_COLUMNS,
+      DHCP_SHARED_SUBNET_RANGE_TABLE_COLUMNS, DHCP_SHARED_SUBNET_MAPPING_TABLE_COLUMNS, DHCP_SHARED_SUBNET_OPTION_TABLE_COLUMNS,
+      STATIC_ROUTE_TABLE_COLUMNS, STATIC_ROUTE6_TABLE_COLUMNS,
+      STATIC_MODAL_NEXTHOP_TABLE_COLUMNS, STATIC_MODAL_NEXTHOP_TABLE_COLUMNS_IPV6, STATIC_MODAL_INTERFACE_TABLE_COLUMNS,
+      BGP_NEIGHBOR_LOCAL_ROLE_OPTIONS, BGP_NEIGHBOR_GRACEFUL_RESTART_OPTIONS,
+      BGP_COLLECTION_TABLE_ACTIONS, STATIC_COLLECTION_TABLE_ACTIONS, FAILOVER_COLLECTION_TABLE_ACTIONS,
+      STATIC_MODAL_COLLECTION_TABLE_ACTIONS, OSPF_ADVANCED_ITEM_TABLE_ACTIONS,
+      BGP_VPN_NETWORK_TABLE_ACTIONS,
+      ospfAdvancedItems,
+      bgpVpnNetworkRows,
+      hasDhcpSharedNetworkDdnsSettings,
+      routeMapOptions, interfaceOptions, bfdProfileOptions, vrfNameOptions, IP_PROTOCOL_OPTIONS, IPV6_PROTOCOL_OPTIONS,
+      DHCP4_SHARED_OPTION_NAMES,
+      DHCP6_SHARED_OPTION_FIELDS,
       load, create, edit, remove, confirmRemove, save,
       addIpProtocol, removeIpProtocol, addIpv6Protocol, removeIpv6Protocol,
+      addBgpNeighbor, removeBgpNeighbor, addBgpPeerGroup, removeBgpPeerGroup, addBgpListenRange, removeBgpListenRange,
+      addBgpInterface, removeBgpInterface, addBgpBmpTarget, removeBgpBmpTarget,
+      openBgpCollectionCreate, openBgpCollectionEdit, saveBgpCollectionModal,
+      requestBgpCollectionDelete, confirmBgpCollectionDelete,
+      openBgpVpnNetworkCreate, openBgpVpnNetworkEdit, saveBgpVpnNetworkModal,
+      requestBgpVpnNetworkDelete, confirmBgpVpnNetworkDelete,
+      openFailoverRouteCreate, openFailoverRouteEdit, saveFailoverRouteModal,
+      removeFailoverRoutesByIds, addFailoverCheckTarget, removeFailoverCheckTarget,
+      openFailoverCheckTargetCreate, openFailoverCheckTargetEdit, saveFailoverCheckTargetModal,
+      requestFailoverCheckTargetDelete, confirmFailoverCheckTargetDelete,
+      openServiceCollectionCreate, openServiceCollectionEdit, saveServiceCollectionModal,
+      openDhcp4SharedStaticRouteCreateFromSharedNetwork,
+      openDhcp4SharedStaticRouteEditFromSharedNetwork,
+      removeDhcp4SharedStaticRouteFromSharedNetwork,
+      openDhcp4SharedSubnetCreateFromSharedNetwork,
+      openDhcp4SharedSubnetEditFromSharedNetwork,
+      removeDhcp4SharedSubnetFromSharedNetwork,
+      openDhcp4SharedSubnetRangeCreateFromSubnet,
+      openDhcp4SharedSubnetRangeEditFromSubnet,
+      removeDhcp4SharedSubnetRangeFromSubnet,
+      openDhcp4SharedSubnetMappingCreateFromSubnet,
+      openDhcp4SharedSubnetMappingEditFromSubnet,
+      removeDhcp4SharedSubnetMappingFromSubnet,
+      openDhcp4SharedSubnetOptionCreateFromSubnet,
+      openDhcp4SharedSubnetOptionEditFromSubnet,
+      removeDhcp4SharedSubnetOptionFromSubnet,
+      openDhcp4SharedSubnetRangeOptionCreateFromRange,
+      openDhcp4SharedSubnetRangeOptionEditFromRange,
+      openDhcp4SharedSubnetMappingOptionCreateFromMapping,
+      openDhcp4SharedSubnetMappingOptionEditFromMapping,
+      openDhcp6SharedSubnetRangeOptionCreateFromRange,
+      openDhcp6SharedSubnetRangeOptionEditFromRange,
+      openDhcp6SharedSubnetMappingOptionCreateFromMapping,
+      openDhcp6SharedSubnetMappingOptionEditFromMapping,
+      openDhcp6SharedSubnetCreateFromSharedNetwork,
+      openDhcp6SharedSubnetEditFromSharedNetwork,
+      removeDhcp6SharedSubnetFromSharedNetwork,
+      openDhcp6SharedSubnetRangeCreateFromSubnet,
+      openDhcp6SharedSubnetRangeEditFromSubnet,
+      removeDhcp6SharedSubnetRangeFromSubnet,
+      openDhcp6SharedSubnetMappingCreateFromSubnet,
+      openDhcp6SharedSubnetMappingEditFromSubnet,
+      removeDhcp6SharedSubnetMappingFromSubnet,
+      openDhcp6SharedSubnetDelegationCreateFromSubnet,
+      openDhcp6SharedSubnetDelegationEditFromSubnet,
+      removeDhcp6SharedSubnetDelegationFromSubnet,
+      openDhcp6SharedSubnetOptionCreateFromSubnet,
+      openDhcp6SharedSubnetOptionEditFromSubnet,
+      removeDhcp6SharedSubnetOptionFromSubnet,
+      removeServiceCollectionByIds,
+      openStaticRouteCreate, openStaticRouteEdit, saveStaticRouteModal,
+      addStaticRouteDraftNextHop, removeStaticRouteDraftNextHopsByIds,
+      openStaticRouteDraftNextHopEdit,
+      addStaticRouteDraftInterfaceRow, removeStaticRouteDraftInterfaceRowsByIds,
+      openStaticRouteDraftInterfaceRowEdit,
+      saveStaticRouteCollectionModal, confirmStaticRouteCollectionDelete,
+      openOspfAreaCreate, openOspfAreaEdit, saveOspfAreaModal, requestOspfAreaDelete, confirmOspfAreaDelete,
+      openOspfAccessListCreate, openOspfAccessListEdit, saveOspfAccessListModal,
+      requestOspfAccessListDelete, confirmOspfAccessListDelete,
+      openOspfNeighborCreate, openOspfNeighborEdit, saveOspfNeighborModal,
+      requestOspfNeighborDelete, confirmOspfNeighborDelete,
+      openOspfSummaryAddressCreate, openOspfSummaryAddressEdit, saveOspfSummaryAddressModal,
+      requestOspfSummaryAddressDelete, confirmOspfSummaryAddressDelete,
+      openOspfSrPrefixCreate, openOspfSrPrefixEdit, saveOspfSrPrefixModal,
+      requestOspfSrPrefixDelete, confirmOspfSrPrefixDelete,
+      openOspfRedistributeTableCreate, openOspfRedistributeTableEdit, saveOspfRedistributeTableModal,
+      requestOspfRedistributeTableDelete, confirmOspfRedistributeTableDelete,
+      openOspfInterfaceCreate, openOspfInterfaceEdit, saveOspfInterfaceModal,
+      requestOspfInterfaceDelete, confirmOspfInterfaceDelete,
+      openOspfRangeCreate, openOspfRangeEdit, saveOspfRangeModal,
+      requestOspfRangeDelete, confirmOspfRangeDelete,
+      openOspfVirtualLinkCreate, openOspfVirtualLinkEdit, saveOspfVirtualLinkModal,
+      requestOspfVirtualLinkDelete, confirmOspfVirtualLinkDelete,
+      openOspfv3AreaCreate, openOspfv3AreaEdit, saveOspfv3AreaModal,
+      requestOspfv3AreaDelete, confirmOspfv3AreaDelete,
+      openOspfv3AreaRangeCreate, openOspfv3AreaRangeEdit, saveOspfv3AreaRangeModal,
+      requestOspfv3AreaRangeDelete, confirmOspfv3AreaRangeDelete,
+      openOspfv3InterfaceCreate, openOspfv3InterfaceEdit, saveOspfv3InterfaceModal,
+      requestOspfv3InterfaceDelete, confirmOspfv3InterfaceDelete,
+      ospfv3RedistributeRows,
+      openOspfv3RedistributeCreate, openOspfv3RedistributeEdit, saveOspfv3RedistributeModal,
+      requestOspfv3RedistributeDelete, confirmOspfv3RedistributeDelete,
+      isisInterfaceRows,
+      openIsisInterfaceCreate, openIsisInterfaceEdit, saveIsisInterfaceModal,
+      requestIsisInterfaceDelete, confirmIsisInterfaceDelete,
+      isisFastRerouteRows,
+      openIsisFastRerouteCreate, openIsisFastRerouteEdit, saveIsisFastRerouteModal,
+      requestIsisFastRerouteDelete, confirmIsisFastRerouteDelete,
+      isisRedistributeRows,
+      openIsisRedistributeCreate, openIsisRedistributeEdit, saveIsisRedistributeModal,
+      requestIsisRedistributeDelete, confirmIsisRedistributeDelete,
+      openRpkiCacheCreate, openRpkiCacheEdit, saveRpkiCacheModal,
+      requestRpkiCacheDelete, confirmRpkiCacheDelete,
+      getOspfv3AreaTypePreview, getOspfv3AreaRangesPreview,
+      getOspfv3InterfaceTimersPreview, getOspfv3InterfaceFlagsPreview,
+      getOspfAreaNetworksPreview, getOspfAreaRangesPreview, getOspfAreaVirtualLinksPreview, getOspfVirtualLinkAuthPreview,
+      getOspfAccessListExportPreview,
+      getOspfSrPrefixFlagsPreview,
+      getOspfInterfaceAuthPreview, getOspfInterfaceTimersPreview, getOspfInterfaceFlagsPreview,
+      addStaticRoute, removeStaticRoute, addStaticRoute6, removeStaticRoute6,
+      addStaticNextHop, removeStaticNextHop, addStaticNextHop6, removeStaticNextHop6,
+      removeStaticRoutesByIds, removeStaticRoutes6ByIds,
+      requestStaticRouteDelete, confirmStaticRouteDelete,
+      appendCliLine, clearCliField,
+      inferStaticRouteBranch,
+      setStaticRouteDraftType,
+      getStaticModalLabel,
+      getStaticRouteTagRangeHint,
+      getProtocolBranchOptions, getProtocolBranchHelp, getProtocolBranchText, setProtocolBranchText,
+      getProtocolScalarValue, setProtocolScalarValue,
+      getProtocolPresence, setProtocolPresence,
+      getProtocolLeafSetValue, setProtocolLeafSetValue,
+      getBgpFieldValue, setBgpFieldValue,
+      getBgpVpnNetworkEntriesText, setBgpVpnNetworkEntriesText,
+      getBgpVpnNetworkRowsForAf,
+      addBgpVpnNetworkRow,
+      updateBgpVpnNetworkRowField,
+      removeBgpVpnNetworkRows,
+      getAvailableIpProtocolOptions, getAvailableIpv6ProtocolOptions,
+      getDhcp4SharedOptionValuePlaceholder,
+      getDhcp4SharedOptionHint,
+      getDhcp4SubnetOptionNameChoices,
+      getDhcp6SubnetOptionNameChoices,
+      getDhcp6SharedOptionHint,
+      getDhcp6OptionFieldHint,
+      getDhcp4SharedOptionInputType,
+      getDhcp4SharedOptionInputMin,
+      getDhcp4SharedOptionInputMax,
+      getEvpnHint,
+      getDhcpServerListenAddressText,
+      setDhcpServerListenAddressText,
+      getDhcpServerListenInterfaceText,
+      setDhcpServerListenInterfaceText,
+      getDhcpv6ServerListenInterfaceText,
+      setDhcpv6ServerListenInterfaceText,
+      getDhcpv6GlobalNameServerText,
+      setDhcpv6GlobalNameServerText,
+      appendProtocolBranchSnippet, appendProtocolBranchSnippetFor,
+      clearProtocolBranch, clearProtocolBranchFor,
+      updateOspfAdvancedItems,
+      openOspfAdvancedItemCreate, openOspfAdvancedItemEdit, saveOspfAdvancedItemModal,
+      requestOspfAdvancedItemsDelete, confirmOspfAdvancedItemsDelete,
+      appendOspfAdvancedSnippetItem, clearOspfAdvancedBranch, getOspfAdvancedItemPreview,
+      selectOspfBranch,
+      getActiveBgpBranch, getActiveBgpBranchHelp,
     };
   },
   template: `
-    <div class="page-container">
+    <div class="page-container vrf-page">
       <div class="section">
         <div class="toolbar">
           <div class="toolbar-left">
@@ -317,9 +11262,33 @@ export default defineComponent({
                    @selection-change="selectedNames = $event" :selectable="true" :externalToolbar="true" row-key="name">
         </DataTable>
       </div>
-      <div class="section">
-      </div>
-      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalName ? t('vrf.buttons.edit') : t('vrf.buttons.create')" width="800px" @confirm="save">
+      <div>
+      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalName ? '编辑VRF' : '创建VRF'" width="980px" @confirm="save">
+        <div ref="vrfModalTabsRoot" style="position:relative;">
+        <div style="position:relative;padding:4px 16px 0 16px;margin-bottom:-1px;height:24px;">
+          <div :style="{ position: 'absolute', left: protocolIndicatorStyle.left, right: protocolIndicatorStyle.right, top: '2px', display: 'flex', alignItems: 'center', gap: '10px' }">
+            <div style="flex:1;position:relative;height:22px;">
+              <div style="position:absolute;left:0;right:0;top:50%;border-top:1px solid #a9a9a9;"></div>
+              <div style="position:absolute;left:0;top:50%;bottom:0;border-left:1px solid #a9a9a9;"></div>
+            </div>
+            <div style="font-size:14px;font-weight:500;color:#8a8a8a;line-height:1;">协议</div>
+            <div style="flex:1;position:relative;height:22px;">
+              <div style="position:absolute;left:0;right:0;top:50%;border-top:1px solid #a9a9a9;"></div>
+              <div style="position:absolute;right:0;top:50%;bottom:0;border-right:1px solid #a9a9a9;"></div>
+            </div>
+          </div>
+          <div :style="{ position: 'absolute', left: serviceIndicatorStyle.left, right: serviceIndicatorStyle.right, top: '2px', display: 'flex', alignItems: 'center', gap: '8px' }">
+            <div style="flex:1;position:relative;height:18px;">
+              <div style="position:absolute;left:0;right:0;top:50%;border-top:1px solid #a9a9a9;"></div>
+              <div style="position:absolute;left:0;top:50%;bottom:0;border-left:1px solid #a9a9a9;"></div>
+            </div>
+            <div style="font-size:13px;font-weight:500;color:#8a8a8a;line-height:1;">服务</div>
+            <div style="flex:1;position:relative;height:18px;">
+              <div style="position:absolute;left:0;right:0;top:50%;border-top:1px solid #a9a9a9;"></div>
+              <div style="position:absolute;right:0;top:50%;bottom:0;border-right:1px solid #a9a9a9;"></div>
+            </div>
+          </div>
+        </div>
         <TabGroup v-model="activeTab" :tabs="TABS">
           <template #basic>
             <ConfigForm v-model="editingVrf" :schema="tabSchemas.basic" :disabled="writeDisabled" :showAdvanced="true" />
@@ -334,16 +11303,25 @@ export default defineComponent({
                 <label class="form-label">{{ t('vrf.form.nhtNoResolveViaDefault') }}</label>
                 <input type="checkbox" v-model="editingVrf.ipNhtNoResolveViaDefault" style="margin-left:8px;" />
               </div>
-              <div class="form-section-title">{{ t('vrf.form.protocolFilter') }}</div>
-              <div v-for="(proto, index) in editingVrf.ipProtocols" :key="index" style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-                <select class="form-control" v-model="proto.protocol" style="flex:1;">
-                  <option value="">{{ t('vrf.form.selectProtocol') }}</option>
-                  <option v-for="opt in PROTOCOL_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-                </select>
-                <input type="text" class="form-control" v-model="proto.routeMap" :placeholder="t('vrf.form.routeMapPlaceholder')" style="flex:1;" />
-                <ToolbarButton icon="delete" @click="removeIpProtocol(index)" :disabled="writeDisabled">{{ t('vrf.buttons.delete') }}</ToolbarButton>
+              <div class="form-group" style="margin-top:0;">
+                <div class="form-group-title">{{ t('vrf.form.protocolFilter') }}</div>
+                <div class="form-group-content">
+                  <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div v-for="(proto, index) in editingVrf.ipProtocols" :key="index" style="display:flex;gap:8px;align-items:center;">
+                      <select class="form-control" v-model="proto.protocol" style="flex:1;">
+                        <option value="">{{ t('vrf.form.selectProtocol') }}</option>
+                        <option v-for="opt in getAvailableIpProtocolOptions(index)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                      </select>
+                      <select class="form-control" v-model="proto.routeMap" style="flex:1;">
+                        <option value="">{{ t('vrf.form.routeMapPlaceholder') }}</option>
+                        <option v-for="opt in routeMapOptions" :key="'ip-rm-' + opt.value" :value="opt.value">{{ opt.label }}</option>
+                      </select>
+                      <ToolbarButton icon="delete" @click="removeIpProtocol(index)" :disabled="writeDisabled">{{ t('vrf.buttons.delete') }}</ToolbarButton>
+                    </div>
+                    <ToolbarButton icon="create" @click="addIpProtocol" :disabled="writeDisabled">{{ t('vrf.buttons.addProtocol') }}</ToolbarButton>
+                  </div>
+                </div>
               </div>
-              <ToolbarButton icon="create" @click="addIpProtocol" :disabled="writeDisabled">{{ t('vrf.buttons.addProtocol') }}</ToolbarButton>
             </div>
           </template>
           <template #ipv6>
@@ -356,19 +11334,1419 @@ export default defineComponent({
                 <label class="form-label">{{ t('vrf.form.nhtNoResolveViaDefault') }}</label>
                 <input type="checkbox" v-model="editingVrf.ipv6NhtNoResolveViaDefault" style="margin-left:8px;" />
               </div>
-              <div class="form-section-title">{{ t('vrf.form.protocolFilter') }}</div>
-              <div v-for="(proto, index) in editingVrf.ipv6Protocols" :key="index" style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-                <select class="form-control" v-model="proto.protocol" style="flex:1;">
-                  <option value="">{{ t('vrf.form.selectProtocol') }}</option>
-                  <option v-for="opt in PROTOCOL_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-                </select>
-                <input type="text" class="form-control" v-model="proto.routeMap" :placeholder="t('vrf.form.routeMapPlaceholder')" style="flex:1;" />
-                <ToolbarButton icon="delete" @click="removeIpv6Protocol(index)" :disabled="writeDisabled">{{ t('vrf.buttons.delete') }}</ToolbarButton>
+              <div class="form-group" style="margin-top:0;">
+                <div class="form-group-title">{{ t('vrf.form.protocolFilter') }}</div>
+                <div class="form-group-content">
+                  <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div v-for="(proto, index) in editingVrf.ipv6Protocols" :key="index" style="display:flex;gap:8px;align-items:center;">
+                      <select class="form-control" v-model="proto.protocol" style="flex:1;">
+                        <option value="">{{ t('vrf.form.selectProtocol') }}</option>
+                        <option v-for="opt in getAvailableIpv6ProtocolOptions(index)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                      </select>
+                      <select class="form-control" v-model="proto.routeMap" style="flex:1;">
+                        <option value="">{{ t('vrf.form.routeMapPlaceholder') }}</option>
+                        <option v-for="opt in routeMapOptions" :key="'ipv6-rm-' + opt.value" :value="opt.value">{{ opt.label }}</option>
+                      </select>
+                      <ToolbarButton icon="delete" @click="removeIpv6Protocol(index)" :disabled="writeDisabled">{{ t('vrf.buttons.delete') }}</ToolbarButton>
+                    </div>
+                    <ToolbarButton icon="create" @click="addIpv6Protocol" :disabled="writeDisabled">{{ t('vrf.buttons.addProtocol') }}</ToolbarButton>
+                  </div>
+                </div>
               </div>
-              <ToolbarButton icon="create" @click="addIpv6Protocol" :disabled="writeDisabled">{{ t('vrf.buttons.addProtocol') }}</ToolbarButton>
+            </div>
+          </template>
+          <template #bgp>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <div class="tab-group" style="margin-top:0;">
+                  <TabGroup class="bgp-branch-headers-only" v-model="activeBgpBranchTab" :tabs="BGP_BRANCH_TABS" :headers-only="true">
+                    <template #system-as></template>
+                    <template #timers></template>
+                    <template #address-family></template>
+                    <template #neighbor></template>
+                    <template #peer-group></template>
+                    <template #interface></template>
+                    <template #listen></template>
+                    <template #parameters></template>
+                    <template #sid></template>
+                    <template #srv6></template>
+                    <template #bmp></template>
+                  </TabGroup>
+                    <div class="tab-panels">
+                      <div class="tab-panel">
+                      <div v-if="activeBgpBranchTab === 'system-as'" style="display:flex;flex-direction:column;gap:8px;">
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.systemAs') }}</label>
+                          <div style="flex:1; max-width:320px;">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('system-as')" @input="setBgpFieldValue('system-as', $event.target.value)" :disabled="writeDisabled" min="1" max="4294967294" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.systemAs') }}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-else-if="activeBgpBranchTab === 'timers'" style="display:flex;flex-direction:column;gap:8px;">
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.holdtime') }}</label>
+                          <div style="flex:1; max-width:320px;">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('timers holdtime')" @input="setBgpFieldValue('timers holdtime', $event.target.value)" :disabled="writeDisabled" min="0" max="65535" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.holdtime') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.keepalive') }}</label>
+                          <div style="flex:1; max-width:320px;">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('timers keepalive')" @input="setBgpFieldValue('timers keepalive', $event.target.value)" :disabled="writeDisabled" min="1" max="65535" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.keepalive') }}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-else-if="activeBgpBranchTab === 'parameters'" style="display:flex;flex-direction:column;gap:8px;">
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.routerId') }}</label>
+                          <div style="flex:1; max-width:320px;">
+                            <input type="text" class="form-control" :value="getBgpFieldValue('parameters router-id')" @input="setBgpFieldValue('parameters router-id', $event.target.value)" :disabled="writeDisabled" placeholder="1.1.1.1" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.routerId') }}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-else-if="activeBgpBranchTab === 'sid'" style="display:flex;flex-direction:column;gap:8px;">
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.sid') }}</label>
+                          <div style="flex:1; max-width:320px;">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('sid')" @input="setBgpFieldValue('sid', $event.target.value)" :disabled="writeDisabled" min="1" max="4294967295" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.sid') }}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-else-if="activeBgpBranchTab === 'address-family'" style="display:flex;flex-direction:column;gap:8px;">
+                    <div class="tab-group" style="margin-top:0;">
+                      <TabGroup class="bgp-branch-headers-only" v-model="activeBgpAfBranchTab" :tabs="BGP_AF_TABS" :headers-only="true">
+                        <template #ipv4-flowspec></template>
+                        <template #ipv4-labeled-unicast></template>
+                        <template #ipv4-multicast></template>
+                        <template #ipv4-unicast></template>
+                        <template #ipv4-vpn></template>
+                        <template #ipv6-flowspec></template>
+                        <template #ipv6-labeled-unicast></template>
+                        <template #ipv6-multicast></template>
+                        <template #ipv6-unicast></template>
+                        <template #ipv6-vpn></template>
+                        <template #l2vpn-evpn></template>
+                      </TabGroup>
+                      <div class="tab-panels">
+                        <div class="tab-panel">
+                    <div v-if="activeBgpAfBranchTab === 'ipv4-flowspec' || activeBgpAfBranchTab === 'ipv6-flowspec'" class="form-row">
+                      <label class="form-label">{{ t('vrf.bgp.fields.localInstallInterface') }}</label>
+                      <div style="flex:1; max-width:320px;">
+                        <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' local-install interface')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' local-install interface', $event.target.value)" :disabled="writeDisabled" placeholder="eth0" />
+                        <div class="form-hint">{{ t('vrf.bgp.hints.localInstallInterface') }}</div>
+                      </div>
+                    </div>
+
+                    <div v-else-if="activeBgpAfBranchTab === 'ipv4-unicast' || activeBgpAfBranchTab === 'ipv6-unicast'" style="display:flex;flex-direction:column;gap:8px;">
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.maxPathsEbgp') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp', $event.target.value)" :disabled="writeDisabled" min="1" max="64" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.maxPathsEbgp') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.maxPathsIbgp') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ibgp')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ibgp', $event.target.value)" :disabled="writeDisabled" min="1" max="64" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.maxPathsIbgp') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.distanceExternal') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance external')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance external', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.distanceExternal') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.distanceInternal') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance internal')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance internal', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.distanceInternal') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.distanceLocal') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance local')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance local', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.distanceLocal') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afExportVpn') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' export vpn')" @change="setProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' export vpn', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afExportVpn') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afImportVpn') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' import vpn')" @change="setProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' import vpn', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afImportVpn') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afImportVrf') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' import vrf')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' import vrf', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.bgp.placeholders.vrfName')" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afImportVrf') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afNexthopVpnExport') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' nexthop vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' nexthop vpn export', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.bgp.placeholders.nextHop')" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afNexthopVpnExport') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afRdVpnExport') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' rd vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' rd vpn export', $event.target.value)" :disabled="writeDisabled" placeholder="65000:100" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afRdVpnExport') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afLabelAllocationPerNexthop') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' label vpn allocation-mode per-nexthop')" @change="setProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' label vpn allocation-mode per-nexthop', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afLabelAllocationPerNexthop') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afLabelVpnExport') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' label vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' label vpn export', $event.target.value)" :disabled="writeDisabled" placeholder="auto" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afLabelVpnExport') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afSidVpnExport') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' sid vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' sid vpn export', $event.target.value)" :disabled="writeDisabled" placeholder="auto" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afSidVpnExport') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afRouteMapVpnExport') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vpn export', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afRouteMapVpnExport') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afRouteMapVpnImport') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vpn import')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vpn import', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afRouteMapVpnImport') }}</div>
+                        </div>
+                      </div>
+                      <div v-if="activeBgpAfBranchTab === 'ipv4-unicast'" class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afRouteMapVrfImport') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vrf import')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vrf import', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afRouteMapVrfImport') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afRouteTargetVpnBoth') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn both')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn both', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afRouteTargetVpnBoth') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afRouteTargetVpnExport') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn export', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afRouteTargetVpnExport') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.afRouteTargetVpnImport') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn import')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn import', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.afRouteTargetVpnImport') }}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div v-else-if="activeBgpAfBranchTab === 'ipv4-vpn' || activeBgpAfBranchTab === 'ipv6-vpn'" style="display:flex;flex-direction:column;gap:8px;">
+                      <div class="form-row" style="display:block;">
+                        <div style="display:flex;align-items:flex-start;gap:12px;">
+                          <label class="form-label" style="min-width:auto;width:auto;padding-top:0;">network</label>
+                          <div class="form-hint" style="margin-top:0;">每行配置一个 network，可选 label 和 rd</div>
+                        </div>
+                        <div style="margin-top:8px; width:100%;">
+                          <div class="form-group" style="width:100%;">
+                            <div class="form-group-content" style="width:100%;">
+                              <DataTable
+                                :columns="[{ key: 'network', title: 'Network' }, { key: 'label', title: 'Label' }, { key: 'rd', title: 'RD' }]"
+                                :data="getBgpVpnNetworkRowsForAf(activeBgpAfBranchTab)"
+                                row-key="__id"
+                                :actions="BGP_VPN_NETWORK_TABLE_ACTIONS"
+                                :disabled="writeDisabled"
+                                :page-size="100"
+                                style="width:100%;"
+                                @create="openBgpVpnNetworkCreate(activeBgpAfBranchTab)"
+                                @edit="openBgpVpnNetworkEdit(activeBgpAfBranchTab, $event)"
+                                @delete="requestBgpVpnNetworkDelete(activeBgpAfBranchTab, $event)"
+                              >
+                                <template #network="{ value }">{{ value || '-' }}</template>
+                                <template #label="{ value }">{{ value || '-' }}</template>
+                                <template #rd="{ value }">{{ value || '-' }}</template>
+                              </DataTable>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div v-else-if="activeBgpAfBranchTab === 'l2vpn-evpn'" style="display:flex;flex-direction:column;gap:8px;">
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.rd') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn rd')" @input="setBgpFieldValue('address-family l2vpn-evpn rd', $event.target.value)" :disabled="writeDisabled" placeholder="65000:100" />
+                          <div class="form-hint">{{ getEvpnHint('rd') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">advertise ipv4 unicast route-map</label>
+                        <div style="flex:1; max-width:380px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn advertise ipv4 unicast route-map')" @input="setBgpFieldValue('address-family l2vpn-evpn advertise ipv4 unicast route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
+                          <div class="form-hint">{{ getEvpnHint('advertiseIpv4RouteMap') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">advertise ipv6 unicast route-map</label>
+                        <div style="flex:1; max-width:380px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn advertise ipv6 unicast route-map')" @input="setBgpFieldValue('address-family l2vpn-evpn advertise ipv6 unicast route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
+                          <div class="form-hint">{{ getEvpnHint('advertiseIpv6RouteMap') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.advertiseAllVni') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-all-vni')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-all-vni', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ getEvpnHint('advertiseAllVni') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">advertise-default-gw</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-default-gw')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-default-gw', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ getEvpnHint('advertiseDefaultGw') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">advertise-svi-ip</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-svi-ip')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-svi-ip', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ getEvpnHint('advertiseSviIp') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">advertise-pip</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn advertise-pip')" @input="setBgpFieldValue('address-family l2vpn-evpn advertise-pip', $event.target.value)" :disabled="writeDisabled" placeholder="192.0.2.1" />
+                          <div class="form-hint">{{ getEvpnHint('advertisePip') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">default-originate ipv4</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn default-originate ipv4')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn default-originate ipv4', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ getEvpnHint('defaultOriginateIpv4') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">default-originate ipv6</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn default-originate ipv6')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn default-originate ipv6', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ getEvpnHint('defaultOriginateIpv6') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">disable-ead-evi-rx</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn disable-ead-evi-rx')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn disable-ead-evi-rx', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ getEvpnHint('disableEadEviRx') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">disable-ead-evi-tx</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn disable-ead-evi-tx')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn disable-ead-evi-tx', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ getEvpnHint('disableEadEviTx') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">ead-es-frag evi-limit</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="number" min="1" max="1000" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn ead-es-frag evi-limit')" @input="setBgpFieldValue('address-family l2vpn-evpn ead-es-frag evi-limit', $event.target.value)" :disabled="writeDisabled" placeholder="1-1000" />
+                          <div class="form-hint">{{ getEvpnHint('eviLimit') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">ead-es-route-target export</label>
+                        <div style="flex:1; max-width:420px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn ead-es-route-target export')" @input="setBgpFieldValue('address-family l2vpn-evpn ead-es-route-target export', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
+                          <div class="form-hint">{{ getEvpnHint('eadEsRouteTargetExport') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">flooding disable</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn flooding disable')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn flooding disable', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ getEvpnHint('floodingDisable') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">flooding head-end-replication</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn flooding head-end-replication')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn flooding head-end-replication', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ getEvpnHint('floodingHer') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">mac-vrf soo</label>
+                        <div style="flex:1; max-width:380px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn mac-vrf soo')" @input="setBgpFieldValue('address-family l2vpn-evpn mac-vrf soo', $event.target.value)" :disabled="writeDisabled" placeholder="65000:100 or 192.0.2.1:100" />
+                          <div class="form-hint">{{ getEvpnHint('macVrfSoo') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">route-target both</label>
+                        <div style="flex:1; max-width:420px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn route-target both')" @input="setBgpFieldValue('address-family l2vpn-evpn route-target both', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
+                          <div class="form-hint">{{ getEvpnHint('routeTarget') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">route-target export</label>
+                        <div style="flex:1; max-width:420px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn route-target export')" @input="setBgpFieldValue('address-family l2vpn-evpn route-target export', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
+                          <div class="form-hint">{{ getEvpnHint('routeTarget') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">route-target import</label>
+                        <div style="flex:1; max-width:420px;">
+                          <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn route-target import')" @input="setBgpFieldValue('address-family l2vpn-evpn route-target import', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
+                          <div class="form-hint">{{ getEvpnHint('routeTarget') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">rt-auto-derive</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn rt-auto-derive')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn rt-auto-derive', $event.target.checked)" :disabled="writeDisabled" />
+                          <div class="form-hint">{{ getEvpnHint('rtAutoDerive') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row" style="display:block;">
+                        <div style="display:flex;align-items:flex-start;gap:12px;">
+                          <label class="form-label" style="min-width:auto;width:auto;padding-top:0;">{{ t('vrf.bgp.fields.vni') }}</label>
+                          <div class="form-hint" style="margin-top:0;">{{ getEvpnHint('vniNote') }}</div>
+                        </div>
+                        <div style="margin-top:8px; width:100%;">
+                          <div class="form-group" style="width:100%;">
+                            <div class="form-group-title">{{ t('vrf.bgp.fields.vniEntries') }}</div>
+                            <div class="form-group-content" style="width:100%;">
+                              <DataTable
+                                :columns="EVPN_VNI_TABLE_COLUMNS"
+                                :data="evpnVniRows"
+                                row-key="__id"
+                                :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                                :disabled="writeDisabled"
+                                :page-size="50"
+                                style="width:100%;"
+                                @create="openEvpnVniCreate"
+                                @edit="openEvpnVniEdit($event)"
+                                @delete="removeEvpnVniByIds($event)"
+                              >
+                                <template #vni="{ value }">{{ value || '-' }}</template>
+                                <template #rd="{ value }">{{ value || '-' }}</template>
+                                <template #routeTargetBoth="{ value }">{{ value || '-' }}</template>
+                                <template #routeTargetExport="{ value }">{{ value || '-' }}</template>
+                                <template #routeTargetImport="{ value }">{{ value || '-' }}</template>
+                                <template #advertiseDefaultGw="{ value }">{{ value ? t('app.yes') : '-' }}</template>
+                                <template #advertiseSviIp="{ value }">{{ value ? t('app.yes') : '-' }}</template>
+                              </DataTable>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div v-else style="display:flex;flex-direction:column;gap:8px;">
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.maxPathsEbgp') }}</label>
+                        <div style="flex:1; max-width:320px;">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp', $event.target.value)" :disabled="writeDisabled" min="1" max="64" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.maxPathsEbgp') }}</div>
+                        </div>
+                      </div>
+                    </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                      <div v-else style="display:flex;flex-direction:column;gap:8px;">
+                        <div v-if="activeBgpBranchTab === 'neighbor'" class="bgp-collection-block" style="display:flex;flex-direction:column;gap:8px;">
+                      <DataTable :columns="BGP_NEIGHBOR_TABLE_COLUMNS" :data="editingVrf.bgpNeighbors" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openBgpCollectionCreate('neighbor')" @edit="openBgpCollectionEdit('neighbor', $event)" @delete="requestBgpCollectionDelete('neighbor', $event)">
+                        <template #address="{ value }">{{ value || '-' }}</template>
+                        <template #remoteAs="{ value }">{{ value || '-' }}</template>
+                        <template #peerGroup="{ value }">{{ value || '-' }}</template>
+                        <template #description="{ value }">{{ value || '-' }}</template>
+                      </DataTable>
+                    </div>
+                        <div v-else-if="activeBgpBranchTab === 'peer-group'" class="bgp-collection-block" style="display:flex;flex-direction:column;gap:8px;">
+                      <DataTable :columns="BGP_PEER_GROUP_TABLE_COLUMNS" :data="editingVrf.bgpPeerGroups" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openBgpCollectionCreate('peer-group')" @edit="openBgpCollectionEdit('peer-group', $event)" @delete="requestBgpCollectionDelete('peer-group', $event)">
+                        <template #name="{ value }">{{ value || '-' }}</template>
+                        <template #remoteAs="{ value }">{{ value || '-' }}</template>
+                        <template #description="{ value }">{{ value || '-' }}</template>
+                      </DataTable>
+                    </div>
+                        <div v-else-if="activeBgpBranchTab === 'interface'" class="bgp-collection-block" style="display:flex;flex-direction:column;gap:8px;">
+                      <DataTable :columns="BGP_INTERFACE_TABLE_COLUMNS" :data="editingVrf.bgpInterfaces" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openBgpCollectionCreate('interface')" @edit="openBgpCollectionEdit('interface', $event)" @delete="requestBgpCollectionDelete('interface', $event)">
+                        <template #name="{ value }">{{ value || '-' }}</template>
+                        <template #peerGroup="{ value }">{{ value || '-' }}</template>
+                        <template #mplsForwarding="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                      </DataTable>
+                    </div>
+                        <div v-else-if="activeBgpBranchTab === 'listen'" class="bgp-collection-block" style="display:flex;flex-direction:column;gap:8px;">
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.listenLimit') }}</label>
+                        <div style="flex:1; max-width:220px;">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('listen limit')" @input="setBgpFieldValue('listen limit', $event.target.value)" :disabled="writeDisabled" min="1" max="5000" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.listenLimit') }}</div>
+                        </div>
+                      </div>
+                      <DataTable :columns="BGP_LISTEN_TABLE_COLUMNS" :data="editingVrf.bgpListenRanges" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openBgpCollectionCreate('listen')" @edit="openBgpCollectionEdit('listen', $event)" @delete="requestBgpCollectionDelete('listen', $event)">
+                        <template #range="{ value }">{{ value || '-' }}</template>
+                        <template #peerGroup="{ value }">{{ value || '-' }}</template>
+                      </DataTable>
+                    </div>
+                        <div v-else-if="activeBgpBranchTab === 'srv6'" class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.srv6Locator') }}</label>
+                          <div style="flex:1; max-width:320px;">
+                            <input type="text" class="form-control" :value="getBgpFieldValue('srv6 locator')" @input="setBgpFieldValue('srv6 locator', $event.target.value)" :disabled="writeDisabled" placeholder="LOC-1" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.srv6Locator') }}</div>
+                          </div>
+                        </div>
+                        <div v-else-if="activeBgpBranchTab === 'bmp'" class="bgp-collection-block" style="display:flex;flex-direction:column;gap:8px;">
+                          <div class="form-row">
+                            <label class="form-label">{{ t('vrf.bgp.fields.bmpMirrorBufferLimit') }}</label>
+                            <div style="flex:1; max-width:320px;">
+                              <input type="number" class="form-control" :value="getBgpFieldValue('bmp mirror-buffer-limit')" @input="setBgpFieldValue('bmp mirror-buffer-limit', $event.target.value)" :disabled="writeDisabled" min="0" max="4294967294" />
+                              <div class="form-hint">{{ t('vrf.bgp.hints.bmpMirrorBufferLimit') }}</div>
+                            </div>
+                          </div>
+                          <DataTable :columns="BGP_BMP_TABLE_COLUMNS" :data="editingVrf.bgpBmpTargets" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openBgpCollectionCreate('bmp')" @edit="openBgpCollectionEdit('bmp', $event)" @delete="requestBgpCollectionDelete('bmp', $event)">
+                            <template #name="{ value }">{{ value || '-' }}</template>
+                            <template #address="{ value }">{{ value || '-' }}</template>
+                            <template #port="{ value }">{{ value || '-' }}</template>
+                            <template #minRetry="{ value }">{{ value || '-' }}</template>
+                            <template #maxRetry="{ value }">{{ value || '-' }}</template>
+                            <template #mirror="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                            <template #monitorV4LocalRib="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                            <template #monitorV4PostPolicy="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                            <template #monitorV4PrePolicy="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                            <template #monitorV6LocalRib="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                            <template #monitorV6PostPolicy="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                            <template #monitorV6PrePolicy="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                          </DataTable>
+                        </div>
+                        <div v-else class="form-hint">{{ getActiveBgpBranchHelp() }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                </div>
+              </template>
+              <template #failover>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <DataTable :columns="FAILOVER_ROUTE_TABLE_COLUMNS" :data="editingVrf.failoverRoutes" row-key="__id" :actions="FAILOVER_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openFailoverRouteCreate" @edit="openFailoverRouteEdit" @delete="removeFailoverRoutesByIds">
+                    <template #prefix="{ row }">
+                      <input class="form-control" v-model="row.prefix" placeholder="0.0.0.0/0" style="max-width:180px;" :disabled="writeDisabled" />
+                    </template>
+                    <template #gatewayType="{ row }">
+                      <select class="form-control" v-model="row.gatewayType" style="max-width:160px;" :disabled="writeDisabled">
+                        <option value="next-hop">next-hop</option>
+                        <option value="dhcp-interface">dhcp-interface</option>
+                      </select>
+                    </template>
+                    <template #nextHop="{ row }">
+                      <input
+                        class="form-control"
+                        :value="row.gatewayType === 'next-hop' ? row.gateway : ''"
+                        placeholder="192.0.2.1"
+                        style="max-width:180px;"
+                        :disabled="writeDisabled"
+                        @input="row.gatewayType = 'next-hop'; row.gateway = $event.target.value"
+                      />
+                    </template>
+                    <template #dhcpInterface="{ row }">
+                      <input
+                        class="form-control"
+                        :value="row.gatewayType === 'dhcp-interface' ? row.gateway : ''"
+                        placeholder="eth0"
+                        style="max-width:180px;"
+                        :disabled="writeDisabled"
+                        @input="row.gatewayType = 'dhcp-interface'; row.gateway = $event.target.value"
+                      />
+                    </template>
+                    <template #gatewayOptions="{ row }">
+                      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <input class="form-control" v-model="row.interface" placeholder="interface" style="max-width:130px;" :disabled="writeDisabled" />
+                        <input type="number" class="form-control" v-model="row.metric" min="1" max="255" placeholder="metric" style="max-width:100px;" :disabled="writeDisabled" />
+                        <label><input type="checkbox" v-model="row.onlink" :disabled="writeDisabled" /> onlink</label>
+                      </div>
+                    </template>
+                    <template #checkOptions="{ row }">
+                      <div style="display:flex;flex-direction:column;gap:6px;min-width:520px;">
+                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                          <select class="form-control" v-model="row.checkPolicy" style="max-width:160px;" :disabled="writeDisabled">
+                            <option value="">{{ t('vrf.form.unsetOption') }}</option>
+                            <option value="any-available">any-available</option>
+                            <option value="all-available">all-available</option>
+                          </select>
+                          <select class="form-control" v-model="row.checkType" style="max-width:120px;" :disabled="writeDisabled">
+                            <option value="">{{ t('vrf.form.unsetOption') }}</option>
+                            <option value="icmp">icmp</option>
+                            <option value="arp">arp</option>
+                            <option value="tcp">tcp</option>
+                          </select>
+                          <input type="number" class="form-control" v-model="row.checkTimeout" min="1" max="300" placeholder="timeout" style="max-width:100px;" :disabled="writeDisabled" />
+                          <input type="number" class="form-control" v-model="row.checkPort" min="1" max="65535" placeholder="port" style="max-width:100px;" :disabled="writeDisabled" />
+                        </div>
+                        <div v-for="(target, targetIdx) in row.checkTargets" :key="'failover-target-' + row.__id + '-' + targetIdx" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                          <input class="form-control" v-model="target.address" placeholder="check target" style="max-width:180px;" :disabled="writeDisabled" />
+                          <input class="form-control" v-model="target.interface" placeholder="target interface" style="max-width:140px;" :disabled="writeDisabled" />
+                          <input class="form-control" v-model="target.vrf" placeholder="target vrf" style="max-width:120px;" :disabled="writeDisabled" />
+                          <ToolbarButton icon="delete" @click="removeFailoverCheckTarget(row, targetIdx)" :disabled="writeDisabled">{{ t('vrf.buttons.delete') }}</ToolbarButton>
+                        </div>
+                        <ToolbarButton icon="create" @click="addFailoverCheckTarget(row)" :disabled="writeDisabled">{{ t('vrf.buttons.addEntry') }}</ToolbarButton>
+                      </div>
+                    </template>
+                  </DataTable>
+                </div>
+              </template>
+              <template #isis>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <TabGroup v-model="isisSubTab" :tabs="ISIS_SUB_TABS">
+                    <template #basic>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.protocols.isisNet') }}</label>
+                          <div style="flex:1; max-width:360px;">
+                            <input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'net')" @input="setProtocolScalarValue('isis', 'net', $event.target.value)" :disabled="writeDisabled" placeholder="49.0001.1921.6800.1001.00" />
+                            <div class="form-hint">{{ t('vrf.protocolHints.isisNet') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.protocols.isisLevel') }}</label>
+                          <div style="flex:1; max-width:260px;">
+                            <select class="form-control" :value="getProtocolScalarValue('isis', 'level')" @change="setProtocolScalarValue('isis', 'level', $event.target.value)" :disabled="writeDisabled">
+                              <option value="">{{ t('vrf.form.unsetOption') }}</option>
+                              <option value="level-1">level-1</option>
+                              <option value="level-2">level-2</option>
+                              <option value="level-1-2">level-1-2</option>
+                            </select>
+                            <div class="form-hint">{{ t('vrf.protocolHints.isisLevel') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.protocols.isisMetricStyle') }}</label>
+                          <div style="flex:1; max-width:260px;">
+                            <select class="form-control" :value="getProtocolScalarValue('isis', 'metric-style')" @change="setProtocolScalarValue('isis', 'metric-style', $event.target.value)" :disabled="writeDisabled">
+                              <option value="">{{ t('vrf.form.unsetOption') }}</option>
+                              <option value="narrow">narrow</option>
+                              <option value="transition">transition</option>
+                              <option value="wide">wide</option>
+                            </select>
+                            <div class="form-hint">{{ t('vrf.protocolHints.isisMetricStyle') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.protocols.isisLspMtu') }}</label>
+                          <div style="flex:1; max-width:220px;">
+                            <input type="number" class="form-control" :value="getProtocolScalarValue('isis', 'lsp-mtu')" @input="setProtocolScalarValue('isis', 'lsp-mtu', $event.target.value)" :disabled="writeDisabled" min="128" max="4352" />
+                            <div class="form-hint">{{ t('vrf.protocolHints.isisLspMtu') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisLspGenInterval') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="120" :value="getProtocolScalarValue('isis', 'lsp-gen-interval')" @input="setProtocolScalarValue('isis', 'lsp-gen-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisLspGenInterval') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisLspRefreshInterval') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="65535" :value="getProtocolScalarValue('isis', 'lsp-refresh-interval')" @input="setProtocolScalarValue('isis', 'lsp-refresh-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisLspRefreshInterval') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisMaxLspLifetime') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="65535" :value="getProtocolScalarValue('isis', 'max-lsp-lifetime')" @input="setProtocolScalarValue('isis', 'max-lsp-lifetime', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisMaxLspLifetime') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">spf-interval</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" :value="getProtocolScalarValue('isis', 'spf-interval')" @input="setProtocolScalarValue('isis', 'spf-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">Minimum interval between SPF calculations.</div></div></div>
+                        <div class="form-row"><label class="form-label">topology</label><div style="flex:1; max-width:260px;"><input type="text" class="form-control" :value="getProtocolLeafSetValue('isis', 'topology')" @input="setProtocolLeafSetValue('isis', 'topology', $event.target.value)" :disabled="writeDisabled" placeholder="ipv4-unicast" /><div class="form-hint">Configure IS-IS topology entry (for example: ipv4-unicast).</div></div></div>
+                      </div>
+                    </template>
+                    <template #auth>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisAreaPasswordMd5') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'area-password md5')" @input="setProtocolScalarValue('isis', 'area-password md5', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisAreaPasswordMd5') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisAreaPasswordPlaintext') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'area-password plaintext-password')" @input="setProtocolScalarValue('isis', 'area-password plaintext-password', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisAreaPasswordPlaintext') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDomainPasswordMd5') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'domain-password md5')" @input="setProtocolScalarValue('isis', 'domain-password md5', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDomainPasswordMd5') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDomainPasswordPlaintext') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'domain-password plaintext-password')" @input="setProtocolScalarValue('isis', 'domain-password plaintext-password', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDomainPasswordPlaintext') }}</div></div></div>
+                      </div>
+                    </template>
+                    <template #default-info>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-1 always</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv4 level-1 always')" @change="setProtocolPresence('isis', 'default-information originate ipv4 level-1 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-1 metric</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-1 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-1 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-1 route-map</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-1 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-1 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
+                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-2 always</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv4 level-2 always')" @change="setProtocolPresence('isis', 'default-information originate ipv4 level-2 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-2 metric</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-2 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-2 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-2 route-map</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-2 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-2 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
+                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-1 always</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv6 level-1 always')" @change="setProtocolPresence('isis', 'default-information originate ipv6 level-1 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-1 metric</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-1 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-1 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-1 route-map</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-1 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-1 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
+                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-2 always</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv6 level-2 always')" @change="setProtocolPresence('isis', 'default-information originate ipv6 level-2 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-2 metric</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-2 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-2 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-2 route-map</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-2 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-2 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
+                      </div>
+                    </template>
+                    <template #features>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">dynamic-hostname</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'dynamic-hostname')" @change="setProtocolPresence('isis', 'dynamic-hostname', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">advertise-high-metrics</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'advertise-high-metrics')" @change="setProtocolPresence('isis', 'advertise-high-metrics', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">advertise-passive-only</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'advertise-passive-only')" @change="setProtocolPresence('isis', 'advertise-passive-only', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">log-adjacency-changes</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'log-adjacency-changes')" @change="setProtocolPresence('isis', 'log-adjacency-changes', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">purge-originator</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'purge-originator')" @change="setProtocolPresence('isis', 'purge-originator', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">set-attached-bit</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'set-attached-bit')" @change="setProtocolPresence('isis', 'set-attached-bit', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">set-overload-bit</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'set-overload-bit')" @change="setProtocolPresence('isis', 'set-overload-bit', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">ldp-sync</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'ldp-sync')" @change="setProtocolPresence('isis', 'ldp-sync', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">Protocol wide LDP-IGP synchronization configuration.</div></div></div>
+                        <div class="form-row"><label class="form-label">fast-reroute</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'fast-reroute')" @change="setProtocolPresence('isis', 'fast-reroute', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">IS-IS fast reroute configuration.</div></div></div>
+                        <div class="form-row"><label class="form-label">segment-routing</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'segment-routing')" @change="setProtocolPresence('isis', 'segment-routing', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">Segment-Routing (SPRING) settings.</div></div></div>
+                        <div class="form-row"><label class="form-label">traffic-engineering</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'traffic-engineering')" @change="setProtocolPresence('isis', 'traffic-engineering', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">IS-IS traffic engineering extensions.</div></div></div>
+                      </div>
+                    </template>
+                    <template #interface>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="ISIS_INTERFACE_TABLE_COLUMNS" :data="isisInterfaceRows" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openIsisInterfaceCreate" @edit="openIsisInterfaceEdit" @delete="requestIsisInterfaceDelete">
+                          <template #name="{ value }">{{ value || '-' }}</template>
+                          <template #passive="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                          <template #metric="{ value }">{{ value || '-' }}</template>
+                          <template #network="{ value }">{{ value || '-' }}</template>
+                          <template #extras="{ row }">{{ row.extrasText || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.isisInterfaceRow') }}</div>
+                      </div>
+                    </template>
+                    <template #fast-reroute>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="ISIS_FAST_REROUTE_TABLE_COLUMNS" :data="isisFastRerouteRows" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openIsisFastRerouteCreate" @edit="openIsisFastRerouteEdit" @delete="requestIsisFastRerouteDelete">
+                          <template #command="{ value }">{{ value || '-' }}</template>
+                          <template #value="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.isisFastRerouteRow') }}</div>
+                      </div>
+                    </template>
+                    <template #redistribute>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="ISIS_REDISTRIBUTE_TABLE_COLUMNS" :data="isisRedistributeRows" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openIsisRedistributeCreate" @edit="openIsisRedistributeEdit" @delete="requestIsisRedistributeDelete">
+                          <template #af="{ value }">{{ value || '-' }}</template>
+                          <template #protocol="{ value }">{{ value || '-' }}</template>
+                          <template #level="{ value }">{{ value || '-' }}</template>
+                          <template #metric="{ value }">{{ value || '-' }}</template>
+                          <template #routeMap="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.isisRedistributeRow') }}</div>
+                      </div>
+                    </template>
+                    <template #segment-routing>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">segment-routing global-block low-label-value</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing global-block low-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing global-block low-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">segment-routing global-block high-label-value</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing global-block high-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing global-block high-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">segment-routing local-block low-label-value</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing local-block low-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing local-block low-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">segment-routing local-block high-label-value</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing local-block high-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing local-block high-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">segment-routing maximum-label-depth</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="16" :value="getProtocolScalarValue('isis', 'segment-routing maximum-label-depth')" @input="setProtocolScalarValue('isis', 'segment-routing maximum-label-depth', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">segment-routing srv6 locator</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'segment-routing srv6 locator')" @input="setProtocolScalarValue('isis', 'segment-routing srv6 locator', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                      </div>
+                    </template>
+                    <template #spf-delay-ietf>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">spf-delay-ietf init-delay</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf init-delay')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf init-delay', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">spf-delay-ietf short-delay</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf short-delay')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf short-delay', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">spf-delay-ietf long-delay</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf long-delay')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf long-delay', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">spf-delay-ietf holddown</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf holddown')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf holddown', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">spf-delay-ietf time-to-learn</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf time-to-learn')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf time-to-learn', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                      </div>
+                    </template>
+                    <template #traffic-engineering>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">traffic-engineering address</label><div style="flex:1; max-width:260px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'traffic-engineering address')" @input="setProtocolScalarValue('isis', 'traffic-engineering address', $event.target.value)" :disabled="writeDisabled" placeholder="1.1.1.1" /></div></div>
+                        <div class="form-row"><label class="form-label">traffic-engineering enable</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'traffic-engineering enable')" @change="setProtocolPresence('isis', 'traffic-engineering enable', $event.target.checked)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">traffic-engineering export</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'traffic-engineering export')" @change="setProtocolPresence('isis', 'traffic-engineering export', $event.target.checked)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">topology</label><div style="flex:1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><label v-for="topology in ISIS_TOPOLOGY_OPTIONS" :key="'isis-topology-' + topology" style="display:flex;gap:4px;align-items:center;"><input type="checkbox" :checked="getProtocolPresence('isis', 'topology ' + topology)" @change="setProtocolPresence('isis', 'topology ' + topology, $event.target.checked)" :disabled="writeDisabled" />{{ topology }}</label></div></div>
+                      </div>
+                    </template>
+                  </TabGroup>
+                </div>
+              </template>
+              <template #ospf>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <TabGroup v-model="ospfSubTab" :tabs="OSPF_SUB_TABS">
+                    <template #basic>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.protocols.ospfRouterId') }}</label>
+                          <div style="flex:1; max-width:360px;">
+                            <input type="text" class="form-control" :value="getProtocolScalarValue('ospf', 'parameters router-id')" @input="setProtocolScalarValue('ospf', 'parameters router-id', $event.target.value)" :disabled="writeDisabled" placeholder="1.1.1.1" />
+                            <div class="form-hint">{{ t('vrf.protocolHints.ospfRouterId') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.protocols.ospfAbrType') }}</label>
+                          <div style="flex:1; max-width:360px;">
+                            <input type="text" class="form-control" :value="getProtocolScalarValue('ospf', 'parameters abr-type')" @input="setProtocolScalarValue('ospf', 'parameters abr-type', $event.target.value)" :disabled="writeDisabled" placeholder="cisco" />
+                            <div class="form-hint">{{ t('vrf.protocolHints.ospfAbrType') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDistanceGlobal') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospf', 'parameters distance global')" @input="setProtocolScalarValue('ospf', 'parameters distance global', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDistance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDistanceInterArea') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospf', 'parameters distance inter-area')" @input="setProtocolScalarValue('ospf', 'parameters distance inter-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDistance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDistanceIntraArea') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospf', 'parameters distance intra-area')" @input="setProtocolScalarValue('ospf', 'parameters distance intra-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDistance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoAlways') }}</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('ospf', 'default-information originate always')" @change="setProtocolPresence('ospf', 'default-information originate always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoMetric') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777214" :value="getProtocolScalarValue('ospf', 'default-information originate metric')" @input="setProtocolScalarValue('ospf', 'default-information originate metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoMetricType') }}</label><div style="flex:1; max-width:220px;"><select class="form-control" :value="getProtocolScalarValue('ospf', 'default-information originate metric-type')" @change="setProtocolScalarValue('ospf', 'default-information originate metric-type', $event.target.value)" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoMetricType') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoRouteMap') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('ospf', 'default-information originate route-map')" @input="setProtocolScalarValue('ospf', 'default-information originate route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoRouteMap') }}</div></div></div>
+                      </div>
+                    </template>
+                    <template #area>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="OSPF_AREA_TABLE_COLUMNS" :data="editingVrf.ospfAreas" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfAreaCreate" @edit="openOspfAreaEdit" @delete="requestOspfAreaDelete">
+                          <template #area="{ value }">{{ value || '-' }}</template>
+                          <template #areaType="{ value }">{{ value || '-' }}</template>
+                          <template #networks="{ row }">{{ getOspfAreaNetworksPreview(row) || '-' }}</template>
+                          <template #ranges="{ row }">{{ getOspfAreaRangesPreview(row) || '-' }}</template>
+                          <template #virtualLinks="{ row }">{{ getOspfAreaVirtualLinksPreview(row) || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.ospfAreaRow') }}</div>
+                      </div>
+                    </template>
+                    <template #interface>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="OSPF_INTERFACE_TABLE_COLUMNS" :data="editingVrf.ospfInterfaces" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfInterfaceCreate" @edit="openOspfInterfaceEdit" @delete="requestOspfInterfaceDelete">
+                          <template #name="{ value }">{{ value || '-' }}</template>
+                          <template #area="{ value }">{{ value || '-' }}</template>
+                          <template #network="{ value }">{{ value || '-' }}</template>
+                          <template #auth="{ row }">{{ getOspfInterfaceAuthPreview(row) }}</template>
+                          <template #cost="{ value }">{{ value || '-' }}</template>
+                          <template #timers="{ row }">{{ getOspfInterfaceTimersPreview(row) || '-' }}</template>
+                          <template #flags="{ row }">{{ getOspfInterfaceFlagsPreview(row) || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.ospfInterfaceRow') }}</div>
+                      </div>
+                    </template>
+                    <template #access-list>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="OSPF_ACCESS_LIST_TABLE_COLUMNS" :data="editingVrf.ospfAccessLists" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfAccessListCreate" @edit="openOspfAccessListEdit" @delete="requestOspfAccessListDelete">
+                          <template #number="{ value }">{{ value || '-' }}</template>
+                          <template #export="{ row }">{{ getOspfAccessListExportPreview(row) || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.ospfAccessListRow') }}</div>
+                      </div>
+                    </template>
+                    <template #neighbor>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="OSPF_NEIGHBOR_TABLE_COLUMNS" :data="editingVrf.ospfNeighbors" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfNeighborCreate" @edit="openOspfNeighborEdit" @delete="requestOspfNeighborDelete">
+                          <template #address="{ value }">{{ value || '-' }}</template>
+                          <template #pollInterval="{ value }">{{ value || '-' }}</template>
+                          <template #priority="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.ospfNeighborRow') }}</div>
+                      </div>
+                    </template>
+                    <template #summary-address>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="OSPF_SUMMARY_ADDRESS_TABLE_COLUMNS" :data="editingVrf.ospfSummaryAddresses" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfSummaryAddressCreate" @edit="openOspfSummaryAddressEdit" @delete="requestOspfSummaryAddressDelete">
+                          <template #prefix="{ value }">{{ value || '-' }}</template>
+                          <template #noAdvertise="{ value }">{{ value ? 'yes' : '-' }}</template>
+                          <template #tag="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.ospfSummaryAddressRow') }}</div>
+                      </div>
+                    </template>
+                    <template #segment-routing>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrGlobalBlockLowLabelValue') }}</label><div style="flex:1;"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.globalBlockLowLabelValue" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrGlobalBlockLowLabelValue') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrGlobalBlockHighLabelValue') }}</label><div style="flex:1;"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.globalBlockHighLabelValue" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrGlobalBlockHighLabelValue') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrLocalBlockLowLabelValue') }}</label><div style="flex:1;"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.localBlockLowLabelValue" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrLocalBlockLowLabelValue') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrLocalBlockHighLabelValue') }}</label><div style="flex:1;"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.localBlockHighLabelValue" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrLocalBlockHighLabelValue') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrMaximumLabelDepth') }}</label><div style="flex:1;"><input type="number" min="1" max="16" class="form-control" v-model="editingVrf.ospfSegmentRouting.maximumLabelDepth" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrMaximumLabelDepth') }}</div></div></div>
+
+                        <DataTable :columns="OSPF_SR_PREFIX_TABLE_COLUMNS" :data="editingVrf.ospfSegmentRouting.prefixes" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfSrPrefixCreate" @edit="openOspfSrPrefixEdit" @delete="requestOspfSrPrefixDelete">
+                          <template #prefix="{ value }">{{ value || '-' }}</template>
+                          <template #indexValue="{ value }">{{ value || '-' }}</template>
+                          <template #flags="{ row }">{{ getOspfSrPrefixFlagsPreview(row) || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.ospfSrPrefixRow') }}</div>
+                      </div>
+                    </template>
+                    <template #redistribute>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeRow') }}</div>
+                        <div v-for="protocol in OSPF_REDISTRIBUTE_PROTOCOLS" :key="'ospf-redistribute-' + protocol" style="border:1px solid #eee;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px;">
+                          <div class="form-row"><label class="form-label">{{ protocol }}</label><div style="flex:1;"><label><input type="checkbox" v-model="editingVrf.ospfRedistribute[protocol].enabled" :disabled="writeDisabled" /> enable</label></div></div>
+                          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetric') }}</label><div style="flex:1;"><input type="number" min="0" max="16777214" class="form-control" v-model="editingVrf.ospfRedistribute[protocol].metric" :disabled="writeDisabled || !editingVrf.ospfRedistribute[protocol].enabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetric') }}</div></div></div>
+                          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetricType') }}</label><div style="flex:1;"><select class="form-control" v-model="editingVrf.ospfRedistribute[protocol].metricType" :disabled="writeDisabled || !editingVrf.ospfRedistribute[protocol].enabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetricType') }}</div></div></div>
+                          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeRouteMap') }}</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.ospfRedistribute[protocol].routeMap" :disabled="writeDisabled || !editingVrf.ospfRedistribute[protocol].enabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeRouteMap') }}</div></div></div>
+                        </div>
+                        <DataTable :columns="OSPF_REDISTRIBUTE_TABLE_COLUMNS" :data="editingVrf.ospfRedistribute.tables" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfRedistributeTableCreate" @edit="openOspfRedistributeTableEdit" @delete="requestOspfRedistributeTableDelete">
+                          <template #table="{ value }">{{ value || '-' }}</template>
+                          <template #metric="{ value }">{{ value || '-' }}</template>
+                          <template #metricType="{ value }">{{ value || '-' }}</template>
+                          <template #routeMap="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeTableRow') }}</div>
+                      </div>
+                    </template>
+                  </TabGroup>
+                </div>
+              </template>
+              <template #ospfv3>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <TabGroup v-model="ospfv3SubTab" :tabs="OSPFV3_SUB_TABS">
+                    <template #basic>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.protocols.ospfv3RouterId') }}</label>
+                          <div style="flex:1; max-width:360px;">
+                            <input type="text" class="form-control" :value="getProtocolScalarValue('ospfv3', 'parameters router-id')" @input="setProtocolScalarValue('ospfv3', 'parameters router-id', $event.target.value)" :disabled="writeDisabled" placeholder="2.2.2.2" />
+                            <div class="form-hint">{{ t('vrf.protocolHints.ospfv3RouterId') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DistanceGlobal') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospfv3', 'parameters distance global')" @input="setProtocolScalarValue('ospfv3', 'parameters distance global', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3Distance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DistanceInterArea') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospfv3', 'parameters distance inter-area')" @input="setProtocolScalarValue('ospfv3', 'parameters distance inter-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3Distance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DistanceIntraArea') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospfv3', 'parameters distance intra-area')" @input="setProtocolScalarValue('ospfv3', 'parameters distance intra-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3Distance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoAlways') }}</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'default-information originate always')" @change="setProtocolPresence('ospfv3', 'default-information originate always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoMetric') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777214" :value="getProtocolScalarValue('ospfv3', 'default-information originate metric')" @input="setProtocolScalarValue('ospfv3', 'default-information originate metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoMetricType') }}</label><div style="flex:1; max-width:220px;"><select class="form-control" :value="getProtocolScalarValue('ospfv3', 'default-information originate metric-type')" @change="setProtocolScalarValue('ospfv3', 'default-information originate metric-type', $event.target.value)" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoMetricType') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoRouteMap') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('ospfv3', 'default-information originate route-map')" @input="setProtocolScalarValue('ospfv3', 'default-information originate route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoRouteMap') }}</div></div></div>
+                      </div>
+                    </template>
+                    <template #graceful-restart>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartGracePeriod') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="1800" :value="getProtocolScalarValue('ospfv3', 'graceful-restart grace-period')" @input="setProtocolScalarValue('ospfv3', 'graceful-restart grace-period', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartGracePeriod') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperEnable') }}</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'graceful-restart helper enable')" @change="setProtocolPresence('ospfv3', 'graceful-restart helper enable', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperEnable') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperEnableRouterId') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolLeafSetValue('ospfv3', 'graceful-restart helper enable router-id')" @input="setProtocolLeafSetValue('ospfv3', 'graceful-restart helper enable router-id', $event.target.value)" :disabled="writeDisabled" placeholder="1.1.1.1" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperEnableRouterId') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperLsaCheckDisable') }}</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'graceful-restart helper lsa-check-disable')" @change="setProtocolPresence('ospfv3', 'graceful-restart helper lsa-check-disable', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperLsaCheckDisable') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperPlannedOnly') }}</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'graceful-restart helper planned-only')" @change="setProtocolPresence('ospfv3', 'graceful-restart helper planned-only', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperPlannedOnly') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperSupportedGraceTime') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="10" max="1800" :value="getProtocolScalarValue('ospfv3', 'graceful-restart helper supported-grace-time')" @input="setProtocolScalarValue('ospfv3', 'graceful-restart helper supported-grace-time', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperSupportedGraceTime') }}</div></div></div>
+                      </div>
+                    </template>
+                    <template #area>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="OSPFV3_AREA_TABLE_COLUMNS" :data="editingVrf.ospfv3Areas" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfv3AreaCreate" @edit="openOspfv3AreaEdit" @delete="requestOspfv3AreaDelete">
+                          <template #area="{ value }">{{ value || '-' }}</template>
+                          <template #areaType="{ row }">{{ getOspfv3AreaTypePreview(row) }}</template>
+                          <template #exportList="{ value }">{{ value || '-' }}</template>
+                          <template #importList="{ value }">{{ value || '-' }}</template>
+                          <template #ranges="{ row }">{{ getOspfv3AreaRangesPreview(row) || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaRow') }}</div>
+                      </div>
+                    </template>
+                    <template #interface>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="OSPFV3_INTERFACE_TABLE_COLUMNS" :data="editingVrf.ospfv3Interfaces" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfv3InterfaceCreate" @edit="openOspfv3InterfaceEdit" @delete="requestOspfv3InterfaceDelete">
+                          <template #name="{ value }">{{ value || '-' }}</template>
+                          <template #area="{ value }">{{ value || '-' }}</template>
+                          <template #bfdProfile="{ value }">{{ value || '-' }}</template>
+                          <template #network="{ value }">{{ value || '-' }}</template>
+                          <template #cost="{ value }">{{ value || '-' }}</template>
+                          <template #timers="{ row }">{{ getOspfv3InterfaceTimersPreview(row) || '-' }}</template>
+                          <template #flags="{ row }">{{ getOspfv3InterfaceFlagsPreview(row) || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.ospfv3InterfaceRow') }}</div>
+                      </div>
+                    </template>
+                    <template #redistribute>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-hint">{{ t('vrf.protocolHints.ospfv3RedistributeRow') }}</div>
+                        <DataTable :columns="OSPFV3_REDISTRIBUTE_TABLE_COLUMNS" :data="ospfv3RedistributeRows" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfv3RedistributeCreate" @edit="openOspfv3RedistributeEdit" @delete="requestOspfv3RedistributeDelete">
+                          <template #protocol="{ value }">{{ value || '-' }}</template>
+                          <template #metric="{ value }">{{ value || '-' }}</template>
+                          <template #metricType="{ value }">{{ value || '-' }}</template>
+                          <template #routeMap="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
+                      </div>
+                    </template>
+                  </TabGroup>
+                </div>
+              </template>
+              <template #rpki>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <TabGroup v-model="rpkiSubTab" :tabs="RPKI_SUB_TABS">
+                    <template #basic>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.protocols.rpkiPollingPeriod') }}</label>
+                          <div style="flex:1; max-width:220px;">
+                            <input type="number" class="form-control" :value="getProtocolScalarValue('rpki', 'polling-period')" @input="setProtocolScalarValue('rpki', 'polling-period', $event.target.value)" :disabled="writeDisabled" min="1" max="86400" />
+                            <div class="form-hint">{{ t('vrf.protocolHints.rpkiPollingPeriod') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiRetryInterval') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="7200" :value="getProtocolScalarValue('rpki', 'retry-interval')" @input="setProtocolScalarValue('rpki', 'retry-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiRetryInterval') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiExpireInterval') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="600" max="172800" :value="getProtocolScalarValue('rpki', 'expire-interval')" @input="setProtocolScalarValue('rpki', 'expire-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiExpireInterval') }}</div></div></div>
+                      </div>
+                    </template>
+                    <template #cache>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="RPKI_CACHE_TABLE_COLUMNS" :data="editingVrf.rpkiCaches" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openRpkiCacheCreate" @edit="openRpkiCacheEdit" @delete="requestRpkiCacheDelete">
+                          <template #address="{ value }">{{ value || '-' }}</template>
+                          <template #port="{ value }">{{ value || '-' }}</template>
+                          <template #preference="{ value }">{{ value || '-' }}</template>
+                          <template #sourceAddress="{ value }">{{ value || '-' }}</template>
+                          <template #sshUsername="{ value }">{{ value || '-' }}</template>
+                          <template #sshKey="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
+                        <div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheRow') }}</div>
+                      </div>
+                    </template>
+                  </TabGroup>
+                </div>
+              </template>
+              <template #static>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  <TabGroup v-model="staticSubTab" :tabs="STATIC_SUB_TABS">
+                    <template #ipv4>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="STATIC_ROUTE_TABLE_COLUMNS" :data="editingVrf.staticRoutes" row-key="__id" :actions="STATIC_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openStaticRouteCreate('ipv4')" @edit="openStaticRouteEdit('ipv4', $event)" @delete="requestStaticRouteDelete('ipv4', $event)">
+                          <template #prefix="{ row }">
+                            <input class="form-control" v-model="row.prefix" :placeholder="t('vrf.protocolPlaceholders.staticRoutePrefix')" style="max-width:220px;" :disabled="writeDisabled" />
+                          </template>
+                          <template #nextHopType="{ row }">
+                            {{ inferStaticRouteBranch(row, 'ipv4') }}
+                          </template>
+                          <template #nextHop="{ row }">
+                            <div v-if="inferStaticRouteBranch(row, 'ipv4') === 'next-hop'" style="display:flex;flex-direction:column;gap:6px;min-width:220px;">
+                              <div v-for="(nh, nhIdx) in row.nextHops" :key="'v4-nh-' + row.__id + '-' + nhIdx" style="display:flex;gap:8px;align-items:center;">
+                                <input class="form-control" v-model="nh.address" :placeholder="t('vrf.protocolPlaceholders.staticRouteNextHop')" style="max-width:180px;" :disabled="writeDisabled" />
+                                <input type="number" class="form-control" v-model="nh.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" style="max-width:100px;" :disabled="writeDisabled" />
+                                <ToolbarButton icon="delete" @click="removeStaticNextHop(row, nhIdx)" :disabled="writeDisabled">{{ t('vrf.buttons.delete') }}</ToolbarButton>
+                              </div>
+                              <ToolbarButton icon="create" @click="addStaticNextHop(row)" :disabled="writeDisabled">{{ t('vrf.buttons.addEntry') }}</ToolbarButton>
+                            </div>
+                            <div v-else>-</div>
+                          </template>
+                          <template #interfaceDetail="{ row }">
+                            <div v-if="inferStaticRouteBranch(row, 'ipv4') === 'next-hop'" style="display:flex;flex-direction:column;gap:6px;min-width:250px;">
+                              <div v-for="(nh, nhIdx) in row.nextHops" :key="'v4-intf-' + row.__id + '-' + nhIdx" style="display:flex;gap:8px;align-items:center;">
+                                <select class="form-control" v-model="nh.interface" style="max-width:120px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'v4-table-intf-' + row.__id + '-' + nhIdx + '-' + name" :value="name">{{ name }}</option></select>
+                                <select class="form-control" v-model="nh.vrf" style="max-width:120px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in vrfNameOptions" :key="'v4-table-vrf-' + row.__id + '-' + nhIdx + '-' + name" :value="name">{{ name }}</option></select>
+                                <label><input type="checkbox" v-model="nh.disable" :disabled="writeDisabled" /> {{ t('vrf.protocols.staticRouteDisable') }}</label>
+                              </div>
+                            </div>
+                            <div v-else-if="inferStaticRouteBranch(row, 'ipv4') === 'interface'" style="display:flex;gap:8px;align-items:center;">
+                              <input type="number" class="form-control" v-model="row.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" style="max-width:100px;" :disabled="writeDisabled" />
+                              <input class="form-control" v-model="row.interface" :placeholder="t('vrf.protocolPlaceholders.staticRouteInterface')" style="max-width:140px;" :disabled="writeDisabled" />
+                              <input class="form-control" v-model="row.vrf" :placeholder="t('vrf.protocolPlaceholders.staticRouteVrf')" style="max-width:120px;" :disabled="writeDisabled" />
+                              <label><input type="checkbox" v-model="row.disable" :disabled="writeDisabled" /> {{ t('vrf.protocols.staticRouteDisable') }}</label>
+                            </div>
+                            <div v-else-if="inferStaticRouteBranch(row, 'ipv4') === 'dhcp-interface'" style="display:flex;gap:8px;align-items:center;">
+                              <input class="form-control" v-model="row.dhcpInterface" :placeholder="t('vrf.protocolPlaceholders.staticRouteDhcpInterface')" style="max-width:180px;" :disabled="writeDisabled" />
+                            </div>
+                            <div v-else>-</div>
+                          </template>
+                          <template #bfdDetail="{ row }">
+                            <div v-if="inferStaticRouteBranch(row, 'ipv4') === 'next-hop'" style="display:flex;flex-direction:column;gap:6px;min-width:300px;">
+                              <div v-for="(nh, nhIdx) in row.nextHops" :key="'v4-bfd-' + row.__id + '-' + nhIdx" style="display:flex;gap:8px;align-items:center;">
+                                <select class="form-control" v-model="nh.bfdProfile" style="max-width:130px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in bfdProfileOptions" :key="'v4-table-bfd-' + row.__id + '-' + nhIdx + '-' + name" :value="name">{{ name }}</option></select>
+                                <input class="form-control" v-model="nh.bfdSourceAddress" :placeholder="t('vrf.protocolPlaceholders.staticRouteBfdSourceAddress')" style="max-width:160px;" :disabled="writeDisabled" />
+                              </div>
+                            </div>
+                            <div v-else>-</div>
+                          </template>
+                          <template #tag="{ row }">
+                            <input type="number" class="form-control" v-model="row.tag" min="1" max="4294967295" :placeholder="t('vrf.protocolPlaceholders.staticRouteTag')" style="max-width:180px;" :disabled="writeDisabled || inferStaticRouteBranch(row, 'ipv4') === 'next-hop' || inferStaticRouteBranch(row, 'ipv4') === 'interface'" />
+                          </template>
+                          <template #description="{ row }">
+                            <input class="form-control" v-model="row.description" :placeholder="t('vrf.protocolPlaceholders.staticRouteDescription')" style="max-width:220px;" :disabled="writeDisabled" />
+                          </template>
+                        </DataTable>
+                      </div>
+                    </template>
+                    <template #ipv6>
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <DataTable :columns="STATIC_ROUTE6_TABLE_COLUMNS" :data="editingVrf.staticRoutes6" row-key="__id" :actions="STATIC_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openStaticRouteCreate('ipv6')" @edit="openStaticRouteEdit('ipv6', $event)" @delete="requestStaticRouteDelete('ipv6', $event)">
+                          <template #prefix="{ row }">
+                            <input class="form-control" v-model="row.prefix" :placeholder="t('vrf.protocolPlaceholders.staticRoute6Prefix')" style="max-width:240px;" :disabled="writeDisabled" />
+                          </template>
+                          <template #nextHopType="{ row }">
+                            {{ inferStaticRouteBranch(row, 'ipv6') }}
+                          </template>
+                          <template #nextHop="{ row }">
+                            <div v-if="inferStaticRouteBranch(row, 'ipv6') === 'next-hop'" style="display:flex;flex-direction:column;gap:6px;min-width:260px;">
+                              <div v-for="(nh, nhIdx) in row.nextHops" :key="'v6-nh-' + row.__id + '-' + nhIdx" style="display:flex;gap:8px;align-items:center;">
+                                <input class="form-control" v-model="nh.address" :placeholder="t('vrf.protocolPlaceholders.staticRoute6NextHop')" style="max-width:220px;" :disabled="writeDisabled" />
+                                <input type="number" class="form-control" v-model="nh.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" style="max-width:100px;" :disabled="writeDisabled" />
+                                <ToolbarButton icon="delete" @click="removeStaticNextHop6(row, nhIdx)" :disabled="writeDisabled">{{ t('vrf.buttons.delete') }}</ToolbarButton>
+                              </div>
+                              <ToolbarButton icon="create" @click="addStaticNextHop6(row)" :disabled="writeDisabled">{{ t('vrf.buttons.addEntry') }}</ToolbarButton>
+                            </div>
+                            <div v-else>-</div>
+                          </template>
+                          <template #interfaceDetail="{ row }">
+                            <div v-if="inferStaticRouteBranch(row, 'ipv6') === 'next-hop'" style="display:flex;flex-direction:column;gap:6px;min-width:240px;">
+                              <div v-for="(nh, nhIdx) in row.nextHops" :key="'v6-intf-' + row.__id + '-' + nhIdx" style="display:flex;gap:8px;align-items:center;">
+                                <select class="form-control" v-model="nh.interface" style="max-width:140px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'v6-table-intf-' + row.__id + '-' + nhIdx + '-' + name" :value="name">{{ name }}</option></select>
+                                <label><input type="checkbox" v-model="nh.disable" :disabled="writeDisabled" /> {{ t('vrf.protocols.staticRouteDisable') }}</label>
+                              </div>
+                            </div>
+                            <div v-else>-</div>
+                          </template>
+                          <template #bfdDetail="{ row }">
+                            <div v-if="inferStaticRouteBranch(row, 'ipv6') === 'next-hop'" style="display:flex;flex-direction:column;gap:6px;min-width:320px;">
+                              <div v-for="(nh, nhIdx) in row.nextHops" :key="'v6-bfd-' + row.__id + '-' + nhIdx" style="display:flex;gap:8px;align-items:center;">
+                                <select class="form-control" v-model="nh.bfdProfile" style="max-width:140px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in bfdProfileOptions" :key="'v6-table-bfd-' + row.__id + '-' + nhIdx + '-' + name" :value="name">{{ name }}</option></select>
+                                <input class="form-control" v-model="nh.bfdSourceAddress" :placeholder="t('vrf.protocolPlaceholders.staticRouteBfdSourceAddress')" style="max-width:180px;" :disabled="writeDisabled" />
+                              </div>
+                            </div>
+                            <div v-else>-</div>
+                          </template>
+                          <template #tag="{ row }">
+                            <input type="number" class="form-control" v-model="row.tag" min="1" max="4294967295" :placeholder="t('vrf.protocolPlaceholders.staticRouteTag')" style="max-width:180px;" :disabled="writeDisabled || inferStaticRouteBranch(row, 'ipv6') === 'next-hop'" />
+                          </template>
+                          <template #description="{ row }">
+                            <input class="form-control" v-model="row.description" :placeholder="t('vrf.protocolPlaceholders.staticRouteDescription')" style="max-width:220px;" :disabled="writeDisabled" />
+                          </template>
+                        </DataTable>
+                      </div>
+                    </template>
+                  </TabGroup>
+                </div>
+              </template>
+          <template #dhcp-server>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <TabGroup v-model="dhcpServerSubTab" :tabs="DHCP_SERVER_SUB_TABS">
+                    <template #basic>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="editingVrf.dhcpServerDisable" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpServerDisable') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">hostfile-update</label><div style="flex:1;"><input type="checkbox" v-model="editingVrf.dhcpServerHostfileUpdate" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpServerHostfileUpdate') }}</div></div></div>
+                        <div class="form-row">
+                          <label class="form-label">listen-address</label>
+                          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                            <textarea
+                              class="form-control"
+                              :value="getDhcpServerListenAddressText()"
+                              @input="setDhcpServerListenAddressText($event.target.value)"
+                              rows="4"
+                              style="max-width:420px;"
+                              placeholder="192.0.2.10\n192.0.2.11"
+                              :disabled="writeDisabled"
+                            ></textarea>
+                            <div class="form-hint">{{ t('vrf.protocolHints.dhcpServerListenAddress') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">listen-interface</label>
+                          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                            <textarea
+                              class="form-control"
+                              :value="getDhcpServerListenInterfaceText()"
+                              @input="setDhcpServerListenInterfaceText($event.target.value)"
+                              rows="4"
+                              style="max-width:420px;"
+                              placeholder="eth0\neth1"
+                              :disabled="writeDisabled"
+                            ></textarea>
+                            <div class="form-hint">{{ t('vrf.protocolHints.dhcpServerListenInterface') }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                    <template #client-class>
+                      <div class="form-group" style="margin-top:0;">
+                        <div class="form-group-title">client-class</div>
+                        <div class="form-group-content">
+                          <div class="form-hint" style="margin-bottom:8px;">{{ t('vrf.protocolHints.dhcpClientClassRow') }}</div>
+                          <DataTable :columns="DHCP_CLIENT_CLASS_TABLE_COLUMNS" :data="editingVrf.dhcpServerClientClasses" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-client-class')" @edit="openServiceCollectionEdit('dhcp4-client-class', $event)" @delete="removeServiceCollectionByIds('dhcp4-client-class', $event)">
+                            <template #name="{ value }">{{ value || '-' }}</template>
+                            <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                            <template #circuitId="{ value }">{{ value || '-' }}</template>
+                            <template #remoteId="{ value }">{{ value || '-' }}</template>
+                          </DataTable>
+                        </div>
+                      </div>
+                    </template>
+                    <template #shared-network>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-group" style="margin-top:0;">
+                          <div class="form-group-title">shared-network-name</div>
+                          <div class="form-group-content">
+                            <div class="form-hint" style="margin-bottom:8px;">{{ t('vrf.protocolHints.dhcpSharedNetworkRow') }}</div>
+                            <DataTable :columns="DHCP_SHARED_NETWORK_TABLE_COLUMNS" :data="editingVrf.dhcpServerSharedNetworks" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-shared-network')" @edit="openServiceCollectionEdit('dhcp4-shared-network', $event)" @delete="removeServiceCollectionByIds('dhcp4-shared-network', $event)">
+                              <template #name="{ value }">{{ value || '-' }}</template>
+                              <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                              <template #authoritative="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                              <template #pingCheck="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                              <template #dynamicDnsUpdate="{ row }">{{ hasDhcpSharedNetworkDdnsSettings(row.dynamicDnsUpdate) ? 'Yes' : '-' }}</template>
+                              <template #description="{ value }">{{ value || '-' }}</template>
+                            </DataTable>
+                          </div>
+                        </div>
+                        <div v-for="shared in editingVrf.dhcpServerSharedNetworks" :key="'svc-shared-nested-' + shared.__id" class="form-group" style="margin-top:0;">
+                          <div class="form-group-title">{{ shared.name || 'shared-network' }}</div>
+                          <div class="form-group-content" style="display:flex;flex-direction:column;gap:10px;">
+                            <TabGroup v-model="dhcpSharedNetworkInnerTab" :tabs="DHCP_SHARED_NETWORK_INNER_TABS">
+                              <template #subnet>
+                                <div>
+                                  <DataTable :columns="DHCP_SHARED_NETWORK_SUBNET_TABLE_COLUMNS" :data="shared.subnets || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-shared-subnet'); serviceCollectionDraft.parentId = shared.__id" @edit="openServiceCollectionEdit('dhcp4-shared-subnet', { ...$event, parentId: shared.__id })" @delete="removeServiceCollectionByIds('dhcp4-shared-subnet', $event)">
+                                    <template #prefix="{ value }">{{ value || '-' }}</template>
+                                    <template #description="{ value }">{{ value || '-' }}</template>
+                                    <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                                    <template #ranges="{ row }">{{ Array.isArray(row?.ranges) ? row.ranges.length : 0 }}</template>
+                                    <template #mappings="{ row }">{{ Array.isArray(row?.staticMappings) ? row.staticMappings.length : 0 }}</template>
+                                    <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                                  </DataTable>
+                                  <div v-for="subnet in (shared.subnets || [])" :key="'svc-subnet-nested-' + shared.__id + '-' + subnet.__id" style="margin-top:8px;padding:8px;border:1px solid #e5e7eb;border-radius:6px;display:flex;flex-direction:column;gap:8px;">
+                                    <div style="font-weight:500;">{{ subnet.prefix || 'subnet' }}</div>
+                                    <div>
+                                      <div style="font-size:12px;font-weight:500;margin-bottom:6px;">range</div>
+                                      <DataTable :columns="DHCP_SHARED_SUBNET_RANGE_TABLE_COLUMNS" :data="subnet.ranges || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-shared-subnet-range'); serviceCollectionDraft.parentId = shared.__id; serviceCollectionDraft.parentSubnetId = subnet.__id" @edit="openServiceCollectionEdit('dhcp4-shared-subnet-range', { ...$event, parentId: shared.__id, parentSubnetId: subnet.__id })" @delete="removeServiceCollectionByIds('dhcp4-shared-subnet-range', $event)">
+                                        <template #name="{ value }">{{ value || '-' }}</template>
+                                        <template #clientClass="{ value }">{{ value || '-' }}</template>
+                                        <template #start="{ value }">{{ value || '-' }}</template>
+                                        <template #stop="{ value }">{{ value || '-' }}</template>
+                                        <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                                      </DataTable>
+                                    </div>
+                                    <div>
+                                      <div style="font-size:12px;font-weight:500;margin-bottom:6px;">static-mapping</div>
+                                      <DataTable :columns="DHCP_SHARED_SUBNET_MAPPING_TABLE_COLUMNS" :data="subnet.staticMappings || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-shared-subnet-mapping'); serviceCollectionDraft.parentId = shared.__id; serviceCollectionDraft.parentSubnetId = subnet.__id" @edit="openServiceCollectionEdit('dhcp4-shared-subnet-mapping', { ...$event, parentId: shared.__id, parentSubnetId: subnet.__id })" @delete="removeServiceCollectionByIds('dhcp4-shared-subnet-mapping', $event)">
+                                        <template #name="{ value }">{{ value || '-' }}</template>
+                                        <template #duid="{ value }">{{ value || '-' }}</template>
+                                        <template #ipAddress="{ value }">{{ value || '-' }}</template>
+                                        <template #macAddress="{ value }">{{ value || '-' }}</template>
+                                        <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                                        <template #description="{ value }">{{ value || '-' }}</template>
+                                        <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                                      </DataTable>
+                                    </div>
+                                    <div>
+                                      <div style="font-size:12px;font-weight:500;margin-bottom:6px;">option</div>
+                                      <DataTable :columns="DHCP_SHARED_SUBNET_OPTION_TABLE_COLUMNS" :data="subnet.options || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-shared-subnet-option'); serviceCollectionDraft.parentId = shared.__id; serviceCollectionDraft.parentSubnetId = subnet.__id" @edit="openServiceCollectionEdit('dhcp4-shared-subnet-option', { ...$event, parentId: shared.__id, parentSubnetId: subnet.__id })" @delete="removeServiceCollectionByIds('dhcp4-shared-subnet-option', $event)">
+                                        <template #name="{ value }">{{ value || '-' }}</template>
+                                        <template #value="{ value }">{{ value || '-' }}</template>
+                                      </DataTable>
+                                    </div>
+                                  </div>
+                                </div>
+                              </template>
+                              <template #dynamic-dns-update>
+                                <div style="display:flex;flex-direction:column;gap:10px;">
+                                  <div class="form-row"><label class="form-label">conflict-resolution</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">generated-prefix</label><div style="flex:1;"><input class="form-control" v-model="shared.dynamicDnsUpdate.generatedPrefix" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">hostname-char-replacement</label><div style="flex:1;"><input class="form-control" v-model="shared.dynamicDnsUpdate.hostnameCharReplacement" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">hostname-char-set</label><div style="flex:1;"><input class="form-control" v-model="shared.dynamicDnsUpdate.hostnameCharSet" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">override-client-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">override-no-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">qualifying-suffix</label><div style="flex:1;"><input class="form-control" v-model="shared.dynamicDnsUpdate.qualifyingSuffix" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">replace-client-name</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">send-updates</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">ttl-percent</label><div style="flex:1;"><input class="form-control" v-model="shared.dynamicDnsUpdate.ttlPercent" :disabled="writeDisabled" style="max-width:200px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">update-on-renew</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
+                                </div>
+                              </template>
+                              <template #option>
+                                <div style="display:flex;flex-direction:column;gap:10px;">
+                                  <div>
+                                    <div style="font-weight:500;margin-bottom:6px;">option</div>
+                                    <DataTable :columns="DHCP_SHARED_NETWORK_OPTION_TABLE_COLUMNS" :data="shared.options || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-shared-option'); serviceCollectionDraft.parentId = shared.__id" @edit="openServiceCollectionEdit('dhcp4-shared-option', { ...$event, parentId: shared.__id })" @delete="removeServiceCollectionByIds('dhcp4-shared-option', $event)">
+                                      <template #name="{ value }">{{ value || '-' }}</template>
+                                      <template #value="{ value }">{{ value || '-' }}</template>
+                                    </DataTable>
+                                  </div>
+                                  <div>
+                                    <div style="font-weight:500;margin-bottom:6px;">static-route</div>
+                                    <DataTable :columns="DHCP_SHARED_NETWORK_STATIC_ROUTE_TABLE_COLUMNS" :data="shared.staticRoutes || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-shared-static-route'); serviceCollectionDraft.parentId = shared.__id" @edit="openServiceCollectionEdit('dhcp4-shared-static-route', { ...$event, parentId: shared.__id })" @delete="removeServiceCollectionByIds('dhcp4-shared-static-route', $event)">
+                                      <template #subnet="{ value }">{{ value || '-' }}</template>
+                                      <template #nextHop="{ value }">{{ value || '-' }}</template>
+                                    </DataTable>
+                                  </div>
+                                </div>
+                              </template>
+                            </TabGroup>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                    <template #dynamic-dns-update>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">conflict-resolution</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
+                        <div class="form-group" style="margin-top:0;"><div class="form-group-title">forward-domain</div><div class="form-group-content"><DataTable :columns="DHCP_DDNS_DOMAIN_TABLE_COLUMNS" :data="editingVrf.dhcpServerDdns.forwardDomains" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('ddns-forward-domain')" @edit="openServiceCollectionEdit('ddns-forward-domain', $event)" @delete="removeServiceCollectionByIds('ddns-forward-domain', $event)"><template #name="{ value }">{{ value || '-' }}</template><template #keyName="{ value }">{{ value || '-' }}</template><template #dnsServersText="{ value }">{{ value || '-' }}</template></DataTable></div></div>
+                        <div class="form-row"><label class="form-label">generated-prefix</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerDdns.generatedPrefix" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">hostname-char-replacement</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerDdns.hostnameCharReplacement" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">hostname-char-set</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerDdns.hostnameCharSet" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">override-client-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">override-no-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">qualifying-suffix</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerDdns.qualifyingSuffix" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">replace-client-name</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
+                        <div class="form-group" style="margin-top:0;"><div class="form-group-title">reverse-domain</div><div class="form-group-content"><DataTable :columns="DHCP_DDNS_DOMAIN_TABLE_COLUMNS" :data="editingVrf.dhcpServerDdns.reverseDomains" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('ddns-reverse-domain')" @edit="openServiceCollectionEdit('ddns-reverse-domain', $event)" @delete="removeServiceCollectionByIds('ddns-reverse-domain', $event)"><template #name="{ value }">{{ value || '-' }}</template><template #keyName="{ value }">{{ value || '-' }}</template><template #dnsServersText="{ value }">{{ value || '-' }}</template></DataTable></div></div>
+                        <div class="form-row"><label class="form-label">send-updates</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
+                        <div class="form-group" style="margin-top:0;"><div class="form-group-title">tsig-key</div><div class="form-group-content"><DataTable :columns="DHCP_DDNS_TSIG_TABLE_COLUMNS" :data="editingVrf.dhcpServerDdns.tsigKeys" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('ddns-tsig-key')" @edit="openServiceCollectionEdit('ddns-tsig-key', $event)" @delete="removeServiceCollectionByIds('ddns-tsig-key', $event)"><template #name="{ value }">{{ value || '-' }}</template><template #algorithm="{ value }">{{ value || '-' }}</template><template #secret="{ value }">{{ value || '-' }}</template></DataTable></div></div>
+                        <div class="form-row"><label class="form-label">ttl-percent</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerDdns.ttlPercent" :disabled="writeDisabled" style="max-width:200px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">update-on-renew</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
+                      </div>
+                    </template>
+                    <template #high-availability>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">ca-certificate</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.caCertificate" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaCaCertificate') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">certificate</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.certificate" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaCertificate') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">mode</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerHighAvailability.mode" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="active-active">active-active</option><option value="active-passive">active-passive</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaMode') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.name" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaName') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">remote</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.remote" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaRemote') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">source-address</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.sourceAddress" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaSourceAddress') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">status</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerHighAvailability.status" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="primary">primary</option><option value="secondary">secondary</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaStatus') }}</div></div></div>
+                      </div>
+                    </template>
+              </TabGroup>
+            </div>
+          </template>
+          <template #dhcpv6-server>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <TabGroup v-model="dhcpv6ServerSubTab" :tabs="DHCPV6_SERVER_SUB_TABS">
+                    <template #basic>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="editingVrf.dhcpv6ServerDisable" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">disable-route-autoinstall</label><div style="flex:1;"><input type="checkbox" v-model="editingVrf.dhcpv6ServerDisableRouteAutoinstall" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">preference</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpv6ServerPreference" :disabled="writeDisabled" style="max-width:200px;" /></div></div>
+                        <div class="form-row">
+                          <label class="form-label">global-parameters name-server</label>
+                          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                            <textarea
+                              class="form-control"
+                              :value="getDhcpv6GlobalNameServerText()"
+                              @input="setDhcpv6GlobalNameServerText($event.target.value)"
+                              rows="4"
+                              style="max-width:420px;"
+                              placeholder="2001:db8::53\n2001:db8::54"
+                              :disabled="writeDisabled"
+                            ></textarea>
+                            <div class="form-hint">支持多行输入，也支持逗号分隔；重复地址会自动去重。</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">listen-interface</label>
+                          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                            <textarea
+                              class="form-control"
+                              :value="getDhcpv6ServerListenInterfaceText()"
+                              @input="setDhcpv6ServerListenInterfaceText($event.target.value)"
+                              rows="4"
+                              style="max-width:420px;"
+                              placeholder="eth0\neth1"
+                              :disabled="writeDisabled"
+                            ></textarea>
+                            <div class="form-hint">支持多行输入，也支持逗号分隔；重复接口会自动去重。</div>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                    <template #shared-network>
+                      <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="form-group" style="margin-top:0;">
+                          <div class="form-group-title">shared-network-name</div>
+                          <div class="form-group-content">
+                            <DataTable :columns="DHCPV6_SHARED_NETWORK_TABLE_COLUMNS" :data="editingVrf.dhcpv6ServerSharedNetworks" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-network')" @edit="openServiceCollectionEdit('dhcp6-shared-network', $event)" @delete="removeServiceCollectionByIds('dhcp6-shared-network', $event)">
+                              <template #name="{ value }">{{ value || '-' }}</template>
+                              <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                              <template #interface="{ value }">{{ value || '-' }}</template>
+                              <template #description="{ value }">{{ value || '-' }}</template>
+                              <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                              <template #subnets="{ row }">{{ Array.isArray(row?.subnets) ? row.subnets.length : 0 }}</template>
+                            </DataTable>
+                          </div>
+                        </div>
+                        <div v-for="shared in editingVrf.dhcpv6ServerSharedNetworks" :key="'svc-shared6-nested-' + shared.__id" class="form-group" style="margin-top:0;">
+                          <div class="form-group-title">{{ shared.name || 'shared-network' }}</div>
+                          <div class="form-group-content" style="display:flex;flex-direction:column;gap:8px;">
+                            <TabGroup v-model="dhcpv6SharedNetworkInnerTab" :tabs="DHCPV6_SHARED_NETWORK_INNER_TABS">
+                              <template #option>
+                                <div>
+                                  <div style="font-size:12px;font-weight:500;margin-bottom:6px;">option</div>
+                                  <DataTable :columns="DHCPV6_SHARED_OPTION_TABLE_COLUMNS" :data="shared.options || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-option'); serviceCollectionDraft.parentId = shared.__id" @edit="openServiceCollectionEdit('dhcp6-shared-option', { ...$event, parentId: shared.__id })" @delete="removeServiceCollectionByIds('dhcp6-shared-option', $event)">
+                                    <template #name="{ value }">{{ value || '-' }}</template>
+                                    <template #value="{ value }">{{ value || '-' }}</template>
+                                  </DataTable>
+                                </div>
+                              </template>
+                              <template #subnet>
+                                <div style="display:flex;flex-direction:column;gap:8px;">
+                                  <DataTable :columns="DHCPV6_SHARED_SUBNET_TABLE_COLUMNS" :data="shared.subnets || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-subnet'); serviceCollectionDraft.parentId = shared.__id" @edit="openServiceCollectionEdit('dhcp6-shared-subnet', { ...$event, parentId: shared.__id })" @delete="removeServiceCollectionByIds('dhcp6-shared-subnet', $event)">
+                                    <template #prefix="{ value }">{{ value || '-' }}</template>
+                                    <template #interface="{ value }">{{ value || '-' }}</template>
+                                    <template #ranges="{ row }">{{ Array.isArray(row?.ranges) ? row.ranges.length : 0 }}</template>
+                                    <template #mappings="{ row }">{{ Array.isArray(row?.staticMappings) ? row.staticMappings.length : 0 }}</template>
+                                    <template #delegations="{ row }">{{ Array.isArray(row?.delegations) ? row.delegations.length : 0 }}</template>
+                                    <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                                  </DataTable>
+                                  <div v-for="subnet in (shared.subnets || [])" :key="'svc-subnet6-nested-' + shared.__id + '-' + subnet.__id" style="padding:8px;border:1px solid #e5e7eb;border-radius:6px;display:flex;flex-direction:column;gap:8px;">
+                                    <div style="font-weight:500;">{{ subnet.prefix || 'subnet' }}</div>
+                                    <div>
+                                      <div style="font-size:12px;font-weight:500;margin-bottom:6px;">range</div>
+                                      <DataTable :columns="DHCPV6_SUBNET_RANGE_TABLE_COLUMNS" :data="subnet.ranges || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-subnet-range'); serviceCollectionDraft.parentId = shared.__id; serviceCollectionDraft.parentSubnetId = subnet.__id" @edit="openServiceCollectionEdit('dhcp6-shared-subnet-range', { ...$event, parentId: shared.__id, parentSubnetId: subnet.__id })" @delete="removeServiceCollectionByIds('dhcp6-shared-subnet-range', $event)">
+                                        <template #name="{ value }">{{ value || '-' }}</template>
+                                        <template #prefix="{ value }">{{ value || '-' }}</template>
+                                        <template #start="{ value }">{{ value || '-' }}</template>
+                                        <template #stop="{ value }">{{ value || '-' }}</template>
+                                        <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                                      </DataTable>
+                                    </div>
+                                    <div>
+                                      <div style="font-size:12px;font-weight:500;margin-bottom:6px;">static-mapping</div>
+                                      <DataTable :columns="DHCPV6_SUBNET_MAPPING_TABLE_COLUMNS" :data="subnet.staticMappings || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-subnet-mapping'); serviceCollectionDraft.parentId = shared.__id; serviceCollectionDraft.parentSubnetId = subnet.__id" @edit="openServiceCollectionEdit('dhcp6-shared-subnet-mapping', { ...$event, parentId: shared.__id, parentSubnetId: subnet.__id })" @delete="removeServiceCollectionByIds('dhcp6-shared-subnet-mapping', $event)">
+                                        <template #name="{ value }">{{ value || '-' }}</template>
+                                        <template #duid="{ value }">{{ value || '-' }}</template>
+                                        <template #ipv6Address="{ value }">{{ value || '-' }}</template>
+                                        <template #ipv6Prefix="{ value }">{{ value || '-' }}</template>
+                                        <template #mac="{ value }">{{ value || '-' }}</template>
+                                        <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                                        <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                                      </DataTable>
+                                    </div>
+                                    <div>
+                                      <div style="font-size:12px;font-weight:500;margin-bottom:6px;">prefix-delegation</div>
+                                      <DataTable :columns="DHCPV6_SUBNET_DELEGATION_TABLE_COLUMNS" :data="subnet.delegations || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-subnet-delegation'); serviceCollectionDraft.parentId = shared.__id; serviceCollectionDraft.parentSubnetId = subnet.__id" @edit="openServiceCollectionEdit('dhcp6-shared-subnet-delegation', { ...$event, parentId: shared.__id, parentSubnetId: subnet.__id })" @delete="removeServiceCollectionByIds('dhcp6-shared-subnet-delegation', $event)">
+                                        <template #prefix="{ value }">{{ value || '-' }}</template>
+                                        <template #delegatedLength="{ value }">{{ value || '-' }}</template>
+                                        <template #prefixLength="{ value }">{{ value || '-' }}</template>
+                                        <template #excludedPrefix="{ value }">{{ value || '-' }}</template>
+                                        <template #excludedPrefixLength="{ value }">{{ value || '-' }}</template>
+                                      </DataTable>
+                                    </div>
+                                    <div>
+                                      <div style="font-size:12px;font-weight:500;margin-bottom:6px;">option</div>
+                                      <DataTable :columns="DHCPV6_SUBNET_OPTION_TABLE_COLUMNS" :data="subnet.options || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-subnet-option'); serviceCollectionDraft.parentId = shared.__id; serviceCollectionDraft.parentSubnetId = subnet.__id" @edit="openServiceCollectionEdit('dhcp6-shared-subnet-option', { ...$event, parentId: shared.__id, parentSubnetId: subnet.__id })" @delete="removeServiceCollectionByIds('dhcp6-shared-subnet-option', $event)">
+                                        <template #name="{ value }">{{ value || '-' }}</template>
+                                        <template #value="{ value }">{{ value || '-' }}</template>
+                                      </DataTable>
+                                    </div>
+                                  </div>
+                                </div>
+                              </template>
+                            </TabGroup>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+              </TabGroup>
             </div>
           </template>
         </TabGroup>
+        </div>
       </DraggableModal>
       <DraggableModal v-model:visible="deleteModalVisible" :title="t('vrf.modals.confirmDelete')" width="400px" @confirm="confirmRemove">
         <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
@@ -376,6 +12754,1469 @@ export default defineComponent({
           <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
+
+      <DraggableModal v-model:visible="serviceCollectionModalVisible" :title="serviceCollectionModalTitle" width="760px" @confirm="saveServiceCollectionModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <template v-if="serviceCollectionType === 'dhcp4-listen-address'">
+            <div class="form-row"><label class="form-label">address</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.address" placeholder="192.0.2.10" style="width:320px;" :disabled="writeDisabled" /></div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp4-listen-interface' || serviceCollectionType === 'dhcp6-listen-interface'">
+            <div class="form-row"><label class="form-label">interface</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.name" style="width:320px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'svc-if-'+serviceCollectionType+'-'+name" :value="name">{{ name }}</option></select></div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp4-client-class'">
+            <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="class-name" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpClientClassDisable') }}</div></div></div>
+            <div class="form-row"><label class="form-label">circuit-id</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.circuitId" placeholder="0x1234 or text" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpRelayAgentCircuitId') }}</div></div></div>
+            <div class="form-row"><label class="form-label">remote-id</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.remoteId" placeholder="0x1234 or text" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpRelayAgentRemoteId') }}</div></div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp4-shared-network'">
+            <TabGroup v-model="dhcpSharedNetworkModalTab" :tabs="DHCP_SHARED_NETWORK_MODAL_TABS">
+              <template #basic>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="shared-network" style="width:320px;" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">description</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" style="width:420px;" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSharedNetworkDisable') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">authoritative</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.authoritative" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSharedNetworkAuthoritative') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">ping-check</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.pingCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSharedNetworkPingCheck') }}</div></div></div>
+                </div>
+              </template>
+              <template #dynamic-dns-update>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="form-row"><label class="form-label">conflict-resolution</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">generated-prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.generatedPrefix" placeholder="generated-prefix" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">hostname-char-replacement</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharReplacement" placeholder="-" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">hostname-char-set</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharSet" placeholder="regex" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">override-client-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">override-no-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">qualifying-suffix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.qualifyingSuffix" placeholder="example.com" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">replace-client-name</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">send-updates</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">ttl-percent</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.ttlPercent" placeholder="percent" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">update-on-renew</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
+                </div>
+              </template>
+              <template #subnet>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <DataTable :columns="DHCP_SHARED_NETWORK_SUBNET_TABLE_COLUMNS" :data="serviceCollectionDraft.subnets || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || (!serviceCollectionDraft.__id && !String(serviceCollectionDraft.name || '').trim())" :page-size="50" @create="openDhcp4SharedSubnetCreateFromSharedNetwork" @edit="openDhcp4SharedSubnetEditFromSharedNetwork($event)" @delete="removeDhcp4SharedSubnetFromSharedNetwork($event)">
+                    <template #prefix="{ value }">{{ value || '-' }}</template>
+                    <template #description="{ value }">{{ value || '-' }}</template>
+                    <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                    <template #ranges="{ row }">{{ Array.isArray(row?.ranges) ? row.ranges.length : 0 }}</template>
+                    <template #mappings="{ row }">{{ Array.isArray(row?.staticMappings) ? row.staticMappings.length : 0 }}</template>
+                    <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                  </DataTable>
+                </div>
+              </template>
+              <template #option>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div>
+                    <div style="font-weight:500;margin-bottom:6px;">option</div>
+                    <div class="form-hint" style="margin-bottom:8px;">Multiple values can be separated by comma or new line.</div>
+                    <div class="form-row"><label class="form-label">bootfile-name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['bootfile-name']" placeholder="Bootstrap file name" style="width:420px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">bootfile-server</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['bootfile-server']" placeholder="192.0.2.10 or host.example.com" style="width:420px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">bootfile-size</label><div style="flex:1;"><input type="number" min="1" max="16" class="form-control" v-model="serviceCollectionDraft.optionValues['bootfile-size']" placeholder="1-16" style="width:220px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">captive-portal</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['captive-portal']" placeholder="https://portal.example.com/api" style="width:520px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">capwap-controller</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['capwap-controller']" placeholder="192.0.2.20" style="width:320px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">client-prefix-length</label><div style="flex:1;"><input type="number" min="0" max="32" class="form-control" v-model="serviceCollectionDraft.optionValues['client-prefix-length']" placeholder="0-32" style="width:220px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">default-router</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['default-router']" placeholder="192.0.2.1" style="width:320px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">domain-name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['domain-name']" placeholder="example.com" style="width:320px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">domain-search</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['domain-search']" placeholder="example.com" style="width:420px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">interface-mtu</label><div style="flex:1;"><input type="number" min="576" max="9000" class="form-control" v-model="serviceCollectionDraft.optionValues['interface-mtu']" placeholder="576-9000" style="width:220px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">ip-forwarding</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.optionValues['ip-forwarding']" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">ipv6-only-preferred</label><div style="flex:1;"><input type="number" min="0" max="4294967295" class="form-control" v-model="serviceCollectionDraft.optionValues['ipv6-only-preferred']" placeholder="0-4294967295" style="width:260px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">name-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['name-server']" rows="2" style="width:420px;" placeholder="192.0.2.53" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">ntp-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['ntp-server']" rows="2" style="width:420px;" placeholder="192.0.2.123" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">pop-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['pop-server']" rows="2" style="width:420px;" placeholder="192.0.2.30" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">server-identifier</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['server-identifier']" placeholder="192.0.2.2" style="width:320px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">smtp-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['smtp-server']" rows="2" style="width:420px;" placeholder="192.0.2.25" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">tftp-server-name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['tftp-server-name']" placeholder="192.0.2.10 or tftp.example.com" style="width:420px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">time-offset</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.optionValues['time-offset']" placeholder="-3600" style="width:220px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">time-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['time-server']" rows="2" style="width:420px;" placeholder="192.0.2.40" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">time-zone</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['time-zone']" placeholder="Asia/Shanghai" style="width:320px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">vendor-option ubiquiti unifi-controller</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['vendor-option ubiquiti unifi-controller']" placeholder="192.0.2.50" style="width:420px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">wins-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['wins-server']" rows="2" style="width:420px;" placeholder="192.0.2.60" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">wpad-url</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['wpad-url']" placeholder="http://wpad.example.com/wpad.dat" style="width:520px;" :disabled="writeDisabled" /></div></div>
+                  </div>
+                  <div>
+                    <div style="font-weight:500;margin-bottom:6px;">static-route</div>
+                    <DataTable :columns="DHCP_SHARED_NETWORK_STATIC_ROUTE_TABLE_COLUMNS" :data="serviceCollectionDraft.staticRoutes || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || (!serviceCollectionDraft.__id && !String(serviceCollectionDraft.name || '').trim())" :page-size="50" @create="openDhcp4SharedStaticRouteCreateFromSharedNetwork" @edit="openDhcp4SharedStaticRouteEditFromSharedNetwork($event)" @delete="removeDhcp4SharedStaticRouteFromSharedNetwork($event)">
+                      <template #subnet="{ value }">{{ value || '-' }}</template>
+                      <template #nextHop="{ value }">{{ value || '-' }}</template>
+                    </DataTable>
+                  </div>
+                </div>
+              </template>
+            </TabGroup>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp4-shared-subnet'">
+            <TabGroup v-model="dhcp4SharedSubnetModalTab" :tabs="DHCP4_SHARED_SUBNET_MODAL_TABS">
+              <template #basic>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="form-row"><label class="form-label">subnet</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="192.0.2.0/24" style="width:320px;" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">description</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" style="width:420px;" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">client-class</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.clientClass" placeholder="client-class-name" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSubnetClientClass') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">subnet-id</label><div style="flex:1;"><input type="number" min="1" max="4294967294" class="form-control" v-model="serviceCollectionDraft.subnetId" placeholder="1" style="width:220px;" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">ignore-client-id</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.ignoreClientId" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">ping-check</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.pingCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSubnetPingCheck') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">lease</label><div style="flex:1;"><input type="number" min="0" max="4294967295" class="form-control" v-model="serviceCollectionDraft.lease" placeholder="86400" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSubnetLease') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">exclude</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.excludeText" rows="2" style="width:420px;" placeholder="192.0.2.10" :disabled="writeDisabled"></textarea></div></div>
+                  <div class="form-row"><label class="form-label">default-router</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.defaultRouterText" rows="2" style="width:420px;" placeholder="192.0.2.1" :disabled="writeDisabled"></textarea></div></div>
+                  <div class="form-row"><label class="form-label">domain-name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.domainName" placeholder="example.com" style="width:320px;" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">domain-search</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.domainSearchText" rows="2" style="width:420px;" placeholder="example.com" :disabled="writeDisabled"></textarea></div></div>
+                  <div class="form-row"><label class="form-label">name-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.nameServerText" rows="2" style="width:420px;" placeholder="192.0.2.53" :disabled="writeDisabled"></textarea></div></div>
+                  <div class="form-row"><label class="form-label">ntp-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.ntpServerText" rows="2" style="width:420px;" placeholder="192.0.2.123" :disabled="writeDisabled"></textarea></div></div>
+                </div>
+              </template>
+              <template #dynamic-dns-update>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="form-row"><label class="form-label">conflict-resolution</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">generated-prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.generatedPrefix" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">hostname-char-replacement</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharReplacement" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">hostname-char-set</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharSet" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">override-client-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">override-no-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">qualifying-suffix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.qualifyingSuffix" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">replace-client-name</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">send-updates</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">ttl-percent</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.ttlPercent" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">update-on-renew</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
+                </div>
+              </template>
+              <template #range>
+                <div>
+                  <DataTable :columns="DHCP_SHARED_SUBNET_RANGE_TABLE_COLUMNS" :data="serviceCollectionDraft.ranges || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || !serviceCollectionDraft.__id" :page-size="50" @create="openDhcp4SharedSubnetRangeCreateFromSubnet" @edit="openDhcp4SharedSubnetRangeEditFromSubnet($event)" @delete="removeDhcp4SharedSubnetRangeFromSubnet($event)">
+                    <template #name="{ value }">{{ value || '-' }}</template>
+                    <template #clientClass="{ value }">{{ value || '-' }}</template>
+                    <template #start="{ value }">{{ value || '-' }}</template>
+                    <template #stop="{ value }">{{ value || '-' }}</template>
+                    <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                  </DataTable>
+                </div>
+              </template>
+              <template #static-mapping>
+                <div>
+                  <DataTable :columns="DHCP_SHARED_SUBNET_MAPPING_TABLE_COLUMNS" :data="serviceCollectionDraft.staticMappings || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || !serviceCollectionDraft.__id" :page-size="50" @create="openDhcp4SharedSubnetMappingCreateFromSubnet" @edit="openDhcp4SharedSubnetMappingEditFromSubnet($event)" @delete="removeDhcp4SharedSubnetMappingFromSubnet($event)">
+                    <template #name="{ value }">{{ value || '-' }}</template>
+                    <template #duid="{ value }">{{ value || '-' }}</template>
+                    <template #ipAddress="{ value }">{{ value || '-' }}</template>
+                    <template #macAddress="{ value }">{{ value || '-' }}</template>
+                    <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                    <template #description="{ value }">{{ value || '-' }}</template>
+                    <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                  </DataTable>
+                </div>
+              </template>
+              <template #option>
+                <div>
+                  <DataTable :columns="DHCP_SHARED_SUBNET_OPTION_TABLE_COLUMNS" :data="serviceCollectionDraft.options || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || !serviceCollectionDraft.__id" :page-size="50" @create="openDhcp4SharedSubnetOptionCreateFromSubnet" @edit="openDhcp4SharedSubnetOptionEditFromSubnet($event)" @delete="removeDhcp4SharedSubnetOptionFromSubnet($event)">
+                    <template #name="{ value }">{{ value || '-' }}</template>
+                    <template #value="{ value }">{{ value || '-' }}</template>
+                  </DataTable>
+                </div>
+              </template>
+            </TabGroup>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp4-shared-option'">
+            <div class="form-row"><label class="form-label">option</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.name" style="width:420px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in DHCP4_SHARED_OPTION_NAMES" :key="'svc-dhcp4-shared-opt-' + name" :value="name">{{ name }}</option></select></div></div>
+            <div class="form-row"><label class="form-label">value</label><div style="flex:1;"><input class="form-control" :type="getDhcp4SharedOptionInputType(serviceCollectionDraft.name)" :min="getDhcp4SharedOptionInputMin(serviceCollectionDraft.name)" :max="getDhcp4SharedOptionInputMax(serviceCollectionDraft.name)" step="1" v-model="serviceCollectionDraft.value" :placeholder="getDhcp4SharedOptionValuePlaceholder(serviceCollectionDraft.name)" style="width:420px;" :disabled="writeDisabled || serviceCollectionDraft.name === 'ip-forwarding'" /></div></div>
+            <div class="form-row"><label class="form-label"></label><div class="form-hint" style="flex:1;">{{ getDhcp4SharedOptionHint(serviceCollectionDraft.name) }}</div></div>
+            <div class="form-row"><label class="form-label"></label><div class="form-hint" style="flex:1;">For repeated options like name-server/ntp-server/wins-server, add multiple rows.</div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp4-shared-static-route'">
+            <div class="form-row"><label class="form-label">subnet</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.subnet" placeholder="10.0.0.0/24" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">next-hop</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.nextHop" placeholder="192.0.2.1" style="width:320px;" :disabled="writeDisabled" /></div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp4-shared-subnet-range'">
+            <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="pool1" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">client-class</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.clientClass" placeholder="client-class-name" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpRangeClientClass') }}</div></div></div>
+            <div class="form-row"><label class="form-label">start</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.start" placeholder="192.0.2.100" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">stop</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.stop" placeholder="192.0.2.200" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-group" style="margin-top:0;"><div class="form-group-title">option</div><div class="form-group-content"><DataTable :columns="DHCP_SHARED_SUBNET_OPTION_TABLE_COLUMNS" :data="serviceCollectionDraft.options || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || !serviceCollectionDraft.__id" :page-size="50" @create="openDhcp4SharedSubnetRangeOptionCreateFromRange" @edit="openDhcp4SharedSubnetRangeOptionEditFromRange($event)" @delete="removeServiceCollectionByIds('dhcp4-shared-subnet-range-option', $event)"><template #name="{ value }">{{ value || '-' }}</template><template #value="{ value }">{{ value || '-' }}</template></DataTable><div class="form-hint">{{ t('vrf.protocolHints.dhcpRangeOptionRowsText') }}</div></div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp4-shared-subnet-mapping'">
+            <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="host1" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">duid</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.duid" placeholder="00:01:00:01:..." style="width:520px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpStaticMappingDuid') }}</div></div></div>
+            <div class="form-row"><label class="form-label">ip-address</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.ipAddress" placeholder="192.0.2.10" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">mac</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.macAddress" placeholder="00:11:22:33:44:55" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">description</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" style="width:420px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+            <div class="form-group" style="margin-top:0;"><div class="form-group-title">option</div><div class="form-group-content"><DataTable :columns="DHCP_SHARED_SUBNET_OPTION_TABLE_COLUMNS" :data="serviceCollectionDraft.options || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || !serviceCollectionDraft.__id" :page-size="50" @create="openDhcp4SharedSubnetMappingOptionCreateFromMapping" @edit="openDhcp4SharedSubnetMappingOptionEditFromMapping($event)" @delete="removeServiceCollectionByIds('dhcp4-shared-subnet-mapping-option', $event)"><template #name="{ value }">{{ value || '-' }}</template><template #value="{ value }">{{ value || '-' }}</template></DataTable><div class="form-hint">{{ t('vrf.protocolHints.dhcpStaticMappingOptionRowsText') }}</div></div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp4-shared-subnet-option' || serviceCollectionType === 'dhcp4-shared-subnet-range-option' || serviceCollectionType === 'dhcp4-shared-subnet-mapping-option'">
+            <div class="form-row"><label class="form-label">option</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.name" style="width:420px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in getDhcp4SubnetOptionNameChoices(serviceCollectionDraft.name)" :key="'svc-dhcp4-subnet-opt-' + name" :value="name">{{ name }}</option></select></div></div>
+            <div class="form-row"><label class="form-label">value</label><div style="flex:1;"><input class="form-control" :type="getDhcp4SharedOptionInputType(serviceCollectionDraft.name)" :min="getDhcp4SharedOptionInputMin(serviceCollectionDraft.name)" :max="getDhcp4SharedOptionInputMax(serviceCollectionDraft.name)" step="1" v-model="serviceCollectionDraft.value" :placeholder="getDhcp4SharedOptionValuePlaceholder(serviceCollectionDraft.name)" style="width:420px;" :disabled="writeDisabled || serviceCollectionDraft.name === 'ip-forwarding'" /></div></div>
+            <div class="form-row"><label class="form-label"></label><div class="form-hint" style="flex:1;">{{ getDhcp4SharedOptionHint(serviceCollectionDraft.name) }}</div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp6-shared-network'">
+            <TabGroup v-model="dhcpv6SharedNetworkModalTab" :tabs="DHCPV6_SHARED_NETWORK_MODAL_TABS">
+              <template #basic>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="shared-network" style="width:320px;" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">interface</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.interface" style="width:320px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'svc-if-dhcp6-shared-'+name" :value="name">{{ name }}</option></select></div></div>
+                  <div class="form-row"><label class="form-label">description</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" style="width:420px;" :disabled="writeDisabled" /></div></div>
+                </div>
+              </template>
+              <template #option>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div class="form-hint" v-if="Array.isArray(serviceCollectionDraft.optionExtraRows) && serviceCollectionDraft.optionExtraRows.length">Unrecognized option rows are preserved automatically ({{ serviceCollectionDraft.optionExtraRows.length }}).</div>
+                  <div class="form-row" v-for="item in DHCP6_SHARED_OPTION_FIELDS" :key="'dhcp6-shared-option-field-' + item.name">
+                    <label class="form-label">{{ item.label }}</label>
+                    <div style="flex:1;">
+                      <textarea
+                        v-if="item.type === 'textarea'"
+                        class="form-control"
+                        v-model="serviceCollectionDraft.optionValues[item.name]"
+                        rows="2"
+                        style="width:520px;"
+                        :placeholder="item.placeholder"
+                        :disabled="writeDisabled"
+                      ></textarea>
+                      <input
+                        v-else
+                        class="form-control"
+                        :type="item.type || 'text'"
+                        :min="item.min || ''"
+                        :max="item.max || ''"
+                        step="1"
+                        v-model="serviceCollectionDraft.optionValues[item.name]"
+                        style="width:520px;"
+                        :placeholder="item.placeholder"
+                        :disabled="writeDisabled"
+                      />
+                      <div class="form-hint">{{ getDhcp6OptionFieldHint(item.name) }}</div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <template #subnet>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <DataTable :columns="DHCPV6_SHARED_SUBNET_TABLE_COLUMNS" :data="serviceCollectionDraft.subnets || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || (!serviceCollectionDraft.__id && !String(serviceCollectionDraft.name || '').trim())" :page-size="50" @create="openDhcp6SharedSubnetCreateFromSharedNetwork" @edit="openDhcp6SharedSubnetEditFromSharedNetwork($event)" @delete="removeDhcp6SharedSubnetFromSharedNetwork($event)">
+                    <template #prefix="{ value }">{{ value || '-' }}</template>
+                    <template #interface="{ value }">{{ value || '-' }}</template>
+                    <template #ranges="{ row }">{{ Array.isArray(row?.ranges) ? row.ranges.length : 0 }}</template>
+                    <template #mappings="{ row }">{{ Array.isArray(row?.staticMappings) ? row.staticMappings.length : 0 }}</template>
+                    <template #delegations="{ row }">{{ Array.isArray(row?.delegations) ? row.delegations.length : 0 }}</template>
+                    <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                  </DataTable>
+                  <div v-for="subnet in (serviceCollectionDraft.subnets || [])" :key="'svc-subnet6-modal-' + serviceCollectionDraft.__id + '-' + subnet.__id" style="padding:8px;border:1px solid #e5e7eb;border-radius:6px;display:flex;flex-direction:column;gap:8px;">
+                    <div style="font-weight:500;">{{ subnet.prefix || 'subnet' }}</div>
+                    <div>
+                      <div style="font-size:12px;font-weight:500;margin-bottom:6px;">range</div>
+                      <DataTable :columns="DHCPV6_SUBNET_RANGE_TABLE_COLUMNS" :data="subnet.ranges || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || !serviceCollectionDraft.__id" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-subnet-range'); serviceCollectionDraft.parentId = serviceCollectionDraft.__id; serviceCollectionDraft.parentSubnetId = subnet.__id" @edit="openServiceCollectionEdit('dhcp6-shared-subnet-range', { ...$event, parentId: serviceCollectionDraft.__id, parentSubnetId: subnet.__id })" @delete="removeServiceCollectionByIds('dhcp6-shared-subnet-range', $event)">
+                        <template #name="{ value }">{{ value || '-' }}</template>
+                        <template #prefix="{ value }">{{ value || '-' }}</template>
+                        <template #start="{ value }">{{ value || '-' }}</template>
+                        <template #stop="{ value }">{{ value || '-' }}</template>
+                        <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                      </DataTable>
+                    </div>
+                    <div>
+                      <div style="font-size:12px;font-weight:500;margin-bottom:6px;">static-mapping</div>
+                      <DataTable :columns="DHCPV6_SUBNET_MAPPING_TABLE_COLUMNS" :data="subnet.staticMappings || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || !serviceCollectionDraft.__id" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-subnet-mapping'); serviceCollectionDraft.parentId = serviceCollectionDraft.__id; serviceCollectionDraft.parentSubnetId = subnet.__id" @edit="openServiceCollectionEdit('dhcp6-shared-subnet-mapping', { ...$event, parentId: serviceCollectionDraft.__id, parentSubnetId: subnet.__id })" @delete="removeServiceCollectionByIds('dhcp6-shared-subnet-mapping', $event)">
+                        <template #name="{ value }">{{ value || '-' }}</template>
+                        <template #duid="{ value }">{{ value || '-' }}</template>
+                        <template #ipv6Address="{ value }">{{ value || '-' }}</template>
+                        <template #ipv6Prefix="{ value }">{{ value || '-' }}</template>
+                        <template #mac="{ value }">{{ value || '-' }}</template>
+                        <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                        <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                      </DataTable>
+                    </div>
+                    <div>
+                      <div style="font-size:12px;font-weight:500;margin-bottom:6px;">prefix-delegation</div>
+                      <DataTable :columns="DHCPV6_SUBNET_DELEGATION_TABLE_COLUMNS" :data="subnet.delegations || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || !serviceCollectionDraft.__id" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-subnet-delegation'); serviceCollectionDraft.parentId = serviceCollectionDraft.__id; serviceCollectionDraft.parentSubnetId = subnet.__id" @edit="openServiceCollectionEdit('dhcp6-shared-subnet-delegation', { ...$event, parentId: serviceCollectionDraft.__id, parentSubnetId: subnet.__id })" @delete="removeServiceCollectionByIds('dhcp6-shared-subnet-delegation', $event)">
+                        <template #prefix="{ value }">{{ value || '-' }}</template>
+                        <template #delegatedLength="{ value }">{{ value || '-' }}</template>
+                        <template #prefixLength="{ value }">{{ value || '-' }}</template>
+                        <template #excludedPrefix="{ value }">{{ value || '-' }}</template>
+                        <template #excludedPrefixLength="{ value }">{{ value || '-' }}</template>
+                      </DataTable>
+                    </div>
+                    <div>
+                      <div style="font-size:12px;font-weight:500;margin-bottom:6px;">option</div>
+                      <DataTable :columns="DHCPV6_SUBNET_OPTION_TABLE_COLUMNS" :data="subnet.options || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || !serviceCollectionDraft.__id" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-subnet-option'); serviceCollectionDraft.parentId = serviceCollectionDraft.__id; serviceCollectionDraft.parentSubnetId = subnet.__id" @edit="openServiceCollectionEdit('dhcp6-shared-subnet-option', { ...$event, parentId: serviceCollectionDraft.__id, parentSubnetId: subnet.__id })" @delete="removeServiceCollectionByIds('dhcp6-shared-subnet-option', $event)">
+                        <template #name="{ value }">{{ value || '-' }}</template>
+                        <template #value="{ value }">{{ value || '-' }}</template>
+                      </DataTable>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </TabGroup>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp6-global-name-server'">
+            <div class="form-row"><label class="form-label">name-server</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.address" placeholder="2001:db8::53" style="width:320px;" :disabled="writeDisabled" /></div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp6-shared-option'">
+            <div class="form-row"><label class="form-label">option</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.name" style="width:420px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in getDhcp6SubnetOptionNameChoices(serviceCollectionDraft.name)" :key="'svc-dhcp6-shared-opt-' + name" :value="name">{{ name }}</option></select></div></div>
+            <div class="form-row"><label class="form-label">value</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.value" placeholder="2001:db8::1" style="width:420px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label"></label><div class="form-hint" style="flex:1;">{{ getDhcp6SharedOptionHint(serviceCollectionDraft.name) }}</div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp6-shared-subnet'">
+            <TabGroup v-model="dhcp6SharedSubnetModalTab" :tabs="DHCPV6_SHARED_SUBNET_MODAL_TABS">
+              <template #basic>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="form-row"><label class="form-label">subnet</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="2001:db8::/64" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix, format: h:h:h:h::/x.</div></div></div>
+                  <div class="form-row"><label class="form-label">interface</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.interface" style="width:320px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'svc-if-dhcp6-subnet-'+name" :value="name">{{ name }}</option></select><div class="form-hint">Interface name, for example eth0.</div></div></div>
+                  <div class="form-row"><label class="form-label">subnet-id</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.subnetId" min="1" max="4294967294" placeholder="1" style="width:240px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6SubnetId') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">lease-time default</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.leaseTimeDefault" min="1" max="4294967295" placeholder="86400" style="width:260px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6LeaseTimeDefault') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">lease-time maximum</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.leaseTimeMaximum" min="1" max="4294967295" placeholder="86400" style="width:260px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6LeaseTimeMaximum') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">lease-time minimum</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.leaseTimeMinimum" min="1" max="4294967295" placeholder="3600" style="width:260px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6LeaseTimeMinimum') }}</div></div></div>
+                </div>
+              </template>
+              <template #range>
+                <div>
+                  <DataTable :columns="DHCPV6_SUBNET_RANGE_TABLE_COLUMNS" :data="serviceCollectionDraft.ranges || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || (!serviceCollectionDraft.__id && !String(serviceCollectionDraft.prefix || '').trim())" :page-size="50" @create="openDhcp6SharedSubnetRangeCreateFromSubnet" @edit="openDhcp6SharedSubnetRangeEditFromSubnet($event)" @delete="removeDhcp6SharedSubnetRangeFromSubnet($event)">
+                    <template #name="{ value }">{{ value || '-' }}</template>
+                    <template #prefix="{ value }">{{ value || '-' }}</template>
+                    <template #start="{ value }">{{ value || '-' }}</template>
+                    <template #stop="{ value }">{{ value || '-' }}</template>
+                    <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                  </DataTable>
+                </div>
+              </template>
+              <template #static-mapping>
+                <div>
+                  <DataTable :columns="DHCPV6_SUBNET_MAPPING_TABLE_COLUMNS" :data="serviceCollectionDraft.staticMappings || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || (!serviceCollectionDraft.__id && !String(serviceCollectionDraft.prefix || '').trim())" :page-size="50" @create="openDhcp6SharedSubnetMappingCreateFromSubnet" @edit="openDhcp6SharedSubnetMappingEditFromSubnet($event)" @delete="removeDhcp6SharedSubnetMappingFromSubnet($event)">
+                    <template #name="{ value }">{{ value || '-' }}</template>
+                    <template #duid="{ value }">{{ value || '-' }}</template>
+                    <template #ipv6Address="{ value }">{{ value || '-' }}</template>
+                    <template #ipv6Prefix="{ value }">{{ value || '-' }}</template>
+                    <template #mac="{ value }">{{ value || '-' }}</template>
+                    <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                    <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                  </DataTable>
+                </div>
+              </template>
+              <template #prefix-delegation>
+                <div>
+                  <DataTable :columns="DHCPV6_SUBNET_DELEGATION_TABLE_COLUMNS" :data="serviceCollectionDraft.delegations || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || (!serviceCollectionDraft.__id && !String(serviceCollectionDraft.prefix || '').trim())" :page-size="50" @create="openDhcp6SharedSubnetDelegationCreateFromSubnet" @edit="openDhcp6SharedSubnetDelegationEditFromSubnet($event)" @delete="removeDhcp6SharedSubnetDelegationFromSubnet($event)">
+                    <template #prefix="{ value }">{{ value || '-' }}</template>
+                    <template #delegatedLength="{ value }">{{ value || '-' }}</template>
+                    <template #prefixLength="{ value }">{{ value || '-' }}</template>
+                    <template #excludedPrefix="{ value }">{{ value || '-' }}</template>
+                    <template #excludedPrefixLength="{ value }">{{ value || '-' }}</template>
+                  </DataTable>
+                </div>
+              </template>
+              <template #option>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div class="form-hint" v-if="Array.isArray(serviceCollectionDraft.optionExtraRows) && serviceCollectionDraft.optionExtraRows.length">Unrecognized option rows are preserved automatically ({{ serviceCollectionDraft.optionExtraRows.length }}).</div>
+                  <div class="form-row" v-for="item in DHCP6_SHARED_OPTION_FIELDS" :key="'dhcp6-subnet-option-field-' + item.name">
+                    <label class="form-label">{{ item.label }}</label>
+                    <div style="flex:1;">
+                      <textarea
+                        v-if="item.type === 'textarea'"
+                        class="form-control"
+                        v-model="serviceCollectionDraft.optionValues[item.name]"
+                        rows="2"
+                        style="width:520px;"
+                        :placeholder="item.placeholder"
+                        :disabled="writeDisabled"
+                      ></textarea>
+                      <input
+                        v-else
+                        class="form-control"
+                        :type="item.type || 'text'"
+                        :min="item.min || ''"
+                        :max="item.max || ''"
+                        step="1"
+                        v-model="serviceCollectionDraft.optionValues[item.name]"
+                        style="width:520px;"
+                        :placeholder="item.placeholder"
+                        :disabled="writeDisabled"
+                      />
+                      <div class="form-hint">{{ getDhcp6OptionFieldHint(item.name) }}</div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </TabGroup>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp6-shared-subnet-range'">
+            <TabGroup v-model="dhcp6SharedSubnetRangeModalTab" :tabs="DHCPV6_SHARED_SUBNET_NESTED_MODAL_TABS">
+              <template #basic>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="range1" style="width:320px;" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="2001:db8:1::/64" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix, format: h:h:h:h::/x.</div></div></div>
+                  <div class="form-row"><label class="form-label">start</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.start" placeholder="2001:db8:1::10" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 address, format: h:h:h:h::.</div></div></div>
+                  <div class="form-row"><label class="form-label">stop</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.stop" placeholder="2001:db8:1::ffff" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 address, must be greater than or equal to start.</div></div></div>
+                </div>
+              </template>
+              <template #option>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div class="form-hint" v-if="Array.isArray(serviceCollectionDraft.optionExtraRows) && serviceCollectionDraft.optionExtraRows.length">Unrecognized option rows are preserved automatically ({{ serviceCollectionDraft.optionExtraRows.length }}).</div>
+                  <div class="form-row" v-for="item in DHCP6_SHARED_OPTION_FIELDS" :key="'dhcp6-range-option-field-' + item.name">
+                    <label class="form-label">{{ item.label }}</label>
+                    <div style="flex:1;">
+                      <textarea
+                        v-if="item.type === 'textarea'"
+                        class="form-control"
+                        v-model="serviceCollectionDraft.optionValues[item.name]"
+                        rows="2"
+                        style="width:520px;"
+                        :placeholder="item.placeholder"
+                        :disabled="writeDisabled"
+                      ></textarea>
+                      <input
+                        v-else
+                        class="form-control"
+                        :type="item.type || 'text'"
+                        :min="item.min || ''"
+                        :max="item.max || ''"
+                        step="1"
+                        v-model="serviceCollectionDraft.optionValues[item.name]"
+                        style="width:520px;"
+                        :placeholder="item.placeholder"
+                        :disabled="writeDisabled"
+                      />
+                      <div class="form-hint">{{ getDhcp6OptionFieldHint(item.name) }}</div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </TabGroup>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp6-shared-subnet-mapping'">
+            <TabGroup v-model="dhcp6SharedSubnetMappingModalTab" :tabs="DHCPV6_SHARED_SUBNET_NESTED_MODAL_TABS">
+              <template #basic>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="host1" style="width:320px;" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">duid</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.duid" placeholder="00:01:00:01:..." style="width:520px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpStaticMappingDuid') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">ipv6-address</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.ipv6Address" placeholder="2001:db8::100" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 address for this static mapping.</div></div></div>
+                  <div class="form-row"><label class="form-label">ipv6-prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.ipv6Prefix" placeholder="2001:db8:100::/56" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix for this static mapping, format: h:h:h:h::/x.</div></div></div>
+                  <div class="form-row"><label class="form-label">mac</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.mac" placeholder="00:11:22:33:44:55" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">MAC address, format: 00:11:22:33:44:55.</div></div></div>
+                  <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+                </div>
+              </template>
+              <template #option>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div class="form-hint" v-if="Array.isArray(serviceCollectionDraft.optionExtraRows) && serviceCollectionDraft.optionExtraRows.length">Unrecognized option rows are preserved automatically ({{ serviceCollectionDraft.optionExtraRows.length }}).</div>
+                  <div class="form-row" v-for="item in DHCP6_SHARED_OPTION_FIELDS" :key="'dhcp6-mapping-option-field-' + item.name">
+                    <label class="form-label">{{ item.label }}</label>
+                    <div style="flex:1;">
+                      <textarea
+                        v-if="item.type === 'textarea'"
+                        class="form-control"
+                        v-model="serviceCollectionDraft.optionValues[item.name]"
+                        rows="2"
+                        style="width:520px;"
+                        :placeholder="item.placeholder"
+                        :disabled="writeDisabled"
+                      ></textarea>
+                      <input
+                        v-else
+                        class="form-control"
+                        :type="item.type || 'text'"
+                        :min="item.min || ''"
+                        :max="item.max || ''"
+                        step="1"
+                        v-model="serviceCollectionDraft.optionValues[item.name]"
+                        style="width:520px;"
+                        :placeholder="item.placeholder"
+                        :disabled="writeDisabled"
+                      />
+                      <div class="form-hint">{{ getDhcp6OptionFieldHint(item.name) }}</div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </TabGroup>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp6-shared-subnet-delegation'">
+            <div class="form-row"><label class="form-label">prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="2001:db8:200::/56" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix used in prefix-delegation.</div></div></div>
+            <div class="form-row"><label class="form-label">delegated-length</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.delegatedLength" min="32" max="64" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">Range: 32-64.</div></div></div>
+            <div class="form-row"><label class="form-label">prefix-length</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.prefixLength" min="32" max="64" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">Range: 32-64.</div></div></div>
+            <div class="form-row"><label class="form-label">excluded-prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.excludedPrefix" placeholder="2001:db8:200:ff00::/64" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">Optional IPv6 prefix excluded from delegation.</div></div></div>
+            <div class="form-row"><label class="form-label">excluded-prefix-length</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.excludedPrefixLength" min="33" max="128" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">Range: 33-128 (optional).</div></div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'dhcp6-shared-subnet-option' || serviceCollectionType === 'dhcp6-shared-subnet-range-option' || serviceCollectionType === 'dhcp6-shared-subnet-mapping-option'">
+            <div class="form-row"><label class="form-label">option</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.name" style="width:420px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in getDhcp6SubnetOptionNameChoices(serviceCollectionDraft.name)" :key="'svc-dhcp6-subnet-opt-' + name" :value="name">{{ name }}</option></select></div></div>
+            <div class="form-row"><label class="form-label">value</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.value" placeholder="example.com" style="width:420px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label"></label><div class="form-hint" style="flex:1;">{{ getDhcp6SharedOptionHint(serviceCollectionDraft.name) }}</div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'ddns-forward-domain' || serviceCollectionType === 'ddns-reverse-domain'">
+            <div class="form-row"><label class="form-label">domain</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="example.com" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">key-name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.keyName" placeholder="tsig-key-name" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsKeyName') }}</div></div></div>
+            <div class="form-row"><label class="form-label">dns-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.dnsServersText" rows="4" style="width:520px;" placeholder="1,192.0.2.10,53" :disabled="writeDisabled"></textarea><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsDnsServerText') }}</div></div></div>
+          </template>
+          <template v-else-if="serviceCollectionType === 'ddns-tsig-key'">
+            <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="key-name" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">algorithm</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.algorithm" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="md5">md5</option><option value="sha1">sha1</option><option value="sha224">sha224</option><option value="sha256">sha256</option><option value="sha384">sha384</option><option value="sha512">sha512</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTsigAlgorithm') }}</div></div></div>
+            <div class="form-row"><label class="form-label">secret</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.secret" placeholder="base64" style="width:520px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTsigSecret') }}</div></div></div>
+          </template>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="failoverRouteModalVisible" :title="failoverRouteModalTitle" width="720px" @confirm="saveFailoverRouteModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">prefix</label><div style="flex:1;"><input class="form-control" v-model="failoverRouteDraft.prefix" placeholder="0.0.0.0/0" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverPrefix') }}</div></div></div>
+          <div class="form-row"><label class="form-label">gateway type</label><div style="flex:1;"><select class="form-control" v-model="failoverRouteDraft.gatewayType" :disabled="writeDisabled"><option value="next-hop">next-hop</option><option value="dhcp-interface">dhcp-interface</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverGatewayType') }}</div></div></div>
+          <div class="form-row"><label class="form-label">gateway</label><div style="flex:1;"><input class="form-control" v-model="failoverRouteDraft.gateway" :placeholder="failoverRouteDraft.gatewayType === 'next-hop' ? '192.0.2.1' : 'eth0'" :disabled="writeDisabled" /><div class="form-hint">{{ failoverRouteDraft.gatewayType === 'next-hop' ? t('vrf.protocolHints.failoverNextHopAddress') : t('vrf.protocolHints.failoverDhcpInterface') }}</div></div></div>
+          <div class="form-row"><label class="form-label">interface</label><div style="flex:1;"><input class="form-control" v-model="failoverRouteDraft.interface" placeholder="eth0" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverNextHopInterface') }}</div></div></div>
+          <div class="form-row"><label class="form-label">metric</label><div style="flex:1;max-width:240px;"><input type="number" class="form-control" v-model="failoverRouteDraft.metric" min="1" max="255" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverMetric') }}</div></div></div>
+          <div class="form-row"><label class="form-label">onlink</label><div style="flex:1;"><input type="checkbox" v-model="failoverRouteDraft.onlink" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverOnlink') }}</div></div></div>
+          <div class="form-row"><label class="form-label">check policy</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="failoverRouteDraft.checkPolicy" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="any-available">any-available</option><option value="all-available">all-available</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckPolicy') }}</div></div></div>
+          <div class="form-row"><label class="form-label">check type</label><div style="flex:1;max-width:220px;"><select class="form-control" v-model="failoverRouteDraft.checkType" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="icmp">icmp</option><option value="arp">arp</option><option value="tcp">tcp</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckType') }}</div></div></div>
+          <div class="form-row"><label class="form-label">check timeout</label><div style="flex:1;max-width:220px;"><input type="number" class="form-control" v-model="failoverRouteDraft.checkTimeout" min="1" max="300" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTimeout') }}</div></div></div>
+          <div class="form-row"><label class="form-label">check port</label><div style="flex:1;max-width:220px;"><input type="number" class="form-control" v-model="failoverRouteDraft.checkPort" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckPort') }}</div></div></div>
+          <div class="form-group" style="margin-top:0;">
+            <div class="form-group-title">check target</div>
+            <div class="form-group-content">
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTarget') }}</div>
+                <DataTable :columns="FAILOVER_CHECK_TARGET_TABLE_COLUMNS" :data="failoverRouteDraft.checkTargets" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openFailoverCheckTargetCreate" @edit="openFailoverCheckTargetEdit" @delete="requestFailoverCheckTargetDelete">
+                  <template #address="{ value }">{{ value || '-' }}</template>
+                  <template #interface="{ value }">{{ value || '-' }}</template>
+                  <template #vrf="{ value }">{{ value || '-' }}</template>
+                </DataTable>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="failoverCheckTargetModalVisible" :title="failoverCheckTargetModalTitle" width="760px" @confirm="saveFailoverCheckTargetModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">check target</label><div style="flex:1;"><input class="form-control" v-model="failoverCheckTargetDraft.address" placeholder="192.0.2.2" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTargetAddress') }}</div></div></div>
+          <div class="form-row"><label class="form-label">interface</label><div style="flex:1;"><select class="form-control" v-model="failoverCheckTargetDraft.interface" style="width:320px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'failover-target-interface-' + name" :value="name">{{ name }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTargetInterface') }}</div></div></div>
+          <div class="form-row"><label class="form-label">vrf</label><div style="flex:1;"><select class="form-control" v-model="failoverCheckTargetDraft.vrf" style="width:320px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in vrfNameOptions" :key="'failover-target-vrf-' + name" :value="name">{{ name }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTargetVrf') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="failoverCheckTargetDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmFailoverCheckTargetDelete">
+        <div>确认删除以下 check target 条目？</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in failoverCheckTargetDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="staticRouteModalVisible" :title="staticRouteModalTitle" width="750px" @confirm="saveStaticRouteModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ staticRouteModalKind === 'ipv6' ? getStaticModalLabel('prefixV6') : getStaticModalLabel('prefixV4') }}</label><div style="flex:1;"><input class="form-control" style="width:320px;" v-model="staticRouteDraft.prefix" :placeholder="staticRouteModalKind === 'ipv6' ? t('vrf.protocolPlaceholders.staticRoute6Prefix') : t('vrf.protocolPlaceholders.staticRoutePrefix')" :disabled="writeDisabled || (staticRouteModalMode === 'edit' && staticRouteModalKind === 'ipv4')" /><div class="form-hint">{{ staticRouteModalKind === 'ipv6' ? t('vrf.protocolHints.staticRoute6Prefix') : t('vrf.protocolHints.staticRoutePrefix') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocolPlaceholders.staticRouteDescription') }}</label><div style="flex:1;"><input class="form-control" style="width:320px;" v-model="staticRouteDraft.description" :placeholder="t('vrf.protocolPlaceholders.staticRouteDescription')" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDescription') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ getStaticModalLabel('nextHopType') }}</label><div style="flex:1;"><select class="form-control" style="width:320px;" v-model="staticRouteDraft.routeType" @change="setStaticRouteDraftType(staticRouteDraft.routeType)" :disabled="writeDisabled"><option value="next-hop">next-hop</option><option value="interface">interface</option><option v-if="staticRouteModalKind === 'ipv4'" value="dhcp-interface">dhcp-interface</option><option value="blackhole">blackhole</option><option value="reject">reject</option></select><div class="form-hint">{{ t('vrf.protocolHints.staticRouteAction') }}</div></div></div>
+          <div v-if="staticRouteDraft.routeType === 'next-hop'" style="display:flex;flex-direction:column;gap:8px;">
+            <DataTable :columns="staticRouteModalKind === 'ipv6' ? STATIC_MODAL_NEXTHOP_TABLE_COLUMNS_IPV6 : STATIC_MODAL_NEXTHOP_TABLE_COLUMNS" :data="staticRouteDraft.nextHops" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="addStaticRouteDraftNextHop" @edit="openStaticRouteDraftNextHopEdit" @delete="removeStaticRouteDraftNextHopsByIds">
+              <template #address="{ value }">{{ value || '-' }}</template>
+              <template #distance="{ value }">{{ value || '-' }}</template>
+              <template #interface="{ value }">{{ value || '-' }}</template>
+              <template #vrf="{ value }">{{ value || '-' }}</template>
+              <template #segments="{ value }" v-if="staticRouteModalKind === 'ipv6'">{{ value || '-' }}</template>
+              <template #bfdProfile="{ value }">{{ value || '-' }}</template>
+              <template #bfdSourceAddress="{ value }">{{ value || '-' }}</template>
+              <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+            </DataTable>
+          </div>
+          <div v-if="staticRouteDraft.routeType === 'interface'" style="display:flex;flex-direction:column;gap:8px;width:100%;">
+            <DataTable style="width:100%;" :columns="STATIC_MODAL_INTERFACE_TABLE_COLUMNS" :data="staticRouteDraft.interfaceRows" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="addStaticRouteDraftInterfaceRow" @edit="openStaticRouteDraftInterfaceRowEdit" @delete="removeStaticRouteDraftInterfaceRowsByIds">
+              <template #name="{ value }">{{ value || '-' }}</template>
+              <template #distance="{ value }">{{ value || '-' }}</template>
+              <template #vrf="{ value }">{{ value || '-' }}</template>
+              <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+            </DataTable>
+          </div>
+          <div v-if="staticRouteDraft.routeType === 'dhcp-interface' && staticRouteModalKind === 'ipv4'" style="display:flex;flex-direction:column;gap:10px;">
+            <div class="form-row"><label class="form-label">{{ getStaticModalLabel('dhcpInterface') }}</label><div style="flex:1;"><select class="form-control" style="width:320px;" v-model="staticRouteDraft.dhcpInterface" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'modal-dhcp-interface-' + name" :value="name">{{ name }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDhcpInterface') }}</div></div></div>
+          </div>
+          <div v-if="staticRouteDraft.routeType === 'blackhole' || staticRouteDraft.routeType === 'reject'" style="display:flex;flex-direction:column;gap:10px;">
+            <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDistance') }}</label><div style="flex:1;"><input type="number" class="form-control" style="width:320px;" v-model="staticRouteDraft.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDistance') }}</div></div></div>
+            <div class="form-row"><label class="form-label">{{ getStaticModalLabel('tag') }}</label><div style="flex:1;"><input type="number" class="form-control" style="width:320px;" v-model="staticRouteDraft.tag" min="1" max="4294967295" :placeholder="t('vrf.protocolPlaceholders.staticRouteTag')" :disabled="writeDisabled" /><div class="form-hint">{{ getStaticRouteTagRangeHint() }}</div></div></div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="staticRouteCollectionModalVisible" :title="staticRouteCollectionModalTitle" width="820px" @confirm="saveStaticRouteCollectionModal">
+        <div v-if="staticRouteCollectionType === 'interface'" style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnInterface') }}</label><div style="flex:1;"><select class="form-control" v-model="staticRouteCollectionDraft.name" :disabled="writeDisabled" style="width:320px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'modal-interface-entry-name-' + name" :value="name">{{ name }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDistance') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="staticRouteCollectionDraft.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" :disabled="writeDisabled" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDistance') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnVrf') }}</label><div style="flex:1;"><select class="form-control" v-model="staticRouteCollectionDraft.vrf" :disabled="writeDisabled" style="width:320px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in vrfNameOptions" :key="'modal-interface-entry-vrf-' + name" :value="name">{{ name }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDisable') }}</label><div style="flex:1;"><input type="checkbox" v-model="staticRouteCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+        </div>
+        <div v-else style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnNextHop') }}</label><div style="flex:1;"><input class="form-control" v-model="staticRouteCollectionDraft.address" :placeholder="staticRouteModalKind === 'ipv6' ? t('vrf.protocolPlaceholders.staticRoute6NextHop') : t('vrf.protocolPlaceholders.staticRouteNextHop')" :disabled="writeDisabled" style="width:320px;" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDistance') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="staticRouteCollectionDraft.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" :disabled="writeDisabled" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDistance') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnInterface') }}</label><div style="flex:1;"><select class="form-control" v-model="staticRouteCollectionDraft.interface" :disabled="writeDisabled" style="width:320px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'modal-next-hop-interface-' + name" :value="name">{{ name }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnVrf') }}</label><div style="flex:1;"><select class="form-control" v-model="staticRouteCollectionDraft.vrf" :disabled="writeDisabled" style="width:320px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in vrfNameOptions" :key="'modal-next-hop-vrf-' + name" :value="name">{{ name }}</option></select></div></div>
+          <div class="form-row" v-if="staticRouteModalKind === 'ipv6'"><label class="form-label">{{ getStaticModalLabel('segments') }}</label><div style="flex:1;"><input class="form-control" v-model="staticRouteCollectionDraft.segments" :placeholder="getStaticModalLabel('segmentsPlaceholder')" :disabled="writeDisabled" style="width:320px;" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnBfdProfile') }}</label><div style="flex:1;"><select class="form-control" v-model="staticRouteCollectionDraft.bfdProfile" :disabled="writeDisabled" style="width:320px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in bfdProfileOptions" :key="'modal-next-hop-bfd-profile-' + name" :value="name">{{ name }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnBfdSourceAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="staticRouteCollectionDraft.bfdSourceAddress" :placeholder="t('vrf.protocolPlaceholders.staticRouteBfdSourceAddress')" :disabled="writeDisabled" style="width:320px;" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDisable') }}</label><div style="flex:1;"><input type="checkbox" v-model="staticRouteCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="staticRouteCollectionDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmStaticRouteCollectionDelete">
+        <div>{{ staticRouteCollectionDeleteType === 'interface' ? t('vrf.modals.staticCollectionDeleteInterface') : t('vrf.modals.staticCollectionDeleteNextHop') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in staticRouteCollectionDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="staticRouteDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmStaticRouteDelete">
+        <div>{{ staticRouteDeleteKind === 'ipv6' ? t('vrf.modals.staticRouteDeleteIpv6') : t('vrf.modals.staticRouteDeleteIpv4') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in staticRouteDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfAreaModalVisible" :title="ospfAreaModalTitle" width="920px" @confirm="saveOspfAreaModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">area</label><div style="flex:1;"><input class="form-control" v-model="ospfAreaDraft.area" :disabled="writeDisabled" placeholder="0.0.0.0" style="width:260px;" /><div class="form-hint">支持十进制或点分十进制区域号，例如 0 或 0.0.0.0。</div></div></div>
+          <div class="form-row"><label class="form-label">area-type</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfAreaDraft.areaType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="normal">normal</option><option value="nssa">nssa</option><option value="stub">stub</option></select><input v-if="ospfAreaDraft.areaType === 'nssa'" type="number" class="form-control" v-model="ospfAreaDraft.nssaDefaultCost" min="0" max="16777215" :disabled="writeDisabled" placeholder="nssa default-cost" style="width:260px;" /><label v-if="ospfAreaDraft.areaType === 'nssa'"><input type="checkbox" v-model="ospfAreaDraft.nssaNoSummary" :disabled="writeDisabled" /> no-summary</label><select v-if="ospfAreaDraft.areaType === 'nssa'" class="form-control" v-model="ospfAreaDraft.nssaTranslate" :disabled="writeDisabled" style="width:260px;"><option value="">translate(candidate)</option><option value="always">always</option><option value="candidate">candidate</option><option value="never">never</option></select><input v-if="ospfAreaDraft.areaType === 'stub'" type="number" class="form-control" v-model="ospfAreaDraft.stubDefaultCost" min="0" max="16777215" :disabled="writeDisabled" placeholder="stub default-cost" style="width:260px;" /><label v-if="ospfAreaDraft.areaType === 'stub'"><input type="checkbox" v-model="ospfAreaDraft.stubNoSummary" :disabled="writeDisabled" /> no-summary</label><div class="form-hint" style="width:100%;">default-cost 范围 0-16777215；NSSA translate 默认 candidate。</div></div></div>
+          <div class="form-row"><label class="form-label">authentication</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfAreaDraft.authenticationType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="plaintext-password">plaintext-password</option><option value="md5">md5</option></select><input v-if="ospfAreaDraft.authenticationType === 'plaintext-password'" class="form-control" v-model="ospfAreaDraft.authenticationPlaintextPassword" :disabled="writeDisabled" placeholder="password" style="width:260px;" /><div class="form-hint" style="width:100%;">plaintext-password 建议不超过 8 字符；md5 通过 virtual-link 子项配置 key-id 与 md5-key。</div></div></div>
+          <div class="form-row"><label class="form-label">export/import list</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><input type="number" class="form-control" v-model="ospfAreaDraft.exportList" min="0" max="4294967295" :disabled="writeDisabled" placeholder="export-list" style="width:260px;" /><input type="number" class="form-control" v-model="ospfAreaDraft.importList" min="0" max="4294967295" :disabled="writeDisabled" placeholder="import-list" style="width:260px;" /><div class="form-hint" style="width:100%;">取值范围 0-4294967295。</div></div></div>
+
+          <div class="form-row"><label class="form-label">network</label><div style="flex:1;"><textarea class="form-control" rows="2" v-model="ospfAreaDraft.networksText" :disabled="writeDisabled" placeholder="1.1.2.0/24, 10.0.0.0/8" style="width:260px;"></textarea><div class="form-hint">支持多个网段，逗号或换行分隔，格式为 x.x.x.x/x。</div></div></div>
+          <div class="form-row"><label class="form-label">shortcut</label><div style="flex:1;"><select class="form-control" v-model="ospfAreaDraft.shortcut" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="default">default</option><option value="disable">disable</option><option value="enable">enable</option></select><div class="form-hint">可选 default / disable / enable。</div></div></div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div class="form-section-title" style="margin-top:2px;">range</div>
+            <DataTable :columns="OSPF_AREA_RANGE_TABLE_COLUMNS" :data="ospfAreaDraft.ranges" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="100" @create="openOspfRangeCreate" @edit="openOspfRangeEdit" @delete="requestOspfRangeDelete">
+              <template #prefix="{ value }">{{ value || '-' }}</template>
+              <template #cost="{ value }">{{ value || '-' }}</template>
+              <template #notAdvertise="{ value }">{{ value ? 'yes' : '-' }}</template>
+              <template #substitute="{ value }">{{ value || '-' }}</template>
+            </DataTable>
+            <div class="form-hint">prefix 必填；cost 范围 0-16777215；可选 not-advertise 与 substitute(x.x.x.x/x)。</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div class="form-section-title" style="margin-top:2px;">virtual-link</div>
+            <DataTable :columns="OSPF_AREA_VIRTUAL_LINK_TABLE_COLUMNS" :data="ospfAreaDraft.virtualLinks" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="100" @create="openOspfVirtualLinkCreate" @edit="openOspfVirtualLinkEdit" @delete="requestOspfVirtualLinkDelete">
+              <template #peer="{ value }">{{ value || '-' }}</template>
+              <template #auth="{ row }">{{ getOspfVirtualLinkAuthPreview(row) }}</template>
+              <template #deadInterval="{ value }">{{ value || '-' }}</template>
+              <template #helloInterval="{ value }">{{ value || '-' }}</template>
+              <template #retransmitInterval="{ value }">{{ value || '-' }}</template>
+              <template #retransmitWindow="{ value }">{{ value || '-' }}</template>
+              <template #transmitDelay="{ value }">{{ value || '-' }}</template>
+            </DataTable>
+            <div class="form-hint">dead/hello/retransmit-interval/transmit-delay 范围 1-65535；retransmit-window 范围 20-1000；默认分别为 40/10/5/1，window 默认 50。</div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfAccessListModalVisible" :title="ospfAccessListModalTitle" width="760px" @confirm="saveOspfAccessListModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfAccessListNumber') }}</label><div style="flex:1;"><input type="number" min="0" max="4294967295" class="form-control" v-model="ospfAccessListDraft.number" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfAccessListNumber') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfAccessListExport') }}</label><div style="flex:1;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <label><input type="checkbox" value="bgp" v-model="ospfAccessListDraft.exportProtocols" :disabled="writeDisabled" /> bgp</label>
+            <label><input type="checkbox" value="connected" v-model="ospfAccessListDraft.exportProtocols" :disabled="writeDisabled" /> connected</label>
+            <label><input type="checkbox" value="isis" v-model="ospfAccessListDraft.exportProtocols" :disabled="writeDisabled" /> isis</label>
+            <label><input type="checkbox" value="kernel" v-model="ospfAccessListDraft.exportProtocols" :disabled="writeDisabled" /> kernel</label>
+            <label><input type="checkbox" value="rip" v-model="ospfAccessListDraft.exportProtocols" :disabled="writeDisabled" /> rip</label>
+            <label><input type="checkbox" value="static" v-model="ospfAccessListDraft.exportProtocols" :disabled="writeDisabled" /> static</label>
+            <div class="form-hint" style="width:100%;">{{ t('vrf.protocolHints.ospfAccessListExport') }}</div>
+          </div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfAccessListDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfAccessListDelete">
+        <div>{{ t('vrf.modals.ospfAccessListDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfAccessListDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfNeighborModalVisible" :title="ospfNeighborModalTitle" width="760px" @confirm="saveOspfNeighborModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfNeighborAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfNeighborDraft.address" :disabled="writeDisabled" placeholder="2.2.2.2" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfNeighborAddress') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfNeighborPollInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfNeighborDraft.pollInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfNeighborPollInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfNeighborPriority') }}</label><div style="flex:1;"><input type="number" min="0" max="255" class="form-control" v-model="ospfNeighborDraft.priority" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfNeighborPriority') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfNeighborDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfNeighborDelete">
+        <div>{{ t('vrf.modals.ospfNeighborDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfNeighborDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfSummaryAddressModalVisible" :title="ospfSummaryAddressModalTitle" width="760px" @confirm="saveOspfSummaryAddressModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSummaryAddressPrefix') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfSummaryAddressDraft.prefix" :disabled="writeDisabled" placeholder="1.1.1.0/24" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSummaryAddressPrefix') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSummaryAddressNoAdvertise') }}</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfSummaryAddressDraft.noAdvertise" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfSummaryAddressNoAdvertise') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfSummaryAddressNoAdvertise') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSummaryAddressTag') }}</label><div style="flex:1;"><input type="number" min="1" max="4294967295" class="form-control" v-model="ospfSummaryAddressDraft.tag" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSummaryAddressTag') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfSummaryAddressDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfSummaryAddressDelete">
+        <div>{{ t('vrf.modals.ospfSummaryAddressDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfSummaryAddressDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfSrPrefixModalVisible" :title="ospfSrPrefixModalTitle" width="760px" @confirm="saveOspfSrPrefixModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrPrefix') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfSrPrefixDraft.prefix" :disabled="writeDisabled" placeholder="3.3.3.0/24" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrPrefix') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrPrefixIndexValue') }}</label><div style="flex:1;"><input type="number" min="0" max="65535" class="form-control" v-model="ospfSrPrefixDraft.indexValue" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrPrefixIndexValue') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrPrefixIndexFlags') }}</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="ospfSrPrefixDraft.explicitNull" :disabled="writeDisabled" /> explicit-null</label><label><input type="checkbox" v-model="ospfSrPrefixDraft.noPhpFlag" :disabled="writeDisabled" /> no-php-flag</label><div class="form-hint" style="width:100%;">{{ t('vrf.protocolHints.ospfSrPrefixIndexFlags') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfSrPrefixDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfSrPrefixDelete">
+        <div>{{ t('vrf.modals.ospfSrPrefixDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfSrPrefixDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfRedistributeTableModalVisible" :title="ospfRedistributeTableModalTitle" width="760px" @confirm="saveOspfRedistributeTableModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeTableId') }}</label><div style="flex:1;"><input type="number" min="1" max="200" class="form-control" v-model="ospfRedistributeTableDraft.table" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeTableId') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetric') }}</label><div style="flex:1;"><input type="number" min="0" max="16777214" class="form-control" v-model="ospfRedistributeTableDraft.metric" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetric') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetricType') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfRedistributeTableDraft.metricType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetricType') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeRouteMap') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfRedistributeTableDraft.routeMap" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeRouteMap') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfRedistributeTableDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfRedistributeTableDelete">
+        <div>{{ t('vrf.modals.ospfRedistributeTableDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfRedistributeTableDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="isisInterfaceModalVisible" :title="isisInterfaceModalTitle" width="820px" @confirm="saveIsisInterfaceModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceName') }}</label><div style="flex:1;"><select class="form-control" v-model="isisInterfaceDraft.name" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="opt in interfaceOptions" :key="'isis-if-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.isisInterfaceName') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfacePassive') }}</label><div style="flex:1;"><label><input type="checkbox" v-model="isisInterfaceDraft.passive" :disabled="writeDisabled" /> {{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</label></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceMetric') }}</label><div style="flex:1;"><input type="number" min="0" max="16777215" class="form-control" v-model="isisInterfaceDraft.metric" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceNetwork') }}</label><div style="flex:1;"><input class="form-control" v-model="isisInterfaceDraft.network" :disabled="writeDisabled" style="width:260px;" placeholder="point-to-point" /><div class="form-hint">{{ t('vrf.protocolHints.isisInterfaceNetwork') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceExtras') }}</label><div style="flex:1;"><textarea class="form-control" rows="5" v-model="isisInterfaceDraft.extrasText" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.isisInterfaceExtras')" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"></textarea><div class="form-hint">{{ t('vrf.protocolHints.isisInterfaceExtras') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="isisInterfaceDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmIsisInterfaceDelete">
+        <div>{{ t('vrf.modals.isisInterfaceDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in isisInterfaceDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="isisFastRerouteModalVisible" :title="isisFastRerouteModalTitle" width="760px" @confirm="saveIsisFastRerouteModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisFastRerouteCommand') }}</label><div style="flex:1;"><input class="form-control" v-model="isisFastRerouteDraft.command" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.isisFastRerouteCommand')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.isisFastRerouteCommand') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisFastRerouteValue') }}</label><div style="flex:1;"><input class="form-control" v-model="isisFastRerouteDraft.value" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.isisFastRerouteValue')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.isisFastRerouteValue') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="isisFastRerouteDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmIsisFastRerouteDelete">
+        <div>{{ t('vrf.modals.isisFastRerouteDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in isisFastRerouteDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="isisRedistributeModalVisible" :title="isisRedistributeModalTitle" width="760px" @confirm="saveIsisRedistributeModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeAddressFamily') }}</label><div style="flex:1;"><select class="form-control" v-model="isisRedistributeDraft.af" :disabled="writeDisabled" style="width:260px;"><option value="ipv4">ipv4</option><option value="ipv6">ipv6</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeProtocol') }}</label><div style="flex:1;"><select class="form-control" v-model="isisRedistributeDraft.protocol" :disabled="writeDisabled" style="width:260px;"><option v-for="protocol in ISIS_REDISTRIBUTE_PROTOCOLS" :key="'isis-redist-proto-'+protocol" :value="protocol">{{ protocol }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeLevel') }}</label><div style="flex:1;"><select class="form-control" v-model="isisRedistributeDraft.level" :disabled="writeDisabled" style="width:260px;"><option value="level-1">level-1</option><option value="level-2">level-2</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeMetric') }}</label><div style="flex:1;"><input type="number" min="0" max="16777215" class="form-control" v-model="isisRedistributeDraft.metric" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeRouteMap') }}</label><div style="flex:1;"><input class="form-control" v-model="isisRedistributeDraft.routeMap" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:260px;" /></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="isisRedistributeDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmIsisRedistributeDelete">
+        <div>{{ t('vrf.modals.isisRedistributeDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in isisRedistributeDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="rpkiCacheModalVisible" :title="rpkiCacheModalTitle" width="760px" @confirm="saveRpkiCacheModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="rpkiCacheDraft.address" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheAddress')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheAddress') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCachePort') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="rpkiCacheDraft.port" :disabled="writeDisabled" style="width:220px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCachePort') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCachePreference') }}</label><div style="flex:1;"><input type="number" min="1" max="255" class="form-control" v-model="rpkiCacheDraft.preference" :disabled="writeDisabled" style="width:220px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCachePreference') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheSourceAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="rpkiCacheDraft.sourceAddress" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheSourceAddress')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheSourceAddress') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheSshUsername') }}</label><div style="flex:1;"><input class="form-control" v-model="rpkiCacheDraft.sshUsername" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheSshUsername')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheSshUsername') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheSshKey') }}</label><div style="flex:1;"><input class="form-control" v-model="rpkiCacheDraft.sshKey" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheSshKey')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheSshKey') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="rpkiCacheDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmRpkiCacheDelete">
+        <div>{{ t('vrf.modals.rpkiCacheDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in rpkiCacheDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfv3AreaModalVisible" :title="ospfv3AreaModalTitle" width="900px" @confirm="saveOspfv3AreaModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaId') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3AreaDraft.area" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfArea')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaValue') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaType') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3AreaDraft.areaType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="nssa">nssa</option><option value="stub">stub</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaType') }}</div></div></div>
+
+          <div class="form-row" v-if="ospfv3AreaDraft.areaType === 'nssa'"><label class="form-label">nssa</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="ospfv3AreaDraft.nssaDefaultInformationOriginate" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3AreaTypeNssaDefaultInfoOriginate') }}</label><label><input type="checkbox" v-model="ospfv3AreaDraft.nssaNoSummary" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3AreaTypeNoSummary') }}</label></div></div>
+          <div class="form-row" v-if="ospfv3AreaDraft.areaType === 'stub'"><label class="form-label">stub</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfv3AreaDraft.stubNoSummary" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3AreaTypeNoSummary') }}</label></div></div>
+
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaExportList') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3AreaDraft.exportList" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaExportList') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaImportList') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3AreaDraft.importList" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaImportList') }}</div></div></div>
+
+          <DataTable :columns="OSPFV3_AREA_RANGE_TABLE_COLUMNS" :data="ospfv3AreaDraft.ranges" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="100" @create="openOspfv3AreaRangeCreate" @edit="openOspfv3AreaRangeEdit" @delete="requestOspfv3AreaRangeDelete">
+            <template #prefix="{ value }">{{ value || '-' }}</template>
+            <template #action="{ value }">{{ value || '-' }}</template>
+          </DataTable>
+          <div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaRangeRow') }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfv3AreaRangeModalVisible" :title="ospfv3AreaRangeModalTitle" width="760px" @confirm="saveOspfv3AreaRangeModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaRangePrefix') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3AreaRangeDraft.prefix" :disabled="writeDisabled" placeholder="2001:db8::/64" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaRangePrefix') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaRangeAction') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3AreaRangeDraft.action" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="advertise">advertise</option><option value="not-advertise">not-advertise</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaRangeAction') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfv3AreaRangeDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfv3AreaRangeDelete">
+        <div>{{ t('vrf.modals.ospfv3AreaRangeDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfv3AreaRangeDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfv3AreaDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfv3AreaDelete">
+        <div>{{ t('vrf.modals.ospfv3AreaDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfv3AreaDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfv3InterfaceModalVisible" :title="ospfv3InterfaceModalTitle" width="900px" @confirm="saveOspfv3InterfaceModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfName') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3InterfaceDraft.name" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') || t('vrf.protocolPlaceholders.ospfInterface') }}</option><option v-for="opt in interfaceOptions" :key="'ospfv3-if-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3InterfaceName') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfArea') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3InterfaceDraft.area" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfArea')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfArea') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfBfdProfile') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3InterfaceDraft.bfdProfile" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="opt in bfdProfileOptions" :key="'ospfv3-if-bfd-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfBfdProfile') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfCost') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.cost" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfCost') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfDeadInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.deadInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfDeadInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfHelloInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.helloInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfHelloInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfIfmtu') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.ifmtu" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfIfmtu') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfInstanceId') }}</label><div style="flex:1;"><input type="number" min="0" max="255" class="form-control" v-model="ospfv3InterfaceDraft.instanceId" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfInstanceId') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfMtuIgnore') }}</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfv3InterfaceDraft.mtuIgnore" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3IfMtuIgnore') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfMtuIgnore') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfNetwork') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3InterfaceDraft.network" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="broadcast">broadcast</option><option value="point-to-point">point-to-point</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfNetwork') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfPassive') }}</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfv3InterfaceDraft.passive" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3IfPassive') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfPassive') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfPriority') }}</label><div style="flex:1;"><input type="number" min="0" max="255" class="form-control" v-model="ospfv3InterfaceDraft.priority" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfPriority') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfRetransmitInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.retransmitInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfRetransmitInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfTransmitDelay') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.transmitDelay" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfTransmitDelay') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfv3InterfaceDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfv3InterfaceDelete">
+        <div>{{ t('vrf.modals.ospfv3InterfaceDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfv3InterfaceDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfv3RedistributeModalVisible" :title="ospfv3RedistributeModalTitle" width="760px" @confirm="saveOspfv3RedistributeModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeProtocol') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3RedistributeDraft.protocol" :disabled="writeDisabled || ospfv3RedistributeModalMode === 'edit'" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="protocol in OSPFV3_REDISTRIBUTE_PROTOCOLS" :key="'ospfv3-redistribute-opt-' + protocol" :value="protocol">{{ protocol }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeMetric') }}</label><div style="flex:1;"><input type="number" min="0" max="16777214" class="form-control" v-model="ospfv3RedistributeDraft.metric" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3RedistributeMetric') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeMetricType') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3RedistributeDraft.metricType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3RedistributeMetricType') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeRouteMap') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3RedistributeDraft.routeMap" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3RedistributeRouteMap') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfv3RedistributeDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfv3RedistributeDelete">
+        <div>{{ t('vrf.modals.ospfv3RedistributeDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfv3RedistributeDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfInterfaceModalVisible" :title="ospfInterfaceModalTitle" width="920px" @confirm="saveOspfInterfaceModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfName') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfInterfaceDraft.name" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') || t('vrf.protocolPlaceholders.ospfInterface') }}</option><option v-for="opt in interfaceOptions" :key="'ospf-if-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfName') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfArea') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfInterfaceDraft.area" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfArea')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfArea') }}</div></div></div>
+
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfAuthentication') }}</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfInterfaceDraft.authenticationType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="md5">md5</option><option value="plaintext-password">plaintext-password</option></select><input v-if="ospfInterfaceDraft.authenticationType === 'md5'" type="number" min="1" max="255" class="form-control" v-model="ospfInterfaceDraft.md5KeyId" :disabled="writeDisabled" placeholder="key-id" style="width:260px;" /><input v-if="ospfInterfaceDraft.authenticationType === 'md5'" class="form-control" v-model="ospfInterfaceDraft.md5Key" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfIfMd5Key')" style="width:260px;" /><input v-if="ospfInterfaceDraft.authenticationType === 'plaintext-password'" class="form-control" v-model="ospfInterfaceDraft.plaintextPassword" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfIfPlaintextPassword')" style="width:260px;" /><div class="form-hint" style="width:100%;">{{ t('vrf.protocolHints.ospfIfAuthentication') }}</div></div></div>
+
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfBandwidth') }}</label><div style="flex:1;"><input type="number" min="1" max="100000" class="form-control" v-model="ospfInterfaceDraft.bandwidth" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfBandwidth') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfBfdProfile') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfInterfaceDraft.bfdProfile" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="opt in bfdProfileOptions" :key="'ospf-if-bfd-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfBfdProfile') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfCost') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.cost" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfCost') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfDeadInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.deadInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfDeadInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfHelloInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.helloInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfHelloInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfHelloMultiplier') }}</label><div style="flex:1;"><input type="number" min="1" max="10" class="form-control" v-model="ospfInterfaceDraft.helloMultiplier" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfHelloMultiplier') }}</div></div></div>
+
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfLdpSync') }}</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfInterfaceDraft.ldpSyncMode" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><input v-if="ospfInterfaceDraft.ldpSyncMode" type="number" min="0" max="10000" class="form-control" v-model="ospfInterfaceDraft.ldpSyncHolddown" :disabled="writeDisabled" placeholder="holddown" style="width:260px;" /><div class="form-hint" style="width:100%;">{{ t('vrf.protocolHints.ospfIfLdpSync') }}</div></div></div>
+
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfMtuIgnore') }}</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfInterfaceDraft.mtuIgnore" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfIfMtuIgnore') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfIfMtuIgnore') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfNetwork') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfInterfaceDraft.network" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="broadcast">broadcast</option><option value="non-broadcast">non-broadcast</option><option value="point-to-multipoint">point-to-multipoint</option><option value="point-to-point">point-to-point</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfNetwork') }}</div></div></div>
+
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfPassive') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfInterfaceDraft.passiveMode" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">passive</option><option value="disable">passive disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfPassive') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfPriority') }}</label><div style="flex:1;"><input type="number" min="0" max="255" class="form-control" v-model="ospfInterfaceDraft.priority" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfPriority') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfRetransmitInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.retransmitInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfRetransmitInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfRetransmitWindow') }}</label><div style="flex:1;"><input type="number" min="20" max="1000" class="form-control" v-model="ospfInterfaceDraft.retransmitWindow" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfRetransmitWindow') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfTransmitDelay') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.transmitDelay" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfTransmitDelay') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfInterfaceDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfInterfaceDelete">
+        <div>{{ t('vrf.modals.ospfInterfaceDeleteConfirm') }}</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfInterfaceDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfVirtualLinkModalVisible" :title="ospfVirtualLinkModalTitle" width="820px" @confirm="saveOspfVirtualLinkModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">peer</label><div style="flex:1;"><input class="form-control" v-model="ospfVirtualLinkDraft.peer" :disabled="writeDisabled" placeholder="3.3.3.3" style="width:260px;" /><div class="form-hint">OSPF 邻居 Router ID（点分十进制）。</div></div></div>
+          <div class="form-row"><label class="form-label">authentication</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfVirtualLinkDraft.authenticationType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="md5">md5</option><option value="plaintext-password">plaintext-password</option></select><input v-if="ospfVirtualLinkDraft.authenticationType === 'md5'" type="number" min="1" max="255" class="form-control" v-model="ospfVirtualLinkDraft.md5KeyId" :disabled="writeDisabled" placeholder="key-id" style="width:260px;" /><input v-if="ospfVirtualLinkDraft.authenticationType === 'md5'" class="form-control" v-model="ospfVirtualLinkDraft.md5Key" :disabled="writeDisabled" placeholder="md5-key(<=16)" style="width:260px;" /><input v-if="ospfVirtualLinkDraft.authenticationType === 'plaintext-password'" class="form-control" v-model="ospfVirtualLinkDraft.plaintextPassword" :disabled="writeDisabled" placeholder="plaintext-password(<=8)" style="width:260px;" /><div class="form-hint" style="width:100%;">md5: key-id 范围 1-255，md5-key 长度不超过 16；plaintext-password 长度不超过 8。</div></div></div>
+          <div class="form-row"><label class="form-label">dead-interval</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.deadInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">范围 1-65535，默认 40。</div></div></div>
+          <div class="form-row"><label class="form-label">hello-interval</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.helloInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">范围 1-65535，默认 10。</div></div></div>
+          <div class="form-row"><label class="form-label">retransmit-interval</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.retransmitInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">范围 1-65535，默认 5。</div></div></div>
+          <div class="form-row"><label class="form-label">retransmit-window</label><div style="flex:1;"><input type="number" min="20" max="1000" class="form-control" v-model="ospfVirtualLinkDraft.retransmitWindow" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">范围 20-1000，默认 50。</div></div></div>
+          <div class="form-row"><label class="form-label">transmit-delay</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.transmitDelay" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">范围 1-65535，默认 1。</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfRangeModalVisible" :title="ospfRangeModalTitle" width="760px" @confirm="saveOspfRangeModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">prefix</label><div style="flex:1;"><input class="form-control" v-model="ospfRangeDraft.prefix" :disabled="writeDisabled" placeholder="1.1.1.0/24" style="width:260px;" /><div class="form-hint">必填，网段格式 x.x.x.x/x。</div></div></div>
+          <div class="form-row"><label class="form-label">cost</label><div style="flex:1;"><input type="number" min="0" max="16777215" class="form-control" v-model="ospfRangeDraft.cost" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">可选，范围 0-16777215。</div></div></div>
+          <div class="form-row"><label class="form-label">not-advertise</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfRangeDraft.notAdvertise" :disabled="writeDisabled" /> 启用</label><div class="form-hint">可选，启用后通告抑制。</div></div></div>
+          <div class="form-row"><label class="form-label">substitute</label><div style="flex:1;"><input class="form-control" v-model="ospfRangeDraft.substitute" :disabled="writeDisabled" placeholder="2.2.0.0/16" style="width:260px;" /><div class="form-hint">可选，替代前缀，格式 x.x.x.x/x。</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfRangeDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfRangeDelete">
+        <div>确认删除以下 OSPF area range 条目？</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfRangeDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfVirtualLinkDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfVirtualLinkDelete">
+        <div>确认删除以下 OSPF virtual-link 条目？</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfVirtualLinkDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfAreaDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfAreaDelete">
+        <div>确认删除以下 OSPF area 条目？</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfAreaDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfItemModalVisible" :title="ospfItemModalTitle" width="760px" @confirm="saveOspfAdvancedItemModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">command</label>
+            <div style="flex:1;">
+              <input class="form-control" v-model="ospfItemDraft.command" :disabled="writeDisabled" placeholder="redistribute babel metric-type" />
+              <div class="form-hint">输入分支内配置路径，不带等号和值。</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">value</label>
+            <div style="flex:1;">
+              <input class="form-control" v-model="ospfItemDraft.value" :disabled="writeDisabled" placeholder="1（可留空）" />
+              <div class="form-hint">留空表示开关项，有值时将生成 command = value。</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">preview</label>
+            <div style="flex:1;padding-top:6px;">{{ getOspfAdvancedItemPreview(ospfItemDraft) || '-' }}</div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="ospfItemDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmOspfAdvancedItemsDelete">
+        <div>确认删除以下 OSPF 配置项？</div>
+        <ul style="margin-top:8px;max-height:180px;overflow:auto;">
+          <li v-for="item in ospfItemDeletePreview" :key="item">{{ item }}</li>
+        </ul>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="evpnVniModalVisible" :title="t('vrf.modals.evpnVni')" width="760px" @confirm="saveEvpnVniModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.vni') }}</label><div style="flex:1;"><input type="number" min="1" max="16777215" class="form-control" v-model="evpnVniDraft.vni" :disabled="writeDisabled" placeholder="1-16777215" style="width:220px;" /><div class="form-hint">{{ getEvpnHint('vniNote') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.rd') }}</label><div style="flex:1;"><input class="form-control" v-model="evpnVniDraft.rd" :disabled="writeDisabled" placeholder="65000:100" style="width:320px;" /><div class="form-hint">{{ getEvpnHint('rd') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.routeTargetBoth') }}</label><div style="flex:1;"><input class="form-control" v-model="evpnVniDraft.routeTargetBoth" :disabled="writeDisabled" placeholder="target:65000:100" style="width:420px;" /><div class="form-hint">{{ getEvpnHint('routeTarget') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.routeTargetExport') }}</label><div style="flex:1;"><input class="form-control" v-model="evpnVniDraft.routeTargetExport" :disabled="writeDisabled" placeholder="target:65000:100" style="width:420px;" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.routeTargetImport') }}</label><div style="flex:1;"><input class="form-control" v-model="evpnVniDraft.routeTargetImport" :disabled="writeDisabled" placeholder="target:65000:100" style="width:420px;" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.advertiseDefaultGw') }}</label><div style="flex:1;"><input type="checkbox" v-model="evpnVniDraft.advertiseDefaultGw" :disabled="writeDisabled" /><div class="form-hint">{{ getEvpnHint('advertiseDefaultGw') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.advertiseSviIp') }}</label><div style="flex:1;"><input type="checkbox" v-model="evpnVniDraft.advertiseSviIp" :disabled="writeDisabled" /><div class="form-hint">{{ getEvpnHint('advertiseSviIp') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpCollectionModalVisible" :title="bgpCollectionModalTitle" width="820px" @confirm="saveBgpCollectionModal">
+        <div v-if="bgpCollectionType === 'neighbor'" style="display:flex;flex-direction:column;gap:10px;">
+          <TabGroup v-model="bgpNeighborModalTab" :tabs="BGP_NEIGHBOR_MODAL_TABS">
+            <template #basic>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.neighborAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.address" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborAddress') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.remoteAs') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.remoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborRemoteAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroup') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.peerGroup" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfacePeerGroup') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.description') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.description" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.description') }}</div></div></div>
+              </div>
+            </template>
+            <template #session>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAs') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.localAs" min="1" max="4294967294" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsNoPrepend') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localAsNoPrepend" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsNoPrepend') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsReplaceAs') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localAsReplaceAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsReplaceAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRole') }}</label><div style="flex:1;"><select class="form-control" v-model="bgpCollectionDraft.localRole" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_LOCAL_ROLE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRole') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRoleStrict') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localRoleStrict" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRoleStrict') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPort') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.port" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPort') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborAdvertisementInterval') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.advertisementInterval" min="0" max="600" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborAdvertisementInterval') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborEbgpMultihop') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.ebgpMultihop" min="1" max="255" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborEbgpMultihop') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassword') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.password" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassword') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborUpdateSource') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.updateSource" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborUpdateSource') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTtlSecurityHops') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.ttlSecurityHops" min="1" max="254" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTtlSecurityHops') }}</div></div></div>
+              </div>
+            </template>
+            <template #timers>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTimersConnect') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.timersConnect" min="0" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTimersConnect') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTimersHoldtime') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.timersHoldtime" min="0" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTimersHoldtime') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTimersKeepalive') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.timersKeepalive" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTimersKeepalive') }}</div></div></div>
+              </div>
+            </template>
+            <template #capability>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborGracefulRestart') }}</label><div style="flex:1;"><select class="form-control" v-model="bgpCollectionDraft.gracefulRestart" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_GRACEFUL_RESTART_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborGracefulRestart') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityDynamic') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilityDynamic" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityDynamic') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityExtendedNexthop') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilityExtendedNexthop" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityExtendedNexthop') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilitySoftwareVersion') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilitySoftwareVersion" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilitySoftwareVersion') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassive') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.passive" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassive') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborShutdown') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.shutdown" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborShutdown') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborSolo') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.solo" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborSolo') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableConnectedCheck') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.disableConnectedCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableConnectedCheck') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborEnforceFirstAs') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.enforceFirstAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborEnforceFirstAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableCapabilityNegotiation') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.disableCapabilityNegotiation" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableCapabilityNegotiation') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborStrictCapabilityMatch') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.strictCapabilityMatch" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborStrictCapabilityMatch') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborOverrideCapability') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.overrideCapability" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborOverrideCapability') }}</div></div></div>
+              </div>
+            </template>
+            <template #bfd>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfd') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.bfd" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfd') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdCheckControlPlaneFailure') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.bfdCheckControlPlaneFailure" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdCheckControlPlaneFailure') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdProfile') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.bfdProfile" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdProfile') }}</div></div></div>
+              </div>
+            </template>
+            <template #interface>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-row"><label class="form-label">interface peer-group</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.interfacePeerGroup" :disabled="writeDisabled" /><div class="form-hint">邻居使用 interface 模式时的 peer-group。</div></div></div>
+                <div class="form-row"><label class="form-label">interface remote-as</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.interfaceRemoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">支持 ASN 或 external/internal。</div></div></div>
+                <div class="form-row"><label class="form-label">interface source-interface</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.interfaceSourceInterface" :disabled="writeDisabled" placeholder="eth0" /><div class="form-hint">用于建立会话的源接口。</div></div></div>
+                <div class="form-row"><label class="form-label">interface v6only peer-group</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.interfaceV6OnlyPeerGroup" :disabled="writeDisabled" /><div class="form-hint">IPv6 link-local only 模式 peer-group。</div></div></div>
+                <div class="form-row"><label class="form-label">interface v6only remote-as</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.interfaceV6OnlyRemoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">支持 ASN 或 external/internal。</div></div></div>
+              </div>
+            </template>
+            <template #path-attribute>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-section-title" style="margin-top:4px;">path-attribute</div>
+                <div class="form-row"><label class="form-label">discard</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeDiscard" :disabled="writeDisabled" placeholder="例如: 1, 2, 99" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
+                <div class="form-row"><label class="form-label">treat-as-withdraw</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeTreatAsWithdraw" :disabled="writeDisabled" placeholder="例如: 10, 200" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
+              </div>
+            </template>
+            <template #address-family>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <TabGroup v-model="bgpNeighborModalAfTab" :tabs="BGP_AF_TABS" :headers-only="true">
+                  <template #ipv4-flowspec></template>
+                  <template #ipv4-labeled-unicast></template>
+                  <template #ipv4-multicast></template>
+                  <template #ipv4-unicast></template>
+                  <template #ipv4-vpn></template>
+                  <template #ipv6-flowspec></template>
+                  <template #ipv6-labeled-unicast></template>
+                  <template #ipv6-multicast></template>
+                  <template #ipv6-unicast></template>
+                  <template #ipv6-vpn></template>
+                  <template #l2vpn-evpn></template>
+                </TabGroup>
+                <div v-if="bgpNeighborModalAfTab === 'l2vpn-evpn'" style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnAllowasInNumber') }}</label>
+                    <div style="flex:1;">
+                      <input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].allowasInNumber" :disabled="writeDisabled" style="width:220px;" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnAllowasInNumber') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnAttributeUnchanged') }}</label>
+                    <div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                      <label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].attributeUnchangedAsPath" :disabled="writeDisabled" /> as-path</label>
+                      <label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].attributeUnchangedMed" :disabled="writeDisabled" /> med</label>
+                      <label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].attributeUnchangedNextHop" :disabled="writeDisabled" /> next-hop</label>
+                      <div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afL2vpnEvpnAttributeUnchanged') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnNexthopSelf') }}</label>
+                    <div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                      <label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].nexthopSelf" :disabled="writeDisabled" /> enable</label>
+                      <label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].nexthopSelfForce" :disabled="writeDisabled" /> force</label>
+                      <div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afL2vpnEvpnNexthopSelf') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteMapExport') }}</label>
+                    <div style="flex:1;">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapExport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteMapExport') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteMapImport') }}</label>
+                    <div style="flex:1;">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapImport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteMapImport') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteReflectorClient') }}</label>
+                    <div style="flex:1;">
+                      <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeReflectorClient" :disabled="writeDisabled" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteReflectorClient') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteServerClient') }}</label>
+                    <div style="flex:1;">
+                      <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeServerClient" :disabled="writeDisabled" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteServerClient') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnSoftReconfigurationInbound') }}</label>
+                    <div style="flex:1;">
+                      <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].softReconfiguration" :disabled="writeDisabled" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnSoftReconfigurationInbound') }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else-if="['ipv4-flowspec', 'ipv6-flowspec'].includes(bgpNeighborModalAfTab)" style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecFilterListExport') }}</label>
+                    <div style="flex:1;">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListExport" :disabled="writeDisabled" style="width:280px;" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecFilterListExport') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecFilterListImport') }}</label>
+                    <div style="flex:1;">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListImport" :disabled="writeDisabled" style="width:280px;" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecFilterListImport') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecPrefixListExport') }}</label>
+                    <div style="flex:1;">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListExport" :disabled="writeDisabled" style="width:280px;" />
+                      <div class="form-hint">{{ bgpNeighborModalAfTab === 'ipv6-flowspec' ? t('vrf.bgp.hints.afFlowspecPrefixListExportV6') : t('vrf.bgp.hints.afFlowspecPrefixListExportV4') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecPrefixListImport') }}</label>
+                    <div style="flex:1;">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListImport" :disabled="writeDisabled" style="width:280px;" />
+                      <div class="form-hint">{{ bgpNeighborModalAfTab === 'ipv6-flowspec' ? t('vrf.bgp.hints.afFlowspecPrefixListImportV6') : t('vrf.bgp.hints.afFlowspecPrefixListImportV4') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecRouteMapExport') }}</label>
+                    <div style="flex:1;">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapExport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecRouteMapExport') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecRouteMapImport') }}</label>
+                    <div style="flex:1;">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapImport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecRouteMapImport') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecRouteReflectorClient') }}</label>
+                    <div style="flex:1;">
+                      <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeReflectorClient" :disabled="writeDisabled" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecRouteReflectorClient') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecRouteServerClient') }}</label>
+                    <div style="flex:1;">
+                      <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeServerClient" :disabled="writeDisabled" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecRouteServerClient') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecSoftReconfigurationInbound') }}</label>
+                    <div style="flex:1;">
+                      <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].softReconfiguration" :disabled="writeDisabled" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecSoftReconfigurationInbound') }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else>
+                  <div class="form-row"><label class="form-label">addpath-tx-all</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].addpathTxAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxAll') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">addpath-tx-per-as</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].addpathTxPerAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxPerAs') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">allowas-in number</label><div style="flex:1;"><input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].allowasInNumber" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAllowasInNumber') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">as-override</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].asOverride" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAsOverride') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">attribute-unchanged</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].attributeUnchangedAsPath" :disabled="writeDisabled" /> as-path</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].attributeUnchangedMed" :disabled="writeDisabled" /> med</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].attributeUnchangedNextHop" :disabled="writeDisabled" /> next-hop</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericAttributeUnchanged') }}</div></div></div>
+                  <div class="form-row" v-if="['ipv4-unicast','ipv4-multicast','ipv6-unicast','ipv6-multicast'].includes(bgpNeighborModalAfTab)"><label class="form-label">capability orf prefix-list</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].capabilityOrfPrefixListReceive" :disabled="writeDisabled" /> receive</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].capabilityOrfPrefixListSend" :disabled="writeDisabled" /> send</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericCapabilityOrfPrefixList') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">conditionally-advertise advertise-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].conditionallyAdvertiseAdvertiseMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyAdvertiseMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">conditionally-advertise exist-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].conditionallyAdvertiseExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyExistMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">conditionally-advertise non-exist-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].conditionallyAdvertiseNonExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyNonExistMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">default-originate route-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].defaultOriginateRouteMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDefaultOriginateRouteMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">disable-send-community</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].disableSendCommunityStandard" :disabled="writeDisabled" /> standard</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].disableSendCommunityExtended" :disabled="writeDisabled" /> extended</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericDisableSendCommunity') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">distribute-list export</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].distributeListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">distribute-list import</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].distributeListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">filter-list export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">filter-list import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">maximum-prefix</label><div style="flex:1;"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].maximumPrefix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">maximum-prefix-out</label><div style="flex:1;"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].maximumPrefixOut" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
+                  <div class="form-row" v-if="bgpNeighborModalAfTab.startsWith('ipv6-')"><label class="form-label">nexthop-local unchanged</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].nexthopLocalUnchanged" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericNexthopLocalUnchanged') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">nexthop-self</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].nexthopSelf" :disabled="writeDisabled" /> enable</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].nexthopSelfForce" :disabled="writeDisabled" /> force</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericNexthopSelf') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">prefix-list export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListExport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpNeighborModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">prefix-list import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListImport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpNeighborModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">remove-private-as all</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].removePrivateAsAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRemovePrivateAsAll') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">route-map export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">route-map import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">route-reflector-client</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeReflectorClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteReflectorClient') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">route-server-client</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeServerClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteServerClient') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">soft-reconfiguration inbound</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].softReconfiguration" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericSoftReconfigurationInbound') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">unsuppress-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].unsuppressMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericUnsuppressMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">weight</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].weight" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericWeight') }}</div></div></div>
+                </div>
+              </div>
+            </template>
+          </TabGroup>
+        </div>
+        <div v-else-if="bgpCollectionType === 'peer-group'" style="display:flex;flex-direction:column;gap:10px;">
+          <TabGroup v-model="bgpPeerGroupModalTab" :tabs="BGP_PEER_GROUP_MODAL_TABS">
+            <template #basic>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroupName') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.peerGroupName') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.remoteAs') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.remoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">{{ t('vrf.bgp.hints.peerGroupRemoteAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.description') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.description" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.description') }}</div></div></div>
+              </div>
+            </template>
+            <template #session>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAs') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.localAs" min="1" max="4294967294" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsNoPrepend') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localAsNoPrepend" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsNoPrepend') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsReplaceAs') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localAsReplaceAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsReplaceAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRole') }}</label><div style="flex:1;"><select class="form-control" v-model="bgpCollectionDraft.localRole" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_LOCAL_ROLE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRole') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRoleStrict') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localRoleStrict" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRoleStrict') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPort') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.port" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPort') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborEbgpMultihop') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.ebgpMultihop" min="1" max="255" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborEbgpMultihop') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassword') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.password" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassword') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborUpdateSource') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.updateSource" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborUpdateSource') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTtlSecurityHops') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.ttlSecurityHops" min="1" max="254" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTtlSecurityHops') }}</div></div></div>
+              </div>
+            </template>
+            <template #capability>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborGracefulRestart') }}</label><div style="flex:1;"><select class="form-control" v-model="bgpCollectionDraft.gracefulRestart" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_GRACEFUL_RESTART_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborGracefulRestart') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityDynamic') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilityDynamic" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityDynamic') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityExtendedNexthop') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilityExtendedNexthop" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityExtendedNexthop') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilitySoftwareVersion') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilitySoftwareVersion" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilitySoftwareVersion') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassive') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.passive" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassive') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborShutdown') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.shutdown" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborShutdown') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborSolo') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.solo" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborSolo') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableConnectedCheck') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.disableConnectedCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableConnectedCheck') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableCapabilityNegotiation') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.disableCapabilityNegotiation" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableCapabilityNegotiation') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborOverrideCapability') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.overrideCapability" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborOverrideCapability') }}</div></div></div>
+              </div>
+            </template>
+            <template #bfd>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfd') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.bfd" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfd') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdCheckControlPlaneFailure') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.bfdCheckControlPlaneFailure" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdCheckControlPlaneFailure') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdProfile') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.bfdProfile" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdProfile') }}</div></div></div>
+              </div>
+            </template>
+            <template #path-attribute>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="form-section-title" style="margin-top:4px;">path-attribute</div>
+                <div class="form-row"><label class="form-label">discard</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeDiscard" :disabled="writeDisabled" placeholder="例如: 1, 2, 99" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
+                <div class="form-row"><label class="form-label">treat-as-withdraw</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeTreatAsWithdraw" :disabled="writeDisabled" placeholder="例如: 10, 200" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
+              </div>
+            </template>
+            <template #address-family>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <TabGroup v-model="bgpPeerGroupModalAfTab" :tabs="BGP_PEER_GROUP_AF_TABS" :headers-only="true">
+                  <template #ipv4-labeled-unicast></template>
+                  <template #ipv4-unicast></template>
+                  <template #ipv4-vpn></template>
+                  <template #ipv6-labeled-unicast></template>
+                  <template #ipv6-unicast></template>
+                  <template #ipv6-vpn></template>
+                  <template #l2vpn-evpn></template>
+                </TabGroup>
+                <div v-if="bgpPeerGroupModalAfTab === 'l2vpn-evpn'" style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnAllowasInNumber') }}</label>
+                    <div style="flex:1;">
+                      <input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].allowasInNumber" :disabled="writeDisabled" style="width:220px;" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnAllowasInNumber') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnAttributeUnchanged') }}</label>
+                    <div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                      <label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].attributeUnchangedAsPath" :disabled="writeDisabled" /> as-path</label>
+                      <label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].attributeUnchangedMed" :disabled="writeDisabled" /> med</label>
+                      <label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].attributeUnchangedNextHop" :disabled="writeDisabled" /> next-hop</label>
+                      <div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afL2vpnEvpnAttributeUnchanged') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnNexthopSelf') }}</label>
+                    <div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                      <label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].nexthopSelf" :disabled="writeDisabled" /> enable</label>
+                      <label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].nexthopSelfForce" :disabled="writeDisabled" /> force</label>
+                      <div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afL2vpnEvpnNexthopSelf') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteMapExport') }}</label>
+                    <div style="flex:1;">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapExport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteMapExport') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteMapImport') }}</label>
+                    <div style="flex:1;">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapImport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteMapImport') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteReflectorClient') }}</label>
+                    <div style="flex:1;">
+                      <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeReflectorClient" :disabled="writeDisabled" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteReflectorClient') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteServerClient') }}</label>
+                    <div style="flex:1;">
+                      <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeServerClient" :disabled="writeDisabled" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteServerClient') }}</div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnSoftReconfigurationInbound') }}</label>
+                    <div style="flex:1;">
+                      <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].softReconfiguration" :disabled="writeDisabled" />
+                      <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnSoftReconfigurationInbound') }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else>
+                <div class="form-row"><label class="form-label">addpath-tx-all</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].addpathTxAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxAll') }}</div></div></div>
+                <div class="form-row"><label class="form-label">addpath-tx-per-as</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].addpathTxPerAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxPerAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">allowas-in number</label><div style="flex:1;"><input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].allowasInNumber" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAllowasInNumber') }}</div></div></div>
+                <div class="form-row"><label class="form-label">as-override</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].asOverride" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAsOverride') }}</div></div></div>
+                <div class="form-row"><label class="form-label">attribute-unchanged</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].attributeUnchangedAsPath" :disabled="writeDisabled" /> as-path</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].attributeUnchangedMed" :disabled="writeDisabled" /> med</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].attributeUnchangedNextHop" :disabled="writeDisabled" /> next-hop</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericAttributeUnchanged') }}</div></div></div>
+                <div class="form-row" v-if="['ipv4-unicast','ipv6-unicast'].includes(bgpPeerGroupModalAfTab)"><label class="form-label">capability orf prefix-list</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].capabilityOrfPrefixListReceive" :disabled="writeDisabled" /> receive</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].capabilityOrfPrefixListSend" :disabled="writeDisabled" /> send</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericCapabilityOrfPrefixList') }}</div></div></div>
+                <div class="form-row"><label class="form-label">conditionally-advertise advertise-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].conditionallyAdvertiseAdvertiseMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyAdvertiseMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">conditionally-advertise exist-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].conditionallyAdvertiseExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyExistMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">conditionally-advertise non-exist-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].conditionallyAdvertiseNonExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyNonExistMap') }}</div></div></div>
+                <div class="form-row" v-if="['ipv4-unicast','ipv6-unicast'].includes(bgpPeerGroupModalAfTab)"><label class="form-label">default-originate route-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].defaultOriginateRouteMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDefaultOriginateRouteMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">disable-send-community</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].disableSendCommunityStandard" :disabled="writeDisabled" /> standard</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].disableSendCommunityExtended" :disabled="writeDisabled" /> extended</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericDisableSendCommunity') }}</div></div></div>
+                <div class="form-row"><label class="form-label">distribute-list export</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].distributeListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
+                <div class="form-row"><label class="form-label">distribute-list import</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].distributeListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
+                <div class="form-row"><label class="form-label">filter-list export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].filterListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
+                <div class="form-row"><label class="form-label">filter-list import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].filterListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
+                <div class="form-row"><label class="form-label">maximum-prefix</label><div style="flex:1;"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].maximumPrefix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
+                <div class="form-row"><label class="form-label">maximum-prefix-out</label><div style="flex:1;"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].maximumPrefixOut" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
+                <div class="form-row" v-if="bgpPeerGroupModalAfTab.startsWith('ipv6-')"><label class="form-label">nexthop-local unchanged</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].nexthopLocalUnchanged" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericNexthopLocalUnchanged') }}</div></div></div>
+                <div class="form-row"><label class="form-label">nexthop-self</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].nexthopSelf" :disabled="writeDisabled" /> enable</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].nexthopSelfForce" :disabled="writeDisabled" /> force</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericNexthopSelf') }}</div></div></div>
+                <div class="form-row"><label class="form-label">prefix-list export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].prefixListExport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpPeerGroupModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
+                <div class="form-row"><label class="form-label">prefix-list import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].prefixListImport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpPeerGroupModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
+                <div class="form-row"><label class="form-label">remove-private-as all</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].removePrivateAsAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRemovePrivateAsAll') }}</div></div></div>
+                <div class="form-row"><label class="form-label">route-map export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">route-map import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">route-reflector-client</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeReflectorClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteReflectorClient') }}</div></div></div>
+                <div class="form-row"><label class="form-label">route-server-client</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeServerClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteServerClient') }}</div></div></div>
+                <div class="form-row"><label class="form-label">soft-reconfiguration inbound</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].softReconfiguration" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericSoftReconfigurationInbound') }}</div></div></div>
+                <div class="form-row"><label class="form-label">unsuppress-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].unsuppressMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericUnsuppressMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">weight</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].weight" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericWeight') }}</div></div></div>
+                </div>
+              </div>
+            </template>
+          </TabGroup>
+        </div>
+        <div v-else-if="bgpCollectionType === 'interface'" style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.interfaceName') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfaceName') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroup') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.peerGroup" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfacePeerGroup') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.interfaceMplsForwarding') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.mplsForwarding" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfaceMplsForwarding') }}</div></div></div>
+        </div>
+        <div v-else-if="bgpCollectionType === 'listen'" style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.listenRange') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.range" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.listenRange') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroup') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.peerGroup" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.listenPeerGroup') }}</div></div></div>
+        </div>
+        <div v-else-if="bgpCollectionType === 'bmp'" style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.bmpTargetName') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpTargetName') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.bmpAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.address" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpTargetAddress') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.bmpPort') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.port" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpPort') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.placeholders.bmpMinRetry') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.minRetry" min="100" max="86400000" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMinRetry') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.placeholders.bmpMaxRetry') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.maxRetry" min="100" max="4294967295" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMaxRetry') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMirror') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.mirror" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMirror') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV4LocalRib') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV4LocalRib" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV4PostPolicy') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV4PostPolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV4PrePolicy') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV4PrePolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV6LocalRib') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV6LocalRib" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV6PostPolicy') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV6PostPolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV6PrePolicy') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV6PrePolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpCollectionDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="460px" @confirm="confirmBgpCollectionDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpCollectionDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpVpnNetworkModalVisible" :title="bgpVpnNetworkModalTitle" width="760px" @confirm="saveBgpVpnNetworkModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">Network</label>
+            <div style="flex:1;">
+              <input class="form-control" v-model="bgpVpnNetworkDraft.network" :disabled="writeDisabled" :placeholder="bgpVpnNetworkDraft.afKey === 'ipv6-vpn' ? '2001:db8::/64' : '1.1.1.0/24'" style="width:280px;" />
+              <div class="form-hint">取值范围：{{ bgpVpnNetworkDraft.afKey === 'ipv6-vpn' ? 'IPv6 CIDR（如 2001:db8::/64）' : 'IPv4 CIDR（如 1.1.1.0/24）' }}。默认值：无（必填）。</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Label</label>
+            <div style="flex:1;">
+              <input type="number" min="0" max="1048575" class="form-control" v-model="bgpVpnNetworkDraft.label" :disabled="writeDisabled" placeholder="0-1048575" style="width:220px;" />
+              <div class="form-hint">取值范围：0-1048575。默认值：无（可选）。</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">RD</label>
+            <div style="flex:1;">
+              <input class="form-control" v-model="bgpVpnNetworkDraft.rd" :disabled="writeDisabled" placeholder="65000:100" style="width:280px;" />
+              <div class="form-hint">取值范围：ASN:NN 或 IPv4:NN（如 65000:100、192.0.2.1:100）。默认值：无（可选）。</div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpVpnNetworkDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmBgpVpnNetworkDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpVpnNetworkDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+    </div>
     </div>
   `,
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },

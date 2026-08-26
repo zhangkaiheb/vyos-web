@@ -86,6 +86,7 @@ def main():
                 menu_item('vrf', 'VRF', 'VRF', route='/system/vrf', component='VrfPage'),
                 menu_item('name-server', 'DNS服务器', 'Name Server', route='/system/name-server', component='TablePage'),
                 menu_item('conntrack', '连接跟踪', 'Conntrack', route='/system/conntrack', component='ConntrackPage'),
+                menu_item('high-availability', '高可用性', 'High Availability', route='/system/settings/high-availability', component='HighAvailabilityPage'),
             ]),
             menu_item('container', '容器', 'Container', children=[
                 menu_item('name', '容器', 'Container', route='/system/container/name', component='TablePage'),
@@ -93,7 +94,6 @@ def main():
                 menu_item('registry', '镜像仓库', 'Registry', route='/system/container/registry', component='TablePage'),
             ]),
             menu_item('pki', 'PKI', 'PKI', route='/system/pki', component='PkiPage'),
-            menu_item('high-availability', '高可用性', 'High Availability', route='/system/high-availability', component='HighAvailabilityPage'),
             menu_item('table-size', '表项规格', 'Table Size', route='/system/table-size', component='TablePage'),
             menu_item('maintenance', '维护工具', 'Maintenance', children=[
                 menu_item('ping', 'Ping', 'Ping', route='/system/maintenance/ping', component='ToolPage'),

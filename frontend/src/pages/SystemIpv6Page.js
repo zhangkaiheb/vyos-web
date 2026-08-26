@@ -19,6 +19,7 @@ export default defineComponent({
     const loading = ref(false);
     const saving = ref(false);
     const activeTab = ref('basic');
+    const routeMapOptions = ref([{ value: '', label: '' }]);
 
     const TABS = computed(() => [
       { key: 'basic', title: t('systemIpv6.tabs.basic') },
@@ -31,7 +32,7 @@ export default defineComponent({
     const config = ref({
       'disable-forwarding': false,
       'strict-dad': false,
-      neighbor: { 'table-size': '8192' },
+      neighbor: { 'table-size': '' },
       multipath: { 'layer4-hashing': false },
       nht: { 'no-resolve-via-default': false },
       protocol: {},
@@ -39,27 +40,64 @@ export default defineComponent({
 
     const commandPath = computed(() => 'system ipv6');
 
-    async function load() {
+    function normalizeRouteMapOptions(data) {
+      const names = Object.keys(data || {}).sort((a, b) => a.localeCompare(b));
+      return [{ value: '', label: '' }, ...names.map(name => ({ value: name, label: name }))];
+    }
+
+    async function loadRouteMapOptions(useSession = true) {
+      try {
+        let nextOptions = [{ value: '', label: '' }];
+        if (useSession) {
+          const sessionRes = await configApi.get('policy route-map', true);
+          nextOptions = normalizeRouteMapOptions(sessionRes.data);
+        }
+        if (!useSession || nextOptions.length === 1) {
+          const runningRes = await configApi.get('policy route-map', false);
+          nextOptions = normalizeRouteMapOptions(runningRes.data);
+        }
+        routeMapOptions.value = nextOptions;
+      } catch (e) {
+        routeMapOptions.value = [{ value: '', label: '' }];
+      }
+    }
+
+    async function load(useSession = true) {
       loading.value = true;
       try {
-        const res = await configApi.get('system ipv6', true);
+        await loadRouteMapOptions(useSession);
+        const res = await configApi.get('system ipv6', useSession);
         const d = res.data || {};
+        const readValue = (obj, hyphenKey, underscoreKey = hyphenKey.replace(/-/g, '_')) => {
+          if (!obj || typeof obj !== 'object') return undefined;
+          if (Object.prototype.hasOwnProperty.call(obj, hyphenKey)) return obj[hyphenKey];
+          if (Object.prototype.hasOwnProperty.call(obj, underscoreKey)) return obj[underscoreKey];
+          return undefined;
+        };
         const c = {
           'disable-forwarding': false,
           'strict-dad': false,
-          neighbor: { 'table-size': '8192' },
+          neighbor: { 'table-size': '' },
           multipath: { 'layer4-hashing': false },
           nht: { 'no-resolve-via-default': false },
           protocol: {},
         };
-        if (d['disable-forwarding']) c['disable-forwarding'] = true;
-        if (d['strict-dad']) c['strict-dad'] = true;
-        if (d.neighbor) c.neighbor['table-size'] = d.neighbor['table-size'] || '8192';
-        if (d.multipath) c.multipath['layer4-hashing'] = !!d.multipath['layer4-hashing'];
-        if (d.nht) c.nht['no-resolve-via-default'] = !!d.nht['no-resolve-via-default'];
-        if (d.protocol) {
+        if (readValue(d, 'disable-forwarding')) c['disable-forwarding'] = true;
+        if (readValue(d, 'strict-dad')) c['strict-dad'] = true;
+        if (d.neighbor) c.neighbor['table-size'] = readValue(d.neighbor, 'table-size') || '';
+        if (d.multipath) c.multipath['layer4-hashing'] = !!readValue(d.multipath, 'layer4-hashing');
+        if (d.nht) c.nht['no-resolve-via-default'] = !!readValue(d.nht, 'no-resolve-via-default');
+        if (d.protocol && typeof d.protocol === 'object') {
           for (const [proto, val] of Object.entries(d.protocol)) {
-            c.protocol[proto] = val?.['route-map'] || '';
+            c.protocol[proto] = readValue(val, 'route-map') || '';
+          }
+        }
+        const knownRouteMaps = new Set(routeMapOptions.value.map(opt => String(opt.value || '')));
+        for (const rm of Object.values(c.protocol)) {
+          const value = String(rm || '').trim();
+          if (value && !knownRouteMaps.has(value)) {
+            routeMapOptions.value.push({ value, label: value });
+            knownRouteMaps.add(value);
           }
         }
         config.value = c;
@@ -77,7 +115,7 @@ export default defineComponent({
         const c = config.value;
         if (c['disable-forwarding']) await configStore.setConfig('system ipv6 disable-forwarding');
         if (c['strict-dad']) await configStore.setConfig('system ipv6 strict-dad');
-        await configStore.setConfig('system ipv6 neighbor table-size', c.neighbor['table-size']);
+        if (c.neighbor['table-size']) await configStore.setConfig('system ipv6 neighbor table-size', c.neighbor['table-size']);
         if (c.multipath['layer4-hashing']) {
           await configStore.setConfig('system ipv6 multipath layer4-hashing');
         }
@@ -97,12 +135,16 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
+    onMounted(() => {
+      load(true);
+      onMenuRefresh(() => load(true));
+      window.addEventListener('config-committed', () => load(false));
+    });
 
     return {t,
       
       loading, saving, config, activeTab, commandPath,
-      TABS, PROTOCOLS, NEIGHBOR_SIZES,
+      TABS, PROTOCOLS, NEIGHBOR_SIZES, routeMapOptions,
       load, save,
     };
   },
@@ -112,45 +154,64 @@ export default defineComponent({
         <template #basic>
           <div class="form-row">
             <label class="form-label">{{ t('systemIpv6.labels.disableIpv6Forwarding') }}</label>
-            <input type="checkbox" v-model="config['disable-forwarding']" />
-            <span class="form-hint">{{ t('systemIpv6.hints.disableIpv6Forwarding') }}</span>
+            <div style="flex:1;">
+              <input type="checkbox" v-model="config['disable-forwarding']" />
+              <div class="form-hint">{{ t('systemIpv6.hints.disableIpv6Forwarding') }}</div>
+            </div>
           </div>
           <div class="form-row">
             <label class="form-label">{{ t('systemIpv6.labels.strictDad') }}</label>
-            <input type="checkbox" v-model="config['strict-dad']" />
-            <span class="form-hint">{{ t('systemIpv6.hints.strictDad') }}</span>
+            <div style="flex:1;">
+              <input type="checkbox" v-model="config['strict-dad']" />
+              <div class="form-hint">{{ t('systemIpv6.hints.strictDad') }}</div>
+            </div>
           </div>
         </template>
         <template #neighbor>
           <div class="form-row">
             <label class="form-label">{{ t('systemIpv6.labels.neighborTableSize') }}</label>
-            <select v-model="config.neighbor['table-size']" class="form-control" style="width:150px">
-              <option v-for="s in NEIGHBOR_SIZES" :key="s" :value="s">{{ s }}</option>
-            </select>
-            <span class="form-hint">{{ t('systemIpv6.hints.neighborTableSize') }}</span>
+            <div style="flex:1;">
+              <select v-model="config.neighbor['table-size']" class="form-control" style="width:150px">
+                <option value=""></option>
+                <option v-for="s in NEIGHBOR_SIZES" :key="s" :value="s">{{ s }}</option>
+              </select>
+              <div class="form-hint">{{ t('systemIpv6.hints.neighborTableSize') }}</div>
+            </div>
           </div>
         </template>
         <template #multipath>
           <div class="form-row">
             <label class="form-label">{{ t('systemIpv6.labels.layer4Hash') }}</label>
-            <input type="checkbox" v-model="config.multipath['layer4-hashing']" />
-            <span class="form-hint">{{ t('systemIpv6.hints.layer4Hash') }}</span>
+            <div style="flex:1;">
+              <input type="checkbox" v-model="config.multipath['layer4-hashing']" />
+              <div class="form-hint">{{ t('systemIpv6.hints.layer4Hash') }}</div>
+            </div>
           </div>
         </template>
         <template #nht>
           <div class="form-row">
             <label class="form-label">{{ t('systemIpv6.labels.resolveViaDefault') }}</label>
-            <input type="checkbox" v-model="config.nht['no-resolve-via-default']" />
-            <span class="form-hint">{{ t('systemIpv6.hints.resolveViaDefault') }}</span>
+            <div style="flex:1;">
+              <input type="checkbox" v-model="config.nht['no-resolve-via-default']" />
+              <div class="form-hint">{{ t('systemIpv6.hints.resolveViaDefault') }}</div>
+            </div>
           </div>
         </template>
         <template #protocol>
           <div v-for="proto in PROTOCOLS" :key="proto" class="form-row">
             <label class="form-label">{{ proto }}</label>
-            <input class="form-control" v-model="config.protocol[proto]" :placeholder="t('systemIpv6.placeholders.routeMapName')" />
+            <select class="form-control" v-model="config.protocol[proto]">
+              <option v-for="opt in routeMapOptions" :key="opt.value || '__empty__'" :value="opt.value">{{ opt.label }}</option>
+            </select>
           </div>
         </template>
       </TabGroup>
+
+      <div v-if="['basic', 'neighbor', 'multipath', 'nht', 'protocol'].includes(activeTab)" style="text-align:right;padding:16px 0;">
+        <ToolbarButton icon="save" primary :disabled="saving || loading" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
     </div>
   `,
 });

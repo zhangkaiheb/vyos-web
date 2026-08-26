@@ -184,8 +184,8 @@ export default defineComponent({
       { key: 'description', title: t('highAvailability.vrrpGroupSchema.description.title'), type: 'text' },
       { key: 'vrid', title: t('highAvailability.vrrpGroupSchema.vrid.title'), type: 'number', min: 1, max: 255, required: true, placeholder: t('highAvailability.vrrpGroupSchema.vrid.placeholder') },
       { key: 'interface', title: t('highAvailability.vrrpGroupSchema.interface.title'), type: 'select', required: true, options: vrrpGroupInterfaceOptions.value, placeholder: t('highAvailability.vrrpGroupSchema.interface.placeholder') },
-      { key: 'addressesText', title: '虚拟地址（每行一个）', type: 'textarea', placeholder: 'IPv4/IPv6 地址' },
-      { key: 'excludedAddressesText', title: '排除地址（每行一个）', type: 'textarea', placeholder: 'IPv4/IPv6 地址' },
+      { key: 'addressesText', title: '虚拟地址（每行一个）', type: 'textarea', placeholder: 'IPv4/IPv6 地址 接口', help: '格式: 地址 接口，例如 59.10.1.1/24 eth2' },
+      { key: 'excludedAddressesText', title: '排除地址（每行一个）', type: 'textarea', placeholder: 'IPv4/IPv6 地址 接口', help: '格式: 地址 接口，例如 1.1.1.1/24 eth2' },
       { key: 'priority', title: t('highAvailability.vrrpGroupSchema.priority.title'), type: 'number', min: 1, max: 255, help: t('highAvailability.vrrpGroupSchema.priority.help') },
       { key: 'advertiseInterval', title: t('highAvailability.vrrpGroupSchema.advertiseInterval.title'), type: 'number', min: 1, max: 255, help: t('highAvailability.vrrpGroupSchema.advertiseInterval.help') },
       { key: 'preemptDelay', title: t('highAvailability.vrrpGroupSchema.preemptDelay.title'), type: 'number', min: 0, max: 1000, help: t('highAvailability.vrrpGroupSchema.preemptDelay.help') },
@@ -605,10 +605,29 @@ export default defineComponent({
     }
 
     function flattenVRRPGroupData(name, attrs) {
+      const extractInterfaceName = (node) => {
+        if (!node || typeof node !== 'object' || Array.isArray(node)) return '';
+        const ifNode = node.interface;
+        if (typeof ifNode === 'string') return ifNode;
+        if (Array.isArray(ifNode)) return String(ifNode[0] || '').trim();
+        if (ifNode && typeof ifNode === 'object') {
+          const ifKeys = Object.keys(ifNode);
+          if (ifKeys.length === 1 && Object.keys(ifNode[ifKeys[0]] || {}).length === 0) return ifKeys[0];
+        }
+        return '';
+      };
+      const formatAddressMap = (mapObj) => {
+        if (!mapObj || typeof mapObj !== 'object') return [];
+        return Object.entries(mapObj).map(([addr, node]) => {
+          const iface = extractInterfaceName(node);
+          return iface ? `${addr} ${iface}` : addr;
+        });
+      };
+
       const addresses = attrs.address || {};
-      const addressList = Object.keys(addresses);
+      const addressList = formatAddressMap(addresses);
       const excludedAddresses = attrs['excluded-address'] || {};
-      const excludedAddressList = Object.keys(excludedAddresses);
+      const excludedAddressList = formatAddressMap(excludedAddresses);
       const auth = attrs.authentication || {};
       const garp = attrs.garp || {};
       const healthCheck = attrs['health-check'] || {};
@@ -715,23 +734,28 @@ export default defineComponent({
       if (Object.keys(transitionScript).length) result['transition-script'] = transitionScript;
 
       // Addresses
-      const addressList = String(v.addressesText || '').split('\n').map(a => a.trim()).filter(Boolean);
-      if (addressList.length) {
-        const addresses = {};
-        for (const addr of addressList) {
-          if (addr) addresses[addr] = {};
+      const parseAddressLines = (text) => {
+        const map = {};
+        const lines = String(text || '').split('\n').map(line => line.trim()).filter(Boolean);
+        for (const line of lines) {
+          const [address, iface] = line.split(/\s+/, 2);
+          if (!address) continue;
+          map[address] = iface ? { interface: iface } : {};
         }
-        result.address = addresses;
+        return map;
+      };
+
+      const addressMap = parseAddressLines(v.addressesText);
+      const addressList = Object.keys(addressMap);
+      if (addressList.length) {
+        result.address = addressMap;
       }
 
       // Excluded addresses
-      const excludedAddressList = String(v.excludedAddressesText || '').split('\n').map(a => a.trim()).filter(Boolean);
+      const excludedAddressMap = parseAddressLines(v.excludedAddressesText);
+      const excludedAddressList = Object.keys(excludedAddressMap);
       if (excludedAddressList.length) {
-        const excludedAddresses = {};
-        for (const addr of excludedAddressList) {
-          if (addr) excludedAddresses[addr] = {};
-        }
-        result['excluded-address'] = excludedAddresses;
+        result['excluded-address'] = excludedAddressMap;
       }
       return result;
     }

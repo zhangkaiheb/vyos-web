@@ -5,6 +5,7 @@ export default defineComponent({
   props: {
     tabs: { type: Array, default: () => [] },
     modelValue: { type: String, default: '' },
+    headersOnly: { type: Boolean, default: false },
   },
   emits: ['update:modelValue'],
   setup(props, { emit, slots }) {
@@ -32,15 +33,18 @@ export default defineComponent({
       h('div', { class: 'tab-headers' }, props.tabs.map(tab =>
         h('div', {
           class: ['tab-header', { active: active.value === tab.key }],
+          'data-tab-key': tab.key,
           onClick: () => select(tab.key)
         }, tab.title)
       )),
-      h('div', { class: 'tab-panels' }, props.tabs.map(tab =>
-        h('div', {
-          class: 'tab-panel',
-          style: { display: active.value === tab.key ? 'block' : 'none' }
-        }, slots[tab.key] ? slots[tab.key]() : [])
-      ))
+      props.headersOnly
+        ? null
+        : h('div', { class: 'tab-panels' }, props.tabs.map(tab =>
+            h('div', {
+              class: 'tab-panel',
+              style: { display: active.value === tab.key ? 'block' : 'none' }
+            }, slots[tab.key] ? slots[tab.key]() : [])
+          ))
     ]);
   },
 });

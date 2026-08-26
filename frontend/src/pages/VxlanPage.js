@@ -9,15 +9,10 @@ import { showError as _showError } from '/src/components/Layout/ErrorDisplay.js'
 import { onMenuRefresh } from '/src/utils/eventBus.js';
 
 const SOURCE_VALIDATION_OPTIONS = [
+  { value: '', label: '' },
   { value: 'strict', label: 'strict' },
   { value: 'loose', label: 'loose' },
   { value: 'disable', label: 'disable' },
-];
-
-const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0' },
-  { value: '1', label: '1' },
-  { value: '2', label: '2' },
 ];
 
 export default defineComponent({
@@ -42,7 +37,9 @@ export default defineComponent({
     const vxlans = ref([]);
     const modalVisible = ref(false);
     const editingVxlan = ref(null);
+    const isEditMode = ref(false);
     const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
     const activeTab = ref('basic');
     const selectedVxlan = ref([]);
 
@@ -58,6 +55,12 @@ export default defineComponent({
     const vlanModalVisible = ref(false);
     const vlanForm = ref(null);
     const selectedVlans = ref([]);
+    const acceptDadOptions = computed(() => [
+      { value: '', label: '' },
+      { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
+      { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
+      { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
+    ]);
 
     const vlanColumns = [
       { key: 'vlan', title: t('interface.vxlan.vlan_id'), width: 120 },
@@ -68,7 +71,7 @@ export default defineComponent({
 
     // Schema definitions
     const basicSchema = computed(() => [
-      { key: 'name', title: t('interface.vxlan.name'), type: 'text', required: true, placeholder: t('interface.vxlan.name_placeholder'), help: t('interface.vxlan.name_help') },
+      { key: 'name', title: t('interface.vxlan.name'), type: 'text', required: true, placeholder: t('interface.vxlan.name_placeholder'), help: t('interface.vxlan.name_help'), disabled: isEditMode.value },
       { key: 'description', title: t('interface.vxlan.description'), type: 'text', placeholder: t('interface.vxlan.description_placeholder') },
       { key: 'vni', title: t('interface.vxlan.vni'), type: 'number', min: 0, max: 16777214, placeholder: t('interface.vxlan.vni_placeholder'), help: t('interface.vxlan.vni_help') },
       { key: 'group', title: t('interface.vxlan.group'), type: 'text', placeholder: t('interface.vxlan.group_placeholder'), help: t('interface.vxlan.group_help') },
@@ -126,49 +129,33 @@ export default defineComponent({
     ]);
 
     const ipv6Schema = computed(() => [
-      {
-        key: 'ipv6', title: t('interface.vxlan.ipv6_config'), type: 'group', children: [
-          { key: 'accept_dad', title: t('interface.vxlan.ipv6_accept_dad'), type: 'select', options: ACCEPT_DAD_OPTIONS, help: t('interface.vxlan.ipv6_accept_dad_help') },
-          { key: 'autoconf', title: t('interface.vxlan.ipv6_autoconf'), type: 'checkbox', help: t('interface.vxlan.ipv6_autoconf_help') },
-          { key: 'eui64', title: t('interface.vxlan.ipv6_eui64'), type: 'text', placeholder: t('interface.vxlan.ipv6_eui64_placeholder'), help: t('interface.vxlan.ipv6_eui64_help') },
-          { key: 'interface_identifier', title: t('interface.vxlan.ipv6_interface_identifier'), type: 'text', placeholder: t('interface.vxlan.ipv6_interface_identifier_placeholder'), help: t('interface.vxlan.ipv6_interface_identifier_help') },
-          { key: 'no_default_link_local', title: t('interface.vxlan.ipv6_no_default_link_local'), type: 'checkbox', help: t('interface.vxlan.ipv6_no_default_link_local_help') },
-          { key: 'adjust_mss', title: t('interface.vxlan.ipv6_adjust_mss'), type: 'text', placeholder: 'clamp-mss-to-pmtu or 536-65535', help: t('interface.vxlan.ipv6_adjust_mss_help') },
-          { key: 'base_reachable_time', title: t('interface.vxlan.ipv6_base_reachable_time'), type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: t('interface.vxlan.ipv6_base_reachable_time_help') },
-          { key: 'disable_forwarding', title: t('interface.vxlan.ipv6_disable_forwarding'), type: 'checkbox', help: t('interface.vxlan.ipv6_disable_forwarding_help') },
-          { key: 'dup_addr_detect_transmits', title: t('interface.vxlan.ipv6_dup_addr_detect_transmits'), type: 'number', min: 0, max: 100, placeholder: '0-100', help: t('interface.vxlan.ipv6_dup_addr_detect_transmits_help') },
-          { key: 'source_validation', title: t('interface.vxlan.ipv6_source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('app.please_select'), help: t('interface.vxlan.ipv6_source_validation_help') },
-        ]
-      }
+      { key: 'ipv6_accept_dad', title: t('interface.vxlan.ipv6_accept_dad'), type: 'select', options: acceptDadOptions.value, help: t('interface.vxlan.ipv6_accept_dad_help') },
+      { key: 'ipv6_autoconf', title: t('interface.vxlan.ipv6_autoconf'), type: 'checkbox', help: t('interface.vxlan.ipv6_autoconf_help') },
+      { key: 'ipv6_eui64', title: t('interface.vxlan.ipv6_eui64'), type: 'text', placeholder: t('interface.vxlan.ipv6_eui64_placeholder'), help: t('interface.vxlan.ipv6_eui64_help') },
+      { key: 'ipv6_interface_identifier', title: t('interface.vxlan.ipv6_interface_identifier'), type: 'text', placeholder: t('interface.vxlan.ipv6_interface_identifier_placeholder'), help: t('interface.vxlan.ipv6_interface_identifier_help') },
+      { key: 'ipv6_no_default_link_local', title: t('interface.vxlan.ipv6_no_default_link_local'), type: 'checkbox', help: t('interface.vxlan.ipv6_no_default_link_local_help') },
+      { key: 'ipv6_adjust_mss', title: t('interface.vxlan.ipv6_adjust_mss'), type: 'text', placeholder: 'clamp-mss-to-pmtu or 536-65535', help: t('interface.vxlan.ipv6_adjust_mss_help') },
+      { key: 'ipv6_base_reachable_time', title: t('interface.vxlan.ipv6_base_reachable_time'), type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: t('interface.vxlan.ipv6_base_reachable_time_help') },
+      { key: 'ipv6_disable_forwarding', title: t('interface.vxlan.ipv6_disable_forwarding'), type: 'checkbox', help: t('interface.vxlan.ipv6_disable_forwarding_help') },
+      { key: 'ipv6_dup_addr_detect_transmits', title: t('interface.vxlan.ipv6_dup_addr_detect_transmits'), type: 'number', min: 0, max: 100, placeholder: '0-100', help: t('interface.vxlan.ipv6_dup_addr_detect_transmits_help') },
+      { key: 'ipv6_source_validation', title: t('interface.vxlan.ipv6_source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('app.please_select'), help: t('interface.vxlan.ipv6_source_validation_help') },
     ]);
 
     const mirrorSchema = computed(() => [
-      {
-        key: 'mirror', title: t('interface.vxlan.mirror_traffic'), type: 'group', children: [
-          { key: 'egress', title: t('interface.vxlan.mirror_egress_title'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.vxlan.mirror_target_placeholder'), help: t('interface.vxlan.mirror_egress_help') },
-          { key: 'ingress', title: t('interface.vxlan.mirror_ingress_title'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.vxlan.mirror_target_placeholder'), help: t('interface.vxlan.mirror_ingress_help') },
-        ]
-      }
+      { key: 'mirror_egress', title: t('interface.vxlan.mirror_egress_title'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('interface.vxlan.mirror_target_placeholder'), help: t('interface.vxlan.mirror_egress_help') },
+      { key: 'mirror_ingress', title: t('interface.vxlan.mirror_ingress_title'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('interface.vxlan.mirror_target_placeholder'), help: t('interface.vxlan.mirror_ingress_help') },
     ]);
 
     const otherSchema = computed(() => [
-      {
-        key: 'other', title: t('interface.vxlan.other_config'), type: 'group', children: [
-          { key: 'redirect', title: t('interface.vxlan.redirect_title'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.vxlan.mirror_target_placeholder'), help: t('interface.vxlan.redirect_help') },
-          { key: 'vrf', title: t('interface.vxlan.vrf_title'), type: 'text', placeholder: t('interface.vxlan.vrf_placeholder'), help: t('interface.vxlan.vrf_help') },
-        ]
-      }
+      { key: 'redirect', title: t('interface.vxlan.redirect_title'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('interface.vxlan.mirror_target_placeholder'), help: t('interface.vxlan.redirect_help') },
+      { key: 'vrf', title: t('interface.vxlan.vrf_title'), type: 'select', options: [{ value: '', label: '' }, ...vrfOptions.value], placeholder: t('interface.vxlan.vrf_placeholder'), help: t('interface.vxlan.vrf_help') },
     ]);
 
     // VLAN-to-VNI schema
     const vlanSchema = computed(() => [
-      {
-        key: 'vlan_to_vni', title: t('interface.vxlan.vlan_to_vni_mapping'), type: 'group', children: [
-          { key: 'vlan', title: t('interface.vxlan.vlan_title'), type: 'text', required: true, placeholder: t('interface.vxlan.vlan_title_placeholder'), help: t('interface.vxlan.vlan_title_help') },
-          { key: 'vni', title: t('interface.vxlan.vni_title'), type: 'text', required: true, placeholder: t('interface.vxlan.vni_title_placeholder'), help: t('interface.vxlan.vni_title_help') },
-          { key: 'description', title: t('interface.vxlan.vlan_desc_title'), type: 'text', placeholder: t('interface.vxlan.vlan_desc_placeholder') },
-        ]
-      }
+      { key: 'vlan', title: t('interface.vxlan.vlan_title'), type: 'text', required: true, placeholder: t('interface.vxlan.vlan_title_placeholder'), help: t('interface.vxlan.vlan_title_help') },
+      { key: 'vni', title: t('interface.vxlan.vni_title'), type: 'text', required: true, placeholder: t('interface.vxlan.vni_title_placeholder'), help: t('interface.vxlan.vni_title_help') },
+      { key: 'description', title: t('interface.vxlan.vlan_desc_title'), type: 'text', placeholder: t('interface.vxlan.vlan_desc_placeholder') },
     ]);
 
     // Command text
@@ -443,6 +430,18 @@ export default defineComponent({
           value: iface.name || iface,
           label: iface.name || iface,
         }));
+
+        // Load VRF options
+        try {
+          const vrfRes = await api.get('/config', { path: 'vrf' });
+          const vrfData = vrfRes.data || {};
+          const nameData = vrfData.name || vrfData;
+          vrfOptions.value = Object.keys(nameData)
+            .filter(name => typeof nameData[name] === 'object')
+            .map(name => ({ value: name, label: name }));
+        } catch (e) {
+          vrfOptions.value = [];
+        }
       } catch (err) {
         showError(err);
       } finally {
@@ -458,6 +457,7 @@ export default defineComponent({
       if (index >= 0) {
         const raw = vxlans.value[index];
         editingVxlan.value = vxlanToForm(raw);
+        isEditMode.value = true;
         // Load vlan-to-vni mappings
         const v2v = raw['vlan-to-vni'] || {};
         vlanToVni.value = Object.entries(v2v).map(([vlan, m]) => ({
@@ -467,10 +467,20 @@ export default defineComponent({
         }));
       } else {
         editingVxlan.value = getDefaultForm();
+        isEditMode.value = false;
         vlanToVni.value = [];
       }
       activeTab.value = 'basic';
       modalVisible.value = true;
+    }
+
+    function openModalByRow(row) {
+      if (!row) {
+        openModal(-1);
+        return;
+      }
+      const index = vxlans.value.findIndex(v => v.name === row.name);
+      openModal(index);
     }
 
     async function save() {
@@ -572,7 +582,7 @@ export default defineComponent({
       basicSchema, parametersSchema, ipSchema, ipv6Schema, mirrorSchema, otherSchema, vlanSchema,
       commandText, modalTabs,
       deleteModalVisible, pendingDeleteNames, vlanDeleteModalVisible, pendingDeleteVlanIndex,
-      openModal, save, remove, confirmRemove, load,
+      openModal, openModalByRow, save, remove, confirmRemove, load,
       openVlanModal, saveVlan, deleteVlan, confirmDeleteVlan,
     };
   },
@@ -585,13 +595,13 @@ export default defineComponent({
         :selectable="true"
         :actions="['create', 'edit', 'delete', 'refresh']"
         @create="openModal(-1)"
-        @edit="openModal"
+        @edit="openModalByRow($event)"
         @delete="remove"
         @refresh="load"
         @selection-change="selected = $event"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="editingVxlan?.name ? $t('interface.vxlan.modal_edit') : $t('interface.vxlan.modal_create')" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingVxlan?.name ? $t('interface.vxlan.modal_edit') : $t('interface.vxlan.modal_create')" width="900px" @confirm="save">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic>
@@ -626,19 +636,11 @@ export default defineComponent({
             </template>
           </TabGroup>
         </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ $t('app.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="save">{{ $t('app.confirm') }}</button>
-        </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="vlanModalVisible" :title="editingVlanIndex >= 0 ? $t('interface.vxlan.edit_vlan_mapping') : $t('interface.vxlan.create_vlan_mapping')" width="600px">
+      <DraggableModal v-model:visible="vlanModalVisible" :title="editingVlanIndex >= 0 ? $t('interface.vxlan.edit_vlan_mapping') : $t('interface.vxlan.create_vlan_mapping')" width="600px" @confirm="saveVlan">
         <template #default>
           <ConfigForm :schema="vlanSchema" :model="vlanForm" />
-        </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="vlanModalVisible = false">{{ $t('app.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="saveVlan">{{ $t('app.confirm') }}</button>
         </template>
       </DraggableModal>
 

@@ -18,8 +18,8 @@ export default defineComponent({
     const items = ref([]);
     const modalVisible = ref(false);
     const editingItem = ref(null);
+    const isEditMode = ref(false);
     const interfaceOptions = ref([]);
-    const activeTab = ref('basic');
     const selectedItems = ref([]);
     const deleteModalVisible = ref(false);
     const pendingDeleteNames = ref([]);
@@ -33,7 +33,7 @@ export default defineComponent({
     ]);
 
     const basicSchema = computed(() => [
-      { key: 'name', title: t('input.schema.name.title'), type: 'text', required: true, placeholder: t('input.schema.name.placeholder'), help: t('input.schema.name.help') },
+      { key: 'name', title: t('input.schema.name.title'), type: 'text', required: true, placeholder: t('input.schema.name.placeholder'), help: t('input.schema.name.help'), disabled: isEditMode.value },
       { key: 'description', title: t('input.schema.description.title'), type: 'text', placeholder: t('input.schema.description.placeholder') },
       { key: 'redirect', title: t('input.schema.redirect.title'), type: 'select', options: interfaceOptions.value, placeholder: t('input.schema.redirect.placeholder'), help: t('input.schema.redirect.help') },
       { key: 'disable', title: t('input.schema.disable.title'), type: 'checkbox', help: t('input.schema.disable.help') },
@@ -51,10 +51,6 @@ export default defineComponent({
 
       return lines.length ? lines.join('\n') : t('input.messages.noConfig');
     });
-
-    const modalTabs = computed(() => [
-      { key: 'basic', title: t('input.tabs.basic') },
-    ]);
 
     function getDefaultForm() {
       return {
@@ -112,11 +108,21 @@ export default defineComponent({
     function openModal(index = -1) {
       if (index >= 0) {
         editingItem.value = itemToForm(items.value[index]);
+        isEditMode.value = true;
       } else {
         editingItem.value = getDefaultForm();
+        isEditMode.value = false;
       }
-      activeTab.value = 'basic';
       modalVisible.value = true;
+    }
+
+    function openModalByRow(row) {
+      if (!row) {
+        openModal(-1);
+        return;
+      }
+      const index = items.value.findIndex(i => i.name === row.name);
+      openModal(index);
     }
 
     async function save() {
@@ -162,11 +168,11 @@ export default defineComponent({
     });
 
     return {
-      loading, items, selected: selectedItems, modalVisible, editingItem, interfaceOptions, activeTab,
+      loading, items, selected: selectedItems, modalVisible, editingItem, isEditMode, interfaceOptions,
       deleteModalVisible, pendingDeleteNames,
       COLUMNS,
-      basicSchema, commandText, modalTabs,
-      openModal, save, remove, confirmRemove, load,
+      basicSchema, commandText,
+      openModal, openModalByRow, save, remove, confirmRemove, load,
       t,
     };
   },
@@ -179,21 +185,14 @@ export default defineComponent({
         :selectable="true"
         :actions="['create', 'edit', 'delete', 'refresh']"
         @create="openModal(-1)"
-        @edit="openModal"
+        @edit="openModalByRow($event)"
         @delete="remove"
         @refresh="load"
         @selection-change="selected = $event"
       />
-      <DraggableModal v-model:visible="modalVisible" :title="editingItem?.name ? t('input.modal.edit') : t('input.modal.create')" width="700px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingItem?.name ? t('input.modal.edit') : t('input.modal.create')" width="700px" @confirm="save">
         <template #default>
-          <TabGroup v-model="activeTab" :tabs="modalTabs">
-            <template #basic><ConfigForm :schema="basicSchema" :model="editingItem" /></template>
-            <template #command><pre style="background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;font-size:13px;">{{ commandText }}</pre></template>
-          </TabGroup>
-        </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('input.buttons.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="save">{{ t('input.buttons.confirm') }}</button>
+          <ConfigForm :schema="basicSchema" :model="editingItem" />
         </template>
       </DraggableModal>
       <DraggableModal v-model:visible="deleteModalVisible" :title="t('input.modal.confirmDelete')" width="400px" @confirm="confirmRemove">

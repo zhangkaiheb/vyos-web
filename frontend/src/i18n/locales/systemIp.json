@@ -7,7 +7,8 @@
         "multipath": "多路径",
         "nht": "NHT",
         "protocol": "协议",
-        "tcp": "TCP"
+        "tcp": "TCP",
+        "importTable": "导入路由表"
       },
       "labels": {
         "disableForwarding": "禁用 IPv4 转发",
@@ -18,6 +19,8 @@
         "mssBase": "MSS Base",
         "mssFloor": "MSS Floor",
         "mssProbing": "MSS 探测",
+        "distance": "距离",
+        "routeMap": "路由映射",
         "importRouteTable": "导入路由表",
         "tableNumber": "表编号",
         "actions": "操作"
@@ -28,8 +31,11 @@
         "ignoreUnreachableNexthops": "忽略不在 ARP 表中的下一跳",
         "layer4Hashing": "使用 Layer 4 信息进行 ECMP 哈希",
         "noResolveViaDefault": "不通过默认路由解析下一跳",
-        "mssBase": "探测起始 MSS（默认: 1024）",
-        "mssFloor": "探测最小 MSS（默认: 48）"
+        "mssBase": "取值范围: 48-1460；探测起始 MSS（默认: 1024）",
+        "mssFloor": "取值范围: 48-1460；探测最小 MSS（默认: 48）",
+        "mssProbing": "可选: on-icmp-black-hole 或 force",
+        "tableNumberRange": "范围: 1-252",
+        "distanceRange": "范围: 1-255"
       },
       "placeholders": {
         "routeMapName": "Route-map 名称"
@@ -43,10 +49,16 @@
         "addRouteTable": "添加路由表",
         "delete": "删除"
       },
+      "modals": {
+        "createImportRouteTable": "创建导入路由表",
+        "editImportRouteTable": "编辑导入路由表"
+      },
       "messages": {
         "loadFailed": "加载失败",
         "saveFailed": "保存失败",
-        "enterRouteTableNumber": "请输入路由表编号 (1-252)"
+        "enterRouteTableNumber": "请输入路由表编号 (1-252)",
+        "distanceRangeInvalid": "距离必须是 1-255 的整数",
+        "routeTableExists": "路由表已存在"
       }
     }
   },
@@ -58,7 +70,8 @@
         "multipath": "Multipath",
         "nht": "NHT",
         "protocol": "Protocol",
-        "tcp": "TCP"
+        "tcp": "TCP",
+        "importTable": "Import Route Table"
       },
       "labels": {
         "disableForwarding": "Disable IPv4 Forwarding",
@@ -69,6 +82,8 @@
         "mssBase": "MSS Base",
         "mssFloor": "MSS Floor",
         "mssProbing": "MSS Probing",
+        "distance": "Distance",
+        "routeMap": "Route-map",
         "importRouteTable": "Import Route Table",
         "tableNumber": "Table Number",
         "actions": "Actions"
@@ -79,8 +94,11 @@
         "ignoreUnreachableNexthops": "Ignore nexthops not in ARP table",
         "layer4Hashing": "Use Layer 4 information for ECMP hashing",
         "noResolveViaDefault": "Do not resolve nexthops via default route",
-        "mssBase": "Probing start MSS (default: 1024)",
-        "mssFloor": "Probing minimum MSS (default: 48)"
+        "mssBase": "Range: 48-1460; base MSS to start probing from (default: 1024)",
+        "mssFloor": "Range: 48-1460; minimum MSS value to probe (default: 48)",
+        "mssProbing": "Options: on-icmp-black-hole or force",
+        "tableNumberRange": "Range: 1-252",
+        "distanceRange": "Range: 1-255"
       },
       "placeholders": {
         "routeMapName": "Route-map name"
@@ -94,10 +112,16 @@
         "addRouteTable": "Add Route Table",
         "delete": "Delete"
       },
+      "modals": {
+        "createImportRouteTable": "Create Import Route Table",
+        "editImportRouteTable": "Edit Import Route Table"
+      },
       "messages": {
         "loadFailed": "Load failed",
         "saveFailed": "Save failed",
-        "enterRouteTableNumber": "Please enter route table number (1-252)"
+        "enterRouteTableNumber": "Please enter route table number (1-252)",
+        "distanceRangeInvalid": "Distance must be an integer between 1 and 255",
+        "routeTableExists": "Route table already exists"
       }
     }
   },
@@ -109,7 +133,8 @@
         "multipath": "Multipath",
         "nht": "NHT",
         "protocol": "Protocol",
-        "tcp": "TCP"
+        "tcp": "TCP",
+        "importTable": "Import Route Table"
       },
       "labels": {
         "disableForwarding": "Disable IPv4 Forwarding",
@@ -120,6 +145,8 @@
         "mssBase": "MSS Base",
         "mssFloor": "MSS Floor",
         "mssProbing": "MSS Probing",
+        "distance": "Distance",
+        "routeMap": "Route-map",
         "importRouteTable": "Import Route Table",
         "tableNumber": "Table Number",
         "actions": "Actions"
@@ -131,7 +158,9 @@
         "layer4Hashing": "Use Layer 4 information for ECMP hashing",
         "noResolveViaDefault": "Do not resolve nexthops via default route",
         "mssBase": "Probing start MSS (default: 1024)",
-        "mssFloor": "Probing minimum MSS (default: 48)"
+        "mssFloor": "Probing minimum MSS (default: 48)",
+        "tableNumberRange": "Range: 1-252",
+        "distanceRange": "Range: 1-255"
       },
       "placeholders": {
         "routeMapName": "Route-map name"
@@ -145,10 +174,16 @@
         "addRouteTable": "Add Route Table",
         "delete": "Delete"
       },
+      "modals": {
+        "createImportRouteTable": "Create Import Route Table",
+        "editImportRouteTable": "Edit Import Route Table"
+      },
       "messages": {
         "loadFailed": "Load failed",
         "saveFailed": "Save failed",
-        "enterRouteTableNumber": "Please enter route table number (1-252)"
+        "enterRouteTableNumber": "Please enter route table number (1-252)",
+        "distanceRangeInvalid": "Distance must be an integer between 1 and 255",
+        "routeTableExists": "Route table already exists"
       }
     }
   },
@@ -160,7 +195,8 @@
         "multipath": "Multipath",
         "nht": "NHT",
         "protocol": "Protocol",
-        "tcp": "TCP"
+        "tcp": "TCP",
+        "importTable": "Import Route Table"
       },
       "labels": {
         "disableForwarding": "Disable IPv4 Forwarding",
@@ -171,6 +207,8 @@
         "mssBase": "MSS Base",
         "mssFloor": "MSS Floor",
         "mssProbing": "MSS Probing",
+        "distance": "Distance",
+        "routeMap": "Route-map",
         "importRouteTable": "Import Route Table",
         "tableNumber": "Table Number",
         "actions": "Actions"
@@ -182,7 +220,9 @@
         "layer4Hashing": "Use Layer 4 information for ECMP hashing",
         "noResolveViaDefault": "Do not resolve nexthops via default route",
         "mssBase": "Probing start MSS (default: 1024)",
-        "mssFloor": "Probing minimum MSS (default: 48)"
+        "mssFloor": "Probing minimum MSS (default: 48)",
+        "tableNumberRange": "Range: 1-252",
+        "distanceRange": "Range: 1-255"
       },
       "placeholders": {
         "routeMapName": "Route-map name"
@@ -196,10 +236,16 @@
         "addRouteTable": "Add Route Table",
         "delete": "Delete"
       },
+      "modals": {
+        "createImportRouteTable": "Create Import Route Table",
+        "editImportRouteTable": "Edit Import Route Table"
+      },
       "messages": {
         "loadFailed": "Load failed",
         "saveFailed": "Save failed",
-        "enterRouteTableNumber": "Please enter route table number (1-252)"
+        "enterRouteTableNumber": "Please enter route table number (1-252)",
+        "distanceRangeInvalid": "Distance must be an integer between 1 and 255",
+        "routeTableExists": "Route table already exists"
       }
     }
   },
@@ -211,7 +257,8 @@
         "multipath": "Multipath",
         "nht": "NHT",
         "protocol": "Protocol",
-        "tcp": "TCP"
+        "tcp": "TCP",
+        "importTable": "Import Route Table"
       },
       "labels": {
         "disableForwarding": "Disable IPv4 Forwarding",
@@ -222,6 +269,8 @@
         "mssBase": "MSS Base",
         "mssFloor": "MSS Floor",
         "mssProbing": "MSS Probing",
+        "distance": "Distance",
+        "routeMap": "Route-map",
         "importRouteTable": "Import Route Table",
         "tableNumber": "Table Number",
         "actions": "Actions"
@@ -233,7 +282,9 @@
         "layer4Hashing": "Use Layer 4 information for ECMP hashing",
         "noResolveViaDefault": "Do not resolve nexthops via default route",
         "mssBase": "Probing start MSS (default: 1024)",
-        "mssFloor": "Probing minimum MSS (default: 48)"
+        "mssFloor": "Probing minimum MSS (default: 48)",
+        "tableNumberRange": "Range: 1-252",
+        "distanceRange": "Range: 1-255"
       },
       "placeholders": {
         "routeMapName": "Route-map name"
@@ -247,10 +298,16 @@
         "addRouteTable": "Add Route Table",
         "delete": "Delete"
       },
+      "modals": {
+        "createImportRouteTable": "Create Import Route Table",
+        "editImportRouteTable": "Edit Import Route Table"
+      },
       "messages": {
         "loadFailed": "Load failed",
         "saveFailed": "Save failed",
-        "enterRouteTableNumber": "Please enter route table number (1-252)"
+        "enterRouteTableNumber": "Please enter route table number (1-252)",
+        "distanceRangeInvalid": "Distance must be an integer between 1 and 255",
+        "routeTableExists": "Route table already exists"
       }
     }
   },
@@ -262,7 +319,8 @@
         "multipath": "Multipath",
         "nht": "NHT",
         "protocol": "Protocol",
-        "tcp": "TCP"
+        "tcp": "TCP",
+        "importTable": "Import Route Table"
       },
       "labels": {
         "disableForwarding": "Disable IPv4 Forwarding",
@@ -273,6 +331,8 @@
         "mssBase": "MSS Base",
         "mssFloor": "MSS Floor",
         "mssProbing": "MSS Probing",
+        "distance": "Distance",
+        "routeMap": "Route-map",
         "importRouteTable": "Import Route Table",
         "tableNumber": "Table Number",
         "actions": "Actions"
@@ -284,7 +344,9 @@
         "layer4Hashing": "Use Layer 4 information for ECMP hashing",
         "noResolveViaDefault": "Do not resolve nexthops via default route",
         "mssBase": "Probing start MSS (default: 1024)",
-        "mssFloor": "Probing minimum MSS (default: 48)"
+        "mssFloor": "Probing minimum MSS (default: 48)",
+        "tableNumberRange": "Range: 1-252",
+        "distanceRange": "Range: 1-255"
       },
       "placeholders": {
         "routeMapName": "Route-map name"
@@ -298,10 +360,16 @@
         "addRouteTable": "Add Route Table",
         "delete": "Delete"
       },
+      "modals": {
+        "createImportRouteTable": "Create Import Route Table",
+        "editImportRouteTable": "Edit Import Route Table"
+      },
       "messages": {
         "loadFailed": "Load failed",
         "saveFailed": "Save failed",
-        "enterRouteTableNumber": "Please enter route table number (1-252)"
+        "enterRouteTableNumber": "Please enter route table number (1-252)",
+        "distanceRangeInvalid": "Distance must be an integer between 1 and 255",
+        "routeTableExists": "Route table already exists"
       }
     }
   },
@@ -313,7 +381,8 @@
         "multipath": "Multipath",
         "nht": "NHT",
         "protocol": "Protocol",
-        "tcp": "TCP"
+        "tcp": "TCP",
+        "importTable": "Import Route Table"
       },
       "labels": {
         "disableForwarding": "Disable IPv4 Forwarding",
@@ -324,6 +393,8 @@
         "mssBase": "MSS Base",
         "mssFloor": "MSS Floor",
         "mssProbing": "MSS Probing",
+        "distance": "Distance",
+        "routeMap": "Route-map",
         "importRouteTable": "Import Route Table",
         "tableNumber": "Table Number",
         "actions": "Actions"
@@ -352,7 +423,9 @@
       "messages": {
         "loadFailed": "Load failed",
         "saveFailed": "Save failed",
-        "enterRouteTableNumber": "Please enter route table number (1-252)"
+        "enterRouteTableNumber": "Please enter route table number (1-252)",
+        "distanceRangeInvalid": "Distance must be an integer between 1 and 255",
+        "routeTableExists": "Route table already exists"
       }
     }
   }

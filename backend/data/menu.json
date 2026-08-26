@@ -500,15 +500,6 @@
             "component": "SystemLoginPage"
           },
           {
-            "id": "high-availability",
-            "label": "高可用性",
-            "label_en": "High Availability",
-            "icon": "",
-            "children": [],
-            "route": "/system/settings/high-availability",
-            "component": "HighAvailabilityPage"
-          },
-          {
             "id": "syslog",
             "label": "Syslog",
             "label_en": "Syslog",
@@ -571,6 +562,15 @@
             "children": [],
             "route": "/system/conntrack",
             "component": "ConntrackPage"
+          },
+          {
+            "id": "high-availability",
+            "label": "高可用性",
+            "label_en": "High Availability",
+            "icon": "",
+            "children": [],
+            "route": "/system/settings/high-availability",
+            "component": "HighAvailabilityPage"
           },
           {
             "id": "ip",

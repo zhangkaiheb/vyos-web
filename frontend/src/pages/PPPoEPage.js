@@ -411,6 +411,15 @@ export default defineComponent({
       modalVisible.value = true;
     }
 
+    function openModalByRow(row) {
+      if (!row) {
+        openModal(-1);
+        return;
+      }
+      const index = pppoes.value.findIndex(p => p.name === row.name);
+      openModal(index);
+    }
+
     async function save() {
       try {
         const form = editingPPPoE.value;
@@ -460,7 +469,7 @@ export default defineComponent({
       COLUMNS,
       basicSchema, dhcpSchema, dhcpv6Schema, ipSchema, ipv6Schema, mirrorSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, confirmRemove, load, t,
+      openModal, openModalByRow, save, remove, confirmRemove, load, t,
     };
   },
   template: `
@@ -472,7 +481,7 @@ export default defineComponent({
         :selectable="true"
         :actions="['create', 'edit', 'delete', 'refresh']"
         @create="openModal(-1)"
-        @edit="openModal"
+        @edit="openModalByRow($event)"
         @delete="remove"
         @refresh="load"
         @selection-change="selected = $event"

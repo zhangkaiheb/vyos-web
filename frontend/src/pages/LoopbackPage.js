@@ -201,7 +201,7 @@ export default defineComponent({
         @refresh="load"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="$t('interface.loopback.modal_edit')" width="800px">
+      <DraggableModal v-model:visible="modalVisible" :title="$t('interface.loopback.modal_edit')" width="800px" @confirm="save">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic>
@@ -217,10 +217,6 @@ export default defineComponent({
               <ConfigForm :schema="otherSchema" :model="editingLoopback" />
             </template>
           </TabGroup>
-        </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ $t('app.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="save">{{ $t('app.confirm') }}</button>
         </template>
       </DraggableModal>
     </div>

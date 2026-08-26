@@ -34,7 +34,7 @@ export default defineComponent({
     ];
 
     const schema = computed(() => [
-      { key: 'name', title: t('netns.columns.name'), type: 'text', required: true, placeholder: t('netns.form.namePlaceholder') },
+      { key: 'name', title: t('netns.columns.name'), type: 'text', required: true, placeholder: t('netns.form.namePlaceholder'), disabled: !!editingOriginalName.value },
       { key: 'description', title: t('netns.columns.description'), type: 'text' },
     ]);
 
@@ -118,23 +118,17 @@ export default defineComponent({
     }
 
     async function save() {
-      if (!editingNetns.value.name) return showError({ message: t('netns.errors.nameRequired') });
       const original = editingOriginalName.value;
-      if (!original && netnsList.value.some(n => n.name === editingNetns.value.name)) {
+      const targetName = original || editingNetns.value.name;
+      if (!targetName) return showError({ message: t('netns.errors.nameRequired') });
+      if (!original && netnsList.value.some(n => n.name === targetName)) {
         return showError({ message: t('netns.errors.nameExists') });
       }
       const value = {};
       if (editingNetns.value.description) value.description = editingNetns.value.description;
       try {
-        if (original && original !== editingNetns.value.name) {
-          await configStore.deleteConfig(`${path.value} name ${original}`);
-          configStore.markPending();
-          await configStore.setConfig(`${path.value} name ${editingNetns.value.name}`, value);
-          configStore.markPending();
-        } else {
-          await configStore.setConfig(`${path.value} name ${editingNetns.value.name}`, value);
-          configStore.markPending();
-        }
+        await configStore.setConfig(`${path.value} name ${targetName}`, value);
+        configStore.markPending();
         modalVisible.value = false;
         await configStore.checkSessionChanged();
         await load();

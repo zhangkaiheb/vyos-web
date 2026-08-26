@@ -47,34 +47,39 @@ export default defineComponent({
     const macsecs = ref([]);
     const modalVisible = ref(false);
     const editingMacsec = ref(null);
+    const isEditMode = ref(false);
     const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
     const activeTab = ref('basic');
     const selectedMacsec = ref([]);
     const deleteModalVisible = ref(false);
     const pendingDeleteNames = ref([]);
 
     const CIPHER_OPTIONS = computed(() => [
+      { value: '', label: '' },
       { value: 'gcm-aes-128', label: t('macsec.options.cipher_128') },
       { value: 'gcm-aes-256', label: t('macsec.options.cipher_256') },
     ]);
 
     const SOURCE_VALIDATION_OPTIONS = computed(() => [
+      { value: '', label: '' },
       { value: 'strict', label: t('macsec.options.source_strict') },
       { value: 'loose', label: t('macsec.options.source_loose') },
       { value: 'disable', label: t('macsec.options.source_disable') },
     ]);
 
-    const ACCEPT_DAD_OPTIONS = computed(() => [
-      { value: '0', label: t('macsec.options.accept_dad_0') },
-      { value: '1', label: t('macsec.options.accept_dad_1') },
-      { value: '2', label: t('macsec.options.accept_dad_2') },
+    const acceptDadOptions = computed(() => [
+      { value: '', label: '' },
+      { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
+      { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
+      { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
     ]);
 
     const basicSchema = computed(() => [
-      { key: 'name', title: t('macsec.fields.name'), type: 'text', required: true, placeholder: t('macsec.fields.name_placeholder'), help: t('macsec.fields.name_help') },
+      { key: 'name', title: t('macsec.fields.name'), type: 'text', required: true, placeholder: t('macsec.fields.name_placeholder'), help: t('macsec.fields.name_help'), disabled: isEditMode.value },
       { key: 'description', title: t('macsec.fields.description'), type: 'text', placeholder: t('macsec.fields.description_placeholder') },
       { key: 'address', title: t('macsec.fields.ip_address'), type: 'textarea', placeholder: t('macsec.fields.address_placeholder'), help: t('macsec.fields.address_help') },
-      { key: 'source_interface', title: t('macsec.fields.source_interface'), type: 'select', options: interfaceOptions.value, placeholder: t('macsec.fields.source_interface_placeholder'), help: t('macsec.fields.source_interface_help') },
+      { key: 'source_interface', title: t('macsec.fields.source_interface'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('macsec.fields.source_interface_placeholder'), help: t('macsec.fields.source_interface_help') },
       { key: 'mtu', title: t('macsec.fields.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('macsec.fields.mtu_placeholder'), help: t('macsec.fields.mtu_help') },
       { key: 'disable', title: t('macsec.fields.disable'), type: 'checkbox', help: t('macsec.fields.disable_help') },
     ]);
@@ -111,7 +116,7 @@ export default defineComponent({
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: t('macsec.fields.ipv6.accept_dad'), type: 'select', options: ACCEPT_DAD_OPTIONS.value, help: t('macsec.fields.ipv6.accept_dad_help') },
+      { key: 'ipv6_accept_dad', title: t('macsec.fields.ipv6.accept_dad'), type: 'select', options: acceptDadOptions.value, help: t('macsec.fields.ipv6.accept_dad_help') },
       { key: 'ipv6_autoconf', title: t('macsec.fields.ipv6.autoconf'), type: 'checkbox', help: t('macsec.fields.ipv6.autoconf_help') },
       { key: 'ipv6_eui64', title: t('macsec.fields.ipv6.eui64'), type: 'text', placeholder: t('macsec.fields.ipv6.eui64_placeholder'), help: t('macsec.fields.ipv6.eui64_help') },
       { key: 'ipv6_no_default_link_local', title: t('macsec.fields.ipv6.no_default_link_local'), type: 'checkbox', help: t('macsec.fields.ipv6.no_default_link_local_help') },
@@ -145,13 +150,13 @@ export default defineComponent({
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: t('macsec.fields.mirror.egress'), type: 'select', options: interfaceOptions.value, placeholder: t('macsec.fields.mirror.placeholder'), help: t('macsec.fields.mirror.egress_help') },
-      { key: 'mirror_ingress', title: t('macsec.fields.mirror.ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('macsec.fields.mirror.placeholder'), help: t('macsec.fields.mirror.ingress_help') },
+      { key: 'mirror_egress', title: t('macsec.fields.mirror.egress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('macsec.fields.mirror.placeholder'), help: t('macsec.fields.mirror.egress_help') },
+      { key: 'mirror_ingress', title: t('macsec.fields.mirror.ingress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('macsec.fields.mirror.placeholder'), help: t('macsec.fields.mirror.ingress_help') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: t('macsec.fields.other.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('macsec.fields.other.redirect_placeholder'), help: t('macsec.fields.other.redirect_help') },
-      { key: 'vrf', title: t('macsec.fields.other.vrf'), type: 'text', placeholder: t('macsec.fields.other.vrf_placeholder'), help: t('macsec.fields.other.vrf_help') },
+      { key: 'redirect', title: t('macsec.fields.other.redirect'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('macsec.fields.other.redirect_placeholder'), help: t('macsec.fields.other.redirect_help') },
+      { key: 'vrf', title: t('macsec.fields.other.vrf'), type: 'select', options: [{ value: '', label: '' }, ...vrfOptions.value], placeholder: t('macsec.fields.other.vrf_placeholder'), help: t('macsec.fields.other.vrf_help') },
     ]);
 
     const commandText = computed(() => {
@@ -267,7 +272,7 @@ export default defineComponent({
         ip_disable_forwarding: false, ip_enable_arp_accept: false, ip_enable_arp_announce: false,
         ip_enable_arp_ignore: false, ip_enable_directed_broadcast: false,
         ip_enable_proxy_arp: false, ip_proxy_arp_pvlan: false, ip_source_validation: '',
-        ipv6_accept_dad: '1', ipv6_autoconf: false, ipv6_eui64: '', ipv6_no_default_link_local: false,
+        ipv6_accept_dad: '', ipv6_autoconf: false, ipv6_eui64: '', ipv6_no_default_link_local: false,
         ipv6_adjust_mss: '', ipv6_base_reachable_time: '', ipv6_disable_forwarding: false,
         ipv6_dup_addr_detect_transmits: '', ipv6_source_validation: '',
         dhcp_client_id: '', dhcp_default_route_distance: '', dhcp_host_name: '',
@@ -309,7 +314,7 @@ export default defineComponent({
         ip_enable_proxy_arp: !!m.ip?.enable_proxy_arp,
         ip_proxy_arp_pvlan: !!m.ip?.proxy_arp_pvlan,
         ip_source_validation: m.ip?.source_validation || '',
-        ipv6_accept_dad: m.ipv6?.accept_dad || '1',
+        ipv6_accept_dad: m.ipv6?.accept_dad || '',
         ipv6_autoconf: !!m.ipv6?.address?.autoconf,
         ipv6_eui64: m.ipv6?.address?.eui64 || '',
         ipv6_no_default_link_local: !!m.ipv6?.address?.no_default_link_local,
@@ -459,6 +464,17 @@ export default defineComponent({
           value: iface.name || iface,
           label: iface.name || iface,
         }));
+
+        try {
+          const vrfRes = await api.get('/config', { path: 'vrf' });
+          const vrfData = vrfRes.data || {};
+          const nameData = vrfData.name || vrfData;
+          vrfOptions.value = Object.keys(nameData)
+            .filter(name => typeof nameData[name] === 'object')
+            .map(name => ({ value: name, label: name }));
+        } catch (e) {
+          vrfOptions.value = [];
+        }
       } catch (err) {
         showError(err);
       } finally {
@@ -469,11 +485,22 @@ export default defineComponent({
     function openModal(index = -1) {
       if (index >= 0) {
         editingMacsec.value = macsecToForm(macsecs.value[index]);
+        isEditMode.value = true;
       } else {
         editingMacsec.value = getDefaultForm();
+        isEditMode.value = false;
       }
       activeTab.value = 'basic';
       modalVisible.value = true;
+    }
+
+    function openModalByRow(row) {
+      if (!row) {
+        openModal(-1);
+        return;
+      }
+      const index = macsecs.value.findIndex(m => m.name === row.name);
+      openModal(index);
     }
 
     async function save() {
@@ -515,12 +542,12 @@ export default defineComponent({
     onMounted(() => { load(); onMenuRefresh(load); window.addEventListener('config-committed', load); });
 
     return {
-      loading, macsecs, selected: selectedMacsec, modalVisible, editingMacsec, interfaceOptions, activeTab,
+      loading, macsecs, selected: selectedMacsec, modalVisible, editingMacsec, isEditMode, interfaceOptions, vrfOptions, activeTab,
       deleteModalVisible, pendingDeleteNames,
       COLUMNS,
       basicSchema, securitySchema, mkaSchema, staticSchema, ipSchema, ipv6Schema, dhcpSchema, dhcpv6Schema, mirrorSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, confirmRemove, load, t,
+      openModal, openModalByRow, save, remove, confirmRemove, load, t,
     };
   },
   template: `
@@ -532,12 +559,12 @@ export default defineComponent({
         :selectable="true"
         :actions="['create', 'edit', 'delete', 'refresh']"
         @create="openModal(-1)"
-        @edit="openModal"
+        @edit="openModalByRow($event)"
         @delete="remove"
         @refresh="load"
         @selection-change="selected = $event"
       />
-      <DraggableModal v-model:visible="modalVisible" :title="editingMacsec?.name ? t('macsec.modal.edit') : t('macsec.modal.create')" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingMacsec?.name ? t('macsec.modal.edit') : t('macsec.modal.create')" width="900px" @confirm="save">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic><ConfigForm :schema="basicSchema" :model="editingMacsec" /></template>
@@ -551,10 +578,6 @@ export default defineComponent({
             <template #mirror><ConfigForm :schema="mirrorSchema" :model="editingMacsec" /></template>
             <template #other><ConfigForm :schema="otherSchema" :model="editingMacsec" /></template>
           </TabGroup>
-        </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('common.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="save">{{ t('common.confirm') }}</button>
         </template>
       </DraggableModal>
       <DraggableModal v-model:visible="deleteModalVisible" :title="t('common.confirm_delete')" width="400px" @confirm="confirmRemove">

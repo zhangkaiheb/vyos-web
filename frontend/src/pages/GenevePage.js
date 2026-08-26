@@ -28,22 +28,26 @@ export default defineComponent({
     ];
 
     const SOURCE_VALIDATION_OPTIONS = [
+      { value: '', label: '' },
       { value: 'strict', label: t('geneve.options.sourceValidationStrict') },
       { value: 'loose', label: t('geneve.options.sourceValidationLoose') },
       { value: 'disable', label: t('geneve.options.sourceValidationDisable') },
     ];
 
-    const ACCEPT_DAD_OPTIONS = [
-      { value: '0', label: t('geneve.options.acceptDad0') },
-      { value: '1', label: t('geneve.options.acceptDad1') },
-      { value: '2', label: t('geneve.options.acceptDad2') },
-    ];
+    const acceptDadOptions = computed(() => [
+      { value: '', label: '' },
+      { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
+      { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
+      { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
+    ]);
 
     const loading = ref(false);
     const geneves = ref([]);
     const modalVisible = ref(false);
     const editingGeneve = ref(null);
+    const isEditMode = ref(false);
     const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
     const activeTab = ref('basic');
     const selectedGeneve = ref([]);
     const deleteModalVisible = ref(false);
@@ -51,7 +55,7 @@ export default defineComponent({
 
     // Schema definitions
     const basicSchema = computed(() => [
-      { key: 'name', title: t('geneve.schema.basic.name'), type: 'text', required: true, placeholder: t('geneve.schema.basic.namePlaceholder'), help: t('geneve.schema.basic.nameHelp') },
+      { key: 'name', title: t('geneve.schema.basic.name'), type: 'text', required: true, placeholder: t('geneve.schema.basic.namePlaceholder'), help: t('geneve.schema.basic.nameHelp'), disabled: isEditMode.value },
       { key: 'description', title: t('geneve.schema.basic.description'), type: 'text', placeholder: t('geneve.schema.basic.descriptionPlaceholder') },
       { key: 'vni', title: t('geneve.schema.basic.vni'), type: 'number', min: 0, max: 16777214, placeholder: '0-16777214', help: t('geneve.schema.basic.vniHelp') },
       { key: 'remote', title: t('geneve.schema.basic.remote'), type: 'text', placeholder: t('geneve.schema.basic.remotePlaceholder'), help: t('geneve.schema.basic.remoteHelp') },
@@ -83,7 +87,7 @@ export default defineComponent({
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: t('geneve.schema.ipv6.acceptDad'), type: 'select', options: ACCEPT_DAD_OPTIONS, help: t('geneve.schema.ipv6.acceptDadHelp') },
+      { key: 'ipv6_accept_dad', title: t('geneve.schema.ipv6.acceptDad'), type: 'select', options: acceptDadOptions.value, help: t('geneve.schema.ipv6.acceptDadHelp') },
       { key: 'ipv6_autoconf', title: t('geneve.schema.ipv6.autoconf'), type: 'checkbox', help: t('geneve.schema.ipv6.autoconfHelp') },
       { key: 'ipv6_eui64', title: t('geneve.schema.ipv6.eui64'), type: 'text', placeholder: t('geneve.schema.ipv6.eui64Placeholder'), help: t('geneve.schema.ipv6.eui64Help') },
       { key: 'ipv6_interface_identifier', title: t('geneve.schema.ipv6.interfaceIdentifier'), type: 'text', placeholder: t('geneve.schema.ipv6.interfaceIdentifierPlaceholder'), help: t('geneve.schema.ipv6.interfaceIdentifierHelp') },
@@ -96,13 +100,13 @@ export default defineComponent({
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: t('geneve.schema.mirror.egress'), type: 'select', options: interfaceOptions.value, placeholder: t('geneve.schema.mirror.targetPlaceholder'), help: t('geneve.schema.mirror.egressHelp') },
-      { key: 'mirror_ingress', title: t('geneve.schema.mirror.ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('geneve.schema.mirror.targetPlaceholder'), help: t('geneve.schema.mirror.ingressHelp') },
+      { key: 'mirror_egress', title: t('geneve.schema.mirror.egress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('geneve.schema.mirror.targetPlaceholder'), help: t('geneve.schema.mirror.egressHelp') },
+      { key: 'mirror_ingress', title: t('geneve.schema.mirror.ingress'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('geneve.schema.mirror.targetPlaceholder'), help: t('geneve.schema.mirror.ingressHelp') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: t('geneve.schema.other.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('geneve.schema.other.redirectPlaceholder'), help: t('geneve.schema.other.redirectHelp') },
-      { key: 'vrf', title: t('geneve.schema.other.vrf'), type: 'text', placeholder: t('geneve.schema.other.vrfPlaceholder'), help: t('geneve.schema.other.vrfHelp') },
+      { key: 'redirect', title: t('geneve.schema.other.redirect'), type: 'select', options: [{ value: '', label: '' }, ...interfaceOptions.value], placeholder: t('geneve.schema.other.redirectPlaceholder'), help: t('geneve.schema.other.redirectHelp') },
+      { key: 'vrf', title: t('geneve.schema.other.vrf'), type: 'select', options: [{ value: '', label: '' }, ...vrfOptions.value], placeholder: t('geneve.schema.other.vrfPlaceholder'), help: t('geneve.schema.other.vrfHelp') },
     ]);
 
     // Command text
@@ -180,7 +184,7 @@ export default defineComponent({
         ip_disable_forwarding: false, ip_enable_arp_accept: false, ip_enable_arp_announce: false,
         ip_enable_arp_ignore: false, ip_enable_directed_broadcast: false,
         ip_enable_proxy_arp: false, ip_proxy_arp_pvlan: false, ip_source_validation: '',
-        ipv6_accept_dad: '1', ipv6_autoconf: false, ipv6_eui64: '',
+        ipv6_accept_dad: '', ipv6_autoconf: false, ipv6_eui64: '',
         ipv6_interface_identifier: '', ipv6_no_default_link_local: false,
         ipv6_adjust_mss: '', ipv6_base_reachable_time: '', ipv6_disable_forwarding: false,
         ipv6_dup_addr_detect_transmits: '', ipv6_source_validation: '',
@@ -214,7 +218,7 @@ export default defineComponent({
         ip_enable_proxy_arp: !!g.ip?.enable_proxy_arp,
         ip_proxy_arp_pvlan: !!g.ip?.proxy_arp_pvlan,
         ip_source_validation: g.ip?.source_validation || '',
-        ipv6_accept_dad: g.ipv6?.accept_dad || '1',
+        ipv6_accept_dad: g.ipv6?.accept_dad || '',
         ipv6_autoconf: !!g.ipv6?.address?.autoconf,
         ipv6_eui64: g.ipv6?.address?.eui64 || '',
         ipv6_interface_identifier: g.ipv6?.address?.interface_identifier || '',
@@ -323,6 +327,18 @@ export default defineComponent({
           value: iface.name || iface,
           label: iface.name || iface,
         }));
+
+        // Load VRF options
+        try {
+          const vrfRes = await api.get('/config', { path: 'vrf' });
+          const vrfData = vrfRes.data || {};
+          const nameData = vrfData.name || vrfData;
+          vrfOptions.value = Object.keys(nameData)
+            .filter(name => typeof nameData[name] === 'object')
+            .map(name => ({ value: name, label: name }));
+        } catch (e) {
+          vrfOptions.value = [];
+        }
       } catch (err) {
         handleError(err);
       } finally {
@@ -337,11 +353,22 @@ export default defineComponent({
     function openModal(index = -1) {
       if (index >= 0) {
         editingGeneve.value = geneveToForm(geneves.value[index]);
+        isEditMode.value = true;
       } else {
         editingGeneve.value = getDefaultForm();
+        isEditMode.value = false;
       }
       activeTab.value = 'basic';
       modalVisible.value = true;
+    }
+
+    function openModalByRow(row) {
+      if (!row) {
+        openModal(-1);
+        return;
+      }
+      const index = geneves.value.findIndex(g => g.name === row.name);
+      openModal(index);
     }
 
     async function save() {
@@ -393,12 +420,12 @@ export default defineComponent({
     });
 
     return {
-      loading, geneves, selected: selectedGeneve, modalVisible, editingGeneve, interfaceOptions, activeTab,
+      loading, geneves, selected: selectedGeneve, modalVisible, editingGeneve, isEditMode, interfaceOptions, vrfOptions, activeTab,
       deleteModalVisible, pendingDeleteNames,
       COLUMNS,
       basicSchema, parametersSchema, ipSchema, ipv6Schema, mirrorSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, confirmRemove, load, t,
+      openModal, openModalByRow, save, remove, confirmRemove, load, t,
     };
   },
   template: `
@@ -410,13 +437,13 @@ export default defineComponent({
         :selectable="true"
         :actions="['create', 'edit', 'delete', 'refresh']"
         @create="openModal(-1)"
-        @edit="openModal"
+        @edit="openModalByRow($event)"
         @delete="remove"
         @refresh="load"
         @selection-change="selected = $event"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="editingGeneve?.name ? t('geneve.modal.editTitle') : t('geneve.modal.createTitle')" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingGeneve?.name ? t('geneve.modal.editTitle') : t('geneve.modal.createTitle')" width="900px" @confirm="save">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic>
@@ -438,10 +465,6 @@ export default defineComponent({
               <ConfigForm :schema="otherSchema" :model="editingGeneve" />
             </template>
           </TabGroup>
-        </template>
-        <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('geneve.buttons.cancel') }}</button>
-          <button type="button" class="btn btn-primary" @click="save">{{ t('geneve.buttons.confirm') }}</button>
         </template>
       </DraggableModal>
       <DraggableModal v-model:visible="deleteModalVisible" :title="t('geneve.delete.title')" width="400px" @confirm="confirmRemove">
