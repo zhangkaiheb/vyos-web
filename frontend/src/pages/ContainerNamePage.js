@@ -28,6 +28,22 @@ function isPresent(value) {
 function joinLines(val) { return toArray(val).join('\n'); }
 function splitLines(text) { return String(text || '').split('\n').map(s => s.trim()).filter(Boolean); }
 
+const CONTAINER_CAPABILITY_OPTIONS = [
+  'net-admin',
+  'net-bind-service',
+  'net-raw',
+  'mknod',
+  'setpcap',
+  'sys-admin',
+  'sys-module',
+  'sys-nice',
+  'sys-time',
+];
+
+const CONTAINER_LOG_DRIVER_OPTIONS = ['k8s-file', 'journald', 'none'];
+const CONTAINER_VOLUME_MODE_OPTIONS = ['rw', 'ro'];
+const CONTAINER_VOLUME_PROPAGATION_OPTIONS = ['shared', 'slave', 'private', 'rshared', 'rslave', 'rprivate'];
+
 export default defineComponent({
   name: 'ContainerNamePage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
@@ -55,11 +71,6 @@ export default defineComponent({
     ];
 
     // Sub-table columns
-    const capabilityColumns = [
-      { key: 'capability', title: t('container.subColumns.capability'), dataIndex: 'capability', width: 300 },
-      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
-
     const environmentColumns = [
       { key: 'name', title: t('container.subColumns.name'), dataIndex: 'name', width: 150 },
       { key: 'value', title: t('container.subColumns.value'), dataIndex: 'value', width: 250 },
@@ -72,11 +83,6 @@ export default defineComponent({
       { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
-    const nameServerColumns = [
-      { key: 'server', title: t('container.subColumns.dnsServer'), dataIndex: 'server', width: 300 },
-      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
-
     const sysctlColumns = [
       { key: 'name', title: t('container.subColumns.parameter'), dataIndex: 'name', width: 200 },
       { key: 'value', title: t('container.subColumns.value'), dataIndex: 'value', width: 200 },
@@ -85,6 +91,7 @@ export default defineComponent({
 
     const tmpfsColumns = [
       { key: 'name', title: t('container.subColumns.path'), dataIndex: 'name', width: 200 },
+      { key: 'destination', title: t('container.subColumns.destination'), dataIndex: 'destination', width: 220 },
       { key: 'size', title: t('container.subColumns.size'), dataIndex: 'size', width: 150 },
       { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
@@ -99,6 +106,7 @@ export default defineComponent({
     const networkColumns = [
       { key: 'name', title: t('container.subColumns.network'), dataIndex: 'name', width: 150 },
       { key: 'address', title: t('container.subColumns.address'), dataIndex: 'address', width: 200 },
+      { key: 'mac', title: t('container.subColumns.mac'), dataIndex: 'mac', width: 170 },
       { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
@@ -106,6 +114,7 @@ export default defineComponent({
       { key: 'name', title: t('container.subColumns.name'), dataIndex: 'name', width: 120 },
       { key: 'source', title: t('container.subColumns.sourcePort'), dataIndex: 'source', width: 100 },
       { key: 'destination', title: t('container.subColumns.destinationPort'), dataIndex: 'destination', width: 100 },
+      { key: 'listen_address', title: t('container.subColumns.listenAddress'), dataIndex: 'listen_address', width: 180 },
       { key: 'protocol', title: t('container.subColumns.protocol'), dataIndex: 'protocol', width: 80 },
       { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
@@ -114,15 +123,14 @@ export default defineComponent({
       { key: 'name', title: t('container.subColumns.name'), dataIndex: 'name', width: 120 },
       { key: 'source', title: t('container.subColumns.source'), dataIndex: 'source', width: 200 },
       { key: 'destination', title: t('container.subColumns.destination'), dataIndex: 'destination', width: 200 },
-      { key: 'readonly', title: t('container.subColumns.readonly'), dataIndex: 'readonly', width: 60 },
+      { key: 'mode', title: t('container.subColumns.mode'), dataIndex: 'mode', width: 90 },
+      { key: 'propagation', title: t('container.subColumns.propagation'), dataIndex: 'propagation', width: 110 },
       { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     // Sub-item selection states
-    const selectedCapabilities = ref([]);
     const selectedEnvironments = ref([]);
     const selectedLabels = ref([]);
-    const selectedNameServers = ref([]);
     const selectedSysctls = ref([]);
     const selectedTmpfs = ref([]);
     const selectedDevices = ref([]);
@@ -131,14 +139,10 @@ export default defineComponent({
     const selectedVolumes = ref([]);
 
     // Sub-item modals
-    const showCapabilityModal = ref(false);
-    const editingCapability = ref(null);
     const showEnvironmentModal = ref(false);
     const editingEnvironment = ref(null);
     const showLabelModal = ref(false);
     const editingLabel = ref(null);
-    const showNameServerModal = ref(false);
-    const editingNameServer = ref(null);
     const showSysctlModal = ref(false);
     const editingSysctl = ref(null);
     const showTmpfsModal = ref(false);
@@ -185,16 +189,30 @@ export default defineComponent({
         allow_host_networks: data['allow-host-networks'] !== undefined,
         allow_host_pid: data['allow-host-pid'] !== undefined,
         disable: data.disable !== undefined,
-        capability: toArray(data.capability),
+        capability: toArray(data.capability).map(c => {
+          const value = typeof c === 'string' ? c : (c?.capability || '');
+          return String(value || '').trim();
+        }).filter(Boolean),
         environment: Object.entries(env).map(([k, v]) => ({ _name: k, name: k, value: v.value || '' })),
         label: Object.entries(label).map(([k, v]) => ({ _name: k, name: k, value: v.value || '' })),
-        name_server: toArray(data['name-server']),
+        name_server: toArray(data['name-server']).map(s => {
+          const value = typeof s === 'string' ? s : (s?.server || '');
+          return String(value || '').trim();
+        }).filter(Boolean),
+        name_server_text: joinLines(data['name-server']),
         sysctl: Object.entries(sysctl).map(([k, v]) => ({ _name: k, name: k, value: v.value || '' })),
-        tmpfs: Object.entries(tmpfs).map(([k, v]) => ({ _name: k, name: k, size: v.size || '' })),
+        tmpfs: Object.entries(tmpfs).map(([k, v]) => ({ _name: k, name: k, destination: v.destination || '', size: v.size || '' })),
         device: Object.entries(device).map(([k, v]) => ({ _name: k, name: k, source: v.source || '', destination: v.destination || '' })),
-        network: Object.entries(network).map(([k, v]) => ({ _name: k, name: k, address: v.address || '' })),
-        port: Object.entries(port).map(([k, v]) => ({ _name: k, name: k, source: v.source || '', destination: v.destination || '', protocol: v.protocol || 'tcp' })),
-        volume: Object.entries(volume).map(([k, v]) => ({ _name: k, name: k, source: v.source || '', destination: v.destination || '', readonly: v.readonly !== undefined })),
+        network: Object.entries(network).map(([k, v]) => ({ _name: k, name: k, address: v.address || '', mac: v.mac || 'auto' })),
+        port: Object.entries(port).map(([k, v]) => ({ _name: k, name: k, source: v.source || '', destination: v.destination || '', listen_address: v['listen-address'] || '', protocol: v.protocol || 'tcp' })),
+        volume: Object.entries(volume).map(([k, v]) => ({
+          _name: k,
+          name: k,
+          source: v.source || '',
+          destination: v.destination || '',
+          mode: v.mode || (v.readonly !== undefined ? 'ro' : 'rw'),
+          propagation: v.propagation || 'rprivate',
+        })),
         health_check: {
           command: hc.command || '',
           interval: hc.interval || '',
@@ -225,8 +243,16 @@ export default defineComponent({
       if (form.allow_host_pid) result['allow-host-pid'] = '';
       if (form.disable) result.disable = '';
 
-      if (form.capability && form.capability.length) result.capability = form.capability;
-      if (form.name_server && form.name_server.length) result['name-server'] = form.name_server;
+      if (form.capability && form.capability.length) {
+        result.capability = form.capability
+          .map(c => (typeof c === 'string' ? c : c.capability))
+          .filter(Boolean)
+          .map(String);
+      }
+      const parsedNameServers = splitLines(form.name_server_text);
+      if (parsedNameServers.length) {
+        result['name-server'] = parsedNameServers;
+      }
 
       if (form.environment && form.environment.length) {
         const env = {};
@@ -259,7 +285,10 @@ export default defineComponent({
         const tmpfs = {};
         for (const t of form.tmpfs) {
           if (!t.name) continue;
-          tmpfs[t.name] = isPresent(t.size) ? { size: String(t.size) } : {};
+          const obj = {};
+          if (isPresent(t.destination)) obj.destination = String(t.destination);
+          if (isPresent(t.size)) obj.size = String(t.size);
+          tmpfs[t.name] = obj;
         }
         if (Object.keys(tmpfs).length) result.tmpfs = tmpfs;
       }
@@ -282,6 +311,7 @@ export default defineComponent({
           if (!n.name) continue;
           const obj = {};
           if (isPresent(n.address)) obj.address = String(n.address);
+          if (isPresent(n.mac)) obj.mac = String(n.mac);
           network[n.name] = obj;
         }
         if (Object.keys(network).length) result.network = network;
@@ -294,6 +324,7 @@ export default defineComponent({
           const obj = {};
           if (isPresent(p.source)) obj.source = String(p.source);
           if (isPresent(p.destination)) obj.destination = String(p.destination);
+          if (isPresent(p.listen_address)) obj['listen-address'] = String(p.listen_address);
           if (p.protocol && p.protocol !== 'tcp') obj.protocol = String(p.protocol);
           port[p.name] = obj;
         }
@@ -307,7 +338,8 @@ export default defineComponent({
           const obj = {};
           if (isPresent(v.source)) obj.source = String(v.source);
           if (isPresent(v.destination)) obj.destination = String(v.destination);
-          if (v.readonly) obj.readonly = '';
+          if (v.mode && v.mode !== 'rw') obj.mode = String(v.mode);
+          if (v.propagation && v.propagation !== 'rprivate') obj.propagation = String(v.propagation);
           volume[v.name] = obj;
         }
         if (Object.keys(volume).length) result.volume = volume;
@@ -365,7 +397,7 @@ export default defineComponent({
         arguments: '', cpu_quota: '0', memory: '512', shared_memory: '64', uid: '', gid: '',
         log_driver: 'journald', restart: 'on-failure', privileged: false, allow_host_networks: false,
         allow_host_pid: false, disable: false, capability: [], environment: [], label: [],
-        name_server: [], sysctl: [], tmpfs: [], device: [], network: [], port: [], volume: [],
+        name_server: [], name_server_text: '', sysctl: [], tmpfs: [], device: [], network: [], port: [], volume: [],
         health_check: { command: '', interval: '', retry: '0', timeout: '' },
       };
       showEditModal.value = true;
@@ -453,25 +485,20 @@ export default defineComponent({
       
       loading, saving, saved, containerList, columns, commandPath,
       selectedContainers, showEditModal, editingContainer,
-      capabilityColumns, environmentColumns, labelColumns, nameServerColumns,
+      environmentColumns, labelColumns,
       sysctlColumns, tmpfsColumns, deviceColumns, networkColumns, portColumns, volumeColumns,
-      selectedCapabilities, selectedEnvironments, selectedLabels, selectedNameServers,
+      selectedEnvironments, selectedLabels,
       selectedSysctls, selectedTmpfs, selectedDevices, selectedNetworks, selectedPorts, selectedVolumes,
-      showCapabilityModal, editingCapability, showEnvironmentModal, editingEnvironment,
-      showLabelModal, editingLabel, showNameServerModal, editingNameServer,
+      showEnvironmentModal, editingEnvironment,
+      showLabelModal, editingLabel,
       showSysctlModal, editingSysctl, showTmpfsModal, editingTmpfs,
       showDeviceModal, editingDevice, showNetworkModal, editingNetwork,
       showPortModal, editingPort, showVolumeModal, editingVolume,
+      CONTAINER_CAPABILITY_OPTIONS, CONTAINER_LOG_DRIVER_OPTIONS,
+      CONTAINER_VOLUME_MODE_OPTIONS, CONTAINER_VOLUME_PROPAGATION_OPTIONS,
       load, saveConfig,
       createContainer, editContainer, removeContainer, saveContainer,
       editContainerByRecord, removeContainerByRecord,
-      // Capability
-      createCapability: () => createSubItem(showCapabilityModal, editingCapability, { _capability: '', capability: '' }),
-      editCapability: () => editSubItem(selectedCapabilities, editingContainer.value?.capability || [], showCapabilityModal, editingCapability, 'capability'),
-      removeCapability: () => removeSubItem(selectedCapabilities, 'capability', 'capability'),
-      saveCapability: () => saveSubItem(showCapabilityModal, editingCapability, 'capability', 'capability', 'capability'),
-      editCapabilityByRecord: (r) => editSubByRecord(r, editingCapability, showCapabilityModal),
-      removeCapabilityByRecord: (r) => removeSubByRecord(r, 'capability', 'capability'),
       // Environment
       createEnvironment: () => createSubItem(showEnvironmentModal, editingEnvironment, { _name: '', name: '', value: '' }),
       editEnvironment: () => editSubItem(selectedEnvironments, editingContainer.value?.environment || [], showEnvironmentModal, editingEnvironment, 'name'),
@@ -486,13 +513,6 @@ export default defineComponent({
       saveLabel: () => saveSubItem(showLabelModal, editingLabel, 'label', 'name', 'name'),
       editLabelByRecord: (r) => editSubByRecord(r, editingLabel, showLabelModal),
       removeLabelByRecord: (r) => removeSubByRecord(r, 'label', 'name'),
-      // NameServer
-      createNameServer: () => createSubItem(showNameServerModal, editingNameServer, { _server: '', server: '' }),
-      editNameServer: () => editSubItem(selectedNameServers, editingContainer.value?.name_server || [], showNameServerModal, editingNameServer, 'server'),
-      removeNameServer: () => removeSubItem(selectedNameServers, 'name_server', 'server'),
-      saveNameServer: () => saveSubItem(showNameServerModal, editingNameServer, 'name_server', 'server', 'server'),
-      editNameServerByRecord: (r) => editSubByRecord(r, editingNameServer, showNameServerModal),
-      removeNameServerByRecord: (r) => removeSubByRecord(r, 'name_server', 'server'),
       // Sysctl
       createSysctl: () => createSubItem(showSysctlModal, editingSysctl, { _name: '', name: '', value: '' }),
       editSysctl: () => editSubItem(selectedSysctls, editingContainer.value?.sysctl || [], showSysctlModal, editingSysctl, 'name'),
@@ -501,7 +521,7 @@ export default defineComponent({
       editSysctlByRecord: (r) => editSubByRecord(r, editingSysctl, showSysctlModal),
       removeSysctlByRecord: (r) => removeSubByRecord(r, 'sysctl', 'name'),
       // Tmpfs
-      createTmpfs: () => createSubItem(showTmpfsModal, editingTmpfs, { _name: '', name: '', size: '' }),
+      createTmpfs: () => createSubItem(showTmpfsModal, editingTmpfs, { _name: '', name: '', destination: '', size: '' }),
       editTmpfs: () => editSubItem(selectedTmpfs, editingContainer.value?.tmpfs || [], showTmpfsModal, editingTmpfs, 'name'),
       removeTmpfs: () => removeSubItem(selectedTmpfs, 'tmpfs', 'name'),
       saveTmpfs: () => saveSubItem(showTmpfsModal, editingTmpfs, 'tmpfs', 'name', 'name'),
@@ -515,21 +535,21 @@ export default defineComponent({
       editDeviceByRecord: (r) => editSubByRecord(r, editingDevice, showDeviceModal),
       removeDeviceByRecord: (r) => removeSubByRecord(r, 'device', 'name'),
       // Network
-      createNetwork: () => createSubItem(showNetworkModal, editingNetwork, { _name: '', name: '', address: '' }),
+      createNetwork: () => createSubItem(showNetworkModal, editingNetwork, { _name: '', name: '', address: '', mac: 'auto' }),
       editNetwork: () => editSubItem(selectedNetworks, editingContainer.value?.network || [], showNetworkModal, editingNetwork, 'name'),
       removeNetwork: () => removeSubItem(selectedNetworks, 'network', 'name'),
       saveNetwork: () => saveSubItem(showNetworkModal, editingNetwork, 'network', 'name', 'name'),
       editNetworkByRecord: (r) => editSubByRecord(r, editingNetwork, showNetworkModal),
       removeNetworkByRecord: (r) => removeSubByRecord(r, 'network', 'name'),
       // Port
-      createPort: () => createSubItem(showPortModal, editingPort, { _name: '', name: '', source: '', destination: '', protocol: 'tcp' }),
+      createPort: () => createSubItem(showPortModal, editingPort, { _name: '', name: '', source: '', destination: '', listen_address: '', protocol: 'tcp' }),
       editPort: () => editSubItem(selectedPorts, editingContainer.value?.port || [], showPortModal, editingPort, 'name'),
       removePort: () => removeSubItem(selectedPorts, 'port', 'name'),
       savePort: () => saveSubItem(showPortModal, editingPort, 'port', 'name', 'name'),
       editPortByRecord: (r) => editSubByRecord(r, editingPort, showPortModal),
       removePortByRecord: (r) => removeSubByRecord(r, 'port', 'name'),
       // Volume
-      createVolume: () => createSubItem(showVolumeModal, editingVolume, { _name: '', name: '', source: '', destination: '', readonly: false }),
+      createVolume: () => createSubItem(showVolumeModal, editingVolume, { _name: '', name: '', source: '', destination: '', mode: 'rw', propagation: 'rprivate' }),
       editVolume: () => editSubItem(selectedVolumes, editingContainer.value?.volume || [], showVolumeModal, editingVolume, 'name'),
       removeVolume: () => removeSubItem(selectedVolumes, 'volume', 'name'),
       saveVolume: () => saveSubItem(showVolumeModal, editingVolume, 'volume', 'name', 'name'),
@@ -558,54 +578,62 @@ export default defineComponent({
 
       <!-- Edit Modal -->
       <DraggableModal v-model:visible="showEditModal" :title="editingContainer && editingContainer._name ? t('container.modal.editContainer') + editingContainer._name : t('container.modal.createContainer')" @confirm="saveContainer" @close="showEditModal = false" width="900px">
-        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingContainer.name" :disabled="editingContainer._name" :title="t('container.form.nameHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.image') }}</label><input class="form-control" v-model="editingContainer.image" :title="t('container.form.imageHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.description') }}</label><input class="form-control" v-model="editingContainer.description" :title="t('container.form.descriptionHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.hostName') }}</label><input class="form-control" v-model="editingContainer.host_name" :title="t('container.form.hostNameHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.command') }}</label><input class="form-control" v-model="editingContainer.command" :title="t('container.form.commandHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.entrypoint') }}</label><input class="form-control" v-model="editingContainer.entrypoint" :title="t('container.form.entrypointHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.arguments') }}</label><textarea class="form-control" v-model="editingContainer.arguments" rows="3" :placeholder="t('container.form.argumentsPlaceholder')" :title="t('container.form.argumentsHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.cpuQuota') }}</label><input class="form-control" v-model="editingContainer.cpu_quota" :title="t('container.form.cpuQuotaHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.memory') }}</label><input class="form-control" type="number" min="4" v-model="editingContainer.memory" :title="t('container.form.memoryHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.sharedMemory') }}</label><input class="form-control" type="number" min="1" v-model="editingContainer.shared_memory" :title="t('container.form.sharedMemoryHelp')" /></div>
-        <div class="form-row"><label class="form-label">UID</label><input class="form-control" type="number" min="0" max="65535" v-model="editingContainer.uid" :title="t('container.form.uidHelp')" /></div>
-        <div class="form-row"><label class="form-label">GID</label><input class="form-control" type="number" min="0" max="65535" v-model="editingContainer.gid" :title="t('container.form.gidHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.logDriver') }}</label><input class="form-control" v-model="editingContainer.log_driver" :title="t('container.form.logDriverHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.restartPolicy') }}</label>
-          <select class="form-control" v-model="editingContainer.restart" :title="t('container.form.restartPolicyHelp')">
-            <option value="no">{{ t('container.restart.no') }}</option>
-            <option value="on-failure">{{ t('container.restart.onFailure') }}</option>
-            <option value="always">{{ t('container.restart.always') }}</option>
-            <option value="unless-stopped">{{ t('container.restart.unlessStopped') }}</option>
-          </select>
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><div class="form-control"><input class="form-control" v-model="editingContainer.name" :disabled="editingContainer._name !== ''" :title="t('container.form.nameHelp')" /><div class="form-hint">{{ t('container.form.nameHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.image') }}</label><div class="form-control"><input class="form-control" v-model="editingContainer.image" :title="t('container.form.imageHelp')" /><div class="form-hint">{{ t('container.form.imageHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.description') }}</label><div class="form-control"><input class="form-control" v-model="editingContainer.description" :title="t('container.form.descriptionHelp')" /><div class="form-hint">{{ t('container.form.descriptionHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.hostName') }}</label><div class="form-control"><input class="form-control" v-model="editingContainer.host_name" :title="t('container.form.hostNameHelp')" /><div class="form-hint">{{ t('container.form.hostNameHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.command') }}</label><div class="form-control"><input class="form-control" v-model="editingContainer.command" :title="t('container.form.commandHelp')" /><div class="form-hint">{{ t('container.form.commandHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.entrypoint') }}</label><div class="form-control"><input class="form-control" v-model="editingContainer.entrypoint" :title="t('container.form.entrypointHelp')" /><div class="form-hint">{{ t('container.form.entrypointHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.arguments') }}</label><div class="form-control"><textarea class="form-control" v-model="editingContainer.arguments" rows="3" :placeholder="t('container.form.argumentsPlaceholder')" :title="t('container.form.argumentsHelp')" /><div class="form-hint">{{ t('container.form.argumentsHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.cpuQuota') }}</label><div class="form-control"><input class="form-control" v-model="editingContainer.cpu_quota" :title="t('container.form.cpuQuotaHelp')" /><div class="form-hint">{{ t('container.form.cpuQuotaHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.memory') }}</label><div class="form-control"><input class="form-control" type="number" min="0" max="16384" v-model="editingContainer.memory" :title="t('container.form.memoryHelp')" /><div class="form-hint">{{ t('container.form.memoryHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.sharedMemory') }}</label><div class="form-control"><input class="form-control" type="number" min="0" max="8192" v-model="editingContainer.shared_memory" :title="t('container.form.sharedMemoryHelp')" /><div class="form-hint">{{ t('container.form.sharedMemoryHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">UID</label><div class="form-control"><input class="form-control" type="number" min="0" max="65535" v-model="editingContainer.uid" :title="t('container.form.uidHelp')" /><div class="form-hint">{{ t('container.form.uidHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">GID</label><div class="form-control"><input class="form-control" type="number" min="0" max="65535" v-model="editingContainer.gid" :title="t('container.form.gidHelp')" /><div class="form-hint">{{ t('container.form.gidHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.logDriver') }}</label>
+          <div class="form-control">
+            <select class="form-control" v-model="editingContainer.log_driver" :title="t('container.form.logDriverHelp')">
+              <option v-for="driver in CONTAINER_LOG_DRIVER_OPTIONS" :key="driver" :value="driver">{{ driver }}</option>
+            </select>
+            <div class="form-hint">{{ t('container.form.logDriverHint') }}</div>
+          </div>
         </div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.privileged') }}</label><input type="checkbox" v-model="editingContainer.privileged" :title="t('container.form.privilegedHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.allowHostNetworks') }}</label><input type="checkbox" v-model="editingContainer.allow_host_networks" :title="t('container.form.allowHostNetworksHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.allowHostPid') }}</label><input type="checkbox" v-model="editingContainer.allow_host_pid" :title="t('container.form.allowHostPidHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.disable') }}</label><input type="checkbox" v-model="editingContainer.disable" :title="t('container.form.disableHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.restartPolicy') }}</label>
+          <div class="form-control">
+            <select class="form-control" v-model="editingContainer.restart" :title="t('container.form.restartPolicyHelp')">
+              <option value="no">{{ t('container.restart.no') }}</option>
+              <option value="on-failure">{{ t('container.restart.onFailure') }}</option>
+              <option value="always">{{ t('container.restart.always') }}</option>
+            </select>
+            <div class="form-hint">{{ t('container.form.restartPolicyHint') }}</div>
+          </div>
+        </div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.privileged') }}</label><div class="form-control"><input type="checkbox" v-model="editingContainer.privileged" :title="t('container.form.privilegedHelp')" /><div class="form-hint">{{ t('container.form.privilegedHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.allowHostNetworks') }}</label><div class="form-control"><input type="checkbox" v-model="editingContainer.allow_host_networks" :title="t('container.form.allowHostNetworksHelp')" /><div class="form-hint">{{ t('container.form.allowHostNetworksHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.allowHostPid') }}</label><div class="form-control"><input type="checkbox" v-model="editingContainer.allow_host_pid" :title="t('container.form.allowHostPidHelp')" /><div class="form-hint">{{ t('container.form.allowHostPidHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.disable') }}</label><div class="form-control"><input type="checkbox" v-model="editingContainer.disable" :title="t('container.form.disableHelp')" /><div class="form-hint">{{ t('container.form.disableHint') }}</div></div></div>
 
         <!-- Health Check -->
         <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.healthCheck') }}</div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.healthCheckCommand') }}</label><input class="form-control" v-model="editingContainer.health_check.command" :title="t('container.form.healthCheckCommandHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.interval') }}</label><input class="form-control" v-model="editingContainer.health_check.interval" :placeholder="t('container.form.intervalPlaceholder')" :title="t('container.form.intervalHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.retryCount') }}</label><input class="form-control" type="number" min="0" max="255" v-model="editingContainer.health_check.retry" :title="t('container.form.retryCountHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.timeout') }}</label><input class="form-control" type="number" min="1" max="16384" v-model="editingContainer.health_check.timeout" :title="t('container.form.timeoutHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.healthCheckCommand') }}</label><div class="form-control"><input class="form-control" v-model="editingContainer.health_check.command" :title="t('container.form.healthCheckCommandHelp')" /><div class="form-hint">{{ t('container.form.healthCheckCommandHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.interval') }}</label><div class="form-control"><input class="form-control" v-model="editingContainer.health_check.interval" :placeholder="t('container.form.intervalPlaceholder')" :title="t('container.form.intervalHelp')" /><div class="form-hint">{{ t('container.form.intervalHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.retryCount') }}</label><div class="form-control"><input class="form-control" type="number" min="0" max="255" v-model="editingContainer.health_check.retry" :title="t('container.form.retryCountHelp')" /><div class="form-hint">{{ t('container.form.retryCountHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.timeout') }}</label><div class="form-control"><input class="form-control" type="number" min="1" max="16384" v-model="editingContainer.health_check.timeout" :title="t('container.form.timeoutHelp')" /><div class="form-hint">{{ t('container.form.timeoutHint') }}</div></div></div>
 
         <!-- Capability -->
         <div style="font-weight:bold;margin:16px 0 8px;">Capabilities</div>
-        <div class="toolbar">
-          <ToolbarButton icon="create" @click="createCapability">{{ t('container.buttons.add') }}</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editCapability" :disabled="!selectedCapabilities.length || selectedCapabilities.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeCapability" :disabled="!selectedCapabilities.length">{{ t('container.buttons.delete') }}</ToolbarButton>
+        <div class="form-row">
+          <label class="form-label">{{ t('container.subColumns.capability') }}</label>
+          <div class="form-control">
+            <div :title="t('container.form.capabilityHelp')" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 10px;height:auto;padding:8px;">
+              <label v-for="cap in CONTAINER_CAPABILITY_OPTIONS" :key="cap" style="display:flex;align-items:center;gap:6px;font-weight:normal;">
+                <input type="checkbox" :value="cap" v-model="editingContainer.capability" />
+                <span>{{ cap }}</span>
+              </label>
+            </div>
+            <div class="form-hint" style="line-height:1.6;">{{ t('container.form.capabilityDetailHint') }}</div>
+          </div>
         </div>
-        <DataTable :columns="capabilityColumns" :data="editingContainer.capability" rowKey="capability" :externalToolbar="true" @selection-change="selectedCapabilities = $event" :selectable="true">
-          <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'actions'">
-              <a @click="editCapabilityByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
-              <a @click="removeCapabilityByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
-            </template>
-          </template>
-        </DataTable>
 
         <!-- Environment -->
         <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.environment') }}</div>
@@ -641,19 +669,19 @@ export default defineComponent({
 
         <!-- Name Server -->
         <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.dnsServer') }}</div>
-        <div class="toolbar">
-          <ToolbarButton icon="create" @click="createNameServer">{{ t('container.buttons.add') }}</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editNameServer" :disabled="!selectedNameServers.length || selectedNameServers.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeNameServer" :disabled="!selectedNameServers.length">{{ t('container.buttons.delete') }}</ToolbarButton>
+        <div class="form-row">
+          <label class="form-label">{{ t('container.form.dnsServer') }}</label>
+          <div class="form-control">
+            <textarea
+              class="form-control"
+              v-model="editingContainer.name_server_text"
+              rows="4"
+              placeholder="x.x.x.x\n2001:db8::1"
+              :title="t('container.form.dnsServerHelp')"
+            />
+            <div class="form-hint">{{ t('container.form.dnsServerHelp') }}</div>
+          </div>
         </div>
-        <DataTable :columns="nameServerColumns" :data="editingContainer.name_server" rowKey="server" :externalToolbar="true" @selection-change="selectedNameServers = $event" :selectable="true">
-          <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'actions'">
-              <a @click="editNameServerByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
-              <a @click="removeNameServerByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
-            </template>
-          </template>
-        </DataTable>
 
         <!-- Sysctl -->
         <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.sysctl') }}</div>
@@ -744,9 +772,6 @@ export default defineComponent({
         </div>
         <DataTable :columns="volumeColumns" :data="editingContainer.volume" rowKey="name" :externalToolbar="true" @selection-change="selectedVolumes = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'readonly'">
-              <span>{{ record.readonly ? t('container.yes') : t('container.no') }}</span>
-            </template>
             <template v-if="column.key === 'actions'">
               <a @click="editVolumeByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
               <a @click="removeVolumeByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
@@ -755,72 +780,83 @@ export default defineComponent({
         </DataTable>
       </DraggableModal>
 
-      <!-- Capability Modal -->
-      <DraggableModal v-model:visible="showCapabilityModal" :title="editingCapability && editingCapability._capability ? t('container.modal.editCapability') : t('container.modal.addCapability')" @confirm="saveCapability" @close="showCapabilityModal = false">
-        <div class="form-row"><label class="form-label">Capability</label><input class="form-control" v-model="editingCapability.capability" :disabled="editingCapability._capability" :title="t('container.form.capabilityHelp')" /></div>
-      </DraggableModal>
-
       <!-- Environment Modal -->
       <DraggableModal v-model:visible="showEnvironmentModal" :title="editingEnvironment && editingEnvironment._name ? t('container.modal.editEnvironment') : t('container.modal.addEnvironment')" @confirm="saveEnvironment" @close="showEnvironmentModal = false">
-        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingEnvironment.name" :disabled="editingEnvironment._name" :title="t('container.form.environmentNameHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.value') }}</label><input class="form-control" v-model="editingEnvironment.value" :title="t('container.form.environmentValueHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><div class="form-control"><input class="form-control" v-model="editingEnvironment.name" :disabled="editingEnvironment._name !== ''" :title="t('container.form.environmentNameHelp')" /><div class="form-hint">{{ t('container.form.environmentNameHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.value') }}</label><div class="form-control"><input class="form-control" v-model="editingEnvironment.value" :title="t('container.form.environmentValueHelp')" /><div class="form-hint">{{ t('container.form.environmentValueHint') }}</div></div></div>
       </DraggableModal>
 
       <!-- Label Modal -->
       <DraggableModal v-model:visible="showLabelModal" :title="editingLabel && editingLabel._name ? t('container.modal.editLabel') : t('container.modal.addLabel')" @confirm="saveLabel" @close="showLabelModal = false">
-        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingLabel.name" :disabled="editingLabel._name" :title="t('container.form.labelNameHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.value') }}</label><input class="form-control" v-model="editingLabel.value" :title="t('container.form.labelValueHelp')" /></div>
-      </DraggableModal>
-
-      <!-- NameServer Modal -->
-      <DraggableModal v-model:visible="showNameServerModal" :title="editingNameServer && editingNameServer._server ? t('container.modal.editDnsServer') : t('container.modal.addDnsServer')" @confirm="saveNameServer" @close="showNameServerModal = false">
-        <div class="form-row"><label class="form-label">{{ t('container.form.dnsServer') }}</label><input class="form-control" v-model="editingNameServer.server" :disabled="editingNameServer._server" placeholder="x.x.x.x" :title="t('container.form.dnsServerHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><div class="form-control"><input class="form-control" v-model="editingLabel.name" :disabled="editingLabel._name !== ''" :title="t('container.form.labelNameHelp')" /><div class="form-hint">{{ t('container.form.labelNameHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.value') }}</label><div class="form-control"><input class="form-control" v-model="editingLabel.value" :title="t('container.form.labelValueHelp')" /><div class="form-hint">{{ t('container.form.labelValueHint') }}</div></div></div>
       </DraggableModal>
 
       <!-- Sysctl Modal -->
       <DraggableModal v-model:visible="showSysctlModal" :title="editingSysctl && editingSysctl._name ? t('container.modal.editSysctl') : t('container.modal.addSysctl')" @confirm="saveSysctl" @close="showSysctlModal = false">
-        <div class="form-row"><label class="form-label">{{ t('container.form.parameterName') }}</label><input class="form-control" v-model="editingSysctl.name" :disabled="editingSysctl._name" :title="t('container.form.sysctlNameHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.value') }}</label><input class="form-control" v-model="editingSysctl.value" :title="t('container.form.sysctlValueHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.parameterName') }}</label><div class="form-control"><input class="form-control" v-model="editingSysctl.name" :disabled="editingSysctl._name !== ''" :title="t('container.form.sysctlNameHelp')" /><div class="form-hint">{{ t('container.form.sysctlNameHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.value') }}</label><div class="form-control"><input class="form-control" v-model="editingSysctl.value" :title="t('container.form.sysctlValueHelp')" /><div class="form-hint">{{ t('container.form.sysctlValueHint') }}</div></div></div>
       </DraggableModal>
 
       <!-- Tmpfs Modal -->
       <DraggableModal v-model:visible="showTmpfsModal" :title="editingTmpfs && editingTmpfs._name ? t('container.modal.editTmpfs') : t('container.modal.addTmpfs')" @confirm="saveTmpfs" @close="showTmpfsModal = false">
-        <div class="form-row"><label class="form-label">{{ t('container.form.path') }}</label><input class="form-control" v-model="editingTmpfs.name" :disabled="editingTmpfs._name" :title="t('container.form.mountPathHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.size') }}</label><input class="form-control" v-model="editingTmpfs.size" :title="t('container.form.tmpfsSizeHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><div class="form-control"><input class="form-control" v-model="editingTmpfs.name" :disabled="editingTmpfs._name !== ''" :title="t('container.form.tmpfsNameHelp')" /><div class="form-hint">{{ t('container.form.tmpfsNameHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.destination') }}</label><div class="form-control"><input class="form-control" v-model="editingTmpfs.destination" :title="t('container.form.tmpfsDestinationHelp')" /><div class="form-hint">{{ t('container.form.tmpfsDestinationHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.size') }}</label><div class="form-control"><input class="form-control" type="number" min="1" max="65536" v-model="editingTmpfs.size" :title="t('container.form.tmpfsSizeHelp')" /><div class="form-hint">{{ t('container.form.tmpfsSizeHint') }}</div></div></div>
       </DraggableModal>
 
       <!-- Device Modal -->
       <DraggableModal v-model:visible="showDeviceModal" :title="editingDevice && editingDevice._name ? t('container.modal.editDevice') : t('container.modal.addDevice')" @confirm="saveDevice" @close="showDeviceModal = false">
-        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingDevice.name" :disabled="editingDevice._name" :title="t('container.form.deviceNameHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.sourceDevice') }}</label><input class="form-control" v-model="editingDevice.source" placeholder="/dev/x" :title="t('container.form.sourceDeviceHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.destinationDevice') }}</label><input class="form-control" v-model="editingDevice.destination" placeholder="/dev/x" :title="t('container.form.destinationDeviceHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><div class="form-control"><input class="form-control" v-model="editingDevice.name" :disabled="editingDevice._name !== ''" :title="t('container.form.deviceNameHelp')" /><div class="form-hint">{{ t('container.form.deviceNameHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.sourceDevice') }}</label><div class="form-control"><input class="form-control" v-model="editingDevice.source" placeholder="/dev/x" :title="t('container.form.sourceDeviceHelp')" /><div class="form-hint">{{ t('container.form.sourceDeviceHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.destinationDevice') }}</label><div class="form-control"><input class="form-control" v-model="editingDevice.destination" placeholder="/dev/x" :title="t('container.form.destinationDeviceHelp')" /><div class="form-hint">{{ t('container.form.destinationDeviceHint') }}</div></div></div>
       </DraggableModal>
 
       <!-- Network Modal -->
       <DraggableModal v-model:visible="showNetworkModal" :title="editingNetwork && editingNetwork._name ? t('container.modal.editNetwork') : t('container.modal.addNetwork')" @confirm="saveNetwork" @close="showNetworkModal = false">
-        <div class="form-row"><label class="form-label">{{ t('container.form.networkName') }}</label><input class="form-control" v-model="editingNetwork.name" :disabled="editingNetwork._name" :title="t('container.form.networkNameHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.ipAddress') }}</label><input class="form-control" v-model="editingNetwork.address" :title="t('container.form.ipAddressHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.networkName') }}</label><div class="form-control"><input class="form-control" v-model="editingNetwork.name" :disabled="editingNetwork._name !== ''" :title="t('container.form.networkNameHelp')" /><div class="form-hint">{{ t('container.form.networkNameHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.ipAddress') }}</label><div class="form-control"><input class="form-control" v-model="editingNetwork.address" :title="t('container.form.ipAddressHelp')" /><div class="form-hint">{{ t('container.form.ipAddressHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.macAddress') }}</label><div class="form-control"><input class="form-control" v-model="editingNetwork.mac" placeholder="auto / xx:xx:xx:xx:xx:xx" :title="t('container.form.macAddressHelp')" /><div class="form-hint">{{ t('container.form.macAddressHint') }}</div></div></div>
       </DraggableModal>
 
       <!-- Port Modal -->
       <DraggableModal v-model:visible="showPortModal" :title="editingPort && editingPort._name ? t('container.modal.editPort') : t('container.modal.addPort')" @confirm="savePort" @close="showPortModal = false">
-        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingPort.name" :disabled="editingPort._name" :title="t('container.form.portNameHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.sourcePort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingPort.source" :title="t('container.form.sourcePortHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.destinationPort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingPort.destination" :title="t('container.form.destinationPortHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><div class="form-control"><input class="form-control" v-model="editingPort.name" :disabled="editingPort._name !== ''" :title="t('container.form.portNameHelp')" /><div class="form-hint">{{ t('container.form.portNameHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.sourcePort') }}</label><div class="form-control"><input class="form-control" v-model="editingPort.source" placeholder="1-65535 or start-end" :title="t('container.form.sourcePortHelp')" /><div class="form-hint">{{ t('container.form.sourcePortHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.destinationPort') }}</label><div class="form-control"><input class="form-control" v-model="editingPort.destination" placeholder="1-65535 or start-end" :title="t('container.form.destinationPortHelp')" /><div class="form-hint">{{ t('container.form.destinationPortHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.listenAddress') }}</label><div class="form-control"><input class="form-control" v-model="editingPort.listen_address" placeholder="x.x.x.x / h:h:h:h:h:h:h:h" :title="t('container.form.listenAddressHelp')" /><div class="form-hint">{{ t('container.form.listenAddressHint') }}</div></div></div>
         <div class="form-row"><label class="form-label">{{ t('container.form.protocol') }}</label>
-          <select class="form-control" v-model="editingPort.protocol" :title="t('container.form.protocolHelp')">
-            <option value="tcp">TCP</option>
-            <option value="udp">UDP</option>
-          </select>
+          <div class="form-control">
+            <select class="form-control" v-model="editingPort.protocol" :title="t('container.form.protocolHelp')">
+              <option value="tcp">TCP</option>
+              <option value="udp">UDP</option>
+            </select>
+            <div class="form-hint">{{ t('container.form.protocolHint') }}</div>
+          </div>
         </div>
       </DraggableModal>
 
       <!-- Volume Modal -->
       <DraggableModal v-model:visible="showVolumeModal" :title="editingVolume && editingVolume._name ? t('container.modal.editVolume') : t('container.modal.addVolume')" @confirm="saveVolume" @close="showVolumeModal = false">
-        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingVolume.name" :disabled="editingVolume._name" :title="t('container.form.volumeNameHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.source') }}</label><input class="form-control" v-model="editingVolume.source" :title="t('container.form.sourceVolumeHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.destination') }}</label><input class="form-control" v-model="editingVolume.destination" :title="t('container.form.destinationMountHelp')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('container.form.readonly') }}</label><input type="checkbox" v-model="editingVolume.readonly" :title="t('container.form.readonlyHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><div class="form-control"><input class="form-control" v-model="editingVolume.name" :disabled="editingVolume._name !== ''" :title="t('container.form.volumeNameHelp')" /><div class="form-hint">{{ t('container.form.volumeNameHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.source') }}</label><div class="form-control"><input class="form-control" v-model="editingVolume.source" :title="t('container.form.sourceVolumeHelp')" /><div class="form-hint">{{ t('container.form.sourceVolumeHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.destination') }}</label><div class="form-control"><input class="form-control" v-model="editingVolume.destination" :title="t('container.form.destinationMountHelp')" /><div class="form-hint">{{ t('container.form.destinationMountHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.mode') }}</label>
+          <div class="form-control">
+            <select class="form-control" v-model="editingVolume.mode" :title="t('container.form.modeHelp')">
+              <option v-for="mode in CONTAINER_VOLUME_MODE_OPTIONS" :key="mode" :value="mode">{{ mode }}</option>
+            </select>
+            <div class="form-hint">{{ t('container.form.modeHint') }}</div>
+          </div>
+        </div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.propagation') }}</label>
+          <div class="form-control">
+            <select class="form-control" v-model="editingVolume.propagation" :title="t('container.form.propagationHelp')">
+              <option v-for="item in CONTAINER_VOLUME_PROPAGATION_OPTIONS" :key="item" :value="item">{{ item }}</option>
+            </select>
+            <div class="form-hint">{{ t('container.form.propagationHint') }}</div>
+          </div>
+        </div>
       </DraggableModal>
     </div>
   `,

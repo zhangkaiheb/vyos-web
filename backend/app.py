@@ -100,6 +100,8 @@ class VyOSWebApp:
                 '/api/system/date': self.handle_system_date,
                 '/api/system/terminal': self.handle_system_terminal,
                 '/api/system/shell': self.handle_system_shell,
+                '/api/pki-files': self.handle_pki_file_delete,
+                '/api/pki-files/read': self.handle_pki_file_read,
                 '/api/system/image/add': self.handle_image_add,
                 '/api/system/image/delete': self.handle_image_delete,
                 '/api/system/image/default': self.handle_image_default,
@@ -139,6 +141,8 @@ class VyOSWebApp:
                 '/api/system/interfaces': self.handle_system_interfaces,
                 '/api/interfaces/ethernet': self.handle_ethernet_interfaces,
                 '/api/system/images': self.handle_list_images,
+                '/api/pki-files': self.handle_pki_file_list,
+                '/api/pki-files/download': self.handle_pki_file_download,
                 '/api/firewall/protocols': self.handle_firewall_protocols,
                 '/api/firewall/rule-stats': self.handle_firewall_rule_stats,
                 '/api/firewall/export': self.handle_firewall_export,
@@ -641,6 +645,229 @@ class VyOSWebApp:
     def handle_system_shell(self, environ, body):
         return self.system_service.shell(body.get('command', ''))
 
+    # ---------- PKI file management ----------
+
+    def handle_pki_file_list(self, environ, body):
+        """List files in /config/auth/ directory, grouped by base name."""
+        import os
+        auth_dir = '/config/auth'
+        raw_files = []
+        file_map = {}  # base_name -> file_info
+        
+        if os.path.isdir(auth_dir):
+            for f in os.listdir(auth_dir):
+                fpath = os.path.join(auth_dir, f)
+                if os.path.isfile(fpath):
+                    stat = os.stat(fpath)
+                    file_type = self._detect_file_type(fpath)
+                    name_without_ext = f.rsplit('.', 1)[0] if '.' in f else f
+                    file_info = {
+                        'name': f,
+                        'path': fpath,
+                        'size': stat.st_size,
+                        'mtime': stat.st_mtime,
+                        'type': file_type,
+                        'base_name': name_without_ext,
+                    }
+                    raw_files.append(file_info)
+                    file_map[name_without_ext] = file_info
+        
+        # Group files by base name: merge cert+key into one row
+        grouped = {}
+        for f in raw_files:
+            base = f['base_name']
+            if base not in grouped:
+                grouped[base] = {
+                    'base_name': base,
+                    'cert_name': '',
+                    'key_name': '',
+                    'names': [],
+                    'type': f['type'],
+                    'size': f['size'],
+                    'mtime': f['mtime'],
+                }
+            g = grouped[base]
+            g['names'].append(f['name'])
+            if f['name'].endswith('.pem'):
+                g['cert_name'] = f['name']
+                g['type'] = f['type']
+                g['size'] = f['size']
+                g['mtime'] = f['mtime']
+            elif f['name'].endswith('.key'):
+                g['key_name'] = f['name']
+                # If no cert found yet, use key's type/size/mtime
+                if not g['cert_name']:
+                    g['type'] = f['type']
+                    g['size'] = f['size']
+                    g['mtime'] = f['mtime']
+            else:
+                # Other files (csr, etc.)
+                if not g['cert_name'] and not g['key_name']:
+                    g['cert_name'] = f['name']
+                    g['type'] = f['type']
+                    g['size'] = f['size']
+                    g['mtime'] = f['mtime']
+        
+        files = []
+        for base, g in grouped.items():
+            files.append({
+                'name': ', '.join(g['names']),
+                'base_name': g['base_name'],
+                'cert_name': g['cert_name'],
+                'key_name': g['key_name'],
+                'type': g['type'],
+                'size': g['size'],
+                'mtime': g['mtime'],
+            })
+        
+        return {'success': True, 'data': files}
+
+    def _detect_file_type(self, fpath):
+        """Detect file type by reading content."""
+        import os
+        try:
+            with open(fpath, 'r', errors='replace') as f:
+                content = f.read(4000)  # 读取前 4000 字符
+            
+            stripped = content.strip()
+            first_line = stripped.split('\n')[0].strip()
+            
+            # SSH 公钥: ssh-rsa / ssh-ed25519 / ssh-dss 开头
+            if first_line.startswith('ssh-rsa') or first_line.startswith('ssh-ed25519') or first_line.startswith('ssh-dss'):
+                return 'ssh-key'
+            
+            # OpenSSH 私钥
+            if 'BEGIN OPENSSH PRIVATE KEY' in content:
+                return 'ssh-key'
+            
+            # 证书相关
+            if 'BEGIN CERTIFICATE' in content:
+                import subprocess
+                try:
+                    result = subprocess.run(
+                        ['openssl', 'x509', '-in', fpath, '-noout', '-text'],
+                        capture_output=True, text=True, timeout=5
+                    )
+                    if 'CA:TRUE' in result.stdout:
+                        return 'ca'
+                except:
+                    pass
+                return 'certificate'
+            
+            # CRL
+            if 'BEGIN X509 CRL' in content:
+                return 'crl'
+            
+            # DH 参数
+            if 'BEGIN DH PARAMETERS' in content:
+                return 'dh'
+            
+            # OpenVPN 静态密钥
+            if 'BEGIN OpenVPN Static key' in content:
+                return 'openvpn'
+            
+            # 通用私钥 (RSA/EC/DSA)
+            if 'BEGIN RSA PRIVATE KEY' in content or 'BEGIN PRIVATE KEY' in content or 'BEGIN EC PRIVATE KEY' in content or 'BEGIN DSA PRIVATE KEY' in content:
+                return 'key-pair'
+            
+            # WireGuard 密钥: 44 字符 base64
+            lines = stripped.split('\n')
+            for line in lines:
+                line = line.strip()
+                if len(line) == 44 and all(c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=' for c in line):
+                    return 'wireguard'
+            
+            return 'unknown'
+        except:
+            return 'unknown'
+
+    def handle_pki_file_delete(self, environ, body):
+        """Delete a file from /config/auth/ directory. Also deletes paired key/cert files."""
+        import os
+        filename = body.get('filename', '')
+        if not filename:
+            return {'success': False, 'message': 'filename is required'}
+        # Security: only allow files in /config/auth/
+        auth_dir = '/config/auth'
+        fpath = os.path.join(auth_dir, filename)
+        if not fpath.startswith(auth_dir):
+            return {'success': False, 'message': 'Invalid file path'}
+        if not os.path.isfile(fpath):
+            # File already deleted (e.g. auto-deleted as paired file), return success
+            return {'success': True, 'message': f'File already deleted: {filename}'}
+
+        deleted = [filename]
+        os.remove(fpath)
+
+        # Auto-delete paired files
+        if '.' in filename:
+            base = filename.rsplit('.', 1)[0]
+        else:
+            base = filename
+
+        # Find and delete paired files
+        if os.path.isdir(auth_dir):
+            for f in os.listdir(auth_dir):
+                if f == filename:
+                    continue
+                f_other = os.path.join(auth_dir, f)
+                if not os.path.isfile(f_other):
+                    continue
+                # Check if same base name
+                if '.' in f:
+                    other_base = f.rsplit('.', 1)[0]
+                else:
+                    other_base = f
+                if other_base == base:
+                    try:
+                        os.remove(f_other)
+                        deleted.append(f)
+                    except OSError:
+                        pass  # File may have been already deleted
+
+        msg = ', '.join(deleted)
+        return {'success': True, 'message': f'Files deleted: {msg}'}
+
+    def handle_pki_file_read(self, environ, body):
+        """Read file content from /config/auth/ directory."""
+        import os
+        filename = body.get('filename', '')
+        if not filename:
+            return {'success': False, 'message': 'filename is required'}
+        auth_dir = '/config/auth'
+        fpath = os.path.join(auth_dir, filename)
+        if not fpath.startswith(auth_dir):
+            return {'success': False, 'message': 'Invalid file path'}
+        if not os.path.isfile(fpath):
+            return {'success': False, 'message': f'File not found: {filename}'}
+        with open(fpath, 'r', errors='replace') as f:
+            content = f.read()
+        return {'success': True, 'data': {'filename': filename, 'content': content}}
+
+    def handle_pki_file_download(self, environ, body):
+        """Download a file from /config/auth/ directory."""
+        import os
+        from urllib.parse import parse_qs
+        query_string = environ.get('QUERY_STRING', '')
+        params = parse_qs(query_string)
+        filename = params.get('filename', [''])[0]
+        if not filename:
+            return {'success': False, 'message': 'filename is required'}
+        # Security: only allow files in /config/auth/
+        auth_dir = '/config/auth'
+        fpath = os.path.join(auth_dir, filename)
+        if not fpath.startswith(auth_dir):
+            return {'success': False, 'message': 'Invalid file path'}
+        if not os.path.isfile(fpath):
+            return {'success': False, 'message': f'File not found: {filename}'}
+        with open(fpath, 'rb') as f:
+            content = f.read()
+        headers = [
+            ('Content-Type', 'application/octet-stream'),
+            ('Content-Disposition', f'attachment; filename="{filename}"'),
+        ]
+        return content, headers
+
     # ---------- image management ----------
 
     def handle_list_images(self, environ, body):
@@ -672,7 +899,8 @@ class VyOSWebApp:
     # ---------- generate commands ----------
 
     def handle_generate_command(self, environ, body):
-        return self.system_service.generate_command(body.get('type', ''), body.get('args', {}))
+        user = environ.get('user', {})
+        return self.system_service.generate_command(body.get('type', ''), body.get('args', {}), user=user, config_service=self.config_service)
 
     # ---------- quotas ----------
 
@@ -785,7 +1013,22 @@ class VyOSWebApp:
         return self.system_service.op_mode('update', body.get('command', ''))
 
     def handle_op_mode_generate(self, environ, body):
-        return self.system_service.generate_command(body.get('command', ''), body.get('args', {}))
+        user = environ.get('user', {})
+        command = body.get('command', '')
+        args = body.get('args', {})
+        input_text = body.get('input', args.get('input', ''))
+        # If command is a full command string like "run generate pki ca ...", parse it
+        if command.startswith('run generate pki'):
+            parts = command.split()
+            if len(parts) >= 4:
+                pki_type = parts[3]
+                remaining = parts[4:] if len(parts) > 4 else []
+                return self.system_service.generate_command('pki', {
+                    'type': pki_type,
+                    'args': remaining,
+                    'input': input_text,
+                }, user=user, config_service=self.config_service)
+        return self.system_service.generate_command(command, args, user=user, config_service=self.config_service)
 
     # ---------- notifications ----------
 

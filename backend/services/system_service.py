@@ -6,7 +6,9 @@ System maintenance and webapp upgrade service.
 
 import json
 import os
+import pty
 import re
+import select
 import subprocess
 import time
 
@@ -36,6 +38,106 @@ def _run_command(cmd, input_text=None, timeout=30):
             }
     except Exception as e:
         return {'success': False, 'message': str(e), 'output': str(e), 'returncode': -1}
+
+
+def _run_interactive_command(cmd, input_lines=None, timeout=60, idle_threshold=5.0):
+    """Run an interactive command using PTY with proper output capture."""
+    if input_lines is None:
+        input_lines = []
+
+    import pty
+    import select as select_mod
+
+    master_fd, slave_fd = pty.openpty()
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            stdin=slave_fd,
+            stdout=slave_fd,
+            stderr=slave_fd,
+            close_fds=True,
+            preexec_fn=os.setsid,  # Detach from controlling terminal
+        )
+        os.close(slave_fd)
+
+        output_chunks = []
+        input_idx = 0
+        start_time = time.time()
+        idle_start = time.time()
+        IDLE_THRESHOLD = idle_threshold  # seconds of no output before sending next input
+
+        while proc.poll() is None:
+            if time.time() - start_time > timeout:
+                proc.kill()
+                proc.wait()
+                return {
+                    'success': False,
+                    'message': f'Command timed out after {timeout}s',
+                    'output': ''.join(output_chunks),
+                    'returncode': -1
+                }
+
+            ready, _, _ = select_mod.select([master_fd], [], [], 0.5)
+            if ready:
+                try:
+                    data = os.read(master_fd, 1024)
+                    if data:
+                        output_chunks.append(data.decode('utf-8', errors='replace'))
+                        idle_start = time.time()
+                except OSError:
+                    break
+
+            # If idle for IDLE_THRESHOLD seconds, send next input line
+            if input_idx < len(input_lines) and (time.time() - idle_start) > IDLE_THRESHOLD:
+                line = input_lines[input_idx]
+                try:
+                    os.write(master_fd, (line + '\n').encode('utf-8'))
+                    input_idx += 1
+                    idle_start = time.time()
+                except OSError:
+                    break
+
+        # Drain remaining output
+        try:
+            while True:
+                ready, _, _ = select_mod.select([master_fd], [], [], 0.5)
+                if ready:
+                    try:
+                        data = os.read(master_fd, 1024)
+                        if data:
+                            output_chunks.append(data.decode('utf-8', errors='replace'))
+                        else:
+                            break
+                    except OSError:
+                        break
+                else:
+                    break
+        except OSError:
+            pass
+
+        proc.wait()
+        full_output = ''.join(output_chunks)
+
+        if proc.returncode == 0:
+            return {
+                'success': True,
+                'output': full_output,
+                'returncode': proc.returncode
+            }
+        else:
+            return {
+                'success': False,
+                'message': f'Command failed with return code {proc.returncode}',
+                'output': full_output,
+                'returncode': proc.returncode
+            }
+    except Exception as e:
+        return {'success': False, 'message': str(e), 'output': str(e), 'returncode': -1}
+    finally:
+        try:
+            os.close(master_fd)
+        except OSError:
+            pass
 
 
 def _write_webapp_history(version, build, commit, action, source='', backup_path='', success=True, error_message=''):
@@ -239,7 +341,7 @@ class SystemService:
 
     # ---------- generate commands ----------
 
-    def generate_command(self, command_type, args=None):
+    def generate_command(self, command_type, args=None, user=None, config_service=None):
         """Run generate commands: firewall-rule-resequence, ipsec, openvpn, wireguard, pki, ssh, etc."""
         args = args or {}
         handlers = {
@@ -247,7 +349,7 @@ class SystemService:
             'wireguard': lambda: self._generate_wireguard(args),
             'openvpn': lambda: self._generate_openvpn(args),
             'ipsec': lambda: self._generate_ipsec(args),
-            'pki': lambda: self._generate_pki(args),
+            'pki': lambda: self._generate_pki(args, user=user, config_service=config_service),
             'ssh': lambda: self._generate_ssh(args),
             'tech-support': lambda: self._generate_tech_support(args),
         }
@@ -275,9 +377,195 @@ class SystemService:
     def _generate_ipsec(self, args):
         return _run_command(['generate', 'ipsec', 'profile', args.get('profile', '')], timeout=30)
 
-    def _generate_pki(self, args):
-        cert_type = args.get('type', 'certificate')
-        return _run_command(['generate', 'pki', cert_type, args.get('name', '')], timeout=60)
+    def _generate_pki(self, args, user=None, config_service=None):
+        """Generate PKI materials."""
+        cert_type = args.get('type', 'ca')
+        input_text = args.get('input', '')
+        cmd_args = args.get('args', [])
+        input_lines = input_text.split('\n') if input_text else []
+
+        # Parse command args to detect action
+        filename = None
+        install_name = None
+        action = 'generate'
+        if 'file' in cmd_args:
+            idx = cmd_args.index('file')
+            if idx + 1 < len(cmd_args):
+                filename = cmd_args[idx + 1]
+                action = 'file'
+        elif 'install' in cmd_args:
+            idx = cmd_args.index('install')
+            if idx + 1 < len(cmd_args):
+                install_name = cmd_args[idx + 1]
+                action = 'install'
+
+        # Validate filename for file action
+        if action == 'file':
+            if not filename or not filename.strip():
+                return {'success': False, 'message': '文件名为必填项', 'output': '', 'returncode': -1}
+            cert_filename = filename if filename.endswith('.pem') else filename + '.pem'
+            pki_dir = '/config/auth'
+            cert_path = os.path.join(pki_dir, cert_filename)
+            if os.path.exists(cert_path):
+                return {'success': False, 'message': f'文件 {cert_filename} 已存在，请使用其他文件名', 'output': '', 'returncode': -1}
+            key_filename = cert_filename[:-4] + '.key'
+            key_path = os.path.join(pki_dir, key_filename)
+            if os.path.exists(key_path):
+                return {'success': False, 'message': f'文件 {key_filename} 已存在，请使用其他文件名', 'output': '', 'returncode': -1}
+
+        # Validate install name
+        if action == 'install':
+            if not install_name or not install_name.strip():
+                return {'success': False, 'message': '安装名称为必填项', 'output': '', 'returncode': -1}
+
+        # For file action, use Python PKI API directly
+        if action == 'file':
+            return self._generate_pki_python(cert_type, input_lines, filename)
+
+        # For install action, use Python PKI API + set VyOS config
+        if action == 'install':
+            return self._install_pki(cert_type, input_lines, install_name)
+
+        # For generate action, use Python PKI API and return content
+        if action == 'generate':
+            return self._generate_pki_content(cert_type, input_lines)
+
+        # For generate action, use PTY interactive command
+        cmd_parts = ['/opt/vyatta/bin/vyatta-op-cmd-wrapper', 'generate', 'pki', cert_type]
+        import logging
+        _pki_logger = logging.getLogger('pki')
+        _pki_logger.info(f'[PKI] Running: {" ".join(cmd_parts)} with {len(input_lines)} inputs')
+        return _run_interactive_command(cmd_parts, input_lines=input_lines, timeout=120)
+
+    def _generate_pki_content(self, cert_type, input_lines):
+        """Generate PKI using Python API and return content."""
+        try:
+            import sys
+            sys.path.insert(0, '/usr/lib/python3/dist-packages')
+            from vyos.pki import (
+                create_private_key, create_certificate_request,
+                create_certificate, encode_certificate, encode_private_key
+            )
+        except ImportError as e:
+            return {'success': False, 'message': f'无法导入 VyOS PKI 模块: {e}', 'output': '', 'returncode': -1}
+
+        # Parse input lines - frontend sends 9 inputs for CA:
+        # p0=keyType, p1=keyBits, p2=country, p3=state, p4=locality,
+        # p5=organization, p6=commonName, p7=validityDays, p8=encryptKey(y/N)
+        p = {}
+        for i, line in enumerate(input_lines):
+            p[f'p{i}'] = line.strip() if line else ''
+
+        key_type = p.get('p0', 'rsa') or 'rsa'
+        key_size = int(p.get('p1', '2048') or '2048')
+        country = p.get('p2', 'CN') or 'CN'
+        state = p.get('p3', '') or ''
+        locality = p.get('p4', '') or ''
+        organization = p.get('p5', '') or ''
+        common_name = p.get('p6', 'vyos.io') or 'vyos.io'
+        valid_days = int(p.get('p7', '1825') or '1825')
+        encrypt_key = (p.get('p8', 'N') or 'N').lower() in ('y', 'yes', 'true', '1')
+        passphrase = p.get('p9', '') if encrypt_key else None
+
+        try:
+            private_key = create_private_key(key_type, key_size)
+            subject = {
+                'country': country, 'state': state, 'locality': locality,
+                'organization': organization, 'common_name': common_name,
+            }
+            cert_req = create_certificate_request(subject, private_key, None)
+            cert = create_certificate(cert_req, cert_req, private_key, valid_days, None, True, False)
+            cert_pem = encode_certificate(cert)
+            key_pem = encode_private_key(private_key, passphrase=passphrase)
+
+            # encode_certificate/encode_private_key already return full PEM with headers
+            return {
+                'success': True,
+                'output': cert_pem,
+                'returncode': 0,
+                'certContent': cert_pem,
+                'keyContent': key_pem,
+            }
+        except Exception as e:
+            return {'success': False, 'message': f'生成失败: {e}', 'output': str(e), 'returncode': -1}
+
+    def _generate_pki_python(self, cert_type, input_lines, filename):
+        """Generate PKI using Python API and write to files."""
+        try:
+            import sys
+            sys.path.insert(0, '/usr/lib/python3/dist-packages')
+            from vyos.pki import (
+                create_private_key, create_certificate_request,
+                create_certificate, encode_certificate, encode_private_key
+            )
+        except ImportError as e:
+            return {'success': False, 'message': f'无法导入 VyOS PKI 模块: {e}', 'output': '', 'returncode': -1}
+
+        # Parse input lines - frontend sends 9 inputs for CA:
+        # p0=keyType, p1=keyBits, p2=country, p3=state, p4=locality,
+        # p5=organization, p6=commonName, p7=validityDays, p8=encryptKey(y/N)
+        p = {}
+        for i, line in enumerate(input_lines):
+            p[f'p{i}'] = line.strip() if line else ''
+
+        key_type = p.get('p0', 'rsa') or 'rsa'
+        key_size = int(p.get('p1', '2048') or '2048')
+        country = p.get('p2', 'CN') or 'CN'
+        state = p.get('p3', '') or ''
+        locality = p.get('p4', '') or ''
+        organization = p.get('p5', '') or ''
+        common_name = p.get('p6', 'vyos.io') or 'vyos.io'
+        valid_days = int(p.get('p7', '1825') or '1825')
+        encrypt_key = (p.get('p8', 'N') or 'N').lower() in ('y', 'yes', 'true', '1')
+        passphrase = p.get('p9', '') if encrypt_key else None
+
+        try:
+            private_key = create_private_key(key_type, key_size)
+            subject = {
+                'country': country, 'state': state, 'locality': locality,
+                'organization': organization, 'common_name': common_name,
+            }
+            cert_req = create_certificate_request(subject, private_key, None)
+            cert = create_certificate(cert_req, cert_req, private_key, valid_days, None, True, False)
+            cert_pem = encode_certificate(cert)
+            key_pem = encode_private_key(private_key, passphrase=passphrase)
+
+            pki_dir = '/config/auth'
+            os.makedirs(pki_dir, exist_ok=True)
+
+            cert_filename = filename if filename.endswith('.pem') else filename + '.pem'
+            cert_path = os.path.join(pki_dir, cert_filename)
+            key_filename = cert_filename[:-4] + '.key'
+            key_path = os.path.join(pki_dir, key_filename)
+            with open(cert_path, 'w') as f:
+                f.write(cert_pem)
+            with open(key_path, 'w') as f:
+                f.write(key_pem)
+            return {
+                'success': True,
+                'output': f'证书已写入: {cert_path}\n私钥已写入: {key_path}',
+                'returncode': 0,
+                'generatedFiles': [cert_filename, key_filename]
+            }
+        except Exception as e:
+            return {'success': False, 'message': f'生成失败: {e}', 'output': str(e), 'returncode': -1}
+
+    def _install_pki(self, cert_type, input_lines, install_name):
+        """Generate PKI via pki.py script (non-interactive, same as CLI: run generate pki ca install <name>)."""
+        import logging
+        _pki_logger = logging.getLogger('pki_install')
+
+        # Actual command: /usr/libexec/vyos/op_mode/pki.py generate_pki --pki-type ca --name <name> --install
+        cmd = [
+            '/usr/libexec/vyos/op_mode/pki.py',
+            'generate_pki',
+            '--pki-type', cert_type,
+            '--name', install_name,
+            '--install'
+        ]
+        _pki_logger.info(f'[PKI install] Running: {" ".join(cmd)}')
+
+        return _run_command(cmd, timeout=120)
 
     def _generate_ssh(self, args):
         return _run_command(['python3', '/usr/libexec/vyos/op_mode/generate_ssh_server_key.py'], timeout=30)

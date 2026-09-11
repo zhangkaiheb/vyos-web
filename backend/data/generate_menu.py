@@ -93,7 +93,10 @@ def main():
                 menu_item('network', '容器网络', 'Network', route='/system/container/network', component='TablePage'),
                 menu_item('registry', '镜像仓库', 'Registry', route='/system/container/registry', component='TablePage'),
             ]),
-            menu_item('pki', 'PKI', 'PKI', route='/system/pki', component='PkiPage'),
+            menu_item('pki', 'PKI', 'PKI', children=[
+                menu_item('pki-management', 'PKI', 'PKI', route='/system/pki', component='PkiPage'),
+                menu_item('pki-tool', 'PKI工具', 'PKI Tool', route='/system/pki-tool', component='PkiToolPage'),
+            ]),
             menu_item('table-size', '表项规格', 'Table Size', route='/system/table-size', component='TablePage'),
             menu_item('maintenance', '维护工具', 'Maintenance', children=[
                 menu_item('ping', 'Ping', 'Ping', route='/system/maintenance/ping', component='ToolPage'),

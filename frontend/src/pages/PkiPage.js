@@ -1003,8 +1003,6 @@ export default defineComponent({
           </template>
         </TabGroup>
       </div>
-      <div class="section">
-      </div>
 
       <!-- CA Modal -->
       <DraggableModal v-model:visible="caModalVisible" :title="editingOriginalCA ? $t('app.edit') : $t('app.create')" width="700px" @confirm="saveCA">

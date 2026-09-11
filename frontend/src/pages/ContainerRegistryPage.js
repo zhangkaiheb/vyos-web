@@ -282,7 +282,6 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div style="font-weight:bold;margin:16px 0 8px;">{{ t('containerRegistry.pageTitle') }}</div>
       <div class="toolbar">
         <ToolbarButton icon="create" @click="createRegistry">{{ t('containerRegistry.buttons.create') }}</ToolbarButton>
         <ToolbarButton icon="edit" @click="editRegistry" :disabled="!selectedRegistries.length || selectedRegistries.length > 1">{{ t('containerRegistry.buttons.edit') }}</ToolbarButton>

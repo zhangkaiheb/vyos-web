@@ -1096,7 +1096,7 @@ class ConfigService:
     def compare_config(self, user, left='working', right='active', path=''):
         """Compare working config against active config and return VyOS-style diff.
         
-        Uses ConfigSession.show_config() which returns working config with diff markers:
+        Uses vyatta-cfg-cmd-wrapper subprocess to get working config with diff markers:
         + (added), - (deleted), > (modified)
         """
         try:
@@ -1105,31 +1105,57 @@ class ConfigService:
             
             path_list = path.split() if path else []
             
-            # Try up to 2 times in case session is expired
-            raw_text = ''
-            for attempt in range(2):
-                try:
-                    session = _get_config_session(token)
-                    raw_text = session.show_config(path_list, format='raw') or ''
-                    break
-                except Exception as e:
-                    error_msg = str(e)
-                    if ('without config session' in error_msg or 'cfgPathExists' in error_msg) and attempt == 0:
-                        _logger.warning(f'[compare_config] Session expired, recreating (attempt {attempt+1}/2)...')
-                        _invalidate_and_recreate_session(token)
-                    else:
-                        raise
+            # Use subprocess to avoid ConfigSession C library state corruption
+            # vyatta-cfg-cmd-wrapper show configuration commands returns working config with diff markers
+            cmd = ['/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper', 'show', 'configuration', 'commands']
+            if path_list:
+                cmd.extend(path_list)
             
-            if not raw_text:
+            _logger.info(f'[compare_config] Running: {" ".join(cmd)}')
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            
+            if result.returncode != 0:
+                _logger.warning(f'[compare_config] Command failed: rc={result.returncode}, stderr={result.stderr[:200]}')
+                return {'success': True, 'diff': []}
+            
+            raw_text = result.stdout
+            if not raw_text or not raw_text.strip():
                 _logger.info(f'[compare_config] No working config changes')
                 return {'success': True, 'diff': []}
             
             # Extract lines with diff markers (+, -, >)
             diff_lines = []
-            for line in raw_text.split('\n'):
-                stripped = line.strip()
-                if stripped and stripped[0] in ('+', '-', '>'):
-                    diff_lines.append(line.rstrip())
+            if path_list:
+                # Filter to only lines under the specified path
+                path_prefix = ' '.join(path_list)
+                in_section = False
+                section_indent = -1
+                for line in raw_text.split('\n'):
+                    stripped = line.strip()
+                    indent = len(line) - len(line.lstrip()) if stripped else 999
+                    
+                    if not stripped:
+                        continue
+                    
+                    # Check if this line starts a matching section
+                    if stripped.startswith(path_prefix + ' ') or stripped == path_prefix + ' {':
+                        in_section = True
+                        section_indent = indent
+                        if stripped[0] in ('+', '-', '>'):
+                            diff_lines.append(line.rstrip())
+                        continue
+                    
+                    if in_section:
+                        if indent <= section_indent and not stripped.startswith('{'):
+                            in_section = False
+                            continue
+                        if stripped[0] in ('+', '-', '>'):
+                            diff_lines.append(line.rstrip())
+            else:
+                for line in raw_text.split('\n'):
+                    stripped = line.strip()
+                    if stripped and stripped[0] in ('+', '-', '>'):
+                        diff_lines.append(line.rstrip())
             
             _logger.info(f'[compare_config] SUCCESS: found {len(diff_lines)} diff lines')
             return {'success': True, 'diff': diff_lines}

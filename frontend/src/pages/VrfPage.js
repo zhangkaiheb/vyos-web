@@ -180,7 +180,7 @@ const PROTOCOL_BRANCH_META = {
 export default defineComponent({
   name: 'VrfPage',
   setup() {
-    const { t, locale } = useI18n();
+    const { t } = useI18n();
     const route = useRoute();
     const configStore = useConfigStore();
     const vrfList = ref([]);
@@ -1569,22 +1569,11 @@ export default defineComponent({
     }
 
     function getStaticModalLabel(key) {
-      const lang = String(locale?.value || '').toLowerCase();
-      const isTw = lang.includes('zh-tw') || lang.includes('zh_hk') || lang.includes('zh-hant');
-      const isZh = lang.startsWith('zh');
-      const dict = {
-        prefixV4: { zh: 'IPv4 前缀', tw: 'IPv4 前綴', en: 'IPv4 Prefix' },
-        prefixV6: { zh: 'IPv6 前缀', tw: 'IPv6 前綴', en: 'IPv6 Prefix' },
-        nextHopType: { zh: '下一跳类型', tw: '下一跳類型', en: 'Next-hop Type' },
-        dhcpInterface: { zh: 'dhcp-interface', tw: 'dhcp-interface', en: 'dhcp-interface' },
-        tag: { zh: 'Tag', tw: 'Tag', en: 'Tag' },
-        segments: { zh: 'segments', tw: 'segments', en: 'segments' },
-        segmentsPlaceholder: { zh: 'Segments (SIDs)', tw: 'Segments (SIDs)', en: 'Segments (SIDs)' },
-      };
-      const entry = dict[key] || {};
-      if (isTw) return entry.tw || entry.en || key;
-      if (isZh) return entry.zh || entry.en || key;
-      return entry.en || key;
+      const name = String(key || '').trim();
+      if (!name) return key;
+      const path = `vrf.modals.static${name.charAt(0).toUpperCase()}${name.slice(1)}`;
+      const value = t(path);
+      return value === path ? key : value;
     }
 
     const staticRouteModalTitle = computed(() => `${staticRouteModalMode.value === 'edit' ? t('app.edit') : t('app.create')} ${staticRouteModalKind.value === 'ipv6' ? 'Static IPv6 route' : 'Static IPv4 route'}`);
@@ -1626,7 +1615,7 @@ export default defineComponent({
         .map(item => formatProtocolBranchItemLine(item) || '(empty)');
     });
 
-    const ospfAreaModalTitle = computed(() => `${ospfAreaModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF area`);
+    const ospfAreaModalTitle = computed(() => `${ospfAreaModalMode.value === 'edit' ? t('app.edit') : t('app.create')} ${t('vrf.protocols.ospfAreaModalName')}`);
 
     const ospfAreaDeletePreview = computed(() => {
       const idSet = new Set((pendingOspfAreaDeleteIds.value || []).map(v => String(v)));
@@ -1644,7 +1633,7 @@ export default defineComponent({
         .map(item => String(item?.number || '').trim() || '(empty)');
     });
 
-    const ospfNeighborModalTitle = computed(() => `${ospfNeighborModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF neighbor`);
+    const ospfNeighborModalTitle = computed(() => `${ospfNeighborModalMode.value === 'edit' ? t('app.edit') : t('app.create')} ${t('vrf.protocols.ospfNeighborModalName')}`);
 
     const ospfNeighborDeletePreview = computed(() => {
       const idSet = new Set((pendingOspfNeighborDeleteIds.value || []).map(v => String(v)));
@@ -1653,7 +1642,7 @@ export default defineComponent({
         .map(item => String(item?.address || '').trim() || '(empty)');
     });
 
-    const ospfSummaryAddressModalTitle = computed(() => `${ospfSummaryAddressModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF summary-address`);
+    const ospfSummaryAddressModalTitle = computed(() => `${ospfSummaryAddressModalMode.value === 'edit' ? t('app.edit') : t('app.create')} ${t('vrf.protocols.ospfSummaryAddressModalName')}`);
 
     const ospfSummaryAddressDeletePreview = computed(() => {
       const idSet = new Set((pendingOspfSummaryAddressDeleteIds.value || []).map(v => String(v)));
@@ -1680,7 +1669,7 @@ export default defineComponent({
         .map(item => String(item?.table || '').trim() || '(empty)');
     });
 
-    const ospfInterfaceModalTitle = computed(() => `${ospfInterfaceModalMode.value === 'edit' ? t('app.edit') : t('app.create')} OSPF interface`);
+    const ospfInterfaceModalTitle = computed(() => `${ospfInterfaceModalMode.value === 'edit' ? t('app.edit') : t('app.create')} ${t('vrf.protocols.ospfIfModalName')}`);
 
     const ospfInterfaceDeletePreview = computed(() => {
       const idSet = new Set((pendingOspfInterfaceDeleteIds.value || []).map(v => String(v)));
@@ -2515,6 +2504,1749 @@ export default defineComponent({
       removeBgpVpnNetworkRows(pendingBgpVpnNetworkDeleteAfKey.value, pendingBgpVpnNetworkDeleteIds.value);
       pendingBgpVpnNetworkDeleteIds.value = [];
       bgpVpnNetworkDeleteVisible.value = false;
+    }
+
+    // ===== BGP Unicast Aggregate-Address, Distance Prefix, Network, Redistribute =====
+    const bgpUcAggregateRows = ref({
+      'ipv4-unicast': [],
+      'ipv6-unicast': [],
+    });
+    const bgpUcDistancePrefixRows = ref({
+      'ipv4-unicast': [],
+      'ipv6-unicast': [],
+    });
+    const bgpUcNetworkRows = ref({
+      'ipv4-unicast': [],
+      'ipv6-unicast': [],
+    });
+    const bgpUcRedistributeRows = ref({
+      'ipv4-unicast': [],
+      'ipv6-unicast': [],
+    });
+    const bgpUcAggregateModalVisible = ref(false);
+    const bgpUcAggregateModalMode = ref('create');
+    const bgpUcAggregateEditId = ref('');
+    const bgpUcAggregateDraft = ref({});
+    const bgpUcAggregateDeleteVisible = ref(false);
+    const pendingBgpUcAggregateDeleteAfKey = ref('');
+    const pendingBgpUcAggregateDeleteIds = ref([]);
+    const bgpUcDistancePrefixModalVisible = ref(false);
+    const bgpUcDistancePrefixModalMode = ref('create');
+    const bgpUcDistancePrefixEditId = ref('');
+    const bgpUcDistancePrefixDraft = ref({});
+    const bgpUcDistancePrefixDeleteVisible = ref(false);
+    const pendingBgpUcDistancePrefixDeleteAfKey = ref('');
+    const pendingBgpUcDistancePrefixDeleteIds = ref([]);
+    const bgpUcNetworkModalVisible = ref(false);
+    const bgpUcNetworkModalMode = ref('create');
+    const bgpUcNetworkEditId = ref('');
+    const bgpUcNetworkDraft = ref({});
+    const bgpUcNetworkDeleteVisible = ref(false);
+    const pendingBgpUcNetworkDeleteAfKey = ref('');
+    const pendingBgpUcNetworkDeleteIds = ref([]);
+    const bgpUcRedistributeModalVisible = ref(false);
+    const bgpUcRedistributeModalMode = ref('create');
+    const bgpUcRedistributeEditId = ref('');
+    const bgpUcRedistributeDraft = ref({});
+    const bgpUcRedistributeDeleteVisible = ref(false);
+    const pendingBgpUcRedistributeDeleteAfKey = ref('');
+    const pendingBgpUcRedistributeDeleteIds = ref([]);
+
+    const bgpUcAggregateModalTitle = computed(() => `${bgpUcAggregateModalMode.value === 'edit' ? t('app.edit') : t('app.create')} BGP ${bgpUcAggregateDraft.value?.afKey === 'ipv6-unicast' ? 'ipv6-unicast' : 'ipv4-unicast'} aggregate-address`);
+    const bgpUcDistancePrefixModalTitle = computed(() => `${bgpUcDistancePrefixModalMode.value === 'edit' ? t('app.edit') : t('app.create')} BGP ${bgpUcDistancePrefixDraft.value?.afKey === 'ipv6-unicast' ? 'ipv6-unicast' : 'ipv4-unicast'} distance prefix`);
+    const bgpUcNetworkModalTitle = computed(() => `${bgpUcNetworkModalMode.value === 'edit' ? t('app.edit') : t('app.create')} BGP ${bgpUcNetworkDraft.value?.afKey === 'ipv6-unicast' ? 'ipv6-unicast' : 'ipv4-unicast'} network`);
+    const bgpUcRedistributeModalTitle = computed(() => `${bgpUcRedistributeModalMode.value === 'edit' ? t('app.edit') : t('app.create')} BGP ${bgpUcRedistributeDraft.value?.afKey === 'ipv6-unicast' ? 'ipv6-unicast' : 'ipv4-unicast'} redistribute`);
+    const bgpUcAggregateDeletePreview = computed(() => {
+      const rows = bgpUcAggregateRows.value[pendingBgpUcAggregateDeleteAfKey.value] || [];
+      return pendingBgpUcAggregateDeleteIds.value
+        .map(id => rows.find(r => String(r.__id) === String(id))?.prefix || '')
+        .filter(Boolean);
+    });
+    const bgpUcDistancePrefixDeletePreview = computed(() => {
+      const rows = bgpUcDistancePrefixRows.value[pendingBgpUcDistancePrefixDeleteAfKey.value] || [];
+      return pendingBgpUcDistancePrefixDeleteIds.value
+        .map(id => rows.find(r => String(r.__id) === String(id))?.prefix || '')
+        .filter(Boolean);
+    });
+    const bgpUcNetworkDeletePreview = computed(() => {
+      const rows = bgpUcNetworkRows.value[pendingBgpUcNetworkDeleteAfKey.value] || [];
+      return pendingBgpUcNetworkDeleteIds.value
+        .map(id => rows.find(r => String(r.__id) === String(id))?.prefix || '')
+        .filter(Boolean);
+    });
+    const bgpUcRedistributeDeletePreview = computed(() => {
+      const rows = bgpUcRedistributeRows.value[pendingBgpUcRedistributeDeleteAfKey.value] || [];
+      return pendingBgpUcRedistributeDeleteIds.value
+        .map(id => rows.find(r => String(r.__id) === String(id))?.protocol || '')
+        .filter(Boolean);
+    });
+
+    function parseBgpUcAggregateInputLine(line) {
+      const tokens = String(line || '').trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return null;
+      const entry = { prefix: tokens[0], asSet: false, routeMap: '', summaryOnly: false };
+      for (let i = 1; i < tokens.length; i += 1) {
+        const key = tokens[i];
+        if (key === 'as-set') entry.asSet = true;
+        else if (key === 'summary-only') entry.summaryOnly = true;
+        else if (key === 'route-map' && tokens[i + 1]) { entry.routeMap = tokens[i + 1]; i += 1; }
+      }
+      return entry.prefix ? entry : null;
+    }
+
+    function parseBgpUcDistancePrefixInputLine(line) {
+      const tokens = String(line || '').trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return null;
+      const entry = { prefix: tokens[0], distance: '' };
+      for (let i = 1; i < tokens.length; i += 1) {
+        const key = tokens[i];
+        if (key === 'distance' && tokens[i + 1]) { entry.distance = tokens[i + 1]; i += 1; }
+      }
+      return entry.prefix ? entry : null;
+    }
+
+    function parseBgpUcNetworkInputLine(line) {
+      const tokens = String(line || '').trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return null;
+      const entry = { prefix: tokens[0], pathLimit: '', routeMap: '' };
+      for (let i = 1; i < tokens.length; i += 1) {
+        const key = tokens[i];
+        if (key === 'path-limit' && tokens[i + 1]) { entry.pathLimit = tokens[i + 1]; i += 1; }
+        else if (key === 'route-map' && tokens[i + 1]) { entry.routeMap = tokens[i + 1]; i += 1; }
+      }
+      return entry.prefix ? entry : null;
+    }
+
+    function parseBgpUcRedistributeInputLine(line) {
+      const tokens = String(line || '').trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return null;
+      const entry = { protocol: tokens[0], tableId: '', metric: '', routeMap: '' };
+      let i = 1;
+      if (entry.protocol === 'table' && tokens[i]) {
+        entry.tableId = tokens[i];
+        i += 1;
+      }
+      for (; i < tokens.length; i += 1) {
+        const key = tokens[i];
+        if (key === 'metric' && tokens[i + 1]) { entry.metric = tokens[i + 1]; i += 1; }
+        else if (key === 'route-map' && tokens[i + 1]) { entry.routeMap = tokens[i + 1]; i += 1; }
+      }
+      return entry.protocol ? entry : null;
+    }
+
+    function getBgpUcAggregateEntriesText(afKey) {
+      if (!afKey) return '';
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} aggregate-address `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const entries = new Map();
+      for (const line of rows) {
+        if (!line.startsWith(prefix)) continue;
+        const rest = line.slice(prefix.length).trim();
+        if (!rest) continue;
+        const eqPos = rest.indexOf('=');
+        if (eqPos >= 0) {
+          const left = rest.slice(0, eqPos).trim();
+          const value = rest.slice(eqPos + 1).trim();
+          const leftTokens = left.split(/\s+/).filter(Boolean);
+          if (!leftTokens.length) continue;
+          const p = leftTokens[0];
+          const attr = leftTokens.slice(1).join(' ');
+          const current = entries.get(p) || { prefix: p, asSet: false, routeMap: '', summaryOnly: false };
+          if (attr === 'as-set') current.asSet = true;
+          if (attr === 'summary-only') current.summaryOnly = true;
+          if (attr === 'route-map') current.routeMap = value;
+          entries.set(p, current);
+          continue;
+        }
+        const parsed = parseBgpUcAggregateInputLine(rest);
+        if (!parsed) continue;
+        const current = entries.get(parsed.prefix) || { prefix: parsed.prefix, asSet: false, routeMap: '', summaryOnly: false };
+        if (parsed.asSet) current.asSet = true;
+        if (parsed.summaryOnly) current.summaryOnly = true;
+        if (parsed.routeMap) current.routeMap = parsed.routeMap;
+        entries.set(parsed.prefix, current);
+      }
+      return Array.from(entries.values()).map((e) => {
+        const parts = [e.prefix];
+        if (e.asSet) parts.push('as-set');
+        if (e.routeMap) parts.push('route-map', e.routeMap);
+        if (e.summaryOnly) parts.push('summary-only');
+        return parts.join(' ');
+      }).join('\n');
+    }
+
+    function setBgpUcAggregateEntriesText(afKey, text) {
+      if (!editingVrf.value || !afKey) return;
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} aggregate-address `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = rows.filter(line => !line.startsWith(prefix));
+      const entries = new Map();
+      for (const line of String(text || '').split('\n').map(v => v.trim()).filter(Boolean)) {
+        const parsed = parseBgpUcAggregateInputLine(line);
+        if (!parsed || !parsed.prefix) continue;
+        entries.set(parsed.prefix, parsed);
+      }
+      for (const entry of entries.values()) {
+        kept.push(`${prefix}${entry.prefix}`);
+        if (entry.asSet) kept.push(`${prefix}${entry.prefix} as-set`);
+        if (entry.routeMap) kept.push(`${prefix}${entry.prefix} route-map = ${entry.routeMap}`);
+        if (entry.summaryOnly) kept.push(`${prefix}${entry.prefix} summary-only`);
+      }
+      setProtocolBranchText('bgp', branch, kept.join('\n'));
+    }
+
+    function getBgpUcDistancePrefixEntriesText(afKey) {
+      if (!afKey) return '';
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} distance prefix `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const entries = new Map();
+      for (const line of rows) {
+        if (!line.startsWith(prefix)) continue;
+        const rest = line.slice(prefix.length).trim();
+        if (!rest) continue;
+        const eqPos = rest.indexOf('=');
+        if (eqPos >= 0) {
+          const left = rest.slice(0, eqPos).trim();
+          const value = rest.slice(eqPos + 1).trim();
+          const leftTokens = left.split(/\s+/).filter(Boolean);
+          if (!leftTokens.length) continue;
+          const p = leftTokens[0];
+          const attr = leftTokens.slice(1).join(' ');
+          const current = entries.get(p) || { prefix: p, distance: '' };
+          if (attr === 'distance') current.distance = value;
+          entries.set(p, current);
+          continue;
+        }
+        const parsed = parseBgpUcDistancePrefixInputLine(rest);
+        if (!parsed) continue;
+        const current = entries.get(parsed.prefix) || { prefix: parsed.prefix, distance: '' };
+        if (parsed.distance) current.distance = parsed.distance;
+        entries.set(parsed.prefix, current);
+      }
+      return Array.from(entries.values()).map((e) => {
+        const parts = [e.prefix];
+        if (e.distance) parts.push('distance', e.distance);
+        return parts.join(' ');
+      }).join('\n');
+    }
+
+    function setBgpUcDistancePrefixEntriesText(afKey, text) {
+      if (!editingVrf.value || !afKey) return;
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} distance prefix `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = rows.filter(line => !line.startsWith(prefix));
+      const entries = new Map();
+      for (const line of String(text || '').split('\n').map(v => v.trim()).filter(Boolean)) {
+        const parsed = parseBgpUcDistancePrefixInputLine(line);
+        if (!parsed || !parsed.prefix) continue;
+        entries.set(parsed.prefix, parsed);
+      }
+      for (const entry of entries.values()) {
+        kept.push(`${prefix}${entry.prefix}`);
+        if (entry.distance) kept.push(`${prefix}${entry.prefix} distance = ${entry.distance}`);
+      }
+      setProtocolBranchText('bgp', branch, kept.join('\n'));
+    }
+
+    function getBgpUcNetworkEntriesText(afKey) {
+      if (!afKey) return '';
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} network `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const entries = new Map();
+      for (const line of rows) {
+        if (!line.startsWith(prefix)) continue;
+        const rest = line.slice(prefix.length).trim();
+        if (!rest) continue;
+        const eqPos = rest.indexOf('=');
+        if (eqPos >= 0) {
+          const left = rest.slice(0, eqPos).trim();
+          const value = rest.slice(eqPos + 1).trim();
+          const leftTokens = left.split(/\s+/).filter(Boolean);
+          if (!leftTokens.length) continue;
+          const p = leftTokens[0];
+          const attr = leftTokens.slice(1).join(' ');
+          const current = entries.get(p) || { prefix: p, pathLimit: '', routeMap: '' };
+          if (attr === 'path-limit') current.pathLimit = value;
+          if (attr === 'route-map') current.routeMap = value;
+          entries.set(p, current);
+          continue;
+        }
+        const parsed = parseBgpUcNetworkInputLine(rest);
+        if (!parsed) continue;
+        const current = entries.get(parsed.prefix) || { prefix: parsed.prefix, pathLimit: '', routeMap: '' };
+        if (parsed.pathLimit) current.pathLimit = parsed.pathLimit;
+        if (parsed.routeMap) current.routeMap = parsed.routeMap;
+        entries.set(parsed.prefix, current);
+      }
+      return Array.from(entries.values()).map((e) => {
+        const parts = [e.prefix];
+        if (e.pathLimit) parts.push('path-limit', e.pathLimit);
+        if (e.routeMap) parts.push('route-map', e.routeMap);
+        return parts.join(' ');
+      }).join('\n');
+    }
+
+    function setBgpUcNetworkEntriesText(afKey, text) {
+      if (!editingVrf.value || !afKey) return;
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} network `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = rows.filter(line => !line.startsWith(prefix));
+      const entries = new Map();
+      for (const line of String(text || '').split('\n').map(v => v.trim()).filter(Boolean)) {
+        const parsed = parseBgpUcNetworkInputLine(line);
+        if (!parsed || !parsed.prefix) continue;
+        entries.set(parsed.prefix, parsed);
+      }
+      for (const entry of entries.values()) {
+        kept.push(`${prefix}${entry.prefix}`);
+        if (entry.pathLimit) kept.push(`${prefix}${entry.prefix} path-limit = ${entry.pathLimit}`);
+        if (entry.routeMap) kept.push(`${prefix}${entry.prefix} route-map = ${entry.routeMap}`);
+      }
+      setProtocolBranchText('bgp', branch, kept.join('\n'));
+    }
+
+    function getBgpUcRedistributeEntriesText(afKey) {
+      if (!afKey) return '';
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} redistribute `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const entries = new Map();
+      for (const line of rows) {
+        if (!line.startsWith(prefix)) continue;
+        const rest = line.slice(prefix.length).trim();
+        if (!rest) continue;
+        const eqPos = rest.indexOf('=');
+        if (eqPos >= 0) {
+          const left = rest.slice(0, eqPos).trim();
+          const value = rest.slice(eqPos + 1).trim();
+          const leftTokens = left.split(/\s+/).filter(Boolean);
+          if (!leftTokens.length) continue;
+          const p = leftTokens[0];
+          const attr = leftTokens.slice(1).join(' ');
+          const current = entries.get(p) || { protocol: p, tableId: '', metric: '', routeMap: '' };
+          if (attr === 'metric') current.metric = value;
+          if (attr === 'route-map') current.routeMap = value;
+          entries.set(p, current);
+          continue;
+        }
+        const parsed = parseBgpUcRedistributeInputLine(rest);
+        if (!parsed) continue;
+        const current = entries.get(parsed.protocol) || { protocol: parsed.protocol, tableId: '', metric: '', routeMap: '' };
+        if (parsed.tableId) current.tableId = parsed.tableId;
+        if (parsed.metric) current.metric = parsed.metric;
+        if (parsed.routeMap) current.routeMap = parsed.routeMap;
+        entries.set(parsed.protocol, current);
+      }
+      return Array.from(entries.values()).map((e) => {
+        const parts = [e.protocol];
+        if (e.protocol === 'table' && e.tableId) parts.push(e.tableId);
+        if (e.metric) parts.push('metric', e.metric);
+        if (e.routeMap) parts.push('route-map', e.routeMap);
+        return parts.join(' ');
+      }).join('\n');
+    }
+
+    function setBgpUcRedistributeEntriesText(afKey, text) {
+      if (!editingVrf.value || !afKey) return;
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} redistribute `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = rows.filter(line => !line.startsWith(prefix));
+      const entries = new Map();
+      for (const line of String(text || '').split('\n').map(v => v.trim()).filter(Boolean)) {
+        const parsed = parseBgpUcRedistributeInputLine(line);
+        if (!parsed || !parsed.protocol) continue;
+        entries.set(parsed.protocol, parsed);
+      }
+      for (const entry of entries.values()) {
+        const base = entry.protocol === 'table' && entry.tableId
+          ? `${prefix}${entry.protocol} ${entry.tableId}`
+          : `${prefix}${entry.protocol}`;
+        kept.push(base);
+        if (entry.metric) kept.push(`${base} metric = ${entry.metric}`);
+        if (entry.routeMap) kept.push(`${base} route-map = ${entry.routeMap}`);
+      }
+      setProtocolBranchText('bgp', branch, kept.join('\n'));
+    }
+
+    function createBgpUcAggregateRow(source = null) {
+      return {
+        __id: source?.__id || nextBgpRowId('bgp-uc-aggregate'),
+        prefix: String(source?.prefix || ''),
+        asSet: !!(source?.asSet),
+        routeMap: String(source?.routeMap || ''),
+        summaryOnly: !!(source?.summaryOnly),
+      };
+    }
+
+    function createBgpUcDistancePrefixRow(source = null) {
+      return {
+        __id: source?.__id || nextBgpRowId('bgp-uc-distance-prefix'),
+        prefix: String(source?.prefix || ''),
+        distance: String(source?.distance || ''),
+      };
+    }
+
+    function createBgpUcNetworkRow(source = null) {
+      return {
+        __id: source?.__id || nextBgpRowId('bgp-uc-network'),
+        prefix: String(source?.prefix || ''),
+        pathLimit: String(source?.pathLimit || ''),
+        routeMap: String(source?.routeMap || ''),
+      };
+    }
+
+    function createBgpUcRedistributeRow(source = null) {
+      return {
+        __id: source?.__id || nextBgpRowId('bgp-uc-redistribute'),
+        protocol: String(source?.protocol || ''),
+        metric: String(source?.metric || ''),
+        routeMap: String(source?.routeMap || ''),
+      };
+    }
+
+    function createBgpUcAggregateDraft(afKey = 'ipv4-unicast', source = null) {
+      return {
+        __id: source?.__id || '',
+        afKey: afKey === 'ipv6-unicast' ? 'ipv6-unicast' : 'ipv4-unicast',
+        prefix: String(source?.prefix || ''),
+        asSet: !!(source?.asSet),
+        routeMap: String(source?.routeMap || ''),
+        summaryOnly: !!(source?.summaryOnly),
+      };
+    }
+
+    function createBgpUcDistancePrefixDraft(afKey = 'ipv4-unicast', source = null) {
+      return {
+        __id: source?.__id || '',
+        afKey: afKey === 'ipv6-unicast' ? 'ipv6-unicast' : 'ipv4-unicast',
+        prefix: String(source?.prefix || ''),
+        distance: String(source?.distance || ''),
+      };
+    }
+
+    function createBgpUcNetworkDraft(afKey = 'ipv4-unicast', source = null) {
+      return {
+        __id: source?.__id || '',
+        afKey: afKey === 'ipv6-unicast' ? 'ipv6-unicast' : 'ipv4-unicast',
+        prefix: String(source?.prefix || ''),
+        pathLimit: String(source?.pathLimit || ''),
+        routeMap: String(source?.routeMap || ''),
+      };
+    }
+
+    function createBgpUcRedistributeDraft(afKey = 'ipv4-unicast', source = null) {
+      return {
+        __id: source?.__id || '',
+        afKey: afKey === 'ipv6-unicast' ? 'ipv6-unicast' : 'ipv4-unicast',
+        protocol: String(source?.protocol || ''),
+        metric: String(source?.metric || ''),
+        routeMap: String(source?.routeMap || ''),
+      };
+    }
+
+    function getBgpUcAggregateRowsForAf(afKey) {
+      if (afKey !== 'ipv4-unicast' && afKey !== 'ipv6-unicast') return [];
+      if (!Array.isArray(bgpUcAggregateRows.value[afKey])) bgpUcAggregateRows.value[afKey] = [];
+      return bgpUcAggregateRows.value[afKey];
+    }
+
+    function getBgpUcDistancePrefixRowsForAf(afKey) {
+      if (afKey !== 'ipv4-unicast' && afKey !== 'ipv6-unicast') return [];
+      if (!Array.isArray(bgpUcDistancePrefixRows.value[afKey])) bgpUcDistancePrefixRows.value[afKey] = [];
+      return bgpUcDistancePrefixRows.value[afKey];
+    }
+
+    function getBgpUcNetworkRowsForAf(afKey) {
+      if (afKey !== 'ipv4-unicast' && afKey !== 'ipv6-unicast') return [];
+      if (!Array.isArray(bgpUcNetworkRows.value[afKey])) bgpUcNetworkRows.value[afKey] = [];
+      return bgpUcNetworkRows.value[afKey];
+    }
+
+    function getBgpUcRedistributeRowsForAf(afKey) {
+      if (afKey !== 'ipv4-unicast' && afKey !== 'ipv6-unicast') return [];
+      if (!Array.isArray(bgpUcRedistributeRows.value[afKey])) bgpUcRedistributeRows.value[afKey] = [];
+      return bgpUcRedistributeRows.value[afKey];
+    }
+
+    function syncBgpUcRowsFromCli(afKey) {
+      if (afKey !== 'ipv4-unicast' && afKey !== 'ipv6-unicast') return;
+      const aggLines = String(getBgpUcAggregateEntriesText(afKey) || '').split('\n').map(v => v.trim()).filter(Boolean);
+      bgpUcAggregateRows.value[afKey] = aggLines.map(line => createBgpUcAggregateRow(parseBgpUcAggregateInputLine(line))).filter(r => r.prefix);
+      const distLines = String(getBgpUcDistancePrefixEntriesText(afKey) || '').split('\n').map(v => v.trim()).filter(Boolean);
+      bgpUcDistancePrefixRows.value[afKey] = distLines.map(line => createBgpUcDistancePrefixRow(parseBgpUcDistancePrefixInputLine(line))).filter(r => r.prefix);
+      const netLines = String(getBgpUcNetworkEntriesText(afKey) || '').split('\n').map(v => v.trim()).filter(Boolean);
+      bgpUcNetworkRows.value[afKey] = netLines.map(line => createBgpUcNetworkRow(parseBgpUcNetworkInputLine(line))).filter(r => r.prefix);
+      const redLines = String(getBgpUcRedistributeEntriesText(afKey) || '').split('\n').map(v => v.trim()).filter(Boolean);
+      bgpUcRedistributeRows.value[afKey] = redLines.map(line => createBgpUcRedistributeRow(parseBgpUcRedistributeInputLine(line))).filter(r => r.protocol);
+    }
+
+    function syncAllBgpUcRowsFromCli() {
+      syncBgpUcRowsFromCli('ipv4-unicast');
+      syncBgpUcRowsFromCli('ipv6-unicast');
+    }
+
+    function persistBgpUcRowsToCli(afKey) {
+      const aggRows = getBgpUcAggregateRowsForAf(afKey).map(row => createBgpUcAggregateRow(row)).map((row) => {
+        row.prefix = String(row.prefix || '').trim();
+        row.routeMap = String(row.routeMap || '').trim();
+        return row;
+      }).filter(row => row.prefix);
+      const aggText = aggRows.map((row) => {
+        const parts = [row.prefix];
+        if (row.asSet) parts.push('as-set');
+        if (row.routeMap) parts.push('route-map', row.routeMap);
+        if (row.summaryOnly) parts.push('summary-only');
+        return parts.join(' ');
+      }).join('\n');
+      setBgpUcAggregateEntriesText(afKey, aggText);
+
+      const distRows = getBgpUcDistancePrefixRowsForAf(afKey).map(row => createBgpUcDistancePrefixRow(row)).map((row) => {
+        row.prefix = String(row.prefix || '').trim();
+        row.distance = String(row.distance || '').trim();
+        return row;
+      }).filter(row => row.prefix);
+      const distText = distRows.map((row) => {
+        const parts = [row.prefix];
+        if (row.distance) parts.push('distance', row.distance);
+        return parts.join(' ');
+      }).join('\n');
+      setBgpUcDistancePrefixEntriesText(afKey, distText);
+
+      const netRows = getBgpUcNetworkRowsForAf(afKey).map(row => createBgpUcNetworkRow(row)).map((row) => {
+        row.prefix = String(row.prefix || '').trim();
+        row.routeMap = String(row.routeMap || '').trim();
+        return row;
+      }).filter(row => row.prefix);
+      const netText = netRows.map((row) => {
+        const parts = [row.prefix];
+        if (row.backdoor) parts.push('backdoor');
+        if (row.routeMap) parts.push('route-map', row.routeMap);
+        return parts.join(' ');
+      }).join('\n');
+      setBgpUcNetworkEntriesText(afKey, netText);
+
+      const redRows = getBgpUcRedistributeRowsForAf(afKey).map(row => createBgpUcRedistributeRow(row)).map((row) => {
+        row.protocol = String(row.protocol || '').trim();
+        row.metric = String(row.metric || '').trim();
+        row.routeMap = String(row.routeMap || '').trim();
+        return row;
+      }).filter(row => row.protocol);
+      const redText = redRows.map((row) => {
+        const parts = [row.protocol];
+        if (row.metric) parts.push('metric', row.metric);
+        if (row.routeMap) parts.push('route-map', row.routeMap);
+        return parts.join(' ');
+      }).join('\n');
+      setBgpUcRedistributeEntriesText(afKey, redText);
+    }
+
+    function openBgpUcAggregateCreate(afKey) {
+      bgpUcAggregateModalMode.value = 'create';
+      bgpUcAggregateEditId.value = '';
+      bgpUcAggregateDraft.value = createBgpUcAggregateDraft(afKey);
+      bgpUcAggregateModalVisible.value = true;
+    }
+
+    function openBgpUcAggregateEdit(afKey, row) {
+      if (!row || !row.__id) return;
+      bgpUcAggregateModalMode.value = 'edit';
+      bgpUcAggregateEditId.value = String(row.__id);
+      bgpUcAggregateDraft.value = createBgpUcAggregateDraft(afKey, row);
+      bgpUcAggregateModalVisible.value = true;
+    }
+
+    function saveBgpUcAggregateModal() {
+      const draft = createBgpUcAggregateDraft(bgpUcAggregateDraft.value?.afKey, bgpUcAggregateDraft.value);
+      draft.prefix = String(draft.prefix || '').trim();
+      draft.routeMap = String(draft.routeMap || '').trim();
+      if (!draft.prefix) return;
+      const afKey = draft.afKey;
+      const rows = getBgpUcAggregateRowsForAf(afKey);
+      if (bgpUcAggregateModalMode.value === 'edit') {
+        const idx = rows.findIndex(item => String(item.__id) === String(bgpUcAggregateEditId.value));
+        if (idx >= 0) rows[idx] = createBgpUcAggregateRow({ ...draft, __id: bgpUcAggregateEditId.value });
+      } else {
+        rows.push(createBgpUcAggregateRow(draft));
+      }
+      bgpUcAggregateModalVisible.value = false;
+      bgpUcAggregateEditId.value = '';
+      bgpUcAggregateDraft.value = {};
+      persistBgpUcRowsToCli(afKey);
+    }
+
+    function requestBgpUcAggregateDelete(afKey, ids) {
+      pendingBgpUcAggregateDeleteAfKey.value = afKey;
+      pendingBgpUcAggregateDeleteIds.value = Array.isArray(ids) ? ids : [ids];
+      bgpUcAggregateDeleteVisible.value = true;
+    }
+
+    function confirmBgpUcAggregateDelete() {
+      const afKey = pendingBgpUcAggregateDeleteAfKey.value;
+      const selected = new Set(pendingBgpUcAggregateDeleteIds.value.map(String));
+      bgpUcAggregateRows.value[afKey] = (bgpUcAggregateRows.value[afKey] || []).filter(item => !selected.has(String(item.__id)));
+      pendingBgpUcAggregateDeleteIds.value = [];
+      bgpUcAggregateDeleteVisible.value = false;
+      persistBgpUcRowsToCli(afKey);
+    }
+
+    function openBgpUcDistancePrefixCreate(afKey) {
+      bgpUcDistancePrefixModalMode.value = 'create';
+      bgpUcDistancePrefixEditId.value = '';
+      bgpUcDistancePrefixDraft.value = createBgpUcDistancePrefixDraft(afKey);
+      bgpUcDistancePrefixModalVisible.value = true;
+    }
+
+    function openBgpUcDistancePrefixEdit(afKey, row) {
+      if (!row || !row.__id) return;
+      bgpUcDistancePrefixModalMode.value = 'edit';
+      bgpUcDistancePrefixEditId.value = String(row.__id);
+      bgpUcDistancePrefixDraft.value = createBgpUcDistancePrefixDraft(afKey, row);
+      bgpUcDistancePrefixModalVisible.value = true;
+    }
+
+    function saveBgpUcDistancePrefixModal() {
+      const draft = createBgpUcDistancePrefixDraft(bgpUcDistancePrefixDraft.value?.afKey, bgpUcDistancePrefixDraft.value);
+      draft.prefix = String(draft.prefix || '').trim();
+      draft.distance = String(draft.distance || '').trim();
+      if (!draft.prefix) return;
+      const afKey = draft.afKey;
+      const rows = getBgpUcDistancePrefixRowsForAf(afKey);
+      if (bgpUcDistancePrefixModalMode.value === 'edit') {
+        const idx = rows.findIndex(item => String(item.__id) === String(bgpUcDistancePrefixEditId.value));
+        if (idx >= 0) rows[idx] = createBgpUcDistancePrefixRow({ ...draft, __id: bgpUcDistancePrefixEditId.value });
+      } else {
+        rows.push(createBgpUcDistancePrefixRow(draft));
+      }
+      bgpUcDistancePrefixModalVisible.value = false;
+      bgpUcDistancePrefixEditId.value = '';
+      bgpUcDistancePrefixDraft.value = {};
+      persistBgpUcRowsToCli(afKey);
+    }
+
+    function requestBgpUcDistancePrefixDelete(afKey, ids) {
+      pendingBgpUcDistancePrefixDeleteAfKey.value = afKey;
+      pendingBgpUcDistancePrefixDeleteIds.value = Array.isArray(ids) ? ids : [ids];
+      bgpUcDistancePrefixDeleteVisible.value = true;
+    }
+
+    function confirmBgpUcDistancePrefixDelete() {
+      const afKey = pendingBgpUcDistancePrefixDeleteAfKey.value;
+      const selected = new Set(pendingBgpUcDistancePrefixDeleteIds.value.map(String));
+      bgpUcDistancePrefixRows.value[afKey] = (bgpUcDistancePrefixRows.value[afKey] || []).filter(item => !selected.has(String(item.__id)));
+      pendingBgpUcDistancePrefixDeleteIds.value = [];
+      bgpUcDistancePrefixDeleteVisible.value = false;
+      persistBgpUcRowsToCli(afKey);
+    }
+
+    function openBgpUcNetworkCreate(afKey) {
+      bgpUcNetworkModalMode.value = 'create';
+      bgpUcNetworkEditId.value = '';
+      bgpUcNetworkDraft.value = createBgpUcNetworkDraft(afKey);
+      bgpUcNetworkModalVisible.value = true;
+    }
+
+    function openBgpUcNetworkEdit(afKey, row) {
+      if (!row || !row.__id) return;
+      bgpUcNetworkModalMode.value = 'edit';
+      bgpUcNetworkEditId.value = String(row.__id);
+      bgpUcNetworkDraft.value = createBgpUcNetworkDraft(afKey, row);
+      bgpUcNetworkModalVisible.value = true;
+    }
+
+    function saveBgpUcNetworkModal() {
+      const draft = createBgpUcNetworkDraft(bgpUcNetworkDraft.value?.afKey, bgpUcNetworkDraft.value);
+      draft.prefix = String(draft.prefix || '').trim();
+      draft.routeMap = String(draft.routeMap || '').trim();
+      if (!draft.prefix) return;
+      const afKey = draft.afKey;
+      const rows = getBgpUcNetworkRowsForAf(afKey);
+      if (bgpUcNetworkModalMode.value === 'edit') {
+        const idx = rows.findIndex(item => String(item.__id) === String(bgpUcNetworkEditId.value));
+        if (idx >= 0) rows[idx] = createBgpUcNetworkRow({ ...draft, __id: bgpUcNetworkEditId.value });
+      } else {
+        rows.push(createBgpUcNetworkRow(draft));
+      }
+      bgpUcNetworkModalVisible.value = false;
+      bgpUcNetworkEditId.value = '';
+      bgpUcNetworkDraft.value = {};
+      persistBgpUcRowsToCli(afKey);
+    }
+
+    function requestBgpUcNetworkDelete(afKey, ids) {
+      pendingBgpUcNetworkDeleteAfKey.value = afKey;
+      pendingBgpUcNetworkDeleteIds.value = Array.isArray(ids) ? ids : [ids];
+      bgpUcNetworkDeleteVisible.value = true;
+    }
+
+    function confirmBgpUcNetworkDelete() {
+      const afKey = pendingBgpUcNetworkDeleteAfKey.value;
+      const selected = new Set(pendingBgpUcNetworkDeleteIds.value.map(String));
+      bgpUcNetworkRows.value[afKey] = (bgpUcNetworkRows.value[afKey] || []).filter(item => !selected.has(String(item.__id)));
+      pendingBgpUcNetworkDeleteIds.value = [];
+      bgpUcNetworkDeleteVisible.value = false;
+      persistBgpUcRowsToCli(afKey);
+    }
+
+    function openBgpUcRedistributeCreate(afKey) {
+      bgpUcRedistributeModalMode.value = 'create';
+      bgpUcRedistributeEditId.value = '';
+      bgpUcRedistributeDraft.value = createBgpUcRedistributeDraft(afKey);
+      bgpUcRedistributeModalVisible.value = true;
+    }
+
+    function openBgpUcRedistributeEdit(afKey, row) {
+      if (!row || !row.__id) return;
+      bgpUcRedistributeModalMode.value = 'edit';
+      bgpUcRedistributeEditId.value = String(row.__id);
+      bgpUcRedistributeDraft.value = createBgpUcRedistributeDraft(afKey, row);
+      bgpUcRedistributeModalVisible.value = true;
+    }
+
+    function saveBgpUcRedistributeModal() {
+      const draft = createBgpUcRedistributeDraft(bgpUcRedistributeDraft.value?.afKey, bgpUcRedistributeDraft.value);
+      draft.protocol = String(draft.protocol || '').trim();
+      draft.metric = String(draft.metric || '').trim();
+      draft.routeMap = String(draft.routeMap || '').trim();
+      if (!draft.protocol) return;
+      const afKey = draft.afKey;
+      const rows = getBgpUcRedistributeRowsForAf(afKey);
+      if (bgpUcRedistributeModalMode.value === 'edit') {
+        const idx = rows.findIndex(item => String(item.__id) === String(bgpUcRedistributeEditId.value));
+        if (idx >= 0) rows[idx] = createBgpUcRedistributeRow({ ...draft, __id: bgpUcRedistributeEditId.value });
+      } else {
+        rows.push(createBgpUcRedistributeRow(draft));
+      }
+      bgpUcRedistributeModalVisible.value = false;
+      bgpUcRedistributeEditId.value = '';
+      bgpUcRedistributeDraft.value = {};
+      persistBgpUcRowsToCli(afKey);
+    }
+
+    function requestBgpUcRedistributeDelete(afKey, ids) {
+      pendingBgpUcRedistributeDeleteAfKey.value = afKey;
+      pendingBgpUcRedistributeDeleteIds.value = Array.isArray(ids) ? ids : [ids];
+      bgpUcRedistributeDeleteVisible.value = true;
+    }
+
+    function confirmBgpUcRedistributeDelete() {
+      const afKey = pendingBgpUcRedistributeDeleteAfKey.value;
+      const selected = new Set(pendingBgpUcRedistributeDeleteIds.value.map(String));
+      bgpUcRedistributeRows.value[afKey] = (bgpUcRedistributeRows.value[afKey] || []).filter(item => !selected.has(String(item.__id)));
+      pendingBgpUcRedistributeDeleteIds.value = [];
+      bgpUcRedistributeDeleteVisible.value = false;
+      persistBgpUcRowsToCli(afKey);
+    }
+
+    // ===== BGP Parameters =====
+    const bgpParamsConfederationPeersRows = ref([]);
+    const bgpParamsConfederationPeersModalVisible = ref(false);
+    const bgpParamsConfederationPeersDeleteVisible = ref(false);
+    const bgpParamsConfederationPeersDraft = ref({ asNumber: '' });
+    const bgpParamsConfederationPeersEditId = ref(null);
+    const bgpParamsConfederationPeersDeleteIds = ref([]);
+    const bgpParamsDistancePrefixRows = ref([]);
+    const bgpParamsDistancePrefixModalVisible = ref(false);
+    const bgpParamsDistancePrefixDeleteVisible = ref(false);
+    const bgpParamsDistancePrefixDraft = ref({ prefix: '', distance: '' });
+    const bgpParamsDistancePrefixEditId = ref(null);
+    const bgpParamsDistancePrefixDeleteIds = ref([]);
+
+    const bgpParamsConfederationPeersModalTitle = computed(() =>
+      bgpParamsConfederationPeersEditId.value ? '编辑 Confederation Peer' : '创建 Confederation Peer'
+    );
+    const bgpParamsDistancePrefixModalTitle = computed(() =>
+      bgpParamsDistancePrefixEditId.value ? '编辑 Distance Prefix' : '创建 Distance Prefix'
+    );
+    const bgpParamsConfederationPeersDeletePreview = computed(() =>
+      bgpParamsConfederationPeersRows.value.filter(r => bgpParamsConfederationPeersDeleteIds.value.includes(r.__id)).map(r => r.asNumber)
+    );
+    const bgpParamsDistancePrefixDeletePreview = computed(() =>
+      bgpParamsDistancePrefixRows.value.filter(r => bgpParamsDistancePrefixDeleteIds.value.includes(r.__id)).map(r => `${r.prefix} ${r.distance}`)
+    );
+
+    function parseBgpParamsConfederationPeersInputLine(line) {
+      const tokens = String(line || '').trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return null;
+      return { asNumber: tokens[0] };
+    }
+
+    function parseBgpParamsDistancePrefixInputLine(line) {
+      const tokens = String(line || '').trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return null;
+      return { prefix: tokens[0], distance: tokens[1] || '' };
+    }
+
+    function getBgpParamsConfederationPeersEntriesText() {
+      const branch = 'parameters confederation peers';
+      const prefix = `${branch} `;
+      const rows = getProtocolBranchText('bgp', 'parameters').split('\n').map(line => line.trim()).filter(Boolean);
+      const entries = new Set();
+      for (const line of rows) {
+        if (!line.startsWith(prefix)) continue;
+        const rest = line.slice(prefix.length).trim();
+        if (!rest) continue;
+        const eqPos = rest.indexOf('=');
+        if (eqPos >= 0) {
+          const value = rest.slice(eqPos + 1).trim();
+          if (value) entries.add(value);
+          continue;
+        }
+        const parsed = parseBgpParamsConfederationPeersInputLine(rest);
+        if (parsed && parsed.asNumber) entries.add(parsed.asNumber);
+      }
+      return Array.from(entries).join('\n');
+    }
+
+    function setBgpParamsConfederationPeersEntriesText(text) {
+      const branch = 'parameters confederation peers';
+      const prefix = `${branch} `;
+      const existing = getProtocolBranchText('bgp', 'parameters').split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = existing.filter(line => !line.startsWith(prefix));
+      const lines = String(text || '').split('\n').map(line => line.trim()).filter(Boolean);
+      for (const line of lines) {
+        const parsed = parseBgpParamsConfederationPeersInputLine(line);
+        if (parsed && parsed.asNumber) kept.push(`${prefix}${parsed.asNumber}`);
+      }
+      setProtocolBranchText('bgp', 'parameters', kept.join('\n'));
+    }
+
+    function getBgpParamsDistancePrefixEntriesText() {
+      const branch = 'parameters distance prefix';
+      const prefix = `${branch} `;
+      const rows = getProtocolBranchText('bgp', 'parameters distance').split('\n').map(line => line.trim()).filter(Boolean);
+      const entries = new Map();
+      for (const line of rows) {
+        if (!line.startsWith(prefix)) continue;
+        const rest = line.slice(prefix.length).trim();
+        if (!rest) continue;
+        const eqPos = rest.indexOf('=');
+        if (eqPos >= 0) {
+          const left = rest.slice(0, eqPos).trim();
+          const value = rest.slice(eqPos + 1).trim();
+          const leftTokens = left.split(/\s+/).filter(Boolean);
+          if (!leftTokens.length) continue;
+          const p = leftTokens[0];
+          const attr = leftTokens.slice(1).join(' ');
+          const current = entries.get(p) || { prefix: p, distance: '' };
+          if (attr === 'distance') current.distance = value;
+          entries.set(p, current);
+          continue;
+        }
+        const parsed = parseBgpParamsDistancePrefixInputLine(rest);
+        if (!parsed) continue;
+        const current = entries.get(parsed.prefix) || { prefix: parsed.prefix, distance: '' };
+        if (parsed.distance) current.distance = parsed.distance;
+        entries.set(parsed.prefix, current);
+      }
+      return Array.from(entries.values()).map((e) => {
+        const parts = [e.prefix];
+        if (e.distance) parts.push('distance', e.distance);
+        return parts.join(' ');
+      }).join('\n');
+    }
+
+    function setBgpParamsDistancePrefixEntriesText(text) {
+      const branch = 'parameters distance prefix';
+      const prefix = `${branch} `;
+      const existing = getProtocolBranchText('bgp', 'parameters distance').split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = existing.filter(line => !line.startsWith(prefix));
+      const lines = String(text || '').split('\n').map(line => line.trim()).filter(Boolean);
+      for (const line of lines) {
+        const parsed = parseBgpParamsDistancePrefixInputLine(line);
+        if (parsed && parsed.prefix) {
+          kept.push(`${prefix}${parsed.prefix}`);
+          if (parsed.distance) kept.push(`${prefix}${parsed.prefix} distance = ${parsed.distance}`);
+        }
+      }
+      setProtocolBranchText('bgp', 'parameters distance', kept.join('\n'));
+    }
+
+    function createBgpParamsConfederationPeersRow(entry) {
+      return { __id: `cp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`, ...entry };
+    }
+
+    function createBgpParamsDistancePrefixRow(entry) {
+      return { __id: `dp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`, ...entry };
+    }
+
+    function createBgpParamsConfederationPeersDraft(source = null) {
+      return { asNumber: source?.asNumber || '' };
+    }
+
+    function createBgpParamsDistancePrefixDraft(source = null) {
+      return { prefix: source?.prefix || '', distance: source?.distance || '' };
+    }
+
+    function syncBgpParamsRowsFromCli() {
+      const cpText = getBgpParamsConfederationPeersEntriesText();
+      const cpLines = cpText.split('\n').filter(Boolean);
+      bgpParamsConfederationPeersRows.value = cpLines.map(line => {
+        const parsed = parseBgpParamsConfederationPeersInputLine(line);
+        return parsed ? createBgpParamsConfederationPeersRow(parsed) : null;
+      }).filter(Boolean);
+
+      const dpText = getBgpParamsDistancePrefixEntriesText();
+      const dpLines = dpText.split('\n').filter(Boolean);
+      bgpParamsDistancePrefixRows.value = dpLines.map(line => {
+        const parsed = parseBgpParamsDistancePrefixInputLine(line);
+        return parsed ? createBgpParamsDistancePrefixRow(parsed) : null;
+      }).filter(Boolean);
+    }
+
+    function persistBgpParamsRowsToCli() {
+      const cpEntries = bgpParamsConfederationPeersRows.value.map(r => r.asNumber).filter(Boolean).join('\n');
+      setBgpParamsConfederationPeersEntriesText(cpEntries);
+
+      const dpEntries = bgpParamsDistancePrefixRows.value.map(r => `${r.prefix} ${r.distance}`).filter(Boolean).join('\n');
+      setBgpParamsDistancePrefixEntriesText(dpEntries);
+    }
+
+    function openBgpParamsConfederationPeersCreate() {
+      bgpParamsConfederationPeersDraft.value = createBgpParamsConfederationPeersDraft();
+      bgpParamsConfederationPeersEditId.value = null;
+      bgpParamsConfederationPeersModalVisible.value = true;
+    }
+
+    function openBgpParamsConfederationPeersEdit(row) {
+      bgpParamsConfederationPeersDraft.value = createBgpParamsConfederationPeersDraft(row);
+      bgpParamsConfederationPeersEditId.value = row.__id;
+      bgpParamsConfederationPeersModalVisible.value = true;
+    }
+
+    function saveBgpParamsConfederationPeersModal() {
+      const draft = bgpParamsConfederationPeersDraft.value;
+      if (!draft.asNumber) return;
+      if (bgpParamsConfederationPeersEditId.value) {
+        const idx = bgpParamsConfederationPeersRows.value.findIndex(r => r.__id === bgpParamsConfederationPeersEditId.value);
+        if (idx >= 0) bgpParamsConfederationPeersRows.value[idx] = { ...bgpParamsConfederationPeersRows.value[idx], ...draft };
+      } else {
+        bgpParamsConfederationPeersRows.value.push(createBgpParamsConfederationPeersRow(draft));
+      }
+      bgpParamsConfederationPeersModalVisible.value = false;
+      persistBgpParamsRowsToCli();
+    }
+
+    function requestBgpParamsConfederationPeersDelete(ids) {
+      bgpParamsConfederationPeersDeleteIds.value = Array.isArray(ids) ? ids : [ids];
+      bgpParamsConfederationPeersDeleteVisible.value = true;
+    }
+
+    function confirmBgpParamsConfederationPeersDelete() {
+      const selected = new Set(bgpParamsConfederationPeersDeleteIds.value.map(String));
+      bgpParamsConfederationPeersRows.value = bgpParamsConfederationPeersRows.value.filter(item => !selected.has(String(item.__id)));
+      bgpParamsConfederationPeersDeleteIds.value = [];
+      bgpParamsConfederationPeersDeleteVisible.value = false;
+      persistBgpParamsRowsToCli();
+    }
+
+    function openBgpParamsDistancePrefixCreate() {
+      bgpParamsDistancePrefixDraft.value = createBgpParamsDistancePrefixDraft();
+      bgpParamsDistancePrefixEditId.value = null;
+      bgpParamsDistancePrefixModalVisible.value = true;
+    }
+
+    function openBgpParamsDistancePrefixEdit(row) {
+      bgpParamsDistancePrefixDraft.value = createBgpParamsDistancePrefixDraft(row);
+      bgpParamsDistancePrefixEditId.value = row.__id;
+      bgpParamsDistancePrefixModalVisible.value = true;
+    }
+
+    function saveBgpParamsDistancePrefixModal() {
+      const draft = bgpParamsDistancePrefixDraft.value;
+      if (!draft.prefix) return;
+      if (bgpParamsDistancePrefixEditId.value) {
+        const idx = bgpParamsDistancePrefixRows.value.findIndex(r => r.__id === bgpParamsDistancePrefixEditId.value);
+        if (idx >= 0) bgpParamsDistancePrefixRows.value[idx] = { ...bgpParamsDistancePrefixRows.value[idx], ...draft };
+      } else {
+        bgpParamsDistancePrefixRows.value.push(createBgpParamsDistancePrefixRow(draft));
+      }
+      bgpParamsDistancePrefixModalVisible.value = false;
+      persistBgpParamsRowsToCli();
+    }
+
+    function requestBgpParamsDistancePrefixDelete(ids) {
+      bgpParamsDistancePrefixDeleteIds.value = Array.isArray(ids) ? ids : [ids];
+      bgpParamsDistancePrefixDeleteVisible.value = true;
+    }
+
+    function confirmBgpParamsDistancePrefixDelete() {
+      const selected = new Set(bgpParamsDistancePrefixDeleteIds.value.map(String));
+      bgpParamsDistancePrefixRows.value = bgpParamsDistancePrefixRows.value.filter(item => !selected.has(String(item.__id)));
+      bgpParamsDistancePrefixDeleteIds.value = [];
+      bgpParamsDistancePrefixDeleteVisible.value = false;
+      persistBgpParamsRowsToCli();
+    }
+
+    // ===== BGP Multicast Aggregate-Address & Network =====
+    const bgpMcAggregateRows = ref({
+      'ipv4-multicast': [],
+      'ipv6-multicast': [],
+    });
+    const bgpMcNetworkRows = ref({
+      'ipv4-multicast': [],
+      'ipv6-multicast': [],
+    });
+    const bgpMcAggregateModalVisible = ref(false);
+    const bgpMcAggregateModalMode = ref('create');
+    const bgpMcAggregateEditId = ref('');
+    const bgpMcAggregateDraft = ref({});
+    const bgpMcAggregateDeleteVisible = ref(false);
+    const pendingBgpMcAggregateDeleteAfKey = ref('');
+    const pendingBgpMcAggregateDeleteIds = ref([]);
+    const bgpMcNetworkModalVisible = ref(false);
+    const bgpMcNetworkModalMode = ref('create');
+    const bgpMcNetworkEditId = ref('');
+    const bgpMcNetworkDraft = ref({});
+    const bgpMcNetworkDeleteVisible = ref(false);
+    const pendingBgpMcNetworkDeleteAfKey = ref('');
+    const pendingBgpMcNetworkDeleteIds = ref([]);
+
+    const bgpMcAggregateModalTitle = computed(() => `${bgpMcAggregateModalMode.value === 'edit' ? t('app.edit') : t('app.create')} BGP ${bgpMcAggregateDraft.value?.afKey === 'ipv6-multicast' ? 'ipv6-multicast' : 'ipv4-multicast'} aggregate-address`);
+    const bgpMcNetworkModalTitle = computed(() => `${bgpMcNetworkModalMode.value === 'edit' ? t('app.edit') : t('app.create')} BGP ${bgpMcNetworkDraft.value?.afKey === 'ipv6-multicast' ? 'ipv6-multicast' : 'ipv4-multicast'} network`);
+    const bgpMcAggregateDeletePreview = computed(() => {
+      const rows = bgpMcAggregateRows.value[pendingBgpMcAggregateDeleteAfKey.value] || [];
+      return pendingBgpMcAggregateDeleteIds.value
+        .map(id => rows.find(r => String(r.__id) === String(id))?.prefix || '')
+        .filter(Boolean);
+    });
+    const bgpMcNetworkDeletePreview = computed(() => {
+      const rows = bgpMcNetworkRows.value[pendingBgpMcNetworkDeleteAfKey.value] || [];
+      return pendingBgpMcNetworkDeleteIds.value
+        .map(id => rows.find(r => String(r.__id) === String(id))?.prefix || '')
+        .filter(Boolean);
+    });
+
+    function parseBgpMcAggregateInputLine(line) {
+      const tokens = String(line || '').trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return null;
+      const entry = { prefix: tokens[0], asSet: false, routeMap: '', summaryOnly: false };
+      for (let i = 1; i < tokens.length; i += 1) {
+        const key = tokens[i];
+        if (key === 'as-set') entry.asSet = true;
+        else if (key === 'summary-only') entry.summaryOnly = true;
+        else if (key === 'route-map' && tokens[i + 1]) { entry.routeMap = tokens[i + 1]; i += 1; }
+      }
+      return entry.prefix ? entry : null;
+    }
+
+    function parseBgpMcNetworkInputLine(line) {
+      const tokens = String(line || '').trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return null;
+      const entry = { prefix: tokens[0], backdoor: false, pathLimit: '', routeMap: '' };
+      for (let i = 1; i < tokens.length; i += 1) {
+        const key = tokens[i];
+        if (key === 'backdoor') entry.backdoor = true;
+        else if (key === 'path-limit' && tokens[i + 1]) { entry.pathLimit = tokens[i + 1]; i += 1; }
+        else if (key === 'route-map' && tokens[i + 1]) { entry.routeMap = tokens[i + 1]; i += 1; }
+      }
+      return entry.prefix ? entry : null;
+    }
+
+    function getBgpMcAggregateEntriesText(afKey) {
+      if (!afKey) return '';
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} aggregate-address `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const entries = new Map();
+      for (const line of rows) {
+        if (!line.startsWith(prefix)) continue;
+        const rest = line.slice(prefix.length).trim();
+        if (!rest) continue;
+        const eqPos = rest.indexOf('=');
+        if (eqPos >= 0) {
+          const left = rest.slice(0, eqPos).trim();
+          const value = rest.slice(eqPos + 1).trim();
+          const leftTokens = left.split(/\s+/).filter(Boolean);
+          if (!leftTokens.length) continue;
+          const p = leftTokens[0];
+          const attr = leftTokens.slice(1).join(' ');
+          const current = entries.get(p) || { prefix: p, asSet: false, routeMap: '', summaryOnly: false };
+          if (attr === 'as-set') current.asSet = true;
+          if (attr === 'summary-only') current.summaryOnly = true;
+          if (attr === 'route-map') current.routeMap = value;
+          entries.set(p, current);
+          continue;
+        }
+        const parsed = parseBgpMcAggregateInputLine(rest);
+        if (!parsed) continue;
+        const current = entries.get(parsed.prefix) || { prefix: parsed.prefix, asSet: false, routeMap: '', summaryOnly: false };
+        if (parsed.asSet) current.asSet = true;
+        if (parsed.summaryOnly) current.summaryOnly = true;
+        if (parsed.routeMap) current.routeMap = parsed.routeMap;
+        entries.set(parsed.prefix, current);
+      }
+      return Array.from(entries.values()).map((e) => {
+        const parts = [e.prefix];
+        if (e.asSet) parts.push('as-set');
+        if (e.routeMap) parts.push('route-map', e.routeMap);
+        if (e.summaryOnly) parts.push('summary-only');
+        return parts.join(' ');
+      }).join('\n');
+    }
+
+    function setBgpMcAggregateEntriesText(afKey, text) {
+      if (!editingVrf.value || !afKey) return;
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} aggregate-address `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = rows.filter(line => !line.startsWith(prefix));
+      const entries = new Map();
+      for (const line of String(text || '').split('\n').map(v => v.trim()).filter(Boolean)) {
+        const parsed = parseBgpMcAggregateInputLine(line);
+        if (!parsed || !parsed.prefix) continue;
+        entries.set(parsed.prefix, parsed);
+      }
+      for (const entry of entries.values()) {
+        kept.push(`${prefix}${entry.prefix}`);
+        if (entry.asSet) kept.push(`${prefix}${entry.prefix} as-set`);
+        if (entry.routeMap) kept.push(`${prefix}${entry.prefix} route-map = ${entry.routeMap}`);
+        if (entry.summaryOnly) kept.push(`${prefix}${entry.prefix} summary-only`);
+      }
+      setProtocolBranchText('bgp', branch, kept.join('\n'));
+    }
+
+    function getBgpMcNetworkEntriesText(afKey) {
+      if (!afKey) return '';
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} network `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const entries = new Map();
+      for (const line of rows) {
+        if (!line.startsWith(prefix)) continue;
+        const rest = line.slice(prefix.length).trim();
+        if (!rest) continue;
+        const eqPos = rest.indexOf('=');
+        if (eqPos >= 0) {
+          const left = rest.slice(0, eqPos).trim();
+          const value = rest.slice(eqPos + 1).trim();
+          const leftTokens = left.split(/\s+/).filter(Boolean);
+          if (!leftTokens.length) continue;
+          const p = leftTokens[0];
+          const attr = leftTokens.slice(1).join(' ');
+          const current = entries.get(p) || { prefix: p, backdoor: false, pathLimit: '', routeMap: '' };
+          if (attr === 'backdoor') current.backdoor = true;
+          if (attr === 'path-limit') current.pathLimit = value;
+          if (attr === 'route-map') current.routeMap = value;
+          entries.set(p, current);
+          continue;
+        }
+        const parsed = parseBgpMcNetworkInputLine(rest);
+        if (!parsed) continue;
+        const current = entries.get(parsed.prefix) || { prefix: parsed.prefix, backdoor: false, pathLimit: '', routeMap: '' };
+        if (parsed.backdoor) current.backdoor = true;
+        if (parsed.pathLimit) current.pathLimit = parsed.pathLimit;
+        if (parsed.routeMap) current.routeMap = parsed.routeMap;
+        entries.set(parsed.prefix, current);
+      }
+      return Array.from(entries.values()).map((e) => {
+        const parts = [e.prefix];
+        if (e.backdoor) parts.push('backdoor');
+        if (e.pathLimit) parts.push('path-limit', e.pathLimit);
+        if (e.routeMap) parts.push('route-map', e.routeMap);
+        return parts.join(' ');
+      }).join('\n');
+    }
+
+    function setBgpMcNetworkEntriesText(afKey, text) {
+      if (!editingVrf.value || !afKey) return;
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} network `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = rows.filter(line => !line.startsWith(prefix));
+      const entries = new Map();
+      for (const line of String(text || '').split('\n').map(v => v.trim()).filter(Boolean)) {
+        const parsed = parseBgpMcNetworkInputLine(line);
+        if (!parsed || !parsed.prefix) continue;
+        entries.set(parsed.prefix, parsed);
+      }
+      for (const entry of entries.values()) {
+        kept.push(`${prefix}${entry.prefix}`);
+        if (entry.backdoor) kept.push(`${prefix}${entry.prefix} backdoor`);
+        if (entry.pathLimit) kept.push(`${prefix}${entry.prefix} path-limit = ${entry.pathLimit}`);
+        if (entry.routeMap) kept.push(`${prefix}${entry.prefix} route-map = ${entry.routeMap}`);
+      }
+      setProtocolBranchText('bgp', branch, kept.join('\n'));
+    }
+
+    function createBgpMcAggregateRow(source = null) {
+      return {
+        __id: source?.__id || nextBgpRowId('bgp-mc-aggregate'),
+        prefix: String(source?.prefix || ''),
+        asSet: !!(source?.asSet),
+        routeMap: String(source?.routeMap || ''),
+        summaryOnly: !!(source?.summaryOnly),
+      };
+    }
+
+    function createBgpMcNetworkRow(source = null) {
+      return {
+        __id: source?.__id || nextBgpRowId('bgp-mc-network'),
+        prefix: String(source?.prefix || ''),
+        backdoor: !!(source?.backdoor),
+        pathLimit: String(source?.pathLimit || ''),
+        routeMap: String(source?.routeMap || ''),
+      };
+    }
+
+    function createBgpMcAggregateDraft(afKey = 'ipv4-multicast', source = null) {
+      return {
+        __id: source?.__id || '',
+        afKey: afKey === 'ipv6-multicast' ? 'ipv6-multicast' : 'ipv4-multicast',
+        prefix: String(source?.prefix || ''),
+        asSet: !!(source?.asSet),
+        routeMap: String(source?.routeMap || ''),
+        summaryOnly: !!(source?.summaryOnly),
+      };
+    }
+
+    function createBgpMcNetworkDraft(afKey = 'ipv4-multicast', source = null) {
+      return {
+        __id: source?.__id || '',
+        afKey: afKey === 'ipv6-multicast' ? 'ipv6-multicast' : 'ipv4-multicast',
+        prefix: String(source?.prefix || ''),
+        backdoor: !!(source?.backdoor),
+        pathLimit: String(source?.pathLimit || ''),
+        routeMap: String(source?.routeMap || ''),
+      };
+    }
+
+    function getBgpMcAggregateRowsForAf(afKey) {
+      if (afKey !== 'ipv4-multicast' && afKey !== 'ipv6-multicast') return [];
+      if (!Array.isArray(bgpMcAggregateRows.value[afKey])) bgpMcAggregateRows.value[afKey] = [];
+      return bgpMcAggregateRows.value[afKey];
+    }
+
+    function getBgpMcNetworkRowsForAf(afKey) {
+      if (afKey !== 'ipv4-multicast' && afKey !== 'ipv6-multicast') return [];
+      if (!Array.isArray(bgpMcNetworkRows.value[afKey])) bgpMcNetworkRows.value[afKey] = [];
+      return bgpMcNetworkRows.value[afKey];
+    }
+
+    function syncBgpMcRowsFromCli(afKey) {
+      if (afKey !== 'ipv4-multicast' && afKey !== 'ipv6-multicast') return;
+      const aggLines = String(getBgpMcAggregateEntriesText(afKey) || '').split('\n').map(v => v.trim()).filter(Boolean);
+      bgpMcAggregateRows.value[afKey] = aggLines.map(line => createBgpMcAggregateRow(parseBgpMcAggregateInputLine(line))).filter(r => r.prefix);
+      const netLines = String(getBgpMcNetworkEntriesText(afKey) || '').split('\n').map(v => v.trim()).filter(Boolean);
+      bgpMcNetworkRows.value[afKey] = netLines.map(line => createBgpMcNetworkRow(parseBgpMcNetworkInputLine(line))).filter(r => r.prefix);
+    }
+
+    function syncAllBgpMcRowsFromCli() {
+      syncBgpMcRowsFromCli('ipv4-multicast');
+      syncBgpMcRowsFromCli('ipv6-multicast');
+    }
+
+    function persistBgpMcRowsToCli(afKey) {
+      const aggRows = getBgpMcAggregateRowsForAf(afKey).map(row => createBgpMcAggregateRow(row)).map((row) => {
+        row.prefix = String(row.prefix || '').trim();
+        row.routeMap = String(row.routeMap || '').trim();
+        return row;
+      }).filter(row => row.prefix);
+      const aggText = aggRows.map((row) => {
+        const parts = [row.prefix];
+        if (row.asSet) parts.push('as-set');
+        if (row.routeMap) parts.push('route-map', row.routeMap);
+        if (row.summaryOnly) parts.push('summary-only');
+        return parts.join(' ');
+      }).join('\n');
+      setBgpMcAggregateEntriesText(afKey, aggText);
+
+      const netRows = getBgpMcNetworkRowsForAf(afKey).map(row => createBgpMcNetworkRow(row)).map((row) => {
+        row.prefix = String(row.prefix || '').trim();
+        row.pathLimit = String(row.pathLimit || '').trim();
+        row.routeMap = String(row.routeMap || '').trim();
+        return row;
+      }).filter(row => row.prefix);
+      const netText = netRows.map((row) => {
+        const parts = [row.prefix];
+        if (row.backdoor) parts.push('backdoor');
+        if (row.pathLimit) parts.push('path-limit', row.pathLimit);
+        if (row.routeMap) parts.push('route-map', row.routeMap);
+        return parts.join(' ');
+      }).join('\n');
+      setBgpMcNetworkEntriesText(afKey, netText);
+    }
+
+    function openBgpMcAggregateCreate(afKey) {
+      bgpMcAggregateModalMode.value = 'create';
+      bgpMcAggregateEditId.value = '';
+      bgpMcAggregateDraft.value = createBgpMcAggregateDraft(afKey);
+      bgpMcAggregateModalVisible.value = true;
+    }
+
+    function openBgpMcAggregateEdit(afKey, row) {
+      if (!row || !row.__id) return;
+      bgpMcAggregateModalMode.value = 'edit';
+      bgpMcAggregateEditId.value = String(row.__id);
+      bgpMcAggregateDraft.value = createBgpMcAggregateDraft(afKey, row);
+      bgpMcAggregateModalVisible.value = true;
+    }
+
+    function saveBgpMcAggregateModal() {
+      const draft = createBgpMcAggregateDraft(bgpMcAggregateDraft.value?.afKey, bgpMcAggregateDraft.value);
+      draft.prefix = String(draft.prefix || '').trim();
+      draft.routeMap = String(draft.routeMap || '').trim();
+      if (!draft.prefix) return;
+      const afKey = draft.afKey;
+      const rows = getBgpMcAggregateRowsForAf(afKey);
+      if (bgpMcAggregateModalMode.value === 'edit') {
+        const idx = rows.findIndex(item => String(item.__id) === String(bgpMcAggregateEditId.value));
+        if (idx >= 0) rows[idx] = createBgpMcAggregateRow({ ...draft, __id: bgpMcAggregateEditId.value });
+      } else {
+        rows.push(createBgpMcAggregateRow(draft));
+      }
+      bgpMcAggregateModalVisible.value = false;
+      bgpMcAggregateEditId.value = '';
+      bgpMcAggregateDraft.value = {};
+      persistBgpMcRowsToCli(afKey);
+    }
+
+    function requestBgpMcAggregateDelete(afKey, ids) {
+      pendingBgpMcAggregateDeleteAfKey.value = afKey;
+      pendingBgpMcAggregateDeleteIds.value = Array.isArray(ids) ? ids : [ids];
+      bgpMcAggregateDeleteVisible.value = true;
+    }
+
+    function confirmBgpMcAggregateDelete() {
+      const afKey = pendingBgpMcAggregateDeleteAfKey.value;
+      const selected = new Set(pendingBgpMcAggregateDeleteIds.value.map(String));
+      bgpMcAggregateRows.value[afKey] = (bgpMcAggregateRows.value[afKey] || []).filter(item => !selected.has(String(item.__id)));
+      pendingBgpMcAggregateDeleteIds.value = [];
+      bgpMcAggregateDeleteVisible.value = false;
+      persistBgpMcRowsToCli(afKey);
+    }
+
+    function openBgpMcNetworkCreate(afKey) {
+      bgpMcNetworkModalMode.value = 'create';
+      bgpMcNetworkEditId.value = '';
+      bgpMcNetworkDraft.value = createBgpMcNetworkDraft(afKey);
+      bgpMcNetworkModalVisible.value = true;
+    }
+
+    function openBgpMcNetworkEdit(afKey, row) {
+      if (!row || !row.__id) return;
+      bgpMcNetworkModalMode.value = 'edit';
+      bgpMcNetworkEditId.value = String(row.__id);
+      bgpMcNetworkDraft.value = createBgpMcNetworkDraft(afKey, row);
+      bgpMcNetworkModalVisible.value = true;
+    }
+
+    function saveBgpMcNetworkModal() {
+      const draft = createBgpMcNetworkDraft(bgpMcNetworkDraft.value?.afKey, bgpMcNetworkDraft.value);
+      draft.prefix = String(draft.prefix || '').trim();
+      draft.routeMap = String(draft.routeMap || '').trim();
+      if (!draft.prefix) return;
+      const afKey = draft.afKey;
+      const rows = getBgpMcNetworkRowsForAf(afKey);
+      if (bgpMcNetworkModalMode.value === 'edit') {
+        const idx = rows.findIndex(item => String(item.__id) === String(bgpMcNetworkEditId.value));
+        if (idx >= 0) rows[idx] = createBgpMcNetworkRow({ ...draft, __id: bgpMcNetworkEditId.value });
+      } else {
+        rows.push(createBgpMcNetworkRow(draft));
+      }
+      bgpMcNetworkModalVisible.value = false;
+      bgpMcNetworkEditId.value = '';
+      bgpMcNetworkDraft.value = {};
+      persistBgpMcRowsToCli(afKey);
+    }
+
+    function requestBgpMcNetworkDelete(afKey, ids) {
+      pendingBgpMcNetworkDeleteAfKey.value = afKey;
+      pendingBgpMcNetworkDeleteIds.value = Array.isArray(ids) ? ids : [ids];
+      bgpMcNetworkDeleteVisible.value = true;
+    }
+
+    function confirmBgpMcNetworkDelete() {
+      const afKey = pendingBgpMcNetworkDeleteAfKey.value;
+      const selected = new Set(pendingBgpMcNetworkDeleteIds.value.map(String));
+      bgpMcNetworkRows.value[afKey] = (bgpMcNetworkRows.value[afKey] || []).filter(item => !selected.has(String(item.__id)));
+      pendingBgpMcNetworkDeleteIds.value = [];
+      bgpMcNetworkDeleteVisible.value = false;
+      persistBgpMcRowsToCli(afKey);
+    }
+
+    // ===== BGP Labeled-Unicast Aggregate-Address & Network =====
+    const bgpLuAggregateRows = ref({
+      'ipv4-labeled-unicast': [],
+      'ipv6-labeled-unicast': [],
+    });
+    const bgpLuNetworkRows = ref({
+      'ipv4-labeled-unicast': [],
+      'ipv6-labeled-unicast': [],
+    });
+    const bgpLuAggregateModalVisible = ref(false);
+    const bgpLuAggregateModalMode = ref('create');
+    const bgpLuAggregateEditId = ref('');
+    const bgpLuAggregateDraft = ref({});
+    const bgpLuAggregateDeleteVisible = ref(false);
+    const pendingBgpLuAggregateDeleteAfKey = ref('');
+    const pendingBgpLuAggregateDeleteIds = ref([]);
+    const bgpLuNetworkModalVisible = ref(false);
+    const bgpLuNetworkModalMode = ref('create');
+    const bgpLuNetworkEditId = ref('');
+    const bgpLuNetworkDraft = ref({});
+    const bgpLuNetworkDeleteVisible = ref(false);
+    const pendingBgpLuNetworkDeleteAfKey = ref('');
+    const pendingBgpLuNetworkDeleteIds = ref([]);
+
+    const bgpLuAggregateModalTitle = computed(() => `${bgpLuAggregateModalMode.value === 'edit' ? t('app.edit') : t('app.create')} BGP ${bgpLuAggregateDraft.value?.afKey === 'ipv6-labeled-unicast' ? 'ipv6-labeled-unicast' : 'ipv4-labeled-unicast'} aggregate-address`);
+    const bgpLuNetworkModalTitle = computed(() => `${bgpLuNetworkModalMode.value === 'edit' ? t('app.edit') : t('app.create')} BGP ${bgpLuNetworkDraft.value?.afKey === 'ipv6-labeled-unicast' ? 'ipv6-labeled-unicast' : 'ipv4-labeled-unicast'} network`);
+    const bgpLuAggregateDeletePreview = computed(() => {
+      const rows = bgpLuAggregateRows.value[pendingBgpLuAggregateDeleteAfKey.value] || [];
+      return pendingBgpLuAggregateDeleteIds.value
+        .map(id => rows.find(r => String(r.__id) === String(id))?.prefix || '')
+        .filter(Boolean);
+    });
+    const bgpLuNetworkDeletePreview = computed(() => {
+      const rows = bgpLuNetworkRows.value[pendingBgpLuNetworkDeleteAfKey.value] || [];
+      return pendingBgpLuNetworkDeleteIds.value
+        .map(id => rows.find(r => String(r.__id) === String(id))?.prefix || '')
+        .filter(Boolean);
+    });
+
+    function parseBgpLuAggregateInputLine(line) {
+      const tokens = String(line || '').trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return null;
+      const entry = { prefix: tokens[0], asSet: false, routeMap: '', summaryOnly: false };
+      for (let i = 1; i < tokens.length; i += 1) {
+        const key = tokens[i];
+        if (key === 'as-set') entry.asSet = true;
+        else if (key === 'summary-only') entry.summaryOnly = true;
+        else if (key === 'route-map' && tokens[i + 1]) { entry.routeMap = tokens[i + 1]; i += 1; }
+      }
+      return entry.prefix ? entry : null;
+    }
+
+    function parseBgpLuNetworkInputLine(line) {
+      const tokens = String(line || '').trim().split(/\s+/).filter(Boolean);
+      if (!tokens.length) return null;
+      const entry = { prefix: tokens[0], backdoor: false, routeMap: '' };
+      for (let i = 1; i < tokens.length; i += 1) {
+        const key = tokens[i];
+        if (key === 'backdoor') entry.backdoor = true;
+        else if (key === 'route-map' && tokens[i + 1]) { entry.routeMap = tokens[i + 1]; i += 1; }
+      }
+      return entry.prefix ? entry : null;
+    }
+
+    function getBgpLuAggregateEntriesText(afKey) {
+      if (!afKey) return '';
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} aggregate-address `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const entries = new Map();
+      for (const line of rows) {
+        if (!line.startsWith(prefix)) continue;
+        const rest = line.slice(prefix.length).trim();
+        if (!rest) continue;
+        const eqPos = rest.indexOf('=');
+        if (eqPos >= 0) {
+          const left = rest.slice(0, eqPos).trim();
+          const value = rest.slice(eqPos + 1).trim();
+          const leftTokens = left.split(/\s+/).filter(Boolean);
+          if (!leftTokens.length) continue;
+          const p = leftTokens[0];
+          const attr = leftTokens.slice(1).join(' ');
+          const current = entries.get(p) || { prefix: p, asSet: false, routeMap: '', summaryOnly: false };
+          if (attr === 'as-set') current.asSet = true;
+          if (attr === 'summary-only') current.summaryOnly = true;
+          if (attr === 'route-map') current.routeMap = value;
+          entries.set(p, current);
+          continue;
+        }
+        const parsed = parseBgpLuAggregateInputLine(rest);
+        if (!parsed) continue;
+        const current = entries.get(parsed.prefix) || { prefix: parsed.prefix, asSet: false, routeMap: '', summaryOnly: false };
+        if (parsed.asSet) current.asSet = true;
+        if (parsed.summaryOnly) current.summaryOnly = true;
+        if (parsed.routeMap) current.routeMap = parsed.routeMap;
+        entries.set(parsed.prefix, current);
+      }
+      return Array.from(entries.values()).map((e) => {
+        const parts = [e.prefix];
+        if (e.asSet) parts.push('as-set');
+        if (e.routeMap) parts.push('route-map', e.routeMap);
+        if (e.summaryOnly) parts.push('summary-only');
+        return parts.join(' ');
+      }).join('\n');
+    }
+
+    function setBgpLuAggregateEntriesText(afKey, text) {
+      if (!editingVrf.value || !afKey) return;
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} aggregate-address `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = rows.filter(line => !line.startsWith(prefix));
+      const entries = new Map();
+      for (const line of String(text || '').split('\n').map(v => v.trim()).filter(Boolean)) {
+        const parsed = parseBgpLuAggregateInputLine(line);
+        if (!parsed || !parsed.prefix) continue;
+        entries.set(parsed.prefix, parsed);
+      }
+      for (const entry of entries.values()) {
+        kept.push(`${prefix}${entry.prefix}`);
+        if (entry.asSet) kept.push(`${prefix}${entry.prefix} as-set`);
+        if (entry.routeMap) kept.push(`${prefix}${entry.prefix} route-map = ${entry.routeMap}`);
+        if (entry.summaryOnly) kept.push(`${prefix}${entry.prefix} summary-only`);
+      }
+      setProtocolBranchText('bgp', branch, kept.join('\n'));
+    }
+
+    function getBgpLuNetworkEntriesText(afKey) {
+      if (!afKey) return '';
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} network `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const entries = new Map();
+      for (const line of rows) {
+        if (!line.startsWith(prefix)) continue;
+        const rest = line.slice(prefix.length).trim();
+        if (!rest) continue;
+        const eqPos = rest.indexOf('=');
+        if (eqPos >= 0) {
+          const left = rest.slice(0, eqPos).trim();
+          const value = rest.slice(eqPos + 1).trim();
+          const leftTokens = left.split(/\s+/).filter(Boolean);
+          if (!leftTokens.length) continue;
+          const p = leftTokens[0];
+          const attr = leftTokens.slice(1).join(' ');
+          const current = entries.get(p) || { prefix: p, backdoor: false, routeMap: '' };
+          if (attr === 'backdoor') current.backdoor = true;
+          if (attr === 'route-map') current.routeMap = value;
+          entries.set(p, current);
+          continue;
+        }
+        const parsed = parseBgpLuNetworkInputLine(rest);
+        if (!parsed) continue;
+        const current = entries.get(parsed.prefix) || { prefix: parsed.prefix, backdoor: false, routeMap: '' };
+        if (parsed.backdoor) current.backdoor = true;
+        if (parsed.routeMap) current.routeMap = parsed.routeMap;
+        entries.set(parsed.prefix, current);
+      }
+      return Array.from(entries.values()).map((e) => {
+        const parts = [e.prefix];
+        if (e.backdoor) parts.push('backdoor');
+        if (e.routeMap) parts.push('route-map', e.routeMap);
+        return parts.join(' ');
+      }).join('\n');
+    }
+
+    function setBgpLuNetworkEntriesText(afKey, text) {
+      if (!editingVrf.value || !afKey) return;
+      const branch = `address-family ${afKey}`;
+      const prefix = `${branch} network `;
+      const rows = getProtocolBranchText('bgp', branch).split('\n').map(line => line.trim()).filter(Boolean);
+      const kept = rows.filter(line => !line.startsWith(prefix));
+      const entries = new Map();
+      for (const line of String(text || '').split('\n').map(v => v.trim()).filter(Boolean)) {
+        const parsed = parseBgpLuNetworkInputLine(line);
+        if (!parsed || !parsed.prefix) continue;
+        entries.set(parsed.prefix, parsed);
+      }
+      for (const entry of entries.values()) {
+        kept.push(`${prefix}${entry.prefix}`);
+        if (entry.backdoor) kept.push(`${prefix}${entry.prefix} backdoor`);
+        if (entry.routeMap) kept.push(`${prefix}${entry.prefix} route-map = ${entry.routeMap}`);
+      }
+      setProtocolBranchText('bgp', branch, kept.join('\n'));
+    }
+
+    function createBgpLuAggregateRow(source = null) {
+      return {
+        __id: source?.__id || nextBgpRowId('bgp-lu-aggregate'),
+        prefix: String(source?.prefix || ''),
+        asSet: !!(source?.asSet),
+        routeMap: String(source?.routeMap || ''),
+        summaryOnly: !!(source?.summaryOnly),
+      };
+    }
+
+    function createBgpLuNetworkRow(source = null) {
+      return {
+        __id: source?.__id || nextBgpRowId('bgp-lu-network'),
+        prefix: String(source?.prefix || ''),
+        backdoor: !!(source?.backdoor),
+        routeMap: String(source?.routeMap || ''),
+      };
+    }
+
+    function createBgpLuAggregateDraft(afKey = 'ipv4-labeled-unicast', source = null) {
+      return {
+        __id: source?.__id || '',
+        afKey: afKey === 'ipv6-labeled-unicast' ? 'ipv6-labeled-unicast' : 'ipv4-labeled-unicast',
+        prefix: String(source?.prefix || ''),
+        asSet: !!(source?.asSet),
+        routeMap: String(source?.routeMap || ''),
+        summaryOnly: !!(source?.summaryOnly),
+      };
+    }
+
+    function createBgpLuNetworkDraft(afKey = 'ipv4-labeled-unicast', source = null) {
+      return {
+        __id: source?.__id || '',
+        afKey: afKey === 'ipv6-labeled-unicast' ? 'ipv6-labeled-unicast' : 'ipv4-labeled-unicast',
+        prefix: String(source?.prefix || ''),
+        backdoor: !!(source?.backdoor),
+        routeMap: String(source?.routeMap || ''),
+      };
+    }
+
+    function getBgpLuAggregateRowsForAf(afKey) {
+      if (afKey !== 'ipv4-labeled-unicast' && afKey !== 'ipv6-labeled-unicast') return [];
+      if (!Array.isArray(bgpLuAggregateRows.value[afKey])) bgpLuAggregateRows.value[afKey] = [];
+      return bgpLuAggregateRows.value[afKey];
+    }
+
+    function getBgpLuNetworkRowsForAf(afKey) {
+      if (afKey !== 'ipv4-labeled-unicast' && afKey !== 'ipv6-labeled-unicast') return [];
+      if (!Array.isArray(bgpLuNetworkRows.value[afKey])) bgpLuNetworkRows.value[afKey] = [];
+      return bgpLuNetworkRows.value[afKey];
+    }
+
+    function syncBgpLuRowsFromCli(afKey) {
+      if (afKey !== 'ipv4-labeled-unicast' && afKey !== 'ipv6-labeled-unicast') return;
+      const aggLines = String(getBgpLuAggregateEntriesText(afKey) || '').split('\n').map(v => v.trim()).filter(Boolean);
+      bgpLuAggregateRows.value[afKey] = aggLines.map(line => createBgpLuAggregateRow(parseBgpLuAggregateInputLine(line))).filter(r => r.prefix);
+      const netLines = String(getBgpLuNetworkEntriesText(afKey) || '').split('\n').map(v => v.trim()).filter(Boolean);
+      bgpLuNetworkRows.value[afKey] = netLines.map(line => createBgpLuNetworkRow(parseBgpLuNetworkInputLine(line))).filter(r => r.prefix);
+    }
+
+    function syncAllBgpLuRowsFromCli() {
+      syncBgpLuRowsFromCli('ipv4-labeled-unicast');
+      syncBgpLuRowsFromCli('ipv6-labeled-unicast');
+    }
+
+    function persistBgpLuRowsToCli(afKey) {
+      const aggRows = getBgpLuAggregateRowsForAf(afKey).map(row => createBgpLuAggregateRow(row)).map((row) => {
+        row.prefix = String(row.prefix || '').trim();
+        row.routeMap = String(row.routeMap || '').trim();
+        return row;
+      }).filter(row => row.prefix);
+      const aggText = aggRows.map((row) => {
+        const parts = [row.prefix];
+        if (row.asSet) parts.push('as-set');
+        if (row.routeMap) parts.push('route-map', row.routeMap);
+        if (row.summaryOnly) parts.push('summary-only');
+        return parts.join(' ');
+      }).join('\n');
+      setBgpLuAggregateEntriesText(afKey, aggText);
+
+      const netRows = getBgpLuNetworkRowsForAf(afKey).map(row => createBgpLuNetworkRow(row)).map((row) => {
+        row.prefix = String(row.prefix || '').trim();
+        row.routeMap = String(row.routeMap || '').trim();
+        return row;
+      }).filter(row => row.prefix);
+      const netText = netRows.map((row) => {
+        const parts = [row.prefix];
+        if (row.backdoor) parts.push('backdoor');
+        if (row.routeMap) parts.push('route-map', row.routeMap);
+        return parts.join(' ');
+      }).join('\n');
+      setBgpLuNetworkEntriesText(afKey, netText);
+    }
+
+    function openBgpLuAggregateCreate(afKey) {
+      bgpLuAggregateModalMode.value = 'create';
+      bgpLuAggregateEditId.value = '';
+      bgpLuAggregateDraft.value = createBgpLuAggregateDraft(afKey);
+      bgpLuAggregateModalVisible.value = true;
+    }
+
+    function openBgpLuAggregateEdit(afKey, row) {
+      if (!row || !row.__id) return;
+      bgpLuAggregateModalMode.value = 'edit';
+      bgpLuAggregateEditId.value = String(row.__id);
+      bgpLuAggregateDraft.value = createBgpLuAggregateDraft(afKey, row);
+      bgpLuAggregateModalVisible.value = true;
+    }
+
+    function saveBgpLuAggregateModal() {
+      const draft = createBgpLuAggregateDraft(bgpLuAggregateDraft.value?.afKey, bgpLuAggregateDraft.value);
+      draft.prefix = String(draft.prefix || '').trim();
+      draft.routeMap = String(draft.routeMap || '').trim();
+      if (!draft.prefix) return;
+      const afKey = draft.afKey;
+      const rows = getBgpLuAggregateRowsForAf(afKey);
+      if (bgpLuAggregateModalMode.value === 'edit') {
+        const idx = rows.findIndex(item => String(item.__id) === String(bgpLuAggregateEditId.value));
+        if (idx >= 0) rows[idx] = createBgpLuAggregateRow({ ...draft, __id: bgpLuAggregateEditId.value });
+      } else {
+        rows.push(createBgpLuAggregateRow(draft));
+      }
+      bgpLuAggregateModalVisible.value = false;
+      bgpLuAggregateEditId.value = '';
+      bgpLuAggregateDraft.value = {};
+      persistBgpLuRowsToCli(afKey);
+    }
+
+    function requestBgpLuAggregateDelete(afKey, ids) {
+      pendingBgpLuAggregateDeleteAfKey.value = afKey;
+      pendingBgpLuAggregateDeleteIds.value = Array.isArray(ids) ? ids : [ids];
+      bgpLuAggregateDeleteVisible.value = true;
+    }
+
+    function confirmBgpLuAggregateDelete() {
+      const afKey = pendingBgpLuAggregateDeleteAfKey.value;
+      const selected = new Set(pendingBgpLuAggregateDeleteIds.value.map(String));
+      bgpLuAggregateRows.value[afKey] = (bgpLuAggregateRows.value[afKey] || []).filter(item => !selected.has(String(item.__id)));
+      pendingBgpLuAggregateDeleteIds.value = [];
+      bgpLuAggregateDeleteVisible.value = false;
+      persistBgpLuRowsToCli(afKey);
+    }
+
+    function openBgpLuNetworkCreate(afKey) {
+      bgpLuNetworkModalMode.value = 'create';
+      bgpLuNetworkEditId.value = '';
+      bgpLuNetworkDraft.value = createBgpLuNetworkDraft(afKey);
+      bgpLuNetworkModalVisible.value = true;
+    }
+
+    function openBgpLuNetworkEdit(afKey, row) {
+      if (!row || !row.__id) return;
+      bgpLuNetworkModalMode.value = 'edit';
+      bgpLuNetworkEditId.value = String(row.__id);
+      bgpLuNetworkDraft.value = createBgpLuNetworkDraft(afKey, row);
+      bgpLuNetworkModalVisible.value = true;
+    }
+
+    function saveBgpLuNetworkModal() {
+      const draft = createBgpLuNetworkDraft(bgpLuNetworkDraft.value?.afKey, bgpLuNetworkDraft.value);
+      draft.prefix = String(draft.prefix || '').trim();
+      draft.routeMap = String(draft.routeMap || '').trim();
+      if (!draft.prefix) return;
+      const afKey = draft.afKey;
+      const rows = getBgpLuNetworkRowsForAf(afKey);
+      if (bgpLuNetworkModalMode.value === 'edit') {
+        const idx = rows.findIndex(item => String(item.__id) === String(bgpLuNetworkEditId.value));
+        if (idx >= 0) rows[idx] = createBgpLuNetworkRow({ ...draft, __id: bgpLuNetworkEditId.value });
+      } else {
+        rows.push(createBgpLuNetworkRow(draft));
+      }
+      bgpLuNetworkModalVisible.value = false;
+      bgpLuNetworkEditId.value = '';
+      bgpLuNetworkDraft.value = {};
+      persistBgpLuRowsToCli(afKey);
+    }
+
+    function requestBgpLuNetworkDelete(afKey, ids) {
+      pendingBgpLuNetworkDeleteAfKey.value = afKey;
+      pendingBgpLuNetworkDeleteIds.value = Array.isArray(ids) ? ids : [ids];
+      bgpLuNetworkDeleteVisible.value = true;
+    }
+
+    function confirmBgpLuNetworkDelete() {
+      const afKey = pendingBgpLuNetworkDeleteAfKey.value;
+      const selected = new Set(pendingBgpLuNetworkDeleteIds.value.map(String));
+      bgpLuNetworkRows.value[afKey] = (bgpLuNetworkRows.value[afKey] || []).filter(item => !selected.has(String(item.__id)));
+      pendingBgpLuNetworkDeleteIds.value = [];
+      bgpLuNetworkDeleteVisible.value = false;
+      persistBgpLuRowsToCli(afKey);
     }
 
     function getAvailableProtocolOptions(list, index, allOptions) {
@@ -7277,10 +9009,10 @@ export default defineComponent({
       if (!name) return 'Select an option first.';
       const field = DHCP6_SHARED_OPTION_FIELDS.find(item => item.name === name);
       if (!field) return 'Option value';
-      if (name === 'info-refresh-time') return 'Range 1-4294967295 seconds. Default: unset.';
+      if (name === 'info-refresh-time') return 'Range 1-4294967295 seconds.';
       if (name === 'sip-server') return 'IPv6 address or FQDN. Repeat by adding rows.';
       if (name === 'domain-search' || name === 'nis-domain' || name === 'nisplus-domain' || name === 'captive-portal') {
-        return 'Text value. Default: unset.';
+        return 'Text value.';
       }
       if (field.type === 'textarea') return 'One value per line. Repeat by adding rows if needed.';
       if (field.placeholder) return `Expected: ${field.placeholder}`;
@@ -7357,87 +9089,11 @@ export default defineComponent({
     }
 
     function getEvpnHint(key) {
-      const lang = String(locale?.value || '').toLowerCase();
-      const zh = lang.startsWith('zh');
-      const map = {
-        rd: {
-          zh: '格式: x.x.x.x:nn 或 asn:nn。默认: 无。',
-          en: 'Format: x.x.x.x:nn or asn:nn. Default: unset.',
-        },
-        advertiseIpv4RouteMap: {
-          zh: 'route-map 名称。默认: 无。',
-          en: 'Route-map name. Default: unset.',
-        },
-        advertiseIpv6RouteMap: {
-          zh: 'route-map 名称。默认: 无。',
-          en: 'Route-map name. Default: unset.',
-        },
-        advertiseAllVni: {
-          zh: '布尔开关。默认: 关闭。',
-          en: 'Boolean flag. Default: disabled.',
-        },
-        advertiseDefaultGw: {
-          zh: '布尔开关。默认: 关闭。',
-          en: 'Boolean flag. Default: disabled.',
-        },
-        advertiseSviIp: {
-          zh: '布尔开关。默认: 关闭。',
-          en: 'Boolean flag. Default: disabled.',
-        },
-        advertisePip: {
-          zh: 'IPv4 地址。默认: 无。',
-          en: 'IPv4 address. Default: unset.',
-        },
-        defaultOriginateIpv4: {
-          zh: '布尔开关。默认: 关闭。',
-          en: 'Boolean flag. Default: disabled.',
-        },
-        defaultOriginateIpv6: {
-          zh: '布尔开关。默认: 关闭。',
-          en: 'Boolean flag. Default: disabled.',
-        },
-        disableEadEviRx: {
-          zh: '布尔开关。默认: 关闭。',
-          en: 'Boolean flag. Default: disabled.',
-        },
-        disableEadEviTx: {
-          zh: '布尔开关。默认: 关闭。',
-          en: 'Boolean flag. Default: disabled.',
-        },
-        eviLimit: {
-          zh: '范围: 1-1000。默认: 无。',
-          en: 'Range: 1-1000. Default: unset.',
-        },
-        eadEsRouteTargetExport: {
-          zh: '格式: A.B.C.D:MN / EF:OPQR / GHJK:MN。默认: 无。',
-          en: 'Format: A.B.C.D:MN / EF:OPQR / GHJK:MN. Default: unset.',
-        },
-        floodingDisable: {
-          zh: '布尔开关。默认: 关闭。',
-          en: 'Boolean flag. Default: disabled.',
-        },
-        floodingHer: {
-          zh: '布尔开关。默认: 关闭。',
-          en: 'Boolean flag. Default: disabled.',
-        },
-        macVrfSoo: {
-          zh: '格式: ASN:NN 或 IP:NN。默认: 无。',
-          en: 'Format: ASN:NN or IP:NN. Default: unset.',
-        },
-        routeTarget: {
-          zh: '格式: A.B.C.D:MN / EF:OPQR / GHJK:MN。默认: 无。',
-          en: 'Format: A.B.C.D:MN / EF:OPQR / GHJK:MN. Default: unset.',
-        },
-        rtAutoDerive: {
-          zh: '布尔开关。默认: 关闭。',
-          en: 'Boolean flag. Default: disabled.',
-        },
-        vniNote: {
-          zh: 'VNI 范围: 1-16777215。可在后续版本补充逐 VNI 可视化编辑。',
-          en: 'VNI range: 1-16777215. Per-VNI visual editor can be added in a follow-up.',
-        },
-      };
-      return map[key]?.[zh ? 'zh' : 'en'] || '';
+      const name = String(key || '').trim();
+      if (!name) return '';
+      const path = `vrf.protocolHints.evpn${name.charAt(0).toUpperCase()}${name.slice(1)}`;
+      const value = t(path);
+      return value === path ? '' : value;
     }
 
     function parseEvpnVniRowsFromBgpCli(text) {
@@ -8579,6 +10235,9 @@ export default defineComponent({
       dhcpv6ServerSubTab.value = 'basic';
       syncDhcpListenTextFromRows();
       syncAllBgpVpnNetworkRowsFromCli();
+      syncAllBgpLuRowsFromCli();
+      syncAllBgpMcRowsFromCli();
+      syncBgpParamsRowsFromCli();
       modalVisible.value = true;
     }
 
@@ -8599,6 +10258,10 @@ export default defineComponent({
       dhcpv6ServerSubTab.value = 'basic';
       syncDhcpListenTextFromRows();
       syncAllBgpVpnNetworkRowsFromCli();
+      syncAllBgpLuRowsFromCli();
+      syncAllBgpMcRowsFromCli();
+      syncAllBgpUcRowsFromCli();
+      syncBgpParamsRowsFromCli();
       modalVisible.value = true;
     }
 
@@ -11008,8 +12671,24 @@ export default defineComponent({
       dhcpv6SharedNetworkModalTab,
       bgpCollectionModalVisible, bgpCollectionDeleteVisible,
       bgpVpnNetworkModalVisible, bgpVpnNetworkDeleteVisible,
+      bgpLuAggregateModalVisible, bgpLuAggregateDeleteVisible,
+      bgpLuNetworkModalVisible, bgpLuNetworkDeleteVisible,
+      bgpMcAggregateModalVisible, bgpMcAggregateDeleteVisible,
+      bgpMcNetworkModalVisible, bgpMcNetworkDeleteVisible,
+      bgpUcAggregateModalVisible, bgpUcAggregateDeleteVisible,
+      bgpUcDistancePrefixModalVisible, bgpUcDistancePrefixDeleteVisible,
+      bgpUcNetworkModalVisible, bgpUcNetworkDeleteVisible,
+      bgpUcRedistributeModalVisible, bgpUcRedistributeDeleteVisible,
       bgpCollectionModalTitle, bgpCollectionType, bgpCollectionDraft, bgpCollectionDeletePreview,
       bgpVpnNetworkModalTitle, bgpVpnNetworkDraft, bgpVpnNetworkDeletePreview,
+      bgpLuAggregateModalTitle, bgpLuAggregateDraft, bgpLuAggregateDeletePreview,
+      bgpLuNetworkModalTitle, bgpLuNetworkDraft, bgpLuNetworkDeletePreview,
+      bgpMcAggregateModalTitle, bgpMcAggregateDraft, bgpMcAggregateDeletePreview,
+      bgpMcNetworkModalTitle, bgpMcNetworkDraft, bgpMcNetworkDeletePreview,
+      bgpUcAggregateModalTitle, bgpUcAggregateDraft, bgpUcAggregateDeletePreview,
+      bgpUcDistancePrefixModalTitle, bgpUcDistancePrefixDraft, bgpUcDistancePrefixDeletePreview,
+      bgpUcNetworkModalTitle, bgpUcNetworkDraft, bgpUcNetworkDeletePreview,
+      bgpUcRedistributeModalTitle, bgpUcRedistributeDraft, bgpUcRedistributeDeletePreview,
       failoverRouteModalVisible, failoverRouteModalTitle, failoverRouteDraft,
       DHCPV6_SHARED_NETWORK_MODAL_TABS,
       failoverCheckTargetModalVisible, failoverCheckTargetModalTitle, failoverCheckTargetDraft,
@@ -11094,6 +12773,12 @@ export default defineComponent({
       BGP_VPN_NETWORK_TABLE_ACTIONS,
       ospfAdvancedItems,
       bgpVpnNetworkRows,
+      bgpLuAggregateRows, bgpLuNetworkRows,
+      bgpMcAggregateRows, bgpMcNetworkRows,
+      bgpUcAggregateRows, bgpUcDistancePrefixRows, bgpUcNetworkRows, bgpUcRedistributeRows,
+      getBgpLuAggregateRowsForAf, getBgpLuNetworkRowsForAf,
+      getBgpMcAggregateRowsForAf, getBgpMcNetworkRowsForAf,
+      getBgpUcAggregateRowsForAf, getBgpUcDistancePrefixRowsForAf, getBgpUcNetworkRowsForAf, getBgpUcRedistributeRowsForAf,
       hasDhcpSharedNetworkDdnsSettings,
       routeMapOptions, interfaceOptions, bfdProfileOptions, vrfNameOptions, IP_PROTOCOL_OPTIONS, IPV6_PROTOCOL_OPTIONS,
       DHCP4_SHARED_OPTION_NAMES,
@@ -11106,6 +12791,34 @@ export default defineComponent({
       requestBgpCollectionDelete, confirmBgpCollectionDelete,
       openBgpVpnNetworkCreate, openBgpVpnNetworkEdit, saveBgpVpnNetworkModal,
       requestBgpVpnNetworkDelete, confirmBgpVpnNetworkDelete,
+      openBgpLuAggregateCreate, openBgpLuAggregateEdit, saveBgpLuAggregateModal,
+      requestBgpLuAggregateDelete, confirmBgpLuAggregateDelete,
+      openBgpLuNetworkCreate, openBgpLuNetworkEdit, saveBgpLuNetworkModal,
+      requestBgpLuNetworkDelete, confirmBgpLuNetworkDelete,
+      openBgpMcAggregateCreate, openBgpMcAggregateEdit, saveBgpMcAggregateModal,
+      requestBgpMcAggregateDelete, confirmBgpMcAggregateDelete,
+      openBgpMcNetworkCreate, openBgpMcNetworkEdit, saveBgpMcNetworkModal,
+      requestBgpMcNetworkDelete, confirmBgpMcNetworkDelete,
+      openBgpUcAggregateCreate, openBgpUcAggregateEdit, saveBgpUcAggregateModal,
+      requestBgpUcAggregateDelete, confirmBgpUcAggregateDelete,
+      openBgpUcDistancePrefixCreate, openBgpUcDistancePrefixEdit, saveBgpUcDistancePrefixModal,
+      requestBgpUcDistancePrefixDelete, confirmBgpUcDistancePrefixDelete,
+      openBgpUcNetworkCreate, openBgpUcNetworkEdit, saveBgpUcNetworkModal,
+      requestBgpUcNetworkDelete, confirmBgpUcNetworkDelete,
+      openBgpUcRedistributeCreate, openBgpUcRedistributeEdit, saveBgpUcRedistributeModal,
+      requestBgpUcRedistributeDelete, confirmBgpUcRedistributeDelete,
+      bgpParamsConfederationPeersRows, bgpParamsDistancePrefixRows,
+      bgpParamsConfederationPeersModalVisible, bgpParamsConfederationPeersDeleteVisible,
+      bgpParamsConfederationPeersDraft, bgpParamsConfederationPeersEditId, bgpParamsConfederationPeersDeleteIds,
+      bgpParamsDistancePrefixModalVisible, bgpParamsDistancePrefixDeleteVisible,
+      bgpParamsDistancePrefixDraft, bgpParamsDistancePrefixEditId, bgpParamsDistancePrefixDeleteIds,
+      bgpParamsConfederationPeersModalTitle, bgpParamsDistancePrefixModalTitle,
+      bgpParamsConfederationPeersDeletePreview, bgpParamsDistancePrefixDeletePreview,
+      openBgpParamsConfederationPeersCreate, openBgpParamsConfederationPeersEdit, saveBgpParamsConfederationPeersModal,
+      requestBgpParamsConfederationPeersDelete, confirmBgpParamsConfederationPeersDelete,
+      openBgpParamsDistancePrefixCreate, openBgpParamsDistancePrefixEdit, saveBgpParamsDistancePrefixModal,
+      requestBgpParamsDistancePrefixDelete, confirmBgpParamsDistancePrefixDelete,
+      syncBgpParamsRowsFromCli,
       openFailoverRouteCreate, openFailoverRouteEdit, saveFailoverRouteModal,
       removeFailoverRoutesByIds, addFailoverCheckTarget, removeFailoverCheckTarget,
       openFailoverCheckTargetCreate, openFailoverCheckTargetEdit, saveFailoverCheckTargetModal,
@@ -11376,7 +13089,7 @@ export default defineComponent({
                       <div v-if="activeBgpBranchTab === 'system-as'" style="display:flex;flex-direction:column;gap:8px;">
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.bgp.fields.systemAs') }}</label>
-                          <div style="flex:1; max-width:320px;">
+                          <div class="form-control">
                             <input type="number" class="form-control" :value="getBgpFieldValue('system-as')" @input="setBgpFieldValue('system-as', $event.target.value)" :disabled="writeDisabled" min="1" max="4294967294" />
                             <div class="form-hint">{{ t('vrf.bgp.hints.systemAs') }}</div>
                           </div>
@@ -11386,14 +13099,14 @@ export default defineComponent({
                       <div v-else-if="activeBgpBranchTab === 'timers'" style="display:flex;flex-direction:column;gap:8px;">
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.bgp.fields.holdtime') }}</label>
-                          <div style="flex:1; max-width:320px;">
+                          <div class="form-control">
                             <input type="number" class="form-control" :value="getBgpFieldValue('timers holdtime')" @input="setBgpFieldValue('timers holdtime', $event.target.value)" :disabled="writeDisabled" min="0" max="65535" />
                             <div class="form-hint">{{ t('vrf.bgp.hints.holdtime') }}</div>
                           </div>
                         </div>
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.bgp.fields.keepalive') }}</label>
-                          <div style="flex:1; max-width:320px;">
+                          <div class="form-control">
                             <input type="number" class="form-control" :value="getBgpFieldValue('timers keepalive')" @input="setBgpFieldValue('timers keepalive', $event.target.value)" :disabled="writeDisabled" min="1" max="65535" />
                             <div class="form-hint">{{ t('vrf.bgp.hints.keepalive') }}</div>
                           </div>
@@ -11403,9 +13116,303 @@ export default defineComponent({
                       <div v-else-if="activeBgpBranchTab === 'parameters'" style="display:flex;flex-direction:column;gap:8px;">
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.bgp.fields.routerId') }}</label>
-                          <div style="flex:1; max-width:320px;">
+                          <div class="form-control">
                             <input type="text" class="form-control" :value="getBgpFieldValue('parameters router-id')" @input="setBgpFieldValue('parameters router-id', $event.target.value)" :disabled="writeDisabled" placeholder="1.1.1.1" />
                             <div class="form-hint">{{ t('vrf.bgp.hints.routerId') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.clusterId') }}</label>
+                          <div class="form-control">
+                            <input type="text" class="form-control" :value="getBgpFieldValue('parameters cluster-id')" @input="setBgpFieldValue('parameters cluster-id', $event.target.value)" :disabled="writeDisabled" placeholder="1.1.1.1" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.clusterId') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.minimumHoldtime') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters minimum-holdtime')" @input="setBgpFieldValue('parameters minimum-holdtime', $event.target.value)" :disabled="writeDisabled" min="1" max="65535" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.minimumHoldtime') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.defaultLocalPref') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters default local-pref')" @input="setBgpFieldValue('parameters default local-pref', $event.target.value)" :disabled="writeDisabled" min="0" max="4294967295" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.defaultLocalPref') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.confederationIdentifier') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters confederation identifier')" @input="setBgpFieldValue('parameters confederation identifier', $event.target.value)" :disabled="writeDisabled" min="1" max="4294967294" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.confederationIdentifier') }}</div>
+                          </div>
+                        </div>
+                        <div>
+                          <div style="font-weight:600;margin-bottom:6px;">{{ t('vrf.bgp.fields.confederationPeers') }}</div>
+                          <DataTable
+                            :columns="[{ key: 'asNumber', title: t('vrf.bgp.fields.confederationPeers') }]"
+                            :data="bgpParamsConfederationPeersRows"
+                            row-key="__id"
+                            :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                            :disabled="writeDisabled"
+                            :page-size="100"
+                            style="width:100%;"
+                            @create="openBgpParamsConfederationPeersCreate"
+                            @edit="openBgpParamsConfederationPeersEdit($event)"
+                            @delete="requestBgpParamsConfederationPeersDelete($event)"
+                          >
+                            <template #asNumber="{ value }">{{ value || '-' }}</template>
+                          </DataTable>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.conditionalAdvertisementTimer') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters conditional-advertisement timer')" @input="setBgpFieldValue('parameters conditional-advertisement timer', $event.target.value)" :disabled="writeDisabled" min="5" max="240" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.conditionalAdvertisementTimer') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.dampeningHalfLife') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters dampening half-life')" @input="setBgpFieldValue('parameters dampening half-life', $event.target.value)" :disabled="writeDisabled" min="1" max="45" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.dampeningHalfLife') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.dampeningMaxSuppressTime') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters dampening max-suppress-time')" @input="setBgpFieldValue('parameters dampening max-suppress-time', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.dampeningMaxSuppressTime') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.dampeningReUse') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters dampening re-use')" @input="setBgpFieldValue('parameters dampening re-use', $event.target.value)" :disabled="writeDisabled" min="1" max="20000" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.dampeningReUse') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.dampeningStartSuppressTime') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters dampening start-suppress-time')" @input="setBgpFieldValue('parameters dampening start-suppress-time', $event.target.value)" :disabled="writeDisabled" min="1" max="20000" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.dampeningStartSuppressTime') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.distanceGlobalExternal') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters distance global external')" @input="setBgpFieldValue('parameters distance global external', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.distanceGlobalExternal') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.distanceGlobalInternal') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters distance global internal')" @input="setBgpFieldValue('parameters distance global internal', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.distanceGlobalInternal') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.distanceGlobalLocal') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters distance global local')" @input="setBgpFieldValue('parameters distance global local', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.distanceGlobalLocal') }}</div>
+                          </div>
+                        </div>
+                        <div>
+                          <div style="font-weight:600;margin-bottom:6px;">{{ t('vrf.bgp.fields.distancePrefix') }}</div>
+                          <DataTable
+                            :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.distancePrefix') }, { key: 'distance', title: t('vrf.bgp.fields.distancePrefixValue') }]"
+                            :data="bgpParamsDistancePrefixRows"
+                            row-key="__id"
+                            :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                            :disabled="writeDisabled"
+                            :page-size="100"
+                            style="width:100%;"
+                            @create="openBgpParamsDistancePrefixCreate"
+                            @edit="openBgpParamsDistancePrefixEdit($event)"
+                            @delete="requestBgpParamsDistancePrefixDelete($event)"
+                          >
+                            <template #prefix="{ value }">{{ value || '-' }}</template>
+                            <template #distance="{ value }">{{ value || '-' }}</template>
+                          </DataTable>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.gracefulRestartStalepathTime') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters graceful-restart stalepath-time')" @input="setBgpFieldValue('parameters graceful-restart stalepath-time', $event.target.value)" :disabled="writeDisabled" min="1" max="3600" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.gracefulRestartStalepathTime') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.tcpKeepaliveIdle') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters tcp-keepalive idle')" @input="setBgpFieldValue('parameters tcp-keepalive idle', $event.target.value)" :disabled="writeDisabled" min="1" max="65535" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.tcpKeepaliveIdle') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.tcpKeepaliveInterval') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters tcp-keepalive interval')" @input="setBgpFieldValue('parameters tcp-keepalive interval', $event.target.value)" :disabled="writeDisabled" min="1" max="65535" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.tcpKeepaliveInterval') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.tcpKeepaliveProbes') }}</label>
+                          <div class="form-control">
+                            <input type="number" class="form-control" :value="getBgpFieldValue('parameters tcp-keepalive probes')" @input="setBgpFieldValue('parameters tcp-keepalive probes', $event.target.value)" :disabled="writeDisabled" min="1" max="30" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.tcpKeepaliveProbes') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.allowMartianNexthop') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters allow-martian-nexthop')" @change="setProtocolPresence('bgp', 'parameters allow-martian-nexthop', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.allowMartianNexthop') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.alwaysCompareMed') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters always-compare-med')" @change="setProtocolPresence('bgp', 'parameters always-compare-med', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.alwaysCompareMed') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.deterministicMed') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters deterministic-med')" @change="setProtocolPresence('bgp', 'parameters deterministic-med', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.deterministicMed') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.disableEbgpConnectedRouteCheck') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters disable-ebgp-connected-route-check')" @change="setProtocolPresence('bgp', 'parameters disable-ebgp-connected-route-check', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.disableEbgpConnectedRouteCheck') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.ebgpRequiresPolicy') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters ebgp-requires-policy')" @change="setProtocolPresence('bgp', 'parameters ebgp-requires-policy', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.ebgpRequiresPolicy') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.fastConvergence') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters fast-convergence')" @change="setProtocolPresence('bgp', 'parameters fast-convergence', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.fastConvergence') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.gracefulShutdown') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters graceful-shutdown')" @change="setProtocolPresence('bgp', 'parameters graceful-shutdown', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.gracefulShutdown') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.logNeighborChanges') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters log-neighbor-changes')" @change="setProtocolPresence('bgp', 'parameters log-neighbor-changes', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.logNeighborChanges') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.networkImportCheck') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters network-import-check')" @change="setProtocolPresence('bgp', 'parameters network-import-check', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.networkImportCheck') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.noClientToClientReflection') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters no-client-to-client-reflection')" @change="setProtocolPresence('bgp', 'parameters no-client-to-client-reflection', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.noClientToClientReflection') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.noFastExternalFailover') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters no-fast-external-failover')" @change="setProtocolPresence('bgp', 'parameters no-fast-external-failover', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.noFastExternalFailover') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.noHardAdministrativeReset') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters no-hard-administrative-reset')" @change="setProtocolPresence('bgp', 'parameters no-hard-administrative-reset', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.noHardAdministrativeReset') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.noIpv6AutoRa') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters no-ipv6-auto-ra')" @change="setProtocolPresence('bgp', 'parameters no-ipv6-auto-ra', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.noIpv6AutoRa') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.noSuppressDuplicates') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters no-suppress-duplicates')" @change="setProtocolPresence('bgp', 'parameters no-suppress-duplicates', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.noSuppressDuplicates') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.rejectAsSets') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters reject-as-sets')" @change="setProtocolPresence('bgp', 'parameters reject-as-sets', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.rejectAsSets') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.routeReflectorAllowOutboundPolicy') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters route-reflector-allow-outbound-policy')" @change="setProtocolPresence('bgp', 'parameters route-reflector-allow-outbound-policy', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.routeReflectorAllowOutboundPolicy') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.shutdown') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters shutdown')" @change="setProtocolPresence('bgp', 'parameters shutdown', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.shutdown') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.suppressFibPending') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters suppress-fib-pending')" @change="setProtocolPresence('bgp', 'parameters suppress-fib-pending', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.suppressFibPending') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.labeledUnicastExplicitNull') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters labeled-unicast explicit-null')" @change="setProtocolPresence('bgp', 'parameters labeled-unicast explicit-null', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.labeledUnicastExplicitNull') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.labeledUnicastIpv4ExplicitNull') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters labeled-unicast ipv4-explicit-null')" @change="setProtocolPresence('bgp', 'parameters labeled-unicast ipv4-explicit-null', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.labeledUnicastIpv4ExplicitNull') }}</div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <label class="form-label">{{ t('vrf.bgp.fields.labeledUnicastIpv6ExplicitNull') }}</label>
+                          <div class="form-control">
+                            <input type="checkbox" :checked="getProtocolPresence('bgp', 'parameters labeled-unicast ipv6-explicit-null')" @change="setProtocolPresence('bgp', 'parameters labeled-unicast ipv6-explicit-null', $event.target.checked)" :disabled="writeDisabled" />
+                            <div class="form-hint">{{ t('vrf.bgp.hints.labeledUnicastIpv6ExplicitNull') }}</div>
                           </div>
                         </div>
                       </div>
@@ -11413,7 +13420,7 @@ export default defineComponent({
                       <div v-else-if="activeBgpBranchTab === 'sid'" style="display:flex;flex-direction:column;gap:8px;">
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.bgp.fields.sid') }}</label>
-                          <div style="flex:1; max-width:320px;">
+                          <div class="form-control">
                             <input type="number" class="form-control" :value="getBgpFieldValue('sid')" @input="setBgpFieldValue('sid', $event.target.value)" :disabled="writeDisabled" min="1" max="4294967295" />
                             <div class="form-hint">{{ t('vrf.bgp.hints.sid') }}</div>
                           </div>
@@ -11439,316 +13446,578 @@ export default defineComponent({
                         <div class="tab-panel">
                     <div v-if="activeBgpAfBranchTab === 'ipv4-flowspec' || activeBgpAfBranchTab === 'ipv6-flowspec'" class="form-row">
                       <label class="form-label">{{ t('vrf.bgp.fields.localInstallInterface') }}</label>
-                      <div style="flex:1; max-width:320px;">
+                      <div class="form-control">
                         <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' local-install interface')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' local-install interface', $event.target.value)" :disabled="writeDisabled" placeholder="eth0" />
                         <div class="form-hint">{{ t('vrf.bgp.hints.localInstallInterface') }}</div>
                       </div>
                     </div>
 
-                    <div v-else-if="activeBgpAfBranchTab === 'ipv4-unicast' || activeBgpAfBranchTab === 'ipv6-unicast'" style="display:flex;flex-direction:column;gap:8px;">
+                    <div v-else-if="activeBgpAfBranchTab === 'ipv4-labeled-unicast'" style="display:flex;flex-direction:column;gap:8px;">
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.maxPathsEbgp') }}</label>
-                        <div style="flex:1; max-width:320px;">
-                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp', $event.target.value)" :disabled="writeDisabled" min="1" max="64" />
-                          <div class="form-hint">{{ t('vrf.bgp.hints.maxPathsEbgp') }}</div>
+                        <div class="form-control">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp', $event.target.value)" :disabled="writeDisabled" min="1" max="256" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.maxPathsEbgpLu') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.maxPathsIbgp') }}</label>
-                        <div style="flex:1; max-width:320px;">
-                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ibgp')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ibgp', $event.target.value)" :disabled="writeDisabled" min="1" max="64" />
-                          <div class="form-hint">{{ t('vrf.bgp.hints.maxPathsIbgp') }}</div>
+                        <div class="form-control">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ibgp')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ibgp', $event.target.value)" :disabled="writeDisabled" min="1" max="256" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.maxPathsIbgpLu') }}</div>
                         </div>
                       </div>
+                      <div>
+                        <div style="font-weight:600;margin-bottom:6px;">{{ t('vrf.bgp.fields.aggregateAddress') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.aggregateAddress') }, { key: 'asSet', title: t('vrf.bgp.fields.aggregateAddressAsSet') }, { key: 'routeMap', title: t('vrf.bgp.fields.aggregateAddressRouteMap') }, { key: 'summaryOnly', title: t('vrf.bgp.fields.aggregateAddressSummaryOnly') }]"
+                          :data="getBgpLuAggregateRowsForAf(activeBgpAfBranchTab)"
+                          row-key="__id"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          :disabled="writeDisabled"
+                          :page-size="100"
+                          style="width:100%;"
+                          @create="openBgpLuAggregateCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpLuAggregateEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpLuAggregateDelete(activeBgpAfBranchTab, $event)"
+                        >
+                          <template #prefix="{ value }">{{ value || '-' }}</template>
+                          <template #asSet="{ value }">{{ value ? 'yes' : '-' }}</template>
+                          <template #routeMap="{ value }">{{ value || '-' }}</template>
+                          <template #summaryOnly="{ value }">{{ value ? 'yes' : '-' }}</template>
+                        </DataTable>
+                      </div>
+                      <div>
+                        <div style="font-weight:600;margin-bottom:6px;">{{ t('vrf.bgp.fields.networkPrefix') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.networkPrefix') }, { key: 'backdoor', title: t('vrf.bgp.fields.networkBackdoor') }, { key: 'routeMap', title: t('vrf.bgp.fields.networkRouteMap') }]"
+                          :data="getBgpLuNetworkRowsForAf(activeBgpAfBranchTab)"
+                          row-key="__id"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          :disabled="writeDisabled"
+                          :page-size="100"
+                          style="width:100%;"
+                          @create="openBgpLuNetworkCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpLuNetworkEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpLuNetworkDelete(activeBgpAfBranchTab, $event)"
+                        >
+                          <template #prefix="{ value }">{{ value || '-' }}</template>
+                          <template #backdoor="{ value }">{{ value ? 'yes' : '-' }}</template>
+                          <template #routeMap="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
+                      </div>
+                    </div>
+
+                    <div v-else-if="activeBgpAfBranchTab === 'ipv6-labeled-unicast'" style="display:flex;flex-direction:column;gap:8px;">
+                      <div>
+                        <div style="font-weight:600;margin-bottom:6px;">{{ t('vrf.bgp.fields.aggregateAddress') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.aggregateAddress') }, { key: 'asSet', title: t('vrf.bgp.fields.aggregateAddressAsSet') }, { key: 'routeMap', title: t('vrf.bgp.fields.aggregateAddressRouteMap') }, { key: 'summaryOnly', title: t('vrf.bgp.fields.aggregateAddressSummaryOnly') }]"
+                          :data="getBgpLuAggregateRowsForAf(activeBgpAfBranchTab)"
+                          row-key="__id"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          :disabled="writeDisabled"
+                          :page-size="100"
+                          style="width:100%;"
+                          @create="openBgpLuAggregateCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpLuAggregateEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpLuAggregateDelete(activeBgpAfBranchTab, $event)"
+                        >
+                          <template #prefix="{ value }">{{ value || '-' }}</template>
+                          <template #asSet="{ value }">{{ value ? 'yes' : '-' }}</template>
+                          <template #routeMap="{ value }">{{ value || '-' }}</template>
+                          <template #summaryOnly="{ value }">{{ value ? 'yes' : '-' }}</template>
+                        </DataTable>
+                      </div>
+                      <div>
+                        <div style="font-weight:600;margin-bottom:6px;">{{ t('vrf.bgp.fields.networkPrefix') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.networkPrefix') }, { key: 'backdoor', title: t('vrf.bgp.fields.networkBackdoor') }, { key: 'routeMap', title: t('vrf.bgp.fields.networkRouteMap') }]"
+                          :data="getBgpLuNetworkRowsForAf(activeBgpAfBranchTab)"
+                          row-key="__id"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          :disabled="writeDisabled"
+                          :page-size="100"
+                          style="width:100%;"
+                          @create="openBgpLuNetworkCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpLuNetworkEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpLuNetworkDelete(activeBgpAfBranchTab, $event)"
+                        >
+                          <template #prefix="{ value }">{{ value || '-' }}</template>
+                          <template #backdoor="{ value }">{{ value ? 'yes' : '-' }}</template>
+                          <template #routeMap="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
+                      </div>
+                    </div>
+
+                    <div v-else-if="activeBgpAfBranchTab === 'ipv4-multicast'" style="display:flex;flex-direction:column;gap:8px;">
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.distanceExternal') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance external')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance external', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.distanceExternal') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.distanceInternal') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance internal')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance internal', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.distanceInternal') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.distanceLocal') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance local')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance local', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.distanceLocal') }}</div>
+                        </div>
+                      </div>
+                      <div>
+                        <div style="font-weight:600;margin-bottom:6px;">{{ t('vrf.bgp.fields.aggregateAddress') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.aggregateAddress') }, { key: 'asSet', title: t('vrf.bgp.fields.aggregateAddressAsSet') }, { key: 'routeMap', title: t('vrf.bgp.fields.aggregateAddressRouteMap') }, { key: 'summaryOnly', title: t('vrf.bgp.fields.aggregateAddressSummaryOnly') }]"
+                          :data="getBgpMcAggregateRowsForAf(activeBgpAfBranchTab)"
+                          row-key="__id"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          :disabled="writeDisabled"
+                          :page-size="100"
+                          style="width:100%;"
+                          @create="openBgpMcAggregateCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpMcAggregateEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpMcAggregateDelete(activeBgpAfBranchTab, $event)"
+                        >
+                          <template #prefix="{ value }">{{ value || '-' }}</template>
+                          <template #asSet="{ value }">{{ value ? 'yes' : '-' }}</template>
+                          <template #routeMap="{ value }">{{ value || '-' }}</template>
+                          <template #summaryOnly="{ value }">{{ value ? 'yes' : '-' }}</template>
+                        </DataTable>
+                      </div>
+                      <div>
+                        <div style="font-weight:600;margin-bottom:6px;">{{ t('vrf.bgp.fields.networkPrefix') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.networkPrefix') }, { key: 'backdoor', title: t('vrf.bgp.fields.networkBackdoor') }, { key: 'routeMap', title: t('vrf.bgp.fields.networkRouteMap') }]"
+                          :data="getBgpMcNetworkRowsForAf(activeBgpAfBranchTab)"
+                          row-key="__id"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          :disabled="writeDisabled"
+                          :page-size="100"
+                          style="width:100%;"
+                          @create="openBgpMcNetworkCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpMcNetworkEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpMcNetworkDelete(activeBgpAfBranchTab, $event)"
+                        >
+                          <template #prefix="{ value }">{{ value || '-' }}</template>
+                          <template #backdoor="{ value }">{{ value ? 'yes' : '-' }}</template>
+                          <template #routeMap="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
+                      </div>
+                    </div>
+
+                    <div v-else-if="activeBgpAfBranchTab === 'ipv6-multicast'" style="display:flex;flex-direction:column;gap:8px;">
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.distanceExternal') }}</label>
+                        <div class="form-control">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ipv6-multicast distance external')" @input="setBgpFieldValue('address-family ipv6-multicast distance external', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.distanceExternal') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.distanceInternal') }}</label>
+                        <div class="form-control">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ipv6-multicast distance internal')" @input="setBgpFieldValue('address-family ipv6-multicast distance internal', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.distanceInternal') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.distanceLocal') }}</label>
+                        <div class="form-control">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ipv6-multicast distance local')" @input="setBgpFieldValue('address-family ipv6-multicast distance local', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.distanceLocal') }}</div>
+                        </div>
+                      </div>
+                      <div>
+                        <div style="font-weight:600;margin-bottom:6px;">{{ t('vrf.bgp.fields.aggregateAddress') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.aggregateAddress') }, { key: 'asSet', title: t('vrf.bgp.fields.aggregateAddressAsSet') }, { key: 'routeMap', title: t('vrf.bgp.fields.aggregateAddressRouteMap') }, { key: 'summaryOnly', title: t('vrf.bgp.fields.aggregateAddressSummaryOnly') }]"
+                          :data="getBgpMcAggregateRowsForAf(activeBgpAfBranchTab)"
+                          row-key="__id"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          :disabled="writeDisabled"
+                          :page-size="100"
+                          style="width:100%;"
+                          @create="openBgpMcAggregateCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpMcAggregateEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpMcAggregateDelete(activeBgpAfBranchTab, $event)"
+                        >
+                          <template #prefix="{ value }">{{ value || '-' }}</template>
+                          <template #asSet="{ value }">{{ value ? 'yes' : '-' }}</template>
+                          <template #routeMap="{ value }">{{ value || '-' }}</template>
+                          <template #summaryOnly="{ value }">{{ value ? 'yes' : '-' }}</template>
+                        </DataTable>
+                      </div>
+                      <div>
+                        <div style="font-weight:600;margin-bottom:6px;">{{ t('vrf.bgp.fields.networkPrefix') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.networkPrefix') }, { key: 'pathLimit', title: t('vrf.bgp.fields.networkPathLimit') }, { key: 'routeMap', title: t('vrf.bgp.fields.networkRouteMap') }]"
+                          :data="getBgpMcNetworkRowsForAf(activeBgpAfBranchTab)"
+                          row-key="__id"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          :disabled="writeDisabled"
+                          :page-size="100"
+                          style="width:100%;"
+                          @create="openBgpMcNetworkCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpMcNetworkEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpMcNetworkDelete(activeBgpAfBranchTab, $event)"
+                        >
+                          <template #prefix="{ value }">{{ value || '-' }}</template>
+                          <template #pathLimit="{ value }">{{ value !== undefined && value !== '' ? value : '-' }}</template>
+                          <template #routeMap="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
+                      </div>
+                    </div>
+
+                    <div v-else-if="activeBgpAfBranchTab === 'ipv4-unicast' || activeBgpAfBranchTab === 'ipv6-unicast'" style="display:flex;flex-direction:column;gap:8px;">
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.maxPathsEbgp') }}</label>
+                        <div class="form-control">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp', $event.target.value)" :disabled="writeDisabled" min="1" max="256" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.maxPathsEbgp') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.maxPathsIbgp') }}</label>
+                        <div class="form-control">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ibgp')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ibgp', $event.target.value)" :disabled="writeDisabled" min="1" max="256" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.maxPathsIbgp') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.distanceExternal') }}</label>
+                        <div class="form-control">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance external')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance external', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.distanceExternal') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.distanceInternal') }}</label>
+                        <div class="form-control">
+                          <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance internal')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance internal', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
+                          <div class="form-hint">{{ t('vrf.bgp.hints.distanceInternal') }}</div>
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <label class="form-label">{{ t('vrf.bgp.fields.distanceLocal') }}</label>
+                        <div class="form-control">
                           <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance local')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' distance local', $event.target.value)" :disabled="writeDisabled" min="1" max="255" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.distanceLocal') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afExportVpn') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' export vpn')" @change="setProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' export vpn', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afExportVpn') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afImportVpn') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' import vpn')" @change="setProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' import vpn', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afImportVpn') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afImportVrf') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' import vrf')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' import vrf', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.bgp.placeholders.vrfName')" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afImportVrf') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afNexthopVpnExport') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' nexthop vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' nexthop vpn export', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.bgp.placeholders.nextHop')" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afNexthopVpnExport') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afRdVpnExport') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' rd vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' rd vpn export', $event.target.value)" :disabled="writeDisabled" placeholder="65000:100" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afRdVpnExport') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afLabelAllocationPerNexthop') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' label vpn allocation-mode per-nexthop')" @change="setProtocolPresence('bgp', 'address-family ' + activeBgpAfBranchTab + ' label vpn allocation-mode per-nexthop', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afLabelAllocationPerNexthop') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afLabelVpnExport') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' label vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' label vpn export', $event.target.value)" :disabled="writeDisabled" placeholder="auto" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afLabelVpnExport') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afSidVpnExport') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' sid vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' sid vpn export', $event.target.value)" :disabled="writeDisabled" placeholder="auto" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afSidVpnExport') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afRouteMapVpnExport') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vpn export', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afRouteMapVpnExport') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afRouteMapVpnImport') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vpn import')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vpn import', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afRouteMapVpnImport') }}</div>
                         </div>
                       </div>
                       <div v-if="activeBgpAfBranchTab === 'ipv4-unicast'" class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afRouteMapVrfImport') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vrf import')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-map vrf import', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afRouteMapVrfImport') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afRouteTargetVpnBoth') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn both')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn both', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afRouteTargetVpnBoth') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afRouteTargetVpnExport') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn export')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn export', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afRouteTargetVpnExport') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.afRouteTargetVpnImport') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn import')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' route-target vpn import', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.afRouteTargetVpnImport') }}</div>
                         </div>
                       </div>
+                      <div v-if="activeBgpAfBranchTab === 'ipv4-unicast' || activeBgpAfBranchTab === 'ipv6-unicast'">
+                        <div style="margin-bottom:8px;font-weight:600;">{{ t('vrf.bgp.fields.aggregateAddress') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.aggregateAddress') }, { key: 'asSet', title: t('vrf.bgp.fields.aggregateAddressAsSet'), type: 'boolean' }, { key: 'routeMap', title: t('vrf.bgp.fields.aggregateAddressRouteMap') }, { key: 'summaryOnly', title: t('vrf.bgp.fields.aggregateAddressSummaryOnly'), type: 'boolean' }]"
+                          :data="getBgpUcAggregateRowsForAf(activeBgpAfBranchTab)"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          @create="openBgpUcAggregateCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpUcAggregateEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpUcAggregateDelete(activeBgpAfBranchTab, $event)"
+                          :disabled="writeDisabled"
+                        />
+                      </div>
+                      <div v-if="activeBgpAfBranchTab === 'ipv4-unicast' || activeBgpAfBranchTab === 'ipv6-unicast'">
+                        <div style="margin-bottom:8px;font-weight:600;">{{ t('vrf.bgp.fields.distancePrefix') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.distancePrefix') }, { key: 'distance', title: t('vrf.bgp.fields.distancePrefixValue') }]"
+                          :data="getBgpUcDistancePrefixRowsForAf(activeBgpAfBranchTab)"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          @create="openBgpUcDistancePrefixCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpUcDistancePrefixEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpUcDistancePrefixDelete(activeBgpAfBranchTab, $event)"
+                          :disabled="writeDisabled"
+                        />
+                      </div>
+                      <div v-if="activeBgpAfBranchTab === 'ipv4-unicast' || activeBgpAfBranchTab === 'ipv6-unicast'">
+                        <div style="margin-bottom:8px;font-weight:600;">{{ t('vrf.bgp.fields.networkPrefix') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'prefix', title: t('vrf.bgp.fields.networkPrefix') }, { key: 'backdoor', title: t('vrf.bgp.fields.networkBackdoor'), type: 'boolean' }, { key: 'routeMap', title: t('vrf.bgp.fields.networkRouteMap') }]"
+                          :data="getBgpUcNetworkRowsForAf(activeBgpAfBranchTab)"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          @create="openBgpUcNetworkCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpUcNetworkEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpUcNetworkDelete(activeBgpAfBranchTab, $event)"
+                          :disabled="writeDisabled"
+                        />
+                      </div>
+                      <div v-if="activeBgpAfBranchTab === 'ipv4-unicast' || activeBgpAfBranchTab === 'ipv6-unicast'">
+                        <div style="margin-bottom:8px;font-weight:600;">{{ t('vrf.bgp.fields.redistribute') }}</div>
+                        <DataTable
+                          :columns="[{ key: 'protocol', title: t('vrf.bgp.fields.redistributeProtocol') }, { key: 'tableId', title: t('vrf.bgp.fields.redistributeTableId') }, { key: 'metric', title: t('vrf.bgp.fields.redistributeMetric') }, { key: 'routeMap', title: t('vrf.bgp.fields.redistributeRouteMap') }]"
+                          :data="getBgpUcRedistributeRowsForAf(activeBgpAfBranchTab)"
+                          :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS"
+                          @create="openBgpUcRedistributeCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpUcRedistributeEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpUcRedistributeDelete(activeBgpAfBranchTab, $event)"
+                          :disabled="writeDisabled"
+                        />
+                      </div>
                     </div>
 
                     <div v-else-if="activeBgpAfBranchTab === 'ipv4-vpn' || activeBgpAfBranchTab === 'ipv6-vpn'" style="display:flex;flex-direction:column;gap:8px;">
-                      <div class="form-row" style="display:block;">
-                        <div style="display:flex;align-items:flex-start;gap:12px;">
-                          <label class="form-label" style="min-width:auto;width:auto;padding-top:0;">network</label>
-                          <div class="form-hint" style="margin-top:0;">每行配置一个 network，可选 label 和 rd</div>
-                        </div>
-                        <div style="margin-top:8px; width:100%;">
-                          <div class="form-group" style="width:100%;">
-                            <div class="form-group-content" style="width:100%;">
-                              <DataTable
-                                :columns="[{ key: 'network', title: 'Network' }, { key: 'label', title: 'Label' }, { key: 'rd', title: 'RD' }]"
-                                :data="getBgpVpnNetworkRowsForAf(activeBgpAfBranchTab)"
-                                row-key="__id"
-                                :actions="BGP_VPN_NETWORK_TABLE_ACTIONS"
-                                :disabled="writeDisabled"
-                                :page-size="100"
-                                style="width:100%;"
-                                @create="openBgpVpnNetworkCreate(activeBgpAfBranchTab)"
-                                @edit="openBgpVpnNetworkEdit(activeBgpAfBranchTab, $event)"
-                                @delete="requestBgpVpnNetworkDelete(activeBgpAfBranchTab, $event)"
-                              >
-                                <template #network="{ value }">{{ value || '-' }}</template>
-                                <template #label="{ value }">{{ value || '-' }}</template>
-                                <template #rd="{ value }">{{ value || '-' }}</template>
-                              </DataTable>
-                            </div>
-                          </div>
-                        </div>
+                      <div style="width:100%;">
+                        <DataTable
+                          :columns="[{ key: 'network', title: 'Network' }, { key: 'label', title: 'Label' }, { key: 'rd', title: 'RD' }]"
+                          :data="getBgpVpnNetworkRowsForAf(activeBgpAfBranchTab)"
+                          row-key="__id"
+                          :actions="BGP_VPN_NETWORK_TABLE_ACTIONS"
+                          :disabled="writeDisabled"
+                          :page-size="100"
+                          style="width:100%;"
+                          @create="openBgpVpnNetworkCreate(activeBgpAfBranchTab)"
+                          @edit="openBgpVpnNetworkEdit(activeBgpAfBranchTab, $event)"
+                          @delete="requestBgpVpnNetworkDelete(activeBgpAfBranchTab, $event)"
+                        >
+                          <template #network="{ value }">{{ value || '-' }}</template>
+                          <template #label="{ value }">{{ value || '-' }}</template>
+                          <template #rd="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
                       </div>
                     </div>
 
                     <div v-else-if="activeBgpAfBranchTab === 'l2vpn-evpn'" style="display:flex;flex-direction:column;gap:8px;">
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.rd') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn rd')" @input="setBgpFieldValue('address-family l2vpn-evpn rd', $event.target.value)" :disabled="writeDisabled" placeholder="65000:100" />
                           <div class="form-hint">{{ getEvpnHint('rd') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">advertise ipv4 unicast route-map</label>
-                        <div style="flex:1; max-width:380px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn advertise ipv4 unicast route-map')" @input="setBgpFieldValue('address-family l2vpn-evpn advertise ipv4 unicast route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
                           <div class="form-hint">{{ getEvpnHint('advertiseIpv4RouteMap') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">advertise ipv6 unicast route-map</label>
-                        <div style="flex:1; max-width:380px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn advertise ipv6 unicast route-map')" @input="setBgpFieldValue('address-family l2vpn-evpn advertise ipv6 unicast route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
                           <div class="form-hint">{{ getEvpnHint('advertiseIpv6RouteMap') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.advertiseAllVni') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-all-vni')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-all-vni', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ getEvpnHint('advertiseAllVni') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">advertise-default-gw</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-default-gw')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-default-gw', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ getEvpnHint('advertiseDefaultGw') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">advertise-svi-ip</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-svi-ip')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn advertise-svi-ip', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ getEvpnHint('advertiseSviIp') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">advertise-pip</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn advertise-pip')" @input="setBgpFieldValue('address-family l2vpn-evpn advertise-pip', $event.target.value)" :disabled="writeDisabled" placeholder="192.0.2.1" />
                           <div class="form-hint">{{ getEvpnHint('advertisePip') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">default-originate ipv4</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn default-originate ipv4')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn default-originate ipv4', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ getEvpnHint('defaultOriginateIpv4') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">default-originate ipv6</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn default-originate ipv6')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn default-originate ipv6', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ getEvpnHint('defaultOriginateIpv6') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">disable-ead-evi-rx</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn disable-ead-evi-rx')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn disable-ead-evi-rx', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ getEvpnHint('disableEadEviRx') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">disable-ead-evi-tx</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn disable-ead-evi-tx')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn disable-ead-evi-tx', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ getEvpnHint('disableEadEviTx') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">ead-es-frag evi-limit</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="number" min="1" max="1000" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn ead-es-frag evi-limit')" @input="setBgpFieldValue('address-family l2vpn-evpn ead-es-frag evi-limit', $event.target.value)" :disabled="writeDisabled" placeholder="1-1000" />
                           <div class="form-hint">{{ getEvpnHint('eviLimit') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">ead-es-route-target export</label>
-                        <div style="flex:1; max-width:420px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn ead-es-route-target export')" @input="setBgpFieldValue('address-family l2vpn-evpn ead-es-route-target export', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
                           <div class="form-hint">{{ getEvpnHint('eadEsRouteTargetExport') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">flooding disable</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn flooding disable')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn flooding disable', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ getEvpnHint('floodingDisable') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">flooding head-end-replication</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn flooding head-end-replication')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn flooding head-end-replication', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ getEvpnHint('floodingHer') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">mac-vrf soo</label>
-                        <div style="flex:1; max-width:380px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn mac-vrf soo')" @input="setBgpFieldValue('address-family l2vpn-evpn mac-vrf soo', $event.target.value)" :disabled="writeDisabled" placeholder="65000:100 or 192.0.2.1:100" />
                           <div class="form-hint">{{ getEvpnHint('macVrfSoo') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">route-target both</label>
-                        <div style="flex:1; max-width:420px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn route-target both')" @input="setBgpFieldValue('address-family l2vpn-evpn route-target both', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
                           <div class="form-hint">{{ getEvpnHint('routeTarget') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">route-target export</label>
-                        <div style="flex:1; max-width:420px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn route-target export')" @input="setBgpFieldValue('address-family l2vpn-evpn route-target export', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
                           <div class="form-hint">{{ getEvpnHint('routeTarget') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">route-target import</label>
-                        <div style="flex:1; max-width:420px;">
+                        <div class="form-control">
                           <input type="text" class="form-control" :value="getBgpFieldValue('address-family l2vpn-evpn route-target import')" @input="setBgpFieldValue('address-family l2vpn-evpn route-target import', $event.target.value)" :disabled="writeDisabled" placeholder="target:65000:100" />
                           <div class="form-hint">{{ getEvpnHint('routeTarget') }}</div>
                         </div>
                       </div>
                       <div class="form-row">
                         <label class="form-label">rt-auto-derive</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="checkbox" :checked="getProtocolPresence('bgp', 'address-family l2vpn-evpn rt-auto-derive')" @change="setProtocolPresence('bgp', 'address-family l2vpn-evpn rt-auto-derive', $event.target.checked)" :disabled="writeDisabled" />
                           <div class="form-hint">{{ getEvpnHint('rtAutoDerive') }}</div>
                         </div>
@@ -11791,7 +14060,7 @@ export default defineComponent({
                     <div v-else style="display:flex;flex-direction:column;gap:8px;">
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.maxPathsEbgp') }}</label>
-                        <div style="flex:1; max-width:320px;">
+                        <div class="form-control">
                           <input type="number" class="form-control" :value="getBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp')" @input="setBgpFieldValue('address-family ' + activeBgpAfBranchTab + ' maximum-paths ebgp', $event.target.value)" :disabled="writeDisabled" min="1" max="64" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.maxPathsEbgp') }}</div>
                         </div>
@@ -11828,7 +14097,7 @@ export default defineComponent({
                         <div v-else-if="activeBgpBranchTab === 'listen'" class="bgp-collection-block" style="display:flex;flex-direction:column;gap:8px;">
                       <div class="form-row">
                         <label class="form-label">{{ t('vrf.bgp.fields.listenLimit') }}</label>
-                        <div style="flex:1; max-width:220px;">
+                        <div class="form-control">
                           <input type="number" class="form-control" :value="getBgpFieldValue('listen limit')" @input="setBgpFieldValue('listen limit', $event.target.value)" :disabled="writeDisabled" min="1" max="5000" />
                           <div class="form-hint">{{ t('vrf.bgp.hints.listenLimit') }}</div>
                         </div>
@@ -11840,7 +14109,7 @@ export default defineComponent({
                     </div>
                         <div v-else-if="activeBgpBranchTab === 'srv6'" class="form-row">
                           <label class="form-label">{{ t('vrf.bgp.fields.srv6Locator') }}</label>
-                          <div style="flex:1; max-width:320px;">
+                          <div class="form-control">
                             <input type="text" class="form-control" :value="getBgpFieldValue('srv6 locator')" @input="setBgpFieldValue('srv6 locator', $event.target.value)" :disabled="writeDisabled" placeholder="LOC-1" />
                             <div class="form-hint">{{ t('vrf.bgp.hints.srv6Locator') }}</div>
                           </div>
@@ -11848,7 +14117,7 @@ export default defineComponent({
                         <div v-else-if="activeBgpBranchTab === 'bmp'" class="bgp-collection-block" style="display:flex;flex-direction:column;gap:8px;">
                           <div class="form-row">
                             <label class="form-label">{{ t('vrf.bgp.fields.bmpMirrorBufferLimit') }}</label>
-                            <div style="flex:1; max-width:320px;">
+                            <div class="form-control">
                               <input type="number" class="form-control" :value="getBgpFieldValue('bmp mirror-buffer-limit')" @input="setBgpFieldValue('bmp mirror-buffer-limit', $event.target.value)" :disabled="writeDisabled" min="0" max="4294967294" />
                               <div class="form-hint">{{ t('vrf.bgp.hints.bmpMirrorBufferLimit') }}</div>
                             </div>
@@ -11950,14 +14219,14 @@ export default defineComponent({
                       <div style="display:flex;flex-direction:column;gap:10px;">
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.protocols.isisNet') }}</label>
-                          <div style="flex:1; max-width:360px;">
+                          <div class="form-control">
                             <input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'net')" @input="setProtocolScalarValue('isis', 'net', $event.target.value)" :disabled="writeDisabled" placeholder="49.0001.1921.6800.1001.00" />
                             <div class="form-hint">{{ t('vrf.protocolHints.isisNet') }}</div>
                           </div>
                         </div>
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.protocols.isisLevel') }}</label>
-                          <div style="flex:1; max-width:260px;">
+                          <div class="form-control">
                             <select class="form-control" :value="getProtocolScalarValue('isis', 'level')" @change="setProtocolScalarValue('isis', 'level', $event.target.value)" :disabled="writeDisabled">
                               <option value="">{{ t('vrf.form.unsetOption') }}</option>
                               <option value="level-1">level-1</option>
@@ -11969,7 +14238,7 @@ export default defineComponent({
                         </div>
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.protocols.isisMetricStyle') }}</label>
-                          <div style="flex:1; max-width:260px;">
+                          <div class="form-control">
                             <select class="form-control" :value="getProtocolScalarValue('isis', 'metric-style')" @change="setProtocolScalarValue('isis', 'metric-style', $event.target.value)" :disabled="writeDisabled">
                               <option value="">{{ t('vrf.form.unsetOption') }}</option>
                               <option value="narrow">narrow</option>
@@ -11981,55 +14250,55 @@ export default defineComponent({
                         </div>
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.protocols.isisLspMtu') }}</label>
-                          <div style="flex:1; max-width:220px;">
+                          <div class="form-control">
                             <input type="number" class="form-control" :value="getProtocolScalarValue('isis', 'lsp-mtu')" @input="setProtocolScalarValue('isis', 'lsp-mtu', $event.target.value)" :disabled="writeDisabled" min="128" max="4352" />
                             <div class="form-hint">{{ t('vrf.protocolHints.isisLspMtu') }}</div>
                           </div>
                         </div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisLspGenInterval') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="120" :value="getProtocolScalarValue('isis', 'lsp-gen-interval')" @input="setProtocolScalarValue('isis', 'lsp-gen-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisLspGenInterval') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisLspRefreshInterval') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="65535" :value="getProtocolScalarValue('isis', 'lsp-refresh-interval')" @input="setProtocolScalarValue('isis', 'lsp-refresh-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisLspRefreshInterval') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisMaxLspLifetime') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="65535" :value="getProtocolScalarValue('isis', 'max-lsp-lifetime')" @input="setProtocolScalarValue('isis', 'max-lsp-lifetime', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisMaxLspLifetime') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">spf-interval</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" :value="getProtocolScalarValue('isis', 'spf-interval')" @input="setProtocolScalarValue('isis', 'spf-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">Minimum interval between SPF calculations.</div></div></div>
-                        <div class="form-row"><label class="form-label">topology</label><div style="flex:1; max-width:260px;"><input type="text" class="form-control" :value="getProtocolLeafSetValue('isis', 'topology')" @input="setProtocolLeafSetValue('isis', 'topology', $event.target.value)" :disabled="writeDisabled" placeholder="ipv4-unicast" /><div class="form-hint">Configure IS-IS topology entry (for example: ipv4-unicast).</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisLspGenInterval') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="120" :value="getProtocolScalarValue('isis', 'lsp-gen-interval')" @input="setProtocolScalarValue('isis', 'lsp-gen-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisLspGenInterval') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisLspRefreshInterval') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="65535" :value="getProtocolScalarValue('isis', 'lsp-refresh-interval')" @input="setProtocolScalarValue('isis', 'lsp-refresh-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisLspRefreshInterval') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisMaxLspLifetime') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="65535" :value="getProtocolScalarValue('isis', 'max-lsp-lifetime')" @input="setProtocolScalarValue('isis', 'max-lsp-lifetime', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisMaxLspLifetime') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">spf-interval</label><div class="form-control"><input type="number" class="form-control" min="1" :value="getProtocolScalarValue('isis', 'spf-interval')" @input="setProtocolScalarValue('isis', 'spf-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">Minimum interval between SPF calculations.</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisTopology') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolLeafSetValue('isis', 'topology')" @input="setProtocolLeafSetValue('isis', 'topology', $event.target.value)" :disabled="writeDisabled" placeholder="ipv4-unicast" /><div class="form-hint">{{ t('vrf.protocolHints.isisTopology') }}</div></div></div>
                       </div>
                     </template>
                     <template #auth>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisAreaPasswordMd5') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'area-password md5')" @input="setProtocolScalarValue('isis', 'area-password md5', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisAreaPasswordMd5') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisAreaPasswordPlaintext') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'area-password plaintext-password')" @input="setProtocolScalarValue('isis', 'area-password plaintext-password', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisAreaPasswordPlaintext') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDomainPasswordMd5') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'domain-password md5')" @input="setProtocolScalarValue('isis', 'domain-password md5', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDomainPasswordMd5') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDomainPasswordPlaintext') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'domain-password plaintext-password')" @input="setProtocolScalarValue('isis', 'domain-password plaintext-password', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDomainPasswordPlaintext') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisAreaPasswordMd5') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'area-password md5')" @input="setProtocolScalarValue('isis', 'area-password md5', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisAreaPasswordMd5') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisAreaPasswordPlaintext') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'area-password plaintext-password')" @input="setProtocolScalarValue('isis', 'area-password plaintext-password', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisAreaPasswordPlaintext') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDomainPasswordMd5') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'domain-password md5')" @input="setProtocolScalarValue('isis', 'domain-password md5', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDomainPasswordMd5') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDomainPasswordPlaintext') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'domain-password plaintext-password')" @input="setProtocolScalarValue('isis', 'domain-password plaintext-password', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDomainPasswordPlaintext') }}</div></div></div>
                       </div>
                     </template>
                     <template #default-info>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-1 always</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv4 level-1 always')" @change="setProtocolPresence('isis', 'default-information originate ipv4 level-1 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-1 metric</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-1 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-1 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-1 route-map</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-1 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-1 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
-                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-2 always</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv4 level-2 always')" @change="setProtocolPresence('isis', 'default-information originate ipv4 level-2 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-2 metric</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-2 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-2 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">default-information originate ipv4 level-2 route-map</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-2 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-2 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
-                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-1 always</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv6 level-1 always')" @change="setProtocolPresence('isis', 'default-information originate ipv6 level-1 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-1 metric</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-1 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-1 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-1 route-map</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-1 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-1 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
-                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-2 always</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv6 level-2 always')" @change="setProtocolPresence('isis', 'default-information originate ipv6 level-2 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-2 metric</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-2 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-2 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">default-information originate ipv6 level-2 route-map</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-2 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-2 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV4Level1Always') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv4 level-1 always')" @change="setProtocolPresence('isis', 'default-information originate ipv4 level-1 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV4Level1Metric') }}</label><div class="form-control"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-1 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-1 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV4Level1RouteMap') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-1 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-1 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV4Level2Always') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv4 level-2 always')" @change="setProtocolPresence('isis', 'default-information originate ipv4 level-2 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV4Level2Metric') }}</label><div class="form-control"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-2 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-2 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV4Level2RouteMap') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv4 level-2 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv4 level-2 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV6Level1Always') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv6 level-1 always')" @change="setProtocolPresence('isis', 'default-information originate ipv6 level-1 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV6Level1Metric') }}</label><div class="form-control"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-1 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-1 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV6Level1RouteMap') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-1 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-1 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV6Level2Always') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'default-information originate ipv6 level-2 always')" @change="setProtocolPresence('isis', 'default-information originate ipv6 level-2 always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV6Level2Metric') }}</label><div class="form-control"><input type="number" class="form-control" min="0" max="16777215" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-2 metric')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-2 metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisDefaultInfoV6Level2RouteMap') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'default-information originate ipv6 level-2 route-map')" @input="setProtocolScalarValue('isis', 'default-information originate ipv6 level-2 route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
                       </div>
                     </template>
                     <template #features>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">dynamic-hostname</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'dynamic-hostname')" @change="setProtocolPresence('isis', 'dynamic-hostname', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">advertise-high-metrics</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'advertise-high-metrics')" @change="setProtocolPresence('isis', 'advertise-high-metrics', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">advertise-passive-only</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'advertise-passive-only')" @change="setProtocolPresence('isis', 'advertise-passive-only', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">log-adjacency-changes</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'log-adjacency-changes')" @change="setProtocolPresence('isis', 'log-adjacency-changes', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">purge-originator</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'purge-originator')" @change="setProtocolPresence('isis', 'purge-originator', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">set-attached-bit</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'set-attached-bit')" @change="setProtocolPresence('isis', 'set-attached-bit', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">set-overload-bit</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'set-overload-bit')" @change="setProtocolPresence('isis', 'set-overload-bit', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">ldp-sync</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'ldp-sync')" @change="setProtocolPresence('isis', 'ldp-sync', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">Protocol wide LDP-IGP synchronization configuration.</div></div></div>
-                        <div class="form-row"><label class="form-label">fast-reroute</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'fast-reroute')" @change="setProtocolPresence('isis', 'fast-reroute', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">IS-IS fast reroute configuration.</div></div></div>
-                        <div class="form-row"><label class="form-label">segment-routing</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'segment-routing')" @change="setProtocolPresence('isis', 'segment-routing', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">Segment-Routing (SPRING) settings.</div></div></div>
-                        <div class="form-row"><label class="form-label">traffic-engineering</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'traffic-engineering')" @change="setProtocolPresence('isis', 'traffic-engineering', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">IS-IS traffic engineering extensions.</div></div></div>
+                        <div class="form-row"><label class="form-label">dynamic-hostname</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'dynamic-hostname')" @change="setProtocolPresence('isis', 'dynamic-hostname', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">advertise-high-metrics</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'advertise-high-metrics')" @change="setProtocolPresence('isis', 'advertise-high-metrics', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">advertise-passive-only</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'advertise-passive-only')" @change="setProtocolPresence('isis', 'advertise-passive-only', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">log-adjacency-changes</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'log-adjacency-changes')" @change="setProtocolPresence('isis', 'log-adjacency-changes', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">purge-originator</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'purge-originator')" @change="setProtocolPresence('isis', 'purge-originator', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">set-attached-bit</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'set-attached-bit')" @change="setProtocolPresence('isis', 'set-attached-bit', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">set-overload-bit</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'set-overload-bit')" @change="setProtocolPresence('isis', 'set-overload-bit', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">ldp-sync</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'ldp-sync')" @change="setProtocolPresence('isis', 'ldp-sync', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">Protocol wide LDP-IGP synchronization configuration.</div></div></div>
+                        <div class="form-row"><label class="form-label">fast-reroute</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'fast-reroute')" @change="setProtocolPresence('isis', 'fast-reroute', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">IS-IS fast reroute configuration.</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSegmentRouting') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'segment-routing')" @change="setProtocolPresence('isis', 'segment-routing', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisSegmentRouting') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisTrafficEngineering') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'traffic-engineering')" @change="setProtocolPresence('isis', 'traffic-engineering', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisTrafficEngineering') }}</div></div></div>
                       </div>
                     </template>
                     <template #interface>
@@ -12041,7 +14310,6 @@ export default defineComponent({
                           <template #network="{ value }">{{ value || '-' }}</template>
                           <template #extras="{ row }">{{ row.extrasText || '-' }}</template>
                         </DataTable>
-                        <div class="form-hint">{{ t('vrf.protocolHints.isisInterfaceRow') }}</div>
                       </div>
                     </template>
                     <template #fast-reroute>
@@ -12050,7 +14318,6 @@ export default defineComponent({
                           <template #command="{ value }">{{ value || '-' }}</template>
                           <template #value="{ value }">{{ value || '-' }}</template>
                         </DataTable>
-                        <div class="form-hint">{{ t('vrf.protocolHints.isisFastRerouteRow') }}</div>
                       </div>
                     </template>
                     <template #redistribute>
@@ -12062,34 +14329,33 @@ export default defineComponent({
                           <template #metric="{ value }">{{ value || '-' }}</template>
                           <template #routeMap="{ value }">{{ value || '-' }}</template>
                         </DataTable>
-                        <div class="form-hint">{{ t('vrf.protocolHints.isisRedistributeRow') }}</div>
                       </div>
                     </template>
                     <template #segment-routing>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">segment-routing global-block low-label-value</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing global-block low-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing global-block low-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">segment-routing global-block high-label-value</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing global-block high-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing global-block high-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">segment-routing local-block low-label-value</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing local-block low-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing local-block low-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">segment-routing local-block high-label-value</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing local-block high-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing local-block high-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">segment-routing maximum-label-depth</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="16" :value="getProtocolScalarValue('isis', 'segment-routing maximum-label-depth')" @input="setProtocolScalarValue('isis', 'segment-routing maximum-label-depth', $event.target.value)" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">segment-routing srv6 locator</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'segment-routing srv6 locator')" @input="setProtocolScalarValue('isis', 'segment-routing srv6 locator', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSrGlobalBlockLow') }}</label><div class="form-control"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing global-block low-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing global-block low-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSrGlobalBlockHigh') }}</label><div class="form-control"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing global-block high-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing global-block high-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSrLocalBlockLow') }}</label><div class="form-control"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing local-block low-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing local-block low-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSrLocalBlockHigh') }}</label><div class="form-control"><input type="number" class="form-control" min="16" max="1048575" :value="getProtocolScalarValue('isis', 'segment-routing local-block high-label-value')" @input="setProtocolScalarValue('isis', 'segment-routing local-block high-label-value', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSrMaxLabelDepth') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="16" :value="getProtocolScalarValue('isis', 'segment-routing maximum-label-depth')" @input="setProtocolScalarValue('isis', 'segment-routing maximum-label-depth', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSrSrv6Locator') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'segment-routing srv6 locator')" @input="setProtocolScalarValue('isis', 'segment-routing srv6 locator', $event.target.value)" :disabled="writeDisabled" /></div></div>
                       </div>
                     </template>
                     <template #spf-delay-ietf>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">spf-delay-ietf init-delay</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf init-delay')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf init-delay', $event.target.value)" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">spf-delay-ietf short-delay</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf short-delay')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf short-delay', $event.target.value)" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">spf-delay-ietf long-delay</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf long-delay')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf long-delay', $event.target.value)" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">spf-delay-ietf holddown</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf holddown')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf holddown', $event.target.value)" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">spf-delay-ietf time-to-learn</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf time-to-learn')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf time-to-learn', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSpfDelayInitDelay') }}</label><div class="form-control"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf init-delay')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf init-delay', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSpfDelayShortDelay') }}</label><div class="form-control"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf short-delay')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf short-delay', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSpfDelayLongDelay') }}</label><div class="form-control"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf long-delay')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf long-delay', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSpfDelayHolddown') }}</label><div class="form-control"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf holddown')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf holddown', $event.target.value)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisSpfDelayTimeToLearn') }}</label><div class="form-control"><input type="number" class="form-control" min="0" max="60000" :value="getProtocolScalarValue('isis', 'spf-delay-ietf time-to-learn')" @input="setProtocolScalarValue('isis', 'spf-delay-ietf time-to-learn', $event.target.value)" :disabled="writeDisabled" /></div></div>
                       </div>
                     </template>
                     <template #traffic-engineering>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">traffic-engineering address</label><div style="flex:1; max-width:260px;"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'traffic-engineering address')" @input="setProtocolScalarValue('isis', 'traffic-engineering address', $event.target.value)" :disabled="writeDisabled" placeholder="1.1.1.1" /></div></div>
-                        <div class="form-row"><label class="form-label">traffic-engineering enable</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'traffic-engineering enable')" @change="setProtocolPresence('isis', 'traffic-engineering enable', $event.target.checked)" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">traffic-engineering export</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('isis', 'traffic-engineering export')" @change="setProtocolPresence('isis', 'traffic-engineering export', $event.target.checked)" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">topology</label><div style="flex:1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><label v-for="topology in ISIS_TOPOLOGY_OPTIONS" :key="'isis-topology-' + topology" style="display:flex;gap:4px;align-items:center;"><input type="checkbox" :checked="getProtocolPresence('isis', 'topology ' + topology)" @change="setProtocolPresence('isis', 'topology ' + topology, $event.target.checked)" :disabled="writeDisabled" />{{ topology }}</label></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisTrafficEngineeringAddress') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('isis', 'traffic-engineering address')" @input="setProtocolScalarValue('isis', 'traffic-engineering address', $event.target.value)" :disabled="writeDisabled" placeholder="1.1.1.1" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisTrafficEngineeringEnable') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'traffic-engineering enable')" @change="setProtocolPresence('isis', 'traffic-engineering enable', $event.target.checked)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisTrafficEngineeringExport') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('isis', 'traffic-engineering export')" @change="setProtocolPresence('isis', 'traffic-engineering export', $event.target.checked)" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisTopology') }}</label><div style="flex:1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><label v-for="topology in ISIS_TOPOLOGY_OPTIONS" :key="'isis-topology-' + topology" style="display:flex;gap:4px;align-items:center;"><input type="checkbox" :checked="getProtocolPresence('isis', 'topology ' + topology)" @change="setProtocolPresence('isis', 'topology ' + topology, $event.target.checked)" :disabled="writeDisabled" />{{ topology }}</label></div></div>
                       </div>
                     </template>
                   </TabGroup>
@@ -12102,25 +14368,25 @@ export default defineComponent({
                       <div style="display:flex;flex-direction:column;gap:10px;">
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.protocols.ospfRouterId') }}</label>
-                          <div style="flex:1; max-width:360px;">
+                          <div class="form-control">
                             <input type="text" class="form-control" :value="getProtocolScalarValue('ospf', 'parameters router-id')" @input="setProtocolScalarValue('ospf', 'parameters router-id', $event.target.value)" :disabled="writeDisabled" placeholder="1.1.1.1" />
                             <div class="form-hint">{{ t('vrf.protocolHints.ospfRouterId') }}</div>
                           </div>
                         </div>
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.protocols.ospfAbrType') }}</label>
-                          <div style="flex:1; max-width:360px;">
+                          <div class="form-control">
                             <input type="text" class="form-control" :value="getProtocolScalarValue('ospf', 'parameters abr-type')" @input="setProtocolScalarValue('ospf', 'parameters abr-type', $event.target.value)" :disabled="writeDisabled" placeholder="cisco" />
                             <div class="form-hint">{{ t('vrf.protocolHints.ospfAbrType') }}</div>
                           </div>
                         </div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDistanceGlobal') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospf', 'parameters distance global')" @input="setProtocolScalarValue('ospf', 'parameters distance global', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDistance') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDistanceInterArea') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospf', 'parameters distance inter-area')" @input="setProtocolScalarValue('ospf', 'parameters distance inter-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDistance') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDistanceIntraArea') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospf', 'parameters distance intra-area')" @input="setProtocolScalarValue('ospf', 'parameters distance intra-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDistance') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoAlways') }}</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('ospf', 'default-information originate always')" @change="setProtocolPresence('ospf', 'default-information originate always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoAlways') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoMetric') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777214" :value="getProtocolScalarValue('ospf', 'default-information originate metric')" @input="setProtocolScalarValue('ospf', 'default-information originate metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoMetric') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoMetricType') }}</label><div style="flex:1; max-width:220px;"><select class="form-control" :value="getProtocolScalarValue('ospf', 'default-information originate metric-type')" @change="setProtocolScalarValue('ospf', 'default-information originate metric-type', $event.target.value)" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoMetricType') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoRouteMap') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('ospf', 'default-information originate route-map')" @input="setProtocolScalarValue('ospf', 'default-information originate route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoRouteMap') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDistanceGlobal') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospf', 'parameters distance global')" @input="setProtocolScalarValue('ospf', 'parameters distance global', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDistance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDistanceInterArea') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospf', 'parameters distance inter-area')" @input="setProtocolScalarValue('ospf', 'parameters distance inter-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDistance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDistanceIntraArea') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospf', 'parameters distance intra-area')" @input="setProtocolScalarValue('ospf', 'parameters distance intra-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDistance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoAlways') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('ospf', 'default-information originate always')" @change="setProtocolPresence('ospf', 'default-information originate always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoMetric') }}</label><div class="form-control"><input type="number" class="form-control" min="0" max="16777214" :value="getProtocolScalarValue('ospf', 'default-information originate metric')" @input="setProtocolScalarValue('ospf', 'default-information originate metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoMetricType') }}</label><div class="form-control"><select class="form-control" :value="getProtocolScalarValue('ospf', 'default-information originate metric-type')" @change="setProtocolScalarValue('ospf', 'default-information originate metric-type', $event.target.value)" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoMetricType') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfDefaultInfoRouteMap') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('ospf', 'default-information originate route-map')" @input="setProtocolScalarValue('ospf', 'default-information originate route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfDefaultInfoRouteMap') }}</div></div></div>
                       </div>
                     </template>
                     <template #area>
@@ -12132,7 +14398,6 @@ export default defineComponent({
                           <template #ranges="{ row }">{{ getOspfAreaRangesPreview(row) || '-' }}</template>
                           <template #virtualLinks="{ row }">{{ getOspfAreaVirtualLinksPreview(row) || '-' }}</template>
                         </DataTable>
-                        <div class="form-hint">{{ t('vrf.protocolHints.ospfAreaRow') }}</div>
                       </div>
                     </template>
                     <template #interface>
@@ -12146,7 +14411,6 @@ export default defineComponent({
                           <template #timers="{ row }">{{ getOspfInterfaceTimersPreview(row) || '-' }}</template>
                           <template #flags="{ row }">{{ getOspfInterfaceFlagsPreview(row) || '-' }}</template>
                         </DataTable>
-                        <div class="form-hint">{{ t('vrf.protocolHints.ospfInterfaceRow') }}</div>
                       </div>
                     </template>
                     <template #access-list>
@@ -12155,7 +14419,6 @@ export default defineComponent({
                           <template #number="{ value }">{{ value || '-' }}</template>
                           <template #export="{ row }">{{ getOspfAccessListExportPreview(row) || '-' }}</template>
                         </DataTable>
-                        <div class="form-hint">{{ t('vrf.protocolHints.ospfAccessListRow') }}</div>
                       </div>
                     </template>
                     <template #neighbor>
@@ -12165,7 +14428,6 @@ export default defineComponent({
                           <template #pollInterval="{ value }">{{ value || '-' }}</template>
                           <template #priority="{ value }">{{ value || '-' }}</template>
                         </DataTable>
-                        <div class="form-hint">{{ t('vrf.protocolHints.ospfNeighborRow') }}</div>
                       </div>
                     </template>
                     <template #summary-address>
@@ -12175,16 +14437,15 @@ export default defineComponent({
                           <template #noAdvertise="{ value }">{{ value ? 'yes' : '-' }}</template>
                           <template #tag="{ value }">{{ value || '-' }}</template>
                         </DataTable>
-                        <div class="form-hint">{{ t('vrf.protocolHints.ospfSummaryAddressRow') }}</div>
                       </div>
                     </template>
                     <template #segment-routing>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrGlobalBlockLowLabelValue') }}</label><div style="flex:1;"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.globalBlockLowLabelValue" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrGlobalBlockLowLabelValue') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrGlobalBlockHighLabelValue') }}</label><div style="flex:1;"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.globalBlockHighLabelValue" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrGlobalBlockHighLabelValue') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrLocalBlockLowLabelValue') }}</label><div style="flex:1;"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.localBlockLowLabelValue" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrLocalBlockLowLabelValue') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrLocalBlockHighLabelValue') }}</label><div style="flex:1;"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.localBlockHighLabelValue" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrLocalBlockHighLabelValue') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrMaximumLabelDepth') }}</label><div style="flex:1;"><input type="number" min="1" max="16" class="form-control" v-model="editingVrf.ospfSegmentRouting.maximumLabelDepth" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrMaximumLabelDepth') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrGlobalBlockLowLabelValue') }}</label><div class="form-control"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.globalBlockLowLabelValue" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrGlobalBlockLowLabelValue') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrGlobalBlockHighLabelValue') }}</label><div class="form-control"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.globalBlockHighLabelValue" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrGlobalBlockHighLabelValue') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrLocalBlockLowLabelValue') }}</label><div class="form-control"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.localBlockLowLabelValue" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrLocalBlockLowLabelValue') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrLocalBlockHighLabelValue') }}</label><div class="form-control"><input type="number" min="16" max="1048575" class="form-control" v-model="editingVrf.ospfSegmentRouting.localBlockHighLabelValue" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrLocalBlockHighLabelValue') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrMaximumLabelDepth') }}</label><div class="form-control"><input type="number" min="1" max="16" class="form-control" v-model="editingVrf.ospfSegmentRouting.maximumLabelDepth" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrMaximumLabelDepth') }}</div></div></div>
 
                         <DataTable :columns="OSPF_SR_PREFIX_TABLE_COLUMNS" :data="editingVrf.ospfSegmentRouting.prefixes" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfSrPrefixCreate" @edit="openOspfSrPrefixEdit" @delete="requestOspfSrPrefixDelete">
                           <template #prefix="{ value }">{{ value || '-' }}</template>
@@ -12198,10 +14459,10 @@ export default defineComponent({
                       <div style="display:flex;flex-direction:column;gap:10px;">
                         <div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeRow') }}</div>
                         <div v-for="protocol in OSPF_REDISTRIBUTE_PROTOCOLS" :key="'ospf-redistribute-' + protocol" style="border:1px solid #eee;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px;">
-                          <div class="form-row"><label class="form-label">{{ protocol }}</label><div style="flex:1;"><label><input type="checkbox" v-model="editingVrf.ospfRedistribute[protocol].enabled" :disabled="writeDisabled" /> enable</label></div></div>
-                          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetric') }}</label><div style="flex:1;"><input type="number" min="0" max="16777214" class="form-control" v-model="editingVrf.ospfRedistribute[protocol].metric" :disabled="writeDisabled || !editingVrf.ospfRedistribute[protocol].enabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetric') }}</div></div></div>
-                          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetricType') }}</label><div style="flex:1;"><select class="form-control" v-model="editingVrf.ospfRedistribute[protocol].metricType" :disabled="writeDisabled || !editingVrf.ospfRedistribute[protocol].enabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetricType') }}</div></div></div>
-                          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeRouteMap') }}</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.ospfRedistribute[protocol].routeMap" :disabled="writeDisabled || !editingVrf.ospfRedistribute[protocol].enabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeRouteMap') }}</div></div></div>
+                          <div class="form-row"><label class="form-label">{{ protocol }}</label><div class="form-control"><label><input type="checkbox" v-model="editingVrf.ospfRedistribute[protocol].enabled" :disabled="writeDisabled" /> enable</label></div></div>
+                          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetric') }}</label><div class="form-control"><input type="number" min="0" max="16777214" class="form-control" v-model="editingVrf.ospfRedistribute[protocol].metric" :disabled="writeDisabled || !editingVrf.ospfRedistribute[protocol].enabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetric') }}</div></div></div>
+                          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetricType') }}</label><div class="form-control"><select class="form-control" v-model="editingVrf.ospfRedistribute[protocol].metricType" :disabled="writeDisabled || !editingVrf.ospfRedistribute[protocol].enabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetricType') }}</div></div></div>
+                          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeRouteMap') }}</label><div class="form-control"><input class="form-control" v-model="editingVrf.ospfRedistribute[protocol].routeMap" :disabled="writeDisabled || !editingVrf.ospfRedistribute[protocol].enabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeRouteMap') }}</div></div></div>
                         </div>
                         <DataTable :columns="OSPF_REDISTRIBUTE_TABLE_COLUMNS" :data="editingVrf.ospfRedistribute.tables" row-key="__id" :actions="BGP_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="200" @create="openOspfRedistributeTableCreate" @edit="openOspfRedistributeTableEdit" @delete="requestOspfRedistributeTableDelete">
                           <template #table="{ value }">{{ value || '-' }}</template>
@@ -12222,28 +14483,28 @@ export default defineComponent({
                       <div style="display:flex;flex-direction:column;gap:10px;">
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.protocols.ospfv3RouterId') }}</label>
-                          <div style="flex:1; max-width:360px;">
+                          <div class="form-control">
                             <input type="text" class="form-control" :value="getProtocolScalarValue('ospfv3', 'parameters router-id')" @input="setProtocolScalarValue('ospfv3', 'parameters router-id', $event.target.value)" :disabled="writeDisabled" placeholder="2.2.2.2" />
                             <div class="form-hint">{{ t('vrf.protocolHints.ospfv3RouterId') }}</div>
                           </div>
                         </div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DistanceGlobal') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospfv3', 'parameters distance global')" @input="setProtocolScalarValue('ospfv3', 'parameters distance global', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3Distance') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DistanceInterArea') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospfv3', 'parameters distance inter-area')" @input="setProtocolScalarValue('ospfv3', 'parameters distance inter-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3Distance') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DistanceIntraArea') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospfv3', 'parameters distance intra-area')" @input="setProtocolScalarValue('ospfv3', 'parameters distance intra-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3Distance') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoAlways') }}</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'default-information originate always')" @change="setProtocolPresence('ospfv3', 'default-information originate always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoAlways') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoMetric') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="0" max="16777214" :value="getProtocolScalarValue('ospfv3', 'default-information originate metric')" @input="setProtocolScalarValue('ospfv3', 'default-information originate metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoMetric') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoMetricType') }}</label><div style="flex:1; max-width:220px;"><select class="form-control" :value="getProtocolScalarValue('ospfv3', 'default-information originate metric-type')" @change="setProtocolScalarValue('ospfv3', 'default-information originate metric-type', $event.target.value)" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoMetricType') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoRouteMap') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolScalarValue('ospfv3', 'default-information originate route-map')" @input="setProtocolScalarValue('ospfv3', 'default-information originate route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoRouteMap') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DistanceGlobal') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospfv3', 'parameters distance global')" @input="setProtocolScalarValue('ospfv3', 'parameters distance global', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3Distance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DistanceInterArea') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospfv3', 'parameters distance inter-area')" @input="setProtocolScalarValue('ospfv3', 'parameters distance inter-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3Distance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DistanceIntraArea') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="255" :value="getProtocolScalarValue('ospfv3', 'parameters distance intra-area')" @input="setProtocolScalarValue('ospfv3', 'parameters distance intra-area', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3Distance') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoAlways') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'default-information originate always')" @change="setProtocolPresence('ospfv3', 'default-information originate always', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoAlways') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoMetric') }}</label><div class="form-control"><input type="number" class="form-control" min="0" max="16777214" :value="getProtocolScalarValue('ospfv3', 'default-information originate metric')" @input="setProtocolScalarValue('ospfv3', 'default-information originate metric', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoMetric') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoMetricType') }}</label><div class="form-control"><select class="form-control" :value="getProtocolScalarValue('ospfv3', 'default-information originate metric-type')" @change="setProtocolScalarValue('ospfv3', 'default-information originate metric-type', $event.target.value)" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoMetricType') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3DefaultInfoRouteMap') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolScalarValue('ospfv3', 'default-information originate route-map')" @input="setProtocolScalarValue('ospfv3', 'default-information originate route-map', $event.target.value)" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3DefaultInfoRouteMap') }}</div></div></div>
                       </div>
                     </template>
                     <template #graceful-restart>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartGracePeriod') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="1800" :value="getProtocolScalarValue('ospfv3', 'graceful-restart grace-period')" @input="setProtocolScalarValue('ospfv3', 'graceful-restart grace-period', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartGracePeriod') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperEnable') }}</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'graceful-restart helper enable')" @change="setProtocolPresence('ospfv3', 'graceful-restart helper enable', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperEnable') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperEnableRouterId') }}</label><div style="flex:1; max-width:320px;"><input type="text" class="form-control" :value="getProtocolLeafSetValue('ospfv3', 'graceful-restart helper enable router-id')" @input="setProtocolLeafSetValue('ospfv3', 'graceful-restart helper enable router-id', $event.target.value)" :disabled="writeDisabled" placeholder="1.1.1.1" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperEnableRouterId') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperLsaCheckDisable') }}</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'graceful-restart helper lsa-check-disable')" @change="setProtocolPresence('ospfv3', 'graceful-restart helper lsa-check-disable', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperLsaCheckDisable') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperPlannedOnly') }}</label><div style="flex:1; max-width:220px;"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'graceful-restart helper planned-only')" @change="setProtocolPresence('ospfv3', 'graceful-restart helper planned-only', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperPlannedOnly') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperSupportedGraceTime') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="10" max="1800" :value="getProtocolScalarValue('ospfv3', 'graceful-restart helper supported-grace-time')" @input="setProtocolScalarValue('ospfv3', 'graceful-restart helper supported-grace-time', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperSupportedGraceTime') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartGracePeriod') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="1800" :value="getProtocolScalarValue('ospfv3', 'graceful-restart grace-period')" @input="setProtocolScalarValue('ospfv3', 'graceful-restart grace-period', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartGracePeriod') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperEnable') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'graceful-restart helper enable')" @change="setProtocolPresence('ospfv3', 'graceful-restart helper enable', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperEnable') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperEnableRouterId') }}</label><div class="form-control"><input type="text" class="form-control" :value="getProtocolLeafSetValue('ospfv3', 'graceful-restart helper enable router-id')" @input="setProtocolLeafSetValue('ospfv3', 'graceful-restart helper enable router-id', $event.target.value)" :disabled="writeDisabled" placeholder="1.1.1.1" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperEnableRouterId') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperLsaCheckDisable') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'graceful-restart helper lsa-check-disable')" @change="setProtocolPresence('ospfv3', 'graceful-restart helper lsa-check-disable', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperLsaCheckDisable') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperPlannedOnly') }}</label><div class="form-control"><input type="checkbox" :checked="getProtocolPresence('ospfv3', 'graceful-restart helper planned-only')" @change="setProtocolPresence('ospfv3', 'graceful-restart helper planned-only', $event.target.checked)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperPlannedOnly') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3GracefulRestartHelperSupportedGraceTime') }}</label><div class="form-control"><input type="number" class="form-control" min="10" max="1800" :value="getProtocolScalarValue('ospfv3', 'graceful-restart helper supported-grace-time')" @input="setProtocolScalarValue('ospfv3', 'graceful-restart helper supported-grace-time', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3GracefulRestartHelperSupportedGraceTime') }}</div></div></div>
                       </div>
                     </template>
                     <template #area>
@@ -12255,7 +14516,6 @@ export default defineComponent({
                           <template #importList="{ value }">{{ value || '-' }}</template>
                           <template #ranges="{ row }">{{ getOspfv3AreaRangesPreview(row) || '-' }}</template>
                         </DataTable>
-                        <div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaRow') }}</div>
                       </div>
                     </template>
                     <template #interface>
@@ -12269,7 +14529,6 @@ export default defineComponent({
                           <template #timers="{ row }">{{ getOspfv3InterfaceTimersPreview(row) || '-' }}</template>
                           <template #flags="{ row }">{{ getOspfv3InterfaceFlagsPreview(row) || '-' }}</template>
                         </DataTable>
-                        <div class="form-hint">{{ t('vrf.protocolHints.ospfv3InterfaceRow') }}</div>
                       </div>
                     </template>
                     <template #redistribute>
@@ -12293,13 +14552,13 @@ export default defineComponent({
                       <div style="display:flex;flex-direction:column;gap:10px;">
                         <div class="form-row">
                           <label class="form-label">{{ t('vrf.protocols.rpkiPollingPeriod') }}</label>
-                          <div style="flex:1; max-width:220px;">
+                          <div class="form-control">
                             <input type="number" class="form-control" :value="getProtocolScalarValue('rpki', 'polling-period')" @input="setProtocolScalarValue('rpki', 'polling-period', $event.target.value)" :disabled="writeDisabled" min="1" max="86400" />
                             <div class="form-hint">{{ t('vrf.protocolHints.rpkiPollingPeriod') }}</div>
                           </div>
                         </div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiRetryInterval') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="1" max="7200" :value="getProtocolScalarValue('rpki', 'retry-interval')" @input="setProtocolScalarValue('rpki', 'retry-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiRetryInterval') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiExpireInterval') }}</label><div style="flex:1; max-width:220px;"><input type="number" class="form-control" min="600" max="172800" :value="getProtocolScalarValue('rpki', 'expire-interval')" @input="setProtocolScalarValue('rpki', 'expire-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiExpireInterval') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiRetryInterval') }}</label><div class="form-control"><input type="number" class="form-control" min="1" max="7200" :value="getProtocolScalarValue('rpki', 'retry-interval')" @input="setProtocolScalarValue('rpki', 'retry-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiRetryInterval') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiExpireInterval') }}</label><div class="form-control"><input type="number" class="form-control" min="600" max="172800" :value="getProtocolScalarValue('rpki', 'expire-interval')" @input="setProtocolScalarValue('rpki', 'expire-interval', $event.target.value)" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiExpireInterval') }}</div></div></div>
                       </div>
                     </template>
                     <template #cache>
@@ -12312,7 +14571,6 @@ export default defineComponent({
                           <template #sshUsername="{ value }">{{ value || '-' }}</template>
                           <template #sshKey="{ value }">{{ value || '-' }}</template>
                         </DataTable>
-                        <div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheRow') }}</div>
                       </div>
                     </template>
                   </TabGroup>
@@ -12433,17 +14691,16 @@ export default defineComponent({
               <TabGroup v-model="dhcpServerSubTab" :tabs="DHCP_SERVER_SUB_TABS">
                     <template #basic>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="editingVrf.dhcpServerDisable" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpServerDisable') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">hostfile-update</label><div style="flex:1;"><input type="checkbox" v-model="editingVrf.dhcpServerHostfileUpdate" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpServerHostfileUpdate') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">disable</label><div class="form-control"><input type="checkbox" v-model="editingVrf.dhcpServerDisable" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpServerDisable') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">hostfile-update</label><div class="form-control"><input type="checkbox" v-model="editingVrf.dhcpServerHostfileUpdate" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpServerHostfileUpdate') }}</div></div></div>
                         <div class="form-row">
                           <label class="form-label">listen-address</label>
-                          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                          <div class="form-control">
                             <textarea
                               class="form-control"
                               :value="getDhcpServerListenAddressText()"
                               @input="setDhcpServerListenAddressText($event.target.value)"
                               rows="4"
-                              style="max-width:420px;"
                               placeholder="192.0.2.10\n192.0.2.11"
                               :disabled="writeDisabled"
                             ></textarea>
@@ -12452,13 +14709,12 @@ export default defineComponent({
                         </div>
                         <div class="form-row">
                           <label class="form-label">listen-interface</label>
-                          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                          <div class="form-control">
                             <textarea
                               class="form-control"
                               :value="getDhcpServerListenInterfaceText()"
                               @input="setDhcpServerListenInterfaceText($event.target.value)"
                               rows="4"
-                              style="max-width:420px;"
                               placeholder="eth0\neth1"
                               :disabled="writeDisabled"
                             ></textarea>
@@ -12468,35 +14724,23 @@ export default defineComponent({
                       </div>
                     </template>
                     <template #client-class>
-                      <div class="form-group" style="margin-top:0;">
-                        <div class="form-group-title">client-class</div>
-                        <div class="form-group-content">
-                          <div class="form-hint" style="margin-bottom:8px;">{{ t('vrf.protocolHints.dhcpClientClassRow') }}</div>
-                          <DataTable :columns="DHCP_CLIENT_CLASS_TABLE_COLUMNS" :data="editingVrf.dhcpServerClientClasses" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-client-class')" @edit="openServiceCollectionEdit('dhcp4-client-class', $event)" @delete="removeServiceCollectionByIds('dhcp4-client-class', $event)">
-                            <template #name="{ value }">{{ value || '-' }}</template>
-                            <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
-                            <template #circuitId="{ value }">{{ value || '-' }}</template>
-                            <template #remoteId="{ value }">{{ value || '-' }}</template>
-                          </DataTable>
-                        </div>
-                      </div>
+                      <DataTable :columns="DHCP_CLIENT_CLASS_TABLE_COLUMNS" :data="editingVrf.dhcpServerClientClasses" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-client-class')" @edit="openServiceCollectionEdit('dhcp4-client-class', $event)" @delete="removeServiceCollectionByIds('dhcp4-client-class', $event)">
+                        <template #name="{ value }">{{ value || '-' }}</template>
+                        <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                        <template #circuitId="{ value }">{{ value || '-' }}</template>
+                        <template #remoteId="{ value }">{{ value || '-' }}</template>
+                      </DataTable>
                     </template>
                     <template #shared-network>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-group" style="margin-top:0;">
-                          <div class="form-group-title">shared-network-name</div>
-                          <div class="form-group-content">
-                            <div class="form-hint" style="margin-bottom:8px;">{{ t('vrf.protocolHints.dhcpSharedNetworkRow') }}</div>
-                            <DataTable :columns="DHCP_SHARED_NETWORK_TABLE_COLUMNS" :data="editingVrf.dhcpServerSharedNetworks" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-shared-network')" @edit="openServiceCollectionEdit('dhcp4-shared-network', $event)" @delete="removeServiceCollectionByIds('dhcp4-shared-network', $event)">
-                              <template #name="{ value }">{{ value || '-' }}</template>
-                              <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
-                              <template #authoritative="{ value }">{{ value ? 'Yes' : '-' }}</template>
-                              <template #pingCheck="{ value }">{{ value ? 'Yes' : '-' }}</template>
-                              <template #dynamicDnsUpdate="{ row }">{{ hasDhcpSharedNetworkDdnsSettings(row.dynamicDnsUpdate) ? 'Yes' : '-' }}</template>
-                              <template #description="{ value }">{{ value || '-' }}</template>
-                            </DataTable>
-                          </div>
-                        </div>
+                        <DataTable :columns="DHCP_SHARED_NETWORK_TABLE_COLUMNS" :data="editingVrf.dhcpServerSharedNetworks" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp4-shared-network')" @edit="openServiceCollectionEdit('dhcp4-shared-network', $event)" @delete="removeServiceCollectionByIds('dhcp4-shared-network', $event)">
+                          <template #name="{ value }">{{ value || '-' }}</template>
+                          <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                          <template #authoritative="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                          <template #pingCheck="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                          <template #dynamicDnsUpdate="{ row }">{{ hasDhcpSharedNetworkDdnsSettings(row.dynamicDnsUpdate) ? 'Yes' : '-' }}</template>
+                          <template #description="{ value }">{{ value || '-' }}</template>
+                        </DataTable>
                         <div v-for="shared in editingVrf.dhcpServerSharedNetworks" :key="'svc-shared-nested-' + shared.__id" class="form-group" style="margin-top:0;">
                           <div class="form-group-title">{{ shared.name || 'shared-network' }}</div>
                           <div class="form-group-content" style="display:flex;flex-direction:column;gap:10px;">
@@ -12547,17 +14791,17 @@ export default defineComponent({
                               </template>
                               <template #dynamic-dns-update>
                                 <div style="display:flex;flex-direction:column;gap:10px;">
-                                  <div class="form-row"><label class="form-label">conflict-resolution</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
-                                  <div class="form-row"><label class="form-label">generated-prefix</label><div style="flex:1;"><input class="form-control" v-model="shared.dynamicDnsUpdate.generatedPrefix" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
-                                  <div class="form-row"><label class="form-label">hostname-char-replacement</label><div style="flex:1;"><input class="form-control" v-model="shared.dynamicDnsUpdate.hostnameCharReplacement" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
-                                  <div class="form-row"><label class="form-label">hostname-char-set</label><div style="flex:1;"><input class="form-control" v-model="shared.dynamicDnsUpdate.hostnameCharSet" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
-                                  <div class="form-row"><label class="form-label">override-client-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
-                                  <div class="form-row"><label class="form-label">override-no-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
-                                  <div class="form-row"><label class="form-label">qualifying-suffix</label><div style="flex:1;"><input class="form-control" v-model="shared.dynamicDnsUpdate.qualifyingSuffix" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
-                                  <div class="form-row"><label class="form-label">replace-client-name</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
-                                  <div class="form-row"><label class="form-label">send-updates</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
-                                  <div class="form-row"><label class="form-label">ttl-percent</label><div style="flex:1;"><input class="form-control" v-model="shared.dynamicDnsUpdate.ttlPercent" :disabled="writeDisabled" style="max-width:200px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
-                                  <div class="form-row"><label class="form-label">update-on-renew</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="shared.dynamicDnsUpdate.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">conflict-resolution</label><div class="form-control"><select class="form-control" v-model="shared.dynamicDnsUpdate.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">generated-prefix</label><div class="form-control"><input class="form-control" v-model="shared.dynamicDnsUpdate.generatedPrefix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">hostname-char-replacement</label><div class="form-control"><input class="form-control" v-model="shared.dynamicDnsUpdate.hostnameCharReplacement" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">hostname-char-set</label><div class="form-control"><input class="form-control" v-model="shared.dynamicDnsUpdate.hostnameCharSet" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">override-client-update</label><div class="form-control"><select class="form-control" v-model="shared.dynamicDnsUpdate.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">override-no-update</label><div class="form-control"><select class="form-control" v-model="shared.dynamicDnsUpdate.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">qualifying-suffix</label><div class="form-control"><input class="form-control" v-model="shared.dynamicDnsUpdate.qualifyingSuffix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">replace-client-name</label><div class="form-control"><select class="form-control" v-model="shared.dynamicDnsUpdate.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">send-updates</label><div class="form-control"><select class="form-control" v-model="shared.dynamicDnsUpdate.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">ttl-percent</label><div class="form-control"><input class="form-control" v-model="shared.dynamicDnsUpdate.ttlPercent" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
+                                  <div class="form-row"><label class="form-label">update-on-renew</label><div class="form-control"><select class="form-control" v-model="shared.dynamicDnsUpdate.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
                                 </div>
                               </template>
                               <template #option>
@@ -12585,31 +14829,31 @@ export default defineComponent({
                     </template>
                     <template #dynamic-dns-update>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">conflict-resolution</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">conflict-resolution</label><div class="form-control"><select class="form-control" v-model="editingVrf.dhcpServerDdns.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
                         <div class="form-group" style="margin-top:0;"><div class="form-group-title">forward-domain</div><div class="form-group-content"><DataTable :columns="DHCP_DDNS_DOMAIN_TABLE_COLUMNS" :data="editingVrf.dhcpServerDdns.forwardDomains" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('ddns-forward-domain')" @edit="openServiceCollectionEdit('ddns-forward-domain', $event)" @delete="removeServiceCollectionByIds('ddns-forward-domain', $event)"><template #name="{ value }">{{ value || '-' }}</template><template #keyName="{ value }">{{ value || '-' }}</template><template #dnsServersText="{ value }">{{ value || '-' }}</template></DataTable></div></div>
-                        <div class="form-row"><label class="form-label">generated-prefix</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerDdns.generatedPrefix" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">hostname-char-replacement</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerDdns.hostnameCharReplacement" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">hostname-char-set</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerDdns.hostnameCharSet" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">override-client-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">override-no-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">qualifying-suffix</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerDdns.qualifyingSuffix" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">replace-client-name</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">generated-prefix</label><div class="form-control"><input class="form-control" v-model="editingVrf.dhcpServerDdns.generatedPrefix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">hostname-char-replacement</label><div class="form-control"><input class="form-control" v-model="editingVrf.dhcpServerDdns.hostnameCharReplacement" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">hostname-char-set</label><div class="form-control"><input class="form-control" v-model="editingVrf.dhcpServerDdns.hostnameCharSet" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">override-client-update</label><div class="form-control"><select class="form-control" v-model="editingVrf.dhcpServerDdns.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">override-no-update</label><div class="form-control"><select class="form-control" v-model="editingVrf.dhcpServerDdns.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">qualifying-suffix</label><div class="form-control"><input class="form-control" v-model="editingVrf.dhcpServerDdns.qualifyingSuffix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">replace-client-name</label><div class="form-control"><select class="form-control" v-model="editingVrf.dhcpServerDdns.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
                         <div class="form-group" style="margin-top:0;"><div class="form-group-title">reverse-domain</div><div class="form-group-content"><DataTable :columns="DHCP_DDNS_DOMAIN_TABLE_COLUMNS" :data="editingVrf.dhcpServerDdns.reverseDomains" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('ddns-reverse-domain')" @edit="openServiceCollectionEdit('ddns-reverse-domain', $event)" @delete="removeServiceCollectionByIds('ddns-reverse-domain', $event)"><template #name="{ value }">{{ value || '-' }}</template><template #keyName="{ value }">{{ value || '-' }}</template><template #dnsServersText="{ value }">{{ value || '-' }}</template></DataTable></div></div>
-                        <div class="form-row"><label class="form-label">send-updates</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">send-updates</label><div class="form-control"><select class="form-control" v-model="editingVrf.dhcpServerDdns.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
                         <div class="form-group" style="margin-top:0;"><div class="form-group-title">tsig-key</div><div class="form-group-content"><DataTable :columns="DHCP_DDNS_TSIG_TABLE_COLUMNS" :data="editingVrf.dhcpServerDdns.tsigKeys" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('ddns-tsig-key')" @edit="openServiceCollectionEdit('ddns-tsig-key', $event)" @delete="removeServiceCollectionByIds('ddns-tsig-key', $event)"><template #name="{ value }">{{ value || '-' }}</template><template #algorithm="{ value }">{{ value || '-' }}</template><template #secret="{ value }">{{ value || '-' }}</template></DataTable></div></div>
-                        <div class="form-row"><label class="form-label">ttl-percent</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerDdns.ttlPercent" :disabled="writeDisabled" style="max-width:200px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">update-on-renew</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerDdns.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">ttl-percent</label><div class="form-control"><input class="form-control" v-model="editingVrf.dhcpServerDdns.ttlPercent" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">update-on-renew</label><div class="form-control"><select class="form-control" v-model="editingVrf.dhcpServerDdns.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
                       </div>
                     </template>
                     <template #high-availability>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">ca-certificate</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.caCertificate" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaCaCertificate') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">certificate</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.certificate" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaCertificate') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">mode</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerHighAvailability.mode" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="active-active">active-active</option><option value="active-passive">active-passive</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaMode') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.name" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaName') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">remote</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.remote" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaRemote') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">source-address</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.sourceAddress" :disabled="writeDisabled" style="max-width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaSourceAddress') }}</div></div></div>
-                        <div class="form-row"><label class="form-label">status</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="editingVrf.dhcpServerHighAvailability.status" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="primary">primary</option><option value="secondary">secondary</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaStatus') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">ca-certificate</label><div class="form-control"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.caCertificate" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaCaCertificate') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">certificate</label><div class="form-control"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.certificate" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaCertificate') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">mode</label><div class="form-control"><select class="form-control" v-model="editingVrf.dhcpServerHighAvailability.mode" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="active-active">active-active</option><option value="active-passive">active-passive</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaMode') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">name</label><div class="form-control"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaName') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">remote</label><div class="form-control"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.remote" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaRemote') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">source-address</label><div class="form-control"><input class="form-control" v-model="editingVrf.dhcpServerHighAvailability.sourceAddress" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaSourceAddress') }}</div></div></div>
+                        <div class="form-row"><label class="form-label">status</label><div class="form-control"><select class="form-control" v-model="editingVrf.dhcpServerHighAvailability.status" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="primary">primary</option><option value="secondary">secondary</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpHaStatus') }}</div></div></div>
                       </div>
                     </template>
               </TabGroup>
@@ -12620,18 +14864,17 @@ export default defineComponent({
               <TabGroup v-model="dhcpv6ServerSubTab" :tabs="DHCPV6_SERVER_SUB_TABS">
                     <template #basic>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="editingVrf.dhcpv6ServerDisable" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">disable-route-autoinstall</label><div style="flex:1;"><input type="checkbox" v-model="editingVrf.dhcpv6ServerDisableRouteAutoinstall" :disabled="writeDisabled" /></div></div>
-                        <div class="form-row"><label class="form-label">preference</label><div style="flex:1;"><input class="form-control" v-model="editingVrf.dhcpv6ServerPreference" :disabled="writeDisabled" style="max-width:200px;" /></div></div>
+                        <div class="form-row"><label class="form-label">disable</label><div class="form-control"><input type="checkbox" v-model="editingVrf.dhcpv6ServerDisable" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">disable-route-autoinstall</label><div class="form-control"><input type="checkbox" v-model="editingVrf.dhcpv6ServerDisableRouteAutoinstall" :disabled="writeDisabled" /></div></div>
+                        <div class="form-row"><label class="form-label">preference</label><div class="form-control"><input class="form-control" v-model="editingVrf.dhcpv6ServerPreference" :disabled="writeDisabled" /></div></div>
                         <div class="form-row">
                           <label class="form-label">global-parameters name-server</label>
-                          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                          <div class="form-control">
                             <textarea
                               class="form-control"
                               :value="getDhcpv6GlobalNameServerText()"
                               @input="setDhcpv6GlobalNameServerText($event.target.value)"
                               rows="4"
-                              style="max-width:420px;"
                               placeholder="2001:db8::53\n2001:db8::54"
                               :disabled="writeDisabled"
                             ></textarea>
@@ -12640,13 +14883,12 @@ export default defineComponent({
                         </div>
                         <div class="form-row">
                           <label class="form-label">listen-interface</label>
-                          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                          <div class="form-control">
                             <textarea
                               class="form-control"
                               :value="getDhcpv6ServerListenInterfaceText()"
                               @input="setDhcpv6ServerListenInterfaceText($event.target.value)"
                               rows="4"
-                              style="max-width:420px;"
                               placeholder="eth0\neth1"
                               :disabled="writeDisabled"
                             ></textarea>
@@ -12657,19 +14899,14 @@ export default defineComponent({
                     </template>
                     <template #shared-network>
                       <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="form-group" style="margin-top:0;">
-                          <div class="form-group-title">shared-network-name</div>
-                          <div class="form-group-content">
-                            <DataTable :columns="DHCPV6_SHARED_NETWORK_TABLE_COLUMNS" :data="editingVrf.dhcpv6ServerSharedNetworks" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-network')" @edit="openServiceCollectionEdit('dhcp6-shared-network', $event)" @delete="removeServiceCollectionByIds('dhcp6-shared-network', $event)">
-                              <template #name="{ value }">{{ value || '-' }}</template>
-                              <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
-                              <template #interface="{ value }">{{ value || '-' }}</template>
-                              <template #description="{ value }">{{ value || '-' }}</template>
-                              <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
-                              <template #subnets="{ row }">{{ Array.isArray(row?.subnets) ? row.subnets.length : 0 }}</template>
-                            </DataTable>
-                          </div>
-                        </div>
+                        <DataTable :columns="DHCPV6_SHARED_NETWORK_TABLE_COLUMNS" :data="editingVrf.dhcpv6ServerSharedNetworks" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openServiceCollectionCreate('dhcp6-shared-network')" @edit="openServiceCollectionEdit('dhcp6-shared-network', $event)" @delete="removeServiceCollectionByIds('dhcp6-shared-network', $event)">
+                          <template #name="{ value }">{{ value || '-' }}</template>
+                          <template #disable="{ value }">{{ value ? 'Yes' : '-' }}</template>
+                          <template #interface="{ value }">{{ value || '-' }}</template>
+                          <template #description="{ value }">{{ value || '-' }}</template>
+                          <template #options="{ row }">{{ Array.isArray(row?.options) ? row.options.length : 0 }}</template>
+                          <template #subnets="{ row }">{{ Array.isArray(row?.subnets) ? row.subnets.length : 0 }}</template>
+                        </DataTable>
                         <div v-for="shared in editingVrf.dhcpv6ServerSharedNetworks" :key="'svc-shared6-nested-' + shared.__id" class="form-group" style="margin-top:0;">
                           <div class="form-group-title">{{ shared.name || 'shared-network' }}</div>
                           <div class="form-group-content" style="display:flex;flex-direction:column;gap:8px;">
@@ -12758,41 +14995,41 @@ export default defineComponent({
       <DraggableModal v-model:visible="serviceCollectionModalVisible" :title="serviceCollectionModalTitle" width="760px" @confirm="saveServiceCollectionModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
           <template v-if="serviceCollectionType === 'dhcp4-listen-address'">
-            <div class="form-row"><label class="form-label">address</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.address" placeholder="192.0.2.10" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">address</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.address" placeholder="192.0.2.10" :disabled="writeDisabled" /></div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp4-listen-interface' || serviceCollectionType === 'dhcp6-listen-interface'">
-            <div class="form-row"><label class="form-label">interface</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.name" style="width:320px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'svc-if-'+serviceCollectionType+'-'+name" :value="name">{{ name }}</option></select></div></div>
+            <div class="form-row"><label class="form-label">interface</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.name" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'svc-if-'+serviceCollectionType+'-'+name" :value="name">{{ name }}</option></select></div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp4-client-class'">
-            <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="class-name" style="width:320px;" :disabled="writeDisabled" /></div></div>
-            <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpClientClassDisable') }}</div></div></div>
-            <div class="form-row"><label class="form-label">circuit-id</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.circuitId" placeholder="0x1234 or text" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpRelayAgentCircuitId') }}</div></div></div>
-            <div class="form-row"><label class="form-label">remote-id</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.remoteId" placeholder="0x1234 or text" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpRelayAgentRemoteId') }}</div></div></div>
+            <div class="form-row"><label class="form-label">name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="class-name" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">disable</label><div class="form-control"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpClientClassDisable') }}</div></div></div>
+            <div class="form-row"><label class="form-label">circuit-id</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.circuitId" placeholder="0x1234 or text" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpRelayAgentCircuitId') }}</div></div></div>
+            <div class="form-row"><label class="form-label">remote-id</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.remoteId" placeholder="0x1234 or text" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpRelayAgentRemoteId') }}</div></div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp4-shared-network'">
             <TabGroup v-model="dhcpSharedNetworkModalTab" :tabs="DHCP_SHARED_NETWORK_MODAL_TABS">
               <template #basic>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                  <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="shared-network" style="width:320px;" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">description</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" style="width:420px;" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSharedNetworkDisable') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">authoritative</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.authoritative" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSharedNetworkAuthoritative') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">ping-check</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.pingCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSharedNetworkPingCheck') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="shared-network" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">description</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">disable</label><div class="form-control"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSharedNetworkDisable') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">authoritative</label><div class="form-control"><input type="checkbox" v-model="serviceCollectionDraft.authoritative" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSharedNetworkAuthoritative') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">ping-check</label><div class="form-control"><input type="checkbox" v-model="serviceCollectionDraft.pingCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSharedNetworkPingCheck') }}</div></div></div>
                 </div>
               </template>
               <template #dynamic-dns-update>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                  <div class="form-row"><label class="form-label">conflict-resolution</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">generated-prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.generatedPrefix" placeholder="generated-prefix" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">hostname-char-replacement</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharReplacement" placeholder="-" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">hostname-char-set</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharSet" placeholder="regex" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">override-client-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">override-no-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">qualifying-suffix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.qualifyingSuffix" placeholder="example.com" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">replace-client-name</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">send-updates</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">ttl-percent</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.ttlPercent" placeholder="percent" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">update-on-renew</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">conflict-resolution</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">generated-prefix</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.generatedPrefix" placeholder="generated-prefix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">hostname-char-replacement</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharReplacement" placeholder="-" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">hostname-char-set</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharSet" placeholder="regex" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">override-client-update</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">override-no-update</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">qualifying-suffix</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.qualifyingSuffix" placeholder="example.com" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">replace-client-name</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">send-updates</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">ttl-percent</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.ttlPercent" placeholder="percent" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">update-on-renew</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
                 </div>
               </template>
               <template #subnet>
@@ -12812,30 +15049,30 @@ export default defineComponent({
                   <div>
                     <div style="font-weight:500;margin-bottom:6px;">option</div>
                     <div class="form-hint" style="margin-bottom:8px;">Multiple values can be separated by comma or new line.</div>
-                    <div class="form-row"><label class="form-label">bootfile-name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['bootfile-name']" placeholder="Bootstrap file name" style="width:420px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">bootfile-server</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['bootfile-server']" placeholder="192.0.2.10 or host.example.com" style="width:420px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">bootfile-size</label><div style="flex:1;"><input type="number" min="1" max="16" class="form-control" v-model="serviceCollectionDraft.optionValues['bootfile-size']" placeholder="1-16" style="width:220px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">captive-portal</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['captive-portal']" placeholder="https://portal.example.com/api" style="width:520px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">capwap-controller</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['capwap-controller']" placeholder="192.0.2.20" style="width:320px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">client-prefix-length</label><div style="flex:1;"><input type="number" min="0" max="32" class="form-control" v-model="serviceCollectionDraft.optionValues['client-prefix-length']" placeholder="0-32" style="width:220px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">default-router</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['default-router']" placeholder="192.0.2.1" style="width:320px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">domain-name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['domain-name']" placeholder="example.com" style="width:320px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">domain-search</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['domain-search']" placeholder="example.com" style="width:420px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">interface-mtu</label><div style="flex:1;"><input type="number" min="576" max="9000" class="form-control" v-model="serviceCollectionDraft.optionValues['interface-mtu']" placeholder="576-9000" style="width:220px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">ip-forwarding</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.optionValues['ip-forwarding']" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">ipv6-only-preferred</label><div style="flex:1;"><input type="number" min="0" max="4294967295" class="form-control" v-model="serviceCollectionDraft.optionValues['ipv6-only-preferred']" placeholder="0-4294967295" style="width:260px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">name-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['name-server']" rows="2" style="width:420px;" placeholder="192.0.2.53" :disabled="writeDisabled"></textarea></div></div>
-                    <div class="form-row"><label class="form-label">ntp-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['ntp-server']" rows="2" style="width:420px;" placeholder="192.0.2.123" :disabled="writeDisabled"></textarea></div></div>
-                    <div class="form-row"><label class="form-label">pop-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['pop-server']" rows="2" style="width:420px;" placeholder="192.0.2.30" :disabled="writeDisabled"></textarea></div></div>
-                    <div class="form-row"><label class="form-label">server-identifier</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['server-identifier']" placeholder="192.0.2.2" style="width:320px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">smtp-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['smtp-server']" rows="2" style="width:420px;" placeholder="192.0.2.25" :disabled="writeDisabled"></textarea></div></div>
-                    <div class="form-row"><label class="form-label">tftp-server-name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['tftp-server-name']" placeholder="192.0.2.10 or tftp.example.com" style="width:420px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">time-offset</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.optionValues['time-offset']" placeholder="-3600" style="width:220px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">time-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['time-server']" rows="2" style="width:420px;" placeholder="192.0.2.40" :disabled="writeDisabled"></textarea></div></div>
-                    <div class="form-row"><label class="form-label">time-zone</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['time-zone']" placeholder="Asia/Shanghai" style="width:320px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">vendor-option ubiquiti unifi-controller</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['vendor-option ubiquiti unifi-controller']" placeholder="192.0.2.50" style="width:420px;" :disabled="writeDisabled" /></div></div>
-                    <div class="form-row"><label class="form-label">wins-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['wins-server']" rows="2" style="width:420px;" placeholder="192.0.2.60" :disabled="writeDisabled"></textarea></div></div>
-                    <div class="form-row"><label class="form-label">wpad-url</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.optionValues['wpad-url']" placeholder="http://wpad.example.com/wpad.dat" style="width:520px;" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">bootfile-name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['bootfile-name']" placeholder="Bootstrap file name" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">bootfile-server</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['bootfile-server']" placeholder="192.0.2.10 or host.example.com" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">bootfile-size</label><div class="form-control"><input type="number" min="1" max="16" class="form-control" v-model="serviceCollectionDraft.optionValues['bootfile-size']" placeholder="1-16" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">captive-portal</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['captive-portal']" placeholder="https://portal.example.com/api" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">capwap-controller</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['capwap-controller']" placeholder="192.0.2.20" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">client-prefix-length</label><div class="form-control"><input type="number" min="0" max="32" class="form-control" v-model="serviceCollectionDraft.optionValues['client-prefix-length']" placeholder="0-32" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">default-router</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['default-router']" placeholder="192.0.2.1" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">domain-name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['domain-name']" placeholder="example.com" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">domain-search</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['domain-search']" placeholder="example.com" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">interface-mtu</label><div class="form-control"><input type="number" min="576" max="9000" class="form-control" v-model="serviceCollectionDraft.optionValues['interface-mtu']" placeholder="576-9000" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">ip-forwarding</label><div class="form-control"><input type="checkbox" v-model="serviceCollectionDraft.optionValues['ip-forwarding']" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">ipv6-only-preferred</label><div class="form-control"><input type="number" min="0" max="4294967295" class="form-control" v-model="serviceCollectionDraft.optionValues['ipv6-only-preferred']" placeholder="0-4294967295" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">name-server</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['name-server']" rows="2" placeholder="192.0.2.53" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">ntp-server</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['ntp-server']" rows="2" placeholder="192.0.2.123" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">pop-server</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['pop-server']" rows="2" placeholder="192.0.2.30" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">server-identifier</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['server-identifier']" placeholder="192.0.2.2" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">smtp-server</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['smtp-server']" rows="2" placeholder="192.0.2.25" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">tftp-server-name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['tftp-server-name']" placeholder="192.0.2.10 or tftp.example.com" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">time-offset</label><div class="form-control"><input type="number" class="form-control" v-model="serviceCollectionDraft.optionValues['time-offset']" placeholder="-3600" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">time-server</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['time-server']" rows="2" placeholder="192.0.2.40" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">time-zone</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['time-zone']" placeholder="Asia/Shanghai" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">vendor-option ubiquiti unifi-controller</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['vendor-option ubiquiti unifi-controller']" placeholder="192.0.2.50" :disabled="writeDisabled" /></div></div>
+                    <div class="form-row"><label class="form-label">wins-server</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.optionValues['wins-server']" rows="2" placeholder="192.0.2.60" :disabled="writeDisabled"></textarea></div></div>
+                    <div class="form-row"><label class="form-label">wpad-url</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.optionValues['wpad-url']" placeholder="http://wpad.example.com/wpad.dat" :disabled="writeDisabled" /></div></div>
                   </div>
                   <div>
                     <div style="font-weight:500;margin-bottom:6px;">static-route</div>
@@ -12852,35 +15089,35 @@ export default defineComponent({
             <TabGroup v-model="dhcp4SharedSubnetModalTab" :tabs="DHCP4_SHARED_SUBNET_MODAL_TABS">
               <template #basic>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                  <div class="form-row"><label class="form-label">subnet</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="192.0.2.0/24" style="width:320px;" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">description</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" style="width:420px;" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">client-class</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.clientClass" placeholder="client-class-name" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSubnetClientClass') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">subnet-id</label><div style="flex:1;"><input type="number" min="1" max="4294967294" class="form-control" v-model="serviceCollectionDraft.subnetId" placeholder="1" style="width:220px;" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">ignore-client-id</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.ignoreClientId" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">ping-check</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.pingCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSubnetPingCheck') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">lease</label><div style="flex:1;"><input type="number" min="0" max="4294967295" class="form-control" v-model="serviceCollectionDraft.lease" placeholder="86400" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSubnetLease') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">exclude</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.excludeText" rows="2" style="width:420px;" placeholder="192.0.2.10" :disabled="writeDisabled"></textarea></div></div>
-                  <div class="form-row"><label class="form-label">default-router</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.defaultRouterText" rows="2" style="width:420px;" placeholder="192.0.2.1" :disabled="writeDisabled"></textarea></div></div>
-                  <div class="form-row"><label class="form-label">domain-name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.domainName" placeholder="example.com" style="width:320px;" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">domain-search</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.domainSearchText" rows="2" style="width:420px;" placeholder="example.com" :disabled="writeDisabled"></textarea></div></div>
-                  <div class="form-row"><label class="form-label">name-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.nameServerText" rows="2" style="width:420px;" placeholder="192.0.2.53" :disabled="writeDisabled"></textarea></div></div>
-                  <div class="form-row"><label class="form-label">ntp-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.ntpServerText" rows="2" style="width:420px;" placeholder="192.0.2.123" :disabled="writeDisabled"></textarea></div></div>
+                  <div class="form-row"><label class="form-label">subnet</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="192.0.2.0/24" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">description</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">disable</label><div class="form-control"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">client-class</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.clientClass" placeholder="client-class-name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSubnetClientClass') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">subnet-id</label><div class="form-control"><input type="number" min="1" max="4294967294" class="form-control" v-model="serviceCollectionDraft.subnetId" placeholder="1" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">ignore-client-id</label><div class="form-control"><input type="checkbox" v-model="serviceCollectionDraft.ignoreClientId" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">ping-check</label><div class="form-control"><input type="checkbox" v-model="serviceCollectionDraft.pingCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSubnetPingCheck') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">lease</label><div class="form-control"><input type="number" min="0" max="4294967295" class="form-control" v-model="serviceCollectionDraft.lease" placeholder="86400" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpSubnetLease') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">exclude</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.excludeText" rows="2" placeholder="192.0.2.10" :disabled="writeDisabled"></textarea></div></div>
+                  <div class="form-row"><label class="form-label">default-router</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.defaultRouterText" rows="2" placeholder="192.0.2.1" :disabled="writeDisabled"></textarea></div></div>
+                  <div class="form-row"><label class="form-label">domain-name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.domainName" placeholder="example.com" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">domain-search</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.domainSearchText" rows="2" placeholder="example.com" :disabled="writeDisabled"></textarea></div></div>
+                  <div class="form-row"><label class="form-label">name-server</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.nameServerText" rows="2" placeholder="192.0.2.53" :disabled="writeDisabled"></textarea></div></div>
+                  <div class="form-row"><label class="form-label">ntp-server</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.ntpServerText" rows="2" placeholder="192.0.2.123" :disabled="writeDisabled"></textarea></div></div>
                 </div>
               </template>
               <template #dynamic-dns-update>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                  <div class="form-row"><label class="form-label">conflict-resolution</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">generated-prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.generatedPrefix" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">hostname-char-replacement</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharReplacement" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">hostname-char-set</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharSet" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">override-client-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">override-no-update</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">qualifying-suffix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.qualifyingSuffix" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">replace-client-name</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">send-updates</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">ttl-percent</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.ttlPercent" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">update-on-renew</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">conflict-resolution</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.conflictResolution" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsConflictResolution') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">generated-prefix</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.generatedPrefix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsGeneratedPrefix') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">hostname-char-replacement</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharReplacement" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharReplacement') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">hostname-char-set</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.hostnameCharSet" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsHostnameCharSet') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">override-client-update</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideClientUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideClientUpdate') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">override-no-update</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.overrideNoUpdate" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsOverrideNoUpdate') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">qualifying-suffix</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.qualifyingSuffix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsQualifyingSuffix') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">replace-client-name</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.replaceClientName" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="never">never</option><option value="always">always</option><option value="when-present">when-present</option><option value="when-not-present">when-not-present</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsReplaceClientName') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">send-updates</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.sendUpdates" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsSendUpdates') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">ttl-percent</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.ttlPercent" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTtlPercent') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">update-on-renew</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.dynamicDnsUpdate.updateOnRenew" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsUpdateOnRenew') }}</div></div></div>
                 </div>
               </template>
               <template #range>
@@ -12918,44 +15155,44 @@ export default defineComponent({
             </TabGroup>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp4-shared-option'">
-            <div class="form-row"><label class="form-label">option</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.name" style="width:420px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in DHCP4_SHARED_OPTION_NAMES" :key="'svc-dhcp4-shared-opt-' + name" :value="name">{{ name }}</option></select></div></div>
-            <div class="form-row"><label class="form-label">value</label><div style="flex:1;"><input class="form-control" :type="getDhcp4SharedOptionInputType(serviceCollectionDraft.name)" :min="getDhcp4SharedOptionInputMin(serviceCollectionDraft.name)" :max="getDhcp4SharedOptionInputMax(serviceCollectionDraft.name)" step="1" v-model="serviceCollectionDraft.value" :placeholder="getDhcp4SharedOptionValuePlaceholder(serviceCollectionDraft.name)" style="width:420px;" :disabled="writeDisabled || serviceCollectionDraft.name === 'ip-forwarding'" /></div></div>
+            <div class="form-row"><label class="form-label">option</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.name" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in DHCP4_SHARED_OPTION_NAMES" :key="'svc-dhcp4-shared-opt-' + name" :value="name">{{ name }}</option></select></div></div>
+            <div class="form-row"><label class="form-label">value</label><div class="form-control"><input class="form-control" :type="getDhcp4SharedOptionInputType(serviceCollectionDraft.name)" :min="getDhcp4SharedOptionInputMin(serviceCollectionDraft.name)" :max="getDhcp4SharedOptionInputMax(serviceCollectionDraft.name)" step="1" v-model="serviceCollectionDraft.value" :placeholder="getDhcp4SharedOptionValuePlaceholder(serviceCollectionDraft.name)" :disabled="writeDisabled || serviceCollectionDraft.name === 'ip-forwarding'" /></div></div>
             <div class="form-row"><label class="form-label"></label><div class="form-hint" style="flex:1;">{{ getDhcp4SharedOptionHint(serviceCollectionDraft.name) }}</div></div>
             <div class="form-row"><label class="form-label"></label><div class="form-hint" style="flex:1;">For repeated options like name-server/ntp-server/wins-server, add multiple rows.</div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp4-shared-static-route'">
-            <div class="form-row"><label class="form-label">subnet</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.subnet" placeholder="10.0.0.0/24" style="width:320px;" :disabled="writeDisabled" /></div></div>
-            <div class="form-row"><label class="form-label">next-hop</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.nextHop" placeholder="192.0.2.1" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">subnet</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.subnet" placeholder="10.0.0.0/24" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">next-hop</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.nextHop" placeholder="192.0.2.1" :disabled="writeDisabled" /></div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp4-shared-subnet-range'">
-            <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="pool1" style="width:320px;" :disabled="writeDisabled" /></div></div>
-            <div class="form-row"><label class="form-label">client-class</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.clientClass" placeholder="client-class-name" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpRangeClientClass') }}</div></div></div>
-            <div class="form-row"><label class="form-label">start</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.start" placeholder="192.0.2.100" style="width:320px;" :disabled="writeDisabled" /></div></div>
-            <div class="form-row"><label class="form-label">stop</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.stop" placeholder="192.0.2.200" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="pool1" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">client-class</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.clientClass" placeholder="client-class-name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpRangeClientClass') }}</div></div></div>
+            <div class="form-row"><label class="form-label">start</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.start" placeholder="192.0.2.100" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">stop</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.stop" placeholder="192.0.2.200" :disabled="writeDisabled" /></div></div>
             <div class="form-group" style="margin-top:0;"><div class="form-group-title">option</div><div class="form-group-content"><DataTable :columns="DHCP_SHARED_SUBNET_OPTION_TABLE_COLUMNS" :data="serviceCollectionDraft.options || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || !serviceCollectionDraft.__id" :page-size="50" @create="openDhcp4SharedSubnetRangeOptionCreateFromRange" @edit="openDhcp4SharedSubnetRangeOptionEditFromRange($event)" @delete="removeServiceCollectionByIds('dhcp4-shared-subnet-range-option', $event)"><template #name="{ value }">{{ value || '-' }}</template><template #value="{ value }">{{ value || '-' }}</template></DataTable><div class="form-hint">{{ t('vrf.protocolHints.dhcpRangeOptionRowsText') }}</div></div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp4-shared-subnet-mapping'">
-            <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="host1" style="width:320px;" :disabled="writeDisabled" /></div></div>
-            <div class="form-row"><label class="form-label">duid</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.duid" placeholder="00:01:00:01:..." style="width:520px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpStaticMappingDuid') }}</div></div></div>
-            <div class="form-row"><label class="form-label">ip-address</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.ipAddress" placeholder="192.0.2.10" style="width:320px;" :disabled="writeDisabled" /></div></div>
-            <div class="form-row"><label class="form-label">mac</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.macAddress" placeholder="00:11:22:33:44:55" style="width:320px;" :disabled="writeDisabled" /></div></div>
-            <div class="form-row"><label class="form-label">description</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" style="width:420px;" :disabled="writeDisabled" /></div></div>
-            <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="host1" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">duid</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.duid" placeholder="00:01:00:01:..." :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpStaticMappingDuid') }}</div></div></div>
+            <div class="form-row"><label class="form-label">ip-address</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.ipAddress" placeholder="192.0.2.10" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">mac</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.macAddress" placeholder="00:11:22:33:44:55" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">description</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">disable</label><div class="form-control"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
             <div class="form-group" style="margin-top:0;"><div class="form-group-title">option</div><div class="form-group-content"><DataTable :columns="DHCP_SHARED_SUBNET_OPTION_TABLE_COLUMNS" :data="serviceCollectionDraft.options || []" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled || !serviceCollectionDraft.__id" :page-size="50" @create="openDhcp4SharedSubnetMappingOptionCreateFromMapping" @edit="openDhcp4SharedSubnetMappingOptionEditFromMapping($event)" @delete="removeServiceCollectionByIds('dhcp4-shared-subnet-mapping-option', $event)"><template #name="{ value }">{{ value || '-' }}</template><template #value="{ value }">{{ value || '-' }}</template></DataTable><div class="form-hint">{{ t('vrf.protocolHints.dhcpStaticMappingOptionRowsText') }}</div></div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp4-shared-subnet-option' || serviceCollectionType === 'dhcp4-shared-subnet-range-option' || serviceCollectionType === 'dhcp4-shared-subnet-mapping-option'">
-            <div class="form-row"><label class="form-label">option</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.name" style="width:420px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in getDhcp4SubnetOptionNameChoices(serviceCollectionDraft.name)" :key="'svc-dhcp4-subnet-opt-' + name" :value="name">{{ name }}</option></select></div></div>
-            <div class="form-row"><label class="form-label">value</label><div style="flex:1;"><input class="form-control" :type="getDhcp4SharedOptionInputType(serviceCollectionDraft.name)" :min="getDhcp4SharedOptionInputMin(serviceCollectionDraft.name)" :max="getDhcp4SharedOptionInputMax(serviceCollectionDraft.name)" step="1" v-model="serviceCollectionDraft.value" :placeholder="getDhcp4SharedOptionValuePlaceholder(serviceCollectionDraft.name)" style="width:420px;" :disabled="writeDisabled || serviceCollectionDraft.name === 'ip-forwarding'" /></div></div>
+            <div class="form-row"><label class="form-label">option</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.name" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in getDhcp4SubnetOptionNameChoices(serviceCollectionDraft.name)" :key="'svc-dhcp4-subnet-opt-' + name" :value="name">{{ name }}</option></select></div></div>
+            <div class="form-row"><label class="form-label">value</label><div class="form-control"><input class="form-control" :type="getDhcp4SharedOptionInputType(serviceCollectionDraft.name)" :min="getDhcp4SharedOptionInputMin(serviceCollectionDraft.name)" :max="getDhcp4SharedOptionInputMax(serviceCollectionDraft.name)" step="1" v-model="serviceCollectionDraft.value" :placeholder="getDhcp4SharedOptionValuePlaceholder(serviceCollectionDraft.name)" :disabled="writeDisabled || serviceCollectionDraft.name === 'ip-forwarding'" /></div></div>
             <div class="form-row"><label class="form-label"></label><div class="form-hint" style="flex:1;">{{ getDhcp4SharedOptionHint(serviceCollectionDraft.name) }}</div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp6-shared-network'">
             <TabGroup v-model="dhcpv6SharedNetworkModalTab" :tabs="DHCPV6_SHARED_NETWORK_MODAL_TABS">
               <template #basic>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                  <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="shared-network" style="width:320px;" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">interface</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.interface" style="width:320px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'svc-if-dhcp6-shared-'+name" :value="name">{{ name }}</option></select></div></div>
-                  <div class="form-row"><label class="form-label">description</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" style="width:420px;" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="shared-network" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">disable</label><div class="form-control"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">interface</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.interface" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'svc-if-dhcp6-shared-'+name" :value="name">{{ name }}</option></select></div></div>
+                  <div class="form-row"><label class="form-label">description</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.description" placeholder="description" :disabled="writeDisabled" /></div></div>
                 </div>
               </template>
               <template #option>
@@ -12963,13 +15200,13 @@ export default defineComponent({
                   <div class="form-hint" v-if="Array.isArray(serviceCollectionDraft.optionExtraRows) && serviceCollectionDraft.optionExtraRows.length">Unrecognized option rows are preserved automatically ({{ serviceCollectionDraft.optionExtraRows.length }}).</div>
                   <div class="form-row" v-for="item in DHCP6_SHARED_OPTION_FIELDS" :key="'dhcp6-shared-option-field-' + item.name">
                     <label class="form-label">{{ item.label }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <textarea
                         v-if="item.type === 'textarea'"
                         class="form-control"
                         v-model="serviceCollectionDraft.optionValues[item.name]"
                         rows="2"
-                        style="width:520px;"
+                       
                         :placeholder="item.placeholder"
                         :disabled="writeDisabled"
                       ></textarea>
@@ -12981,7 +15218,7 @@ export default defineComponent({
                         :max="item.max || ''"
                         step="1"
                         v-model="serviceCollectionDraft.optionValues[item.name]"
-                        style="width:520px;"
+                       
                         :placeholder="item.placeholder"
                         :disabled="writeDisabled"
                       />
@@ -13047,23 +15284,23 @@ export default defineComponent({
             </TabGroup>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp6-global-name-server'">
-            <div class="form-row"><label class="form-label">name-server</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.address" placeholder="2001:db8::53" style="width:320px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">name-server</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.address" placeholder="2001:db8::53" :disabled="writeDisabled" /></div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp6-shared-option'">
-            <div class="form-row"><label class="form-label">option</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.name" style="width:420px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in getDhcp6SubnetOptionNameChoices(serviceCollectionDraft.name)" :key="'svc-dhcp6-shared-opt-' + name" :value="name">{{ name }}</option></select></div></div>
-            <div class="form-row"><label class="form-label">value</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.value" placeholder="2001:db8::1" style="width:420px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">option</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.name" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in getDhcp6SubnetOptionNameChoices(serviceCollectionDraft.name)" :key="'svc-dhcp6-shared-opt-' + name" :value="name">{{ name }}</option></select></div></div>
+            <div class="form-row"><label class="form-label">value</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.value" placeholder="2001:db8::1" :disabled="writeDisabled" /></div></div>
             <div class="form-row"><label class="form-label"></label><div class="form-hint" style="flex:1;">{{ getDhcp6SharedOptionHint(serviceCollectionDraft.name) }}</div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp6-shared-subnet'">
             <TabGroup v-model="dhcp6SharedSubnetModalTab" :tabs="DHCPV6_SHARED_SUBNET_MODAL_TABS">
               <template #basic>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                  <div class="form-row"><label class="form-label">subnet</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="2001:db8::/64" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix, format: h:h:h:h::/x.</div></div></div>
-                  <div class="form-row"><label class="form-label">interface</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.interface" style="width:320px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'svc-if-dhcp6-subnet-'+name" :value="name">{{ name }}</option></select><div class="form-hint">Interface name, for example eth0.</div></div></div>
-                  <div class="form-row"><label class="form-label">subnet-id</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.subnetId" min="1" max="4294967294" placeholder="1" style="width:240px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6SubnetId') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">lease-time default</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.leaseTimeDefault" min="1" max="4294967295" placeholder="86400" style="width:260px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6LeaseTimeDefault') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">lease-time maximum</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.leaseTimeMaximum" min="1" max="4294967295" placeholder="86400" style="width:260px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6LeaseTimeMaximum') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">lease-time minimum</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.leaseTimeMinimum" min="1" max="4294967295" placeholder="3600" style="width:260px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6LeaseTimeMinimum') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">subnet</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="2001:db8::/64" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix, format: h:h:h:h::/x.</div></div></div>
+                  <div class="form-row"><label class="form-label">interface</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.interface" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'svc-if-dhcp6-subnet-'+name" :value="name">{{ name }}</option></select><div class="form-hint">Interface name, for example eth0.</div></div></div>
+                  <div class="form-row"><label class="form-label">subnet-id</label><div class="form-control"><input type="number" class="form-control" v-model="serviceCollectionDraft.subnetId" min="1" max="4294967294" placeholder="1" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6SubnetId') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">lease-time default</label><div class="form-control"><input type="number" class="form-control" v-model="serviceCollectionDraft.leaseTimeDefault" min="1" max="4294967295" placeholder="86400" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6LeaseTimeDefault') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">lease-time maximum</label><div class="form-control"><input type="number" class="form-control" v-model="serviceCollectionDraft.leaseTimeMaximum" min="1" max="4294967295" placeholder="86400" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6LeaseTimeMaximum') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">lease-time minimum</label><div class="form-control"><input type="number" class="form-control" v-model="serviceCollectionDraft.leaseTimeMinimum" min="1" max="4294967295" placeholder="3600" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpv6LeaseTimeMinimum') }}</div></div></div>
                 </div>
               </template>
               <template #range>
@@ -13106,13 +15343,13 @@ export default defineComponent({
                   <div class="form-hint" v-if="Array.isArray(serviceCollectionDraft.optionExtraRows) && serviceCollectionDraft.optionExtraRows.length">Unrecognized option rows are preserved automatically ({{ serviceCollectionDraft.optionExtraRows.length }}).</div>
                   <div class="form-row" v-for="item in DHCP6_SHARED_OPTION_FIELDS" :key="'dhcp6-subnet-option-field-' + item.name">
                     <label class="form-label">{{ item.label }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <textarea
                         v-if="item.type === 'textarea'"
                         class="form-control"
                         v-model="serviceCollectionDraft.optionValues[item.name]"
                         rows="2"
-                        style="width:520px;"
+                       
                         :placeholder="item.placeholder"
                         :disabled="writeDisabled"
                       ></textarea>
@@ -13124,7 +15361,7 @@ export default defineComponent({
                         :max="item.max || ''"
                         step="1"
                         v-model="serviceCollectionDraft.optionValues[item.name]"
-                        style="width:520px;"
+                       
                         :placeholder="item.placeholder"
                         :disabled="writeDisabled"
                       />
@@ -13139,10 +15376,10 @@ export default defineComponent({
             <TabGroup v-model="dhcp6SharedSubnetRangeModalTab" :tabs="DHCPV6_SHARED_SUBNET_NESTED_MODAL_TABS">
               <template #basic>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                  <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="range1" style="width:320px;" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="2001:db8:1::/64" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix, format: h:h:h:h::/x.</div></div></div>
-                  <div class="form-row"><label class="form-label">start</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.start" placeholder="2001:db8:1::10" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 address, format: h:h:h:h::.</div></div></div>
-                  <div class="form-row"><label class="form-label">stop</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.stop" placeholder="2001:db8:1::ffff" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 address, must be greater than or equal to start.</div></div></div>
+                  <div class="form-row"><label class="form-label">name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="range1" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">prefix</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="2001:db8:1::/64" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix, format: h:h:h:h::/x.</div></div></div>
+                  <div class="form-row"><label class="form-label">start</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.start" placeholder="2001:db8:1::10" :disabled="writeDisabled" /><div class="form-hint">IPv6 address, format: h:h:h:h::.</div></div></div>
+                  <div class="form-row"><label class="form-label">stop</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.stop" placeholder="2001:db8:1::ffff" :disabled="writeDisabled" /><div class="form-hint">IPv6 address, must be greater than or equal to start.</div></div></div>
                 </div>
               </template>
               <template #option>
@@ -13150,13 +15387,13 @@ export default defineComponent({
                   <div class="form-hint" v-if="Array.isArray(serviceCollectionDraft.optionExtraRows) && serviceCollectionDraft.optionExtraRows.length">Unrecognized option rows are preserved automatically ({{ serviceCollectionDraft.optionExtraRows.length }}).</div>
                   <div class="form-row" v-for="item in DHCP6_SHARED_OPTION_FIELDS" :key="'dhcp6-range-option-field-' + item.name">
                     <label class="form-label">{{ item.label }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <textarea
                         v-if="item.type === 'textarea'"
                         class="form-control"
                         v-model="serviceCollectionDraft.optionValues[item.name]"
                         rows="2"
-                        style="width:520px;"
+                       
                         :placeholder="item.placeholder"
                         :disabled="writeDisabled"
                       ></textarea>
@@ -13168,7 +15405,7 @@ export default defineComponent({
                         :max="item.max || ''"
                         step="1"
                         v-model="serviceCollectionDraft.optionValues[item.name]"
-                        style="width:520px;"
+                       
                         :placeholder="item.placeholder"
                         :disabled="writeDisabled"
                       />
@@ -13183,12 +15420,12 @@ export default defineComponent({
             <TabGroup v-model="dhcp6SharedSubnetMappingModalTab" :tabs="DHCPV6_SHARED_SUBNET_NESTED_MODAL_TABS">
               <template #basic>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                  <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="host1" style="width:320px;" :disabled="writeDisabled" /></div></div>
-                  <div class="form-row"><label class="form-label">duid</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.duid" placeholder="00:01:00:01:..." style="width:520px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpStaticMappingDuid') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">ipv6-address</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.ipv6Address" placeholder="2001:db8::100" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 address for this static mapping.</div></div></div>
-                  <div class="form-row"><label class="form-label">ipv6-prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.ipv6Prefix" placeholder="2001:db8:100::/56" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix for this static mapping, format: h:h:h:h::/x.</div></div></div>
-                  <div class="form-row"><label class="form-label">mac</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.mac" placeholder="00:11:22:33:44:55" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">MAC address, format: 00:11:22:33:44:55.</div></div></div>
-                  <div class="form-row"><label class="form-label">disable</label><div style="flex:1;"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="host1" :disabled="writeDisabled" /></div></div>
+                  <div class="form-row"><label class="form-label">duid</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.duid" placeholder="00:01:00:01:..." :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpStaticMappingDuid') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">ipv6-address</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.ipv6Address" placeholder="2001:db8::100" :disabled="writeDisabled" /><div class="form-hint">IPv6 address for this static mapping.</div></div></div>
+                  <div class="form-row"><label class="form-label">ipv6-prefix</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.ipv6Prefix" placeholder="2001:db8:100::/56" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix for this static mapping, format: h:h:h:h::/x.</div></div></div>
+                  <div class="form-row"><label class="form-label">mac</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.mac" placeholder="00:11:22:33:44:55" :disabled="writeDisabled" /><div class="form-hint">MAC address, format: 00:11:22:33:44:55.</div></div></div>
+                  <div class="form-row"><label class="form-label">disable</label><div class="form-control"><input type="checkbox" v-model="serviceCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
                 </div>
               </template>
               <template #option>
@@ -13196,13 +15433,13 @@ export default defineComponent({
                   <div class="form-hint" v-if="Array.isArray(serviceCollectionDraft.optionExtraRows) && serviceCollectionDraft.optionExtraRows.length">Unrecognized option rows are preserved automatically ({{ serviceCollectionDraft.optionExtraRows.length }}).</div>
                   <div class="form-row" v-for="item in DHCP6_SHARED_OPTION_FIELDS" :key="'dhcp6-mapping-option-field-' + item.name">
                     <label class="form-label">{{ item.label }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <textarea
                         v-if="item.type === 'textarea'"
                         class="form-control"
                         v-model="serviceCollectionDraft.optionValues[item.name]"
                         rows="2"
-                        style="width:520px;"
+                       
                         :placeholder="item.placeholder"
                         :disabled="writeDisabled"
                       ></textarea>
@@ -13214,7 +15451,7 @@ export default defineComponent({
                         :max="item.max || ''"
                         step="1"
                         v-model="serviceCollectionDraft.optionValues[item.name]"
-                        style="width:520px;"
+                       
                         :placeholder="item.placeholder"
                         :disabled="writeDisabled"
                       />
@@ -13226,47 +15463,46 @@ export default defineComponent({
             </TabGroup>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp6-shared-subnet-delegation'">
-            <div class="form-row"><label class="form-label">prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="2001:db8:200::/56" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix used in prefix-delegation.</div></div></div>
-            <div class="form-row"><label class="form-label">delegated-length</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.delegatedLength" min="32" max="64" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">Range: 32-64.</div></div></div>
-            <div class="form-row"><label class="form-label">prefix-length</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.prefixLength" min="32" max="64" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">Range: 32-64.</div></div></div>
-            <div class="form-row"><label class="form-label">excluded-prefix</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.excludedPrefix" placeholder="2001:db8:200:ff00::/64" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">Optional IPv6 prefix excluded from delegation.</div></div></div>
-            <div class="form-row"><label class="form-label">excluded-prefix-length</label><div style="flex:1;"><input type="number" class="form-control" v-model="serviceCollectionDraft.excludedPrefixLength" min="33" max="128" style="width:220px;" :disabled="writeDisabled" /><div class="form-hint">Range: 33-128 (optional).</div></div></div>
+            <div class="form-row"><label class="form-label">prefix</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.prefix" placeholder="2001:db8:200::/56" :disabled="writeDisabled" /><div class="form-hint">IPv6 prefix used in prefix-delegation.</div></div></div>
+            <div class="form-row"><label class="form-label">delegated-length</label><div class="form-control"><input type="number" class="form-control" v-model="serviceCollectionDraft.delegatedLength" min="32" max="64" :disabled="writeDisabled" /><div class="form-hint">Range: 32-64.</div></div></div>
+            <div class="form-row"><label class="form-label">prefix-length</label><div class="form-control"><input type="number" class="form-control" v-model="serviceCollectionDraft.prefixLength" min="32" max="64" :disabled="writeDisabled" /><div class="form-hint">Range: 32-64.</div></div></div>
+            <div class="form-row"><label class="form-label">excluded-prefix</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.excludedPrefix" placeholder="2001:db8:200:ff00::/64" :disabled="writeDisabled" /><div class="form-hint">Optional IPv6 prefix excluded from delegation.</div></div></div>
+            <div class="form-row"><label class="form-label">excluded-prefix-length</label><div class="form-control"><input type="number" class="form-control" v-model="serviceCollectionDraft.excludedPrefixLength" min="33" max="128" :disabled="writeDisabled" /><div class="form-hint">Range: 33-128 (optional).</div></div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'dhcp6-shared-subnet-option' || serviceCollectionType === 'dhcp6-shared-subnet-range-option' || serviceCollectionType === 'dhcp6-shared-subnet-mapping-option'">
-            <div class="form-row"><label class="form-label">option</label><div style="flex:1;"><select class="form-control" v-model="serviceCollectionDraft.name" style="width:420px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in getDhcp6SubnetOptionNameChoices(serviceCollectionDraft.name)" :key="'svc-dhcp6-subnet-opt-' + name" :value="name">{{ name }}</option></select></div></div>
-            <div class="form-row"><label class="form-label">value</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.value" placeholder="example.com" style="width:420px;" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">option</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.name" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in getDhcp6SubnetOptionNameChoices(serviceCollectionDraft.name)" :key="'svc-dhcp6-subnet-opt-' + name" :value="name">{{ name }}</option></select></div></div>
+            <div class="form-row"><label class="form-label">value</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.value" placeholder="example.com" :disabled="writeDisabled" /></div></div>
             <div class="form-row"><label class="form-label"></label><div class="form-hint" style="flex:1;">{{ getDhcp6SharedOptionHint(serviceCollectionDraft.name) }}</div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'ddns-forward-domain' || serviceCollectionType === 'ddns-reverse-domain'">
-            <div class="form-row"><label class="form-label">domain</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="example.com" style="width:320px;" :disabled="writeDisabled" /></div></div>
-            <div class="form-row"><label class="form-label">key-name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.keyName" placeholder="tsig-key-name" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsKeyName') }}</div></div></div>
-            <div class="form-row"><label class="form-label">dns-server</label><div style="flex:1;"><textarea class="form-control" v-model="serviceCollectionDraft.dnsServersText" rows="4" style="width:520px;" placeholder="1,192.0.2.10,53" :disabled="writeDisabled"></textarea><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsDnsServerText') }}</div></div></div>
+            <div class="form-row"><label class="form-label">domain</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="example.com" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">key-name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.keyName" placeholder="tsig-key-name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsKeyName') }}</div></div></div>
+            <div class="form-row"><label class="form-label">dns-server</label><div class="form-control"><textarea class="form-control" v-model="serviceCollectionDraft.dnsServersText" rows="4" placeholder="1,192.0.2.10,53" :disabled="writeDisabled"></textarea><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsDnsServerText') }}</div></div></div>
           </template>
           <template v-else-if="serviceCollectionType === 'ddns-tsig-key'">
-            <div class="form-row"><label class="form-label">name</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="key-name" style="width:320px;" :disabled="writeDisabled" /></div></div>
-            <div class="form-row"><label class="form-label">algorithm</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="serviceCollectionDraft.algorithm" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="md5">md5</option><option value="sha1">sha1</option><option value="sha224">sha224</option><option value="sha256">sha256</option><option value="sha384">sha384</option><option value="sha512">sha512</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTsigAlgorithm') }}</div></div></div>
-            <div class="form-row"><label class="form-label">secret</label><div style="flex:1;"><input class="form-control" v-model="serviceCollectionDraft.secret" placeholder="base64" style="width:520px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTsigSecret') }}</div></div></div>
+            <div class="form-row"><label class="form-label">name</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.name" placeholder="key-name" :disabled="writeDisabled" /></div></div>
+            <div class="form-row"><label class="form-label">algorithm</label><div class="form-control"><select class="form-control" v-model="serviceCollectionDraft.algorithm" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="md5">md5</option><option value="sha1">sha1</option><option value="sha224">sha224</option><option value="sha256">sha256</option><option value="sha384">sha384</option><option value="sha512">sha512</option></select><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTsigAlgorithm') }}</div></div></div>
+            <div class="form-row"><label class="form-label">secret</label><div class="form-control"><input class="form-control" v-model="serviceCollectionDraft.secret" placeholder="base64" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.dhcpDdnsTsigSecret') }}</div></div></div>
           </template>
         </div>
       </DraggableModal>
 
       <DraggableModal v-model:visible="failoverRouteModalVisible" :title="failoverRouteModalTitle" width="720px" @confirm="saveFailoverRouteModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">prefix</label><div style="flex:1;"><input class="form-control" v-model="failoverRouteDraft.prefix" placeholder="0.0.0.0/0" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverPrefix') }}</div></div></div>
-          <div class="form-row"><label class="form-label">gateway type</label><div style="flex:1;"><select class="form-control" v-model="failoverRouteDraft.gatewayType" :disabled="writeDisabled"><option value="next-hop">next-hop</option><option value="dhcp-interface">dhcp-interface</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverGatewayType') }}</div></div></div>
-          <div class="form-row"><label class="form-label">gateway</label><div style="flex:1;"><input class="form-control" v-model="failoverRouteDraft.gateway" :placeholder="failoverRouteDraft.gatewayType === 'next-hop' ? '192.0.2.1' : 'eth0'" :disabled="writeDisabled" /><div class="form-hint">{{ failoverRouteDraft.gatewayType === 'next-hop' ? t('vrf.protocolHints.failoverNextHopAddress') : t('vrf.protocolHints.failoverDhcpInterface') }}</div></div></div>
-          <div class="form-row"><label class="form-label">interface</label><div style="flex:1;"><input class="form-control" v-model="failoverRouteDraft.interface" placeholder="eth0" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverNextHopInterface') }}</div></div></div>
-          <div class="form-row"><label class="form-label">metric</label><div style="flex:1;max-width:240px;"><input type="number" class="form-control" v-model="failoverRouteDraft.metric" min="1" max="255" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverMetric') }}</div></div></div>
-          <div class="form-row"><label class="form-label">onlink</label><div style="flex:1;"><input type="checkbox" v-model="failoverRouteDraft.onlink" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverOnlink') }}</div></div></div>
-          <div class="form-row"><label class="form-label">check policy</label><div style="flex:1;max-width:260px;"><select class="form-control" v-model="failoverRouteDraft.checkPolicy" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="any-available">any-available</option><option value="all-available">all-available</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckPolicy') }}</div></div></div>
-          <div class="form-row"><label class="form-label">check type</label><div style="flex:1;max-width:220px;"><select class="form-control" v-model="failoverRouteDraft.checkType" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="icmp">icmp</option><option value="arp">arp</option><option value="tcp">tcp</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckType') }}</div></div></div>
-          <div class="form-row"><label class="form-label">check timeout</label><div style="flex:1;max-width:220px;"><input type="number" class="form-control" v-model="failoverRouteDraft.checkTimeout" min="1" max="300" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTimeout') }}</div></div></div>
-          <div class="form-row"><label class="form-label">check port</label><div style="flex:1;max-width:220px;"><input type="number" class="form-control" v-model="failoverRouteDraft.checkPort" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckPort') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverPrefix') }}</label><div class="form-control"><input class="form-control" v-model="failoverRouteDraft.prefix" placeholder="0.0.0.0/0" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverPrefix') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverGatewayType') }}</label><div class="form-control"><select class="form-control" v-model="failoverRouteDraft.gatewayType" :disabled="writeDisabled"><option value="next-hop">next-hop</option><option value="dhcp-interface">dhcp-interface</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverGatewayType') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverGateway') }}</label><div class="form-control"><input class="form-control" v-model="failoverRouteDraft.gateway" :placeholder="failoverRouteDraft.gatewayType === 'next-hop' ? '192.0.2.1' : 'eth0'" :disabled="writeDisabled" /><div class="form-hint">{{ failoverRouteDraft.gatewayType === 'next-hop' ? t('vrf.protocolHints.failoverNextHopAddress') : t('vrf.protocolHints.failoverDhcpInterface') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverInterface') }}</label><div class="form-control"><input class="form-control" v-model="failoverRouteDraft.interface" placeholder="eth0" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverNextHopInterface') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverMetric') }}</label><div class="form-control"><input type="number" class="form-control" v-model="failoverRouteDraft.metric" min="1" max="255" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverMetric') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverOnlink') }}</label><div class="form-control"><input type="checkbox" v-model="failoverRouteDraft.onlink" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverOnlink') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverCheckPolicy') }}</label><div class="form-control"><select class="form-control" v-model="failoverRouteDraft.checkPolicy" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="any-available">any-available</option><option value="all-available">all-available</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckPolicy') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverCheckType') }}</label><div class="form-control"><select class="form-control" v-model="failoverRouteDraft.checkType" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="icmp">icmp</option><option value="arp">arp</option><option value="tcp">tcp</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckType') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverCheckTimeout') }}</label><div class="form-control"><input type="number" class="form-control" v-model="failoverRouteDraft.checkTimeout" min="1" max="300" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTimeout') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverCheckPort') }}</label><div class="form-control"><input type="number" class="form-control" v-model="failoverRouteDraft.checkPort" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckPort') }}</div></div></div>
           <div class="form-group" style="margin-top:0;">
-            <div class="form-group-title">check target</div>
+            <div class="form-group-title">{{ t('vrf.protocols.failoverCheckTarget') }}</div>
             <div class="form-group-content">
               <div style="display:flex;flex-direction:column;gap:8px;">
-                <div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTarget') }}</div>
                 <DataTable :columns="FAILOVER_CHECK_TARGET_TABLE_COLUMNS" :data="failoverRouteDraft.checkTargets" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="openFailoverCheckTargetCreate" @edit="openFailoverCheckTargetEdit" @delete="requestFailoverCheckTargetDelete">
                   <template #address="{ value }">{{ value || '-' }}</template>
                   <template #interface="{ value }">{{ value || '-' }}</template>
@@ -13280,9 +15516,9 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="failoverCheckTargetModalVisible" :title="failoverCheckTargetModalTitle" width="760px" @confirm="saveFailoverCheckTargetModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">check target</label><div style="flex:1;"><input class="form-control" v-model="failoverCheckTargetDraft.address" placeholder="192.0.2.2" style="width:320px;" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTargetAddress') }}</div></div></div>
-          <div class="form-row"><label class="form-label">interface</label><div style="flex:1;"><select class="form-control" v-model="failoverCheckTargetDraft.interface" style="width:320px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'failover-target-interface-' + name" :value="name">{{ name }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTargetInterface') }}</div></div></div>
-          <div class="form-row"><label class="form-label">vrf</label><div style="flex:1;"><select class="form-control" v-model="failoverCheckTargetDraft.vrf" style="width:320px;" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in vrfNameOptions" :key="'failover-target-vrf-' + name" :value="name">{{ name }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTargetVrf') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverCheckTarget') }}</label><div class="form-control"><input class="form-control" v-model="failoverCheckTargetDraft.address" placeholder="192.0.2.2" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTargetAddress') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverInterface') }}</label><div class="form-control"><select class="form-control" v-model="failoverCheckTargetDraft.interface" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'failover-target-interface-' + name" :value="name">{{ name }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTargetInterface') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.failoverTargetVrf') }}</label><div class="form-control"><select class="form-control" v-model="failoverCheckTargetDraft.vrf" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in vrfNameOptions" :key="'failover-target-vrf-' + name" :value="name">{{ name }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.failoverCheckTargetVrf') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13295,9 +15531,9 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="staticRouteModalVisible" :title="staticRouteModalTitle" width="750px" @confirm="saveStaticRouteModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ staticRouteModalKind === 'ipv6' ? getStaticModalLabel('prefixV6') : getStaticModalLabel('prefixV4') }}</label><div style="flex:1;"><input class="form-control" style="width:320px;" v-model="staticRouteDraft.prefix" :placeholder="staticRouteModalKind === 'ipv6' ? t('vrf.protocolPlaceholders.staticRoute6Prefix') : t('vrf.protocolPlaceholders.staticRoutePrefix')" :disabled="writeDisabled || (staticRouteModalMode === 'edit' && staticRouteModalKind === 'ipv4')" /><div class="form-hint">{{ staticRouteModalKind === 'ipv6' ? t('vrf.protocolHints.staticRoute6Prefix') : t('vrf.protocolHints.staticRoutePrefix') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocolPlaceholders.staticRouteDescription') }}</label><div style="flex:1;"><input class="form-control" style="width:320px;" v-model="staticRouteDraft.description" :placeholder="t('vrf.protocolPlaceholders.staticRouteDescription')" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDescription') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ getStaticModalLabel('nextHopType') }}</label><div style="flex:1;"><select class="form-control" style="width:320px;" v-model="staticRouteDraft.routeType" @change="setStaticRouteDraftType(staticRouteDraft.routeType)" :disabled="writeDisabled"><option value="next-hop">next-hop</option><option value="interface">interface</option><option v-if="staticRouteModalKind === 'ipv4'" value="dhcp-interface">dhcp-interface</option><option value="blackhole">blackhole</option><option value="reject">reject</option></select><div class="form-hint">{{ t('vrf.protocolHints.staticRouteAction') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ staticRouteModalKind === 'ipv6' ? getStaticModalLabel('prefixV6') : getStaticModalLabel('prefixV4') }}</label><div class="form-control"><input class="form-control" v-model="staticRouteDraft.prefix" :placeholder="staticRouteModalKind === 'ipv6' ? t('vrf.protocolPlaceholders.staticRoute6Prefix') : t('vrf.protocolPlaceholders.staticRoutePrefix')" :disabled="writeDisabled || (staticRouteModalMode === 'edit' && staticRouteModalKind === 'ipv4')" /><div class="form-hint">{{ staticRouteModalKind === 'ipv6' ? t('vrf.protocolHints.staticRoute6Prefix') : t('vrf.protocolHints.staticRoutePrefix') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocolPlaceholders.staticRouteDescription') }}</label><div class="form-control"><input class="form-control" v-model="staticRouteDraft.description" :placeholder="t('vrf.protocolPlaceholders.staticRouteDescription')" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDescription') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ getStaticModalLabel('nextHopType') }}</label><div class="form-control"><select class="form-control" v-model="staticRouteDraft.routeType" @change="setStaticRouteDraftType(staticRouteDraft.routeType)" :disabled="writeDisabled"><option value="next-hop">next-hop</option><option value="interface">interface</option><option v-if="staticRouteModalKind === 'ipv4'" value="dhcp-interface">dhcp-interface</option><option value="blackhole">blackhole</option><option value="reject">reject</option></select><div class="form-hint">{{ t('vrf.protocolHints.staticRouteAction') }}</div></div></div>
           <div v-if="staticRouteDraft.routeType === 'next-hop'" style="display:flex;flex-direction:column;gap:8px;">
             <DataTable :columns="staticRouteModalKind === 'ipv6' ? STATIC_MODAL_NEXTHOP_TABLE_COLUMNS_IPV6 : STATIC_MODAL_NEXTHOP_TABLE_COLUMNS" :data="staticRouteDraft.nextHops" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="50" @create="addStaticRouteDraftNextHop" @edit="openStaticRouteDraftNextHopEdit" @delete="removeStaticRouteDraftNextHopsByIds">
               <template #address="{ value }">{{ value || '-' }}</template>
@@ -13319,31 +15555,31 @@ export default defineComponent({
             </DataTable>
           </div>
           <div v-if="staticRouteDraft.routeType === 'dhcp-interface' && staticRouteModalKind === 'ipv4'" style="display:flex;flex-direction:column;gap:10px;">
-            <div class="form-row"><label class="form-label">{{ getStaticModalLabel('dhcpInterface') }}</label><div style="flex:1;"><select class="form-control" style="width:320px;" v-model="staticRouteDraft.dhcpInterface" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'modal-dhcp-interface-' + name" :value="name">{{ name }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDhcpInterface') }}</div></div></div>
+            <div class="form-row"><label class="form-label">{{ getStaticModalLabel('dhcpInterface') }}</label><div class="form-control"><select class="form-control" v-model="staticRouteDraft.dhcpInterface" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'modal-dhcp-interface-' + name" :value="name">{{ name }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDhcpInterface') }}</div></div></div>
           </div>
           <div v-if="staticRouteDraft.routeType === 'blackhole' || staticRouteDraft.routeType === 'reject'" style="display:flex;flex-direction:column;gap:10px;">
-            <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDistance') }}</label><div style="flex:1;"><input type="number" class="form-control" style="width:320px;" v-model="staticRouteDraft.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDistance') }}</div></div></div>
-            <div class="form-row"><label class="form-label">{{ getStaticModalLabel('tag') }}</label><div style="flex:1;"><input type="number" class="form-control" style="width:320px;" v-model="staticRouteDraft.tag" min="1" max="4294967295" :placeholder="t('vrf.protocolPlaceholders.staticRouteTag')" :disabled="writeDisabled" /><div class="form-hint">{{ getStaticRouteTagRangeHint() }}</div></div></div>
+            <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDistance') }}</label><div class="form-control"><input type="number" class="form-control" v-model="staticRouteDraft.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDistance') }}</div></div></div>
+            <div class="form-row"><label class="form-label">{{ getStaticModalLabel('tag') }}</label><div class="form-control"><input type="number" class="form-control" v-model="staticRouteDraft.tag" min="1" max="4294967295" :placeholder="t('vrf.protocolPlaceholders.staticRouteTag')" :disabled="writeDisabled" /><div class="form-hint">{{ getStaticRouteTagRangeHint() }}</div></div></div>
           </div>
         </div>
       </DraggableModal>
 
       <DraggableModal v-model:visible="staticRouteCollectionModalVisible" :title="staticRouteCollectionModalTitle" width="820px" @confirm="saveStaticRouteCollectionModal">
         <div v-if="staticRouteCollectionType === 'interface'" style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnInterface') }}</label><div style="flex:1;"><select class="form-control" v-model="staticRouteCollectionDraft.name" :disabled="writeDisabled" style="width:320px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'modal-interface-entry-name-' + name" :value="name">{{ name }}</option></select></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDistance') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="staticRouteCollectionDraft.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" :disabled="writeDisabled" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDistance') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnVrf') }}</label><div style="flex:1;"><select class="form-control" v-model="staticRouteCollectionDraft.vrf" :disabled="writeDisabled" style="width:320px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in vrfNameOptions" :key="'modal-interface-entry-vrf-' + name" :value="name">{{ name }}</option></select></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDisable') }}</label><div style="flex:1;"><input type="checkbox" v-model="staticRouteCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnInterface') }}</label><div class="form-control"><select class="form-control" v-model="staticRouteCollectionDraft.name" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'modal-interface-entry-name-' + name" :value="name">{{ name }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDistance') }}</label><div class="form-control"><input type="number" class="form-control" v-model="staticRouteCollectionDraft.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDistance') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnVrf') }}</label><div class="form-control"><select class="form-control" v-model="staticRouteCollectionDraft.vrf" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in vrfNameOptions" :key="'modal-interface-entry-vrf-' + name" :value="name">{{ name }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDisable') }}</label><div class="form-control"><input type="checkbox" v-model="staticRouteCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
         </div>
         <div v-else style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnNextHop') }}</label><div style="flex:1;"><input class="form-control" v-model="staticRouteCollectionDraft.address" :placeholder="staticRouteModalKind === 'ipv6' ? t('vrf.protocolPlaceholders.staticRoute6NextHop') : t('vrf.protocolPlaceholders.staticRouteNextHop')" :disabled="writeDisabled" style="width:320px;" /></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDistance') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="staticRouteCollectionDraft.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" :disabled="writeDisabled" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDistance') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnInterface') }}</label><div style="flex:1;"><select class="form-control" v-model="staticRouteCollectionDraft.interface" :disabled="writeDisabled" style="width:320px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'modal-next-hop-interface-' + name" :value="name">{{ name }}</option></select></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnVrf') }}</label><div style="flex:1;"><select class="form-control" v-model="staticRouteCollectionDraft.vrf" :disabled="writeDisabled" style="width:320px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in vrfNameOptions" :key="'modal-next-hop-vrf-' + name" :value="name">{{ name }}</option></select></div></div>
-          <div class="form-row" v-if="staticRouteModalKind === 'ipv6'"><label class="form-label">{{ getStaticModalLabel('segments') }}</label><div style="flex:1;"><input class="form-control" v-model="staticRouteCollectionDraft.segments" :placeholder="getStaticModalLabel('segmentsPlaceholder')" :disabled="writeDisabled" style="width:320px;" /></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnBfdProfile') }}</label><div style="flex:1;"><select class="form-control" v-model="staticRouteCollectionDraft.bfdProfile" :disabled="writeDisabled" style="width:320px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in bfdProfileOptions" :key="'modal-next-hop-bfd-profile-' + name" :value="name">{{ name }}</option></select></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnBfdSourceAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="staticRouteCollectionDraft.bfdSourceAddress" :placeholder="t('vrf.protocolPlaceholders.staticRouteBfdSourceAddress')" :disabled="writeDisabled" style="width:320px;" /></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDisable') }}</label><div style="flex:1;"><input type="checkbox" v-model="staticRouteCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnNextHop') }}</label><div class="form-control"><input class="form-control" v-model="staticRouteCollectionDraft.address" :placeholder="staticRouteModalKind === 'ipv6' ? t('vrf.protocolPlaceholders.staticRoute6NextHop') : t('vrf.protocolPlaceholders.staticRouteNextHop')" :disabled="writeDisabled" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDistance') }}</label><div class="form-control"><input type="number" class="form-control" v-model="staticRouteCollectionDraft.distance" min="1" max="255" :placeholder="t('vrf.protocolPlaceholders.staticRouteDistance')" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.staticRouteDistance') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnInterface') }}</label><div class="form-control"><select class="form-control" v-model="staticRouteCollectionDraft.interface" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in interfaceOptions" :key="'modal-next-hop-interface-' + name" :value="name">{{ name }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnVrf') }}</label><div class="form-control"><select class="form-control" v-model="staticRouteCollectionDraft.vrf" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in vrfNameOptions" :key="'modal-next-hop-vrf-' + name" :value="name">{{ name }}</option></select></div></div>
+          <div class="form-row" v-if="staticRouteModalKind === 'ipv6'"><label class="form-label">{{ getStaticModalLabel('segments') }}</label><div class="form-control"><input class="form-control" v-model="staticRouteCollectionDraft.segments" :placeholder="getStaticModalLabel('segmentsPlaceholder')" :disabled="writeDisabled" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnBfdProfile') }}</label><div class="form-control"><select class="form-control" v-model="staticRouteCollectionDraft.bfdProfile" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="name in bfdProfileOptions" :key="'modal-next-hop-bfd-profile-' + name" :value="name">{{ name }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnBfdSourceAddress') }}</label><div class="form-control"><input class="form-control" v-model="staticRouteCollectionDraft.bfdSourceAddress" :placeholder="t('vrf.protocolPlaceholders.staticRouteBfdSourceAddress')" :disabled="writeDisabled" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.staticColumnDisable') }}</label><div class="form-control"><input type="checkbox" v-model="staticRouteCollectionDraft.disable" :disabled="writeDisabled" /></div></div>
         </div>
       </DraggableModal>
 
@@ -13363,43 +15599,45 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="ospfAreaModalVisible" :title="ospfAreaModalTitle" width="920px" @confirm="saveOspfAreaModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">area</label><div style="flex:1;"><input class="form-control" v-model="ospfAreaDraft.area" :disabled="writeDisabled" placeholder="0.0.0.0" style="width:260px;" /><div class="form-hint">支持十进制或点分十进制区域号，例如 0 或 0.0.0.0。</div></div></div>
-          <div class="form-row"><label class="form-label">area-type</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfAreaDraft.areaType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="normal">normal</option><option value="nssa">nssa</option><option value="stub">stub</option></select><input v-if="ospfAreaDraft.areaType === 'nssa'" type="number" class="form-control" v-model="ospfAreaDraft.nssaDefaultCost" min="0" max="16777215" :disabled="writeDisabled" placeholder="nssa default-cost" style="width:260px;" /><label v-if="ospfAreaDraft.areaType === 'nssa'"><input type="checkbox" v-model="ospfAreaDraft.nssaNoSummary" :disabled="writeDisabled" /> no-summary</label><select v-if="ospfAreaDraft.areaType === 'nssa'" class="form-control" v-model="ospfAreaDraft.nssaTranslate" :disabled="writeDisabled" style="width:260px;"><option value="">translate(candidate)</option><option value="always">always</option><option value="candidate">candidate</option><option value="never">never</option></select><input v-if="ospfAreaDraft.areaType === 'stub'" type="number" class="form-control" v-model="ospfAreaDraft.stubDefaultCost" min="0" max="16777215" :disabled="writeDisabled" placeholder="stub default-cost" style="width:260px;" /><label v-if="ospfAreaDraft.areaType === 'stub'"><input type="checkbox" v-model="ospfAreaDraft.stubNoSummary" :disabled="writeDisabled" /> no-summary</label><div class="form-hint" style="width:100%;">default-cost 范围 0-16777215；NSSA translate 默认 candidate。</div></div></div>
-          <div class="form-row"><label class="form-label">authentication</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfAreaDraft.authenticationType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="plaintext-password">plaintext-password</option><option value="md5">md5</option></select><input v-if="ospfAreaDraft.authenticationType === 'plaintext-password'" class="form-control" v-model="ospfAreaDraft.authenticationPlaintextPassword" :disabled="writeDisabled" placeholder="password" style="width:260px;" /><div class="form-hint" style="width:100%;">plaintext-password 建议不超过 8 字符；md5 通过 virtual-link 子项配置 key-id 与 md5-key。</div></div></div>
-          <div class="form-row"><label class="form-label">export/import list</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><input type="number" class="form-control" v-model="ospfAreaDraft.exportList" min="0" max="4294967295" :disabled="writeDisabled" placeholder="export-list" style="width:260px;" /><input type="number" class="form-control" v-model="ospfAreaDraft.importList" min="0" max="4294967295" :disabled="writeDisabled" placeholder="import-list" style="width:260px;" /><div class="form-hint" style="width:100%;">取值范围 0-4294967295。</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfArea') }}</label><div class="form-control"><input class="form-control" v-model="ospfAreaDraft.area" :disabled="writeDisabled" placeholder="0.0.0.0" /><div class="form-hint">{{ t('vrf.protocolHints.ospfAreaValue') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfAreaType') }}</label><div style="flex:1;display:flex;flex-direction:column;gap:8px;"><select class="form-control" v-model="ospfAreaDraft.areaType" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="normal">normal</option><option value="nssa">nssa</option><option value="stub">stub</option></select><input v-if="ospfAreaDraft.areaType === 'nssa'" type="number" class="form-control" v-model="ospfAreaDraft.nssaDefaultCost" min="0" max="16777215" :disabled="writeDisabled" placeholder="nssa default-cost" /><label v-if="ospfAreaDraft.areaType === 'nssa'"><input type="checkbox" v-model="ospfAreaDraft.nssaNoSummary" :disabled="writeDisabled" /> no-summary</label><select v-if="ospfAreaDraft.areaType === 'nssa'" class="form-control" v-model="ospfAreaDraft.nssaTranslate" :disabled="writeDisabled"><option value="">translate(candidate)</option><option value="always">always</option><option value="candidate">candidate</option><option value="never">never</option></select><input v-if="ospfAreaDraft.areaType === 'stub'" type="number" class="form-control" v-model="ospfAreaDraft.stubDefaultCost" min="0" max="16777215" :disabled="writeDisabled" placeholder="stub default-cost" /><label v-if="ospfAreaDraft.areaType === 'stub'"><input type="checkbox" v-model="ospfAreaDraft.stubNoSummary" :disabled="writeDisabled" /> no-summary</label><div class="form-hint" style="width:100%" v-if="ospfAreaDraft.areaType === 'nssa'">{{ t('vrf.protocolHints.ospfAreaTypeNssaDetail') }}</div><div class="form-hint" style="width:100%" v-if="ospfAreaDraft.areaType === 'stub'">{{ t('vrf.protocolHints.ospfAreaTypeStubDetail') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfAuthentication') }}</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfAreaDraft.authenticationType" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="plaintext-password">plaintext-password</option><option value="md5">md5</option></select><input v-if="ospfAreaDraft.authenticationType === 'plaintext-password'" class="form-control" v-model="ospfAreaDraft.authenticationPlaintextPassword" :disabled="writeDisabled" placeholder="password" /><div class="form-hint" style="width:100%;">{{ t('vrf.protocolHints.ospfAreaAuthDetail') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfExportImportList') }}</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><input type="number" class="form-control" v-model="ospfAreaDraft.exportList" min="0" max="4294967295" :disabled="writeDisabled" placeholder="export-list" /><input type="number" class="form-control" v-model="ospfAreaDraft.importList" min="0" max="4294967295" :disabled="writeDisabled" placeholder="import-list" /><div class="form-hint" style="width:100%;">{{ t('vrf.protocolHints.ospfExportImportListRange') }}</div></div></div>
 
-          <div class="form-row"><label class="form-label">network</label><div style="flex:1;"><textarea class="form-control" rows="2" v-model="ospfAreaDraft.networksText" :disabled="writeDisabled" placeholder="1.1.2.0/24, 10.0.0.0/8" style="width:260px;"></textarea><div class="form-hint">支持多个网段，逗号或换行分隔，格式为 x.x.x.x/x。</div></div></div>
-          <div class="form-row"><label class="form-label">shortcut</label><div style="flex:1;"><select class="form-control" v-model="ospfAreaDraft.shortcut" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="default">default</option><option value="disable">disable</option><option value="enable">enable</option></select><div class="form-hint">可选 default / disable / enable。</div></div></div>
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <div class="form-section-title" style="margin-top:2px;">range</div>
-            <DataTable :columns="OSPF_AREA_RANGE_TABLE_COLUMNS" :data="ospfAreaDraft.ranges" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="100" @create="openOspfRangeCreate" @edit="openOspfRangeEdit" @delete="requestOspfRangeDelete">
-              <template #prefix="{ value }">{{ value || '-' }}</template>
-              <template #cost="{ value }">{{ value || '-' }}</template>
-              <template #notAdvertise="{ value }">{{ value ? 'yes' : '-' }}</template>
-              <template #substitute="{ value }">{{ value || '-' }}</template>
-            </DataTable>
-            <div class="form-hint">prefix 必填；cost 范围 0-16777215；可选 not-advertise 与 substitute(x.x.x.x/x)。</div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfNetwork') }}</label><div class="form-control"><textarea class="form-control" rows="2" v-model="ospfAreaDraft.networksText" :disabled="writeDisabled" placeholder="1.1.2.0/24, 10.0.0.0/8"></textarea><div class="form-hint">{{ t('vrf.protocolHints.ospfNetworks') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfShortcut') }}</label><div class="form-control"><select class="form-control" v-model="ospfAreaDraft.shortcut" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="default">default</option><option value="disable">disable</option><option value="enable">enable</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfShortcut') }}</div></div></div>
+          <div class="form-group" style="margin-top:0;">
+            <div class="form-group-title">range</div>
+            <div class="form-group-content">
+              <DataTable :columns="OSPF_AREA_RANGE_TABLE_COLUMNS" :data="ospfAreaDraft.ranges" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="100" @create="openOspfRangeCreate" @edit="openOspfRangeEdit" @delete="requestOspfRangeDelete">
+                <template #prefix="{ value }">{{ value || '-' }}</template>
+                <template #cost="{ value }">{{ value || '-' }}</template>
+                <template #notAdvertise="{ value }">{{ value ? 'yes' : '-' }}</template>
+                <template #substitute="{ value }">{{ value || '-' }}</template>
+              </DataTable>
+            </div>
           </div>
 
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <div class="form-section-title" style="margin-top:2px;">virtual-link</div>
-            <DataTable :columns="OSPF_AREA_VIRTUAL_LINK_TABLE_COLUMNS" :data="ospfAreaDraft.virtualLinks" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="100" @create="openOspfVirtualLinkCreate" @edit="openOspfVirtualLinkEdit" @delete="requestOspfVirtualLinkDelete">
-              <template #peer="{ value }">{{ value || '-' }}</template>
-              <template #auth="{ row }">{{ getOspfVirtualLinkAuthPreview(row) }}</template>
-              <template #deadInterval="{ value }">{{ value || '-' }}</template>
-              <template #helloInterval="{ value }">{{ value || '-' }}</template>
-              <template #retransmitInterval="{ value }">{{ value || '-' }}</template>
-              <template #retransmitWindow="{ value }">{{ value || '-' }}</template>
-              <template #transmitDelay="{ value }">{{ value || '-' }}</template>
-            </DataTable>
-            <div class="form-hint">dead/hello/retransmit-interval/transmit-delay 范围 1-65535；retransmit-window 范围 20-1000；默认分别为 40/10/5/1，window 默认 50。</div>
+          <div class="form-group" style="margin-top:0;">
+            <div class="form-group-title">virtual-link</div>
+            <div class="form-group-content">
+              <DataTable :columns="OSPF_AREA_VIRTUAL_LINK_TABLE_COLUMNS" :data="ospfAreaDraft.virtualLinks" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="100" @create="openOspfVirtualLinkCreate" @edit="openOspfVirtualLinkEdit" @delete="requestOspfVirtualLinkDelete">
+                <template #peer="{ value }">{{ value || '-' }}</template>
+                <template #auth="{ row }">{{ getOspfVirtualLinkAuthPreview(row) }}</template>
+                <template #deadInterval="{ value }">{{ value || '-' }}</template>
+                <template #helloInterval="{ value }">{{ value || '-' }}</template>
+                <template #retransmitInterval="{ value }">{{ value || '-' }}</template>
+                <template #retransmitWindow="{ value }">{{ value || '-' }}</template>
+                <template #transmitDelay="{ value }">{{ value || '-' }}</template>
+              </DataTable>
+            </div>
           </div>
         </div>
       </DraggableModal>
 
       <DraggableModal v-model:visible="ospfAccessListModalVisible" :title="ospfAccessListModalTitle" width="760px" @confirm="saveOspfAccessListModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfAccessListNumber') }}</label><div style="flex:1;"><input type="number" min="0" max="4294967295" class="form-control" v-model="ospfAccessListDraft.number" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfAccessListNumber') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfAccessListNumber') }}</label><div class="form-control"><input type="number" min="0" max="4294967295" class="form-control" v-model="ospfAccessListDraft.number" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfAccessListNumber') }}</div></div></div>
           <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfAccessListExport') }}</label><div style="flex:1;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <label><input type="checkbox" value="bgp" v-model="ospfAccessListDraft.exportProtocols" :disabled="writeDisabled" /> bgp</label>
             <label><input type="checkbox" value="connected" v-model="ospfAccessListDraft.exportProtocols" :disabled="writeDisabled" /> connected</label>
@@ -13421,9 +15659,9 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="ospfNeighborModalVisible" :title="ospfNeighborModalTitle" width="760px" @confirm="saveOspfNeighborModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfNeighborAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfNeighborDraft.address" :disabled="writeDisabled" placeholder="2.2.2.2" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfNeighborAddress') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfNeighborPollInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfNeighborDraft.pollInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfNeighborPollInterval') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfNeighborPriority') }}</label><div style="flex:1;"><input type="number" min="0" max="255" class="form-control" v-model="ospfNeighborDraft.priority" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfNeighborPriority') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfNeighborAddress') }}</label><div class="form-control"><input class="form-control" v-model="ospfNeighborDraft.address" :disabled="writeDisabled" placeholder="2.2.2.2" /><div class="form-hint">{{ t('vrf.protocolHints.ospfNeighborAddress') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfNeighborPollInterval') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfNeighborDraft.pollInterval" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfNeighborPollInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfNeighborPriority') }}</label><div class="form-control"><input type="number" min="0" max="255" class="form-control" v-model="ospfNeighborDraft.priority" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfNeighborPriority') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13436,9 +15674,9 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="ospfSummaryAddressModalVisible" :title="ospfSummaryAddressModalTitle" width="760px" @confirm="saveOspfSummaryAddressModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSummaryAddressPrefix') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfSummaryAddressDraft.prefix" :disabled="writeDisabled" placeholder="1.1.1.0/24" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSummaryAddressPrefix') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSummaryAddressNoAdvertise') }}</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfSummaryAddressDraft.noAdvertise" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfSummaryAddressNoAdvertise') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfSummaryAddressNoAdvertise') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSummaryAddressTag') }}</label><div style="flex:1;"><input type="number" min="1" max="4294967295" class="form-control" v-model="ospfSummaryAddressDraft.tag" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSummaryAddressTag') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSummaryAddressPrefix') }}</label><div class="form-control"><input class="form-control" v-model="ospfSummaryAddressDraft.prefix" :disabled="writeDisabled" placeholder="1.1.1.0/24" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSummaryAddressPrefix') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSummaryAddressNoAdvertise') }}</label><div class="form-control"><label><input type="checkbox" v-model="ospfSummaryAddressDraft.noAdvertise" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfSummaryAddressNoAdvertise') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfSummaryAddressNoAdvertise') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSummaryAddressTag') }}</label><div class="form-control"><input type="number" min="1" max="4294967295" class="form-control" v-model="ospfSummaryAddressDraft.tag" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSummaryAddressTag') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13451,8 +15689,8 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="ospfSrPrefixModalVisible" :title="ospfSrPrefixModalTitle" width="760px" @confirm="saveOspfSrPrefixModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrPrefix') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfSrPrefixDraft.prefix" :disabled="writeDisabled" placeholder="3.3.3.0/24" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrPrefix') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrPrefixIndexValue') }}</label><div style="flex:1;"><input type="number" min="0" max="65535" class="form-control" v-model="ospfSrPrefixDraft.indexValue" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrPrefixIndexValue') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrPrefix') }}</label><div class="form-control"><input class="form-control" v-model="ospfSrPrefixDraft.prefix" :disabled="writeDisabled" placeholder="3.3.3.0/24" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrPrefix') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrPrefixIndexValue') }}</label><div class="form-control"><input type="number" min="0" max="65535" class="form-control" v-model="ospfSrPrefixDraft.indexValue" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfSrPrefixIndexValue') }}</div></div></div>
           <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfSrPrefixIndexFlags') }}</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="ospfSrPrefixDraft.explicitNull" :disabled="writeDisabled" /> explicit-null</label><label><input type="checkbox" v-model="ospfSrPrefixDraft.noPhpFlag" :disabled="writeDisabled" /> no-php-flag</label><div class="form-hint" style="width:100%;">{{ t('vrf.protocolHints.ospfSrPrefixIndexFlags') }}</div></div></div>
         </div>
       </DraggableModal>
@@ -13466,10 +15704,10 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="ospfRedistributeTableModalVisible" :title="ospfRedistributeTableModalTitle" width="760px" @confirm="saveOspfRedistributeTableModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeTableId') }}</label><div style="flex:1;"><input type="number" min="1" max="200" class="form-control" v-model="ospfRedistributeTableDraft.table" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeTableId') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetric') }}</label><div style="flex:1;"><input type="number" min="0" max="16777214" class="form-control" v-model="ospfRedistributeTableDraft.metric" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetric') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetricType') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfRedistributeTableDraft.metricType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetricType') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeRouteMap') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfRedistributeTableDraft.routeMap" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeRouteMap') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeTableId') }}</label><div class="form-control"><input type="number" min="1" max="200" class="form-control" v-model="ospfRedistributeTableDraft.table" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeTableId') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetric') }}</label><div class="form-control"><input type="number" min="0" max="16777214" class="form-control" v-model="ospfRedistributeTableDraft.metric" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetric') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeMetricType') }}</label><div class="form-control"><select class="form-control" v-model="ospfRedistributeTableDraft.metricType" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeMetricType') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfRedistributeRouteMap') }}</label><div class="form-control"><input class="form-control" v-model="ospfRedistributeTableDraft.routeMap" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfRedistributeRouteMap') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13482,11 +15720,11 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="isisInterfaceModalVisible" :title="isisInterfaceModalTitle" width="820px" @confirm="saveIsisInterfaceModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceName') }}</label><div style="flex:1;"><select class="form-control" v-model="isisInterfaceDraft.name" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="opt in interfaceOptions" :key="'isis-if-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.isisInterfaceName') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfacePassive') }}</label><div style="flex:1;"><label><input type="checkbox" v-model="isisInterfaceDraft.passive" :disabled="writeDisabled" /> {{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</label></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceMetric') }}</label><div style="flex:1;"><input type="number" min="0" max="16777215" class="form-control" v-model="isisInterfaceDraft.metric" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceNetwork') }}</label><div style="flex:1;"><input class="form-control" v-model="isisInterfaceDraft.network" :disabled="writeDisabled" style="width:260px;" placeholder="point-to-point" /><div class="form-hint">{{ t('vrf.protocolHints.isisInterfaceNetwork') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceExtras') }}</label><div style="flex:1;"><textarea class="form-control" rows="5" v-model="isisInterfaceDraft.extrasText" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.isisInterfaceExtras')" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"></textarea><div class="form-hint">{{ t('vrf.protocolHints.isisInterfaceExtras') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceName') }}</label><div class="form-control"><select class="form-control" v-model="isisInterfaceDraft.name" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="opt in interfaceOptions" :key="'isis-if-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.isisInterfaceName') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfacePassive') }}</label><div class="form-control"><label><input type="checkbox" v-model="isisInterfaceDraft.passive" :disabled="writeDisabled" /> {{ t('vrf.protocolHints.booleanSwitchDefaultOff') }}</label></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceMetric') }}</label><div class="form-control"><input type="number" min="0" max="16777215" class="form-control" v-model="isisInterfaceDraft.metric" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceNetwork') }}</label><div class="form-control"><input class="form-control" v-model="isisInterfaceDraft.network" :disabled="writeDisabled" placeholder="point-to-point" /><div class="form-hint">{{ t('vrf.protocolHints.isisInterfaceNetwork') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisInterfaceExtras') }}</label><div class="form-control"><textarea class="form-control" rows="5" v-model="isisInterfaceDraft.extrasText" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.isisInterfaceExtras')" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"></textarea><div class="form-hint">{{ t('vrf.protocolHints.isisInterfaceExtras') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13499,8 +15737,8 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="isisFastRerouteModalVisible" :title="isisFastRerouteModalTitle" width="760px" @confirm="saveIsisFastRerouteModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisFastRerouteCommand') }}</label><div style="flex:1;"><input class="form-control" v-model="isisFastRerouteDraft.command" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.isisFastRerouteCommand')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.isisFastRerouteCommand') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisFastRerouteValue') }}</label><div style="flex:1;"><input class="form-control" v-model="isisFastRerouteDraft.value" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.isisFastRerouteValue')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.isisFastRerouteValue') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisFastRerouteCommand') }}</label><div class="form-control"><input class="form-control" v-model="isisFastRerouteDraft.command" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.isisFastRerouteCommand')" /><div class="form-hint">{{ t('vrf.protocolHints.isisFastRerouteCommand') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisFastRerouteValue') }}</label><div class="form-control"><input class="form-control" v-model="isisFastRerouteDraft.value" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.isisFastRerouteValue')" /><div class="form-hint">{{ t('vrf.protocolHints.isisFastRerouteValue') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13513,11 +15751,11 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="isisRedistributeModalVisible" :title="isisRedistributeModalTitle" width="760px" @confirm="saveIsisRedistributeModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeAddressFamily') }}</label><div style="flex:1;"><select class="form-control" v-model="isisRedistributeDraft.af" :disabled="writeDisabled" style="width:260px;"><option value="ipv4">ipv4</option><option value="ipv6">ipv6</option></select></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeProtocol') }}</label><div style="flex:1;"><select class="form-control" v-model="isisRedistributeDraft.protocol" :disabled="writeDisabled" style="width:260px;"><option v-for="protocol in ISIS_REDISTRIBUTE_PROTOCOLS" :key="'isis-redist-proto-'+protocol" :value="protocol">{{ protocol }}</option></select></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeLevel') }}</label><div style="flex:1;"><select class="form-control" v-model="isisRedistributeDraft.level" :disabled="writeDisabled" style="width:260px;"><option value="level-1">level-1</option><option value="level-2">level-2</option></select></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeMetric') }}</label><div style="flex:1;"><input type="number" min="0" max="16777215" class="form-control" v-model="isisRedistributeDraft.metric" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeRouteMap') }}</label><div style="flex:1;"><input class="form-control" v-model="isisRedistributeDraft.routeMap" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:260px;" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeAddressFamily') }}</label><div class="form-control"><select class="form-control" v-model="isisRedistributeDraft.af" :disabled="writeDisabled"><option value="ipv4">ipv4</option><option value="ipv6">ipv6</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeProtocol') }}</label><div class="form-control"><select class="form-control" v-model="isisRedistributeDraft.protocol" :disabled="writeDisabled"><option v-for="protocol in ISIS_REDISTRIBUTE_PROTOCOLS" :key="'isis-redist-proto-'+protocol" :value="protocol">{{ protocol }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeLevel') }}</label><div class="form-control"><select class="form-control" v-model="isisRedistributeDraft.level" :disabled="writeDisabled"><option value="level-1">level-1</option><option value="level-2">level-2</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeMetric') }}</label><div class="form-control"><input type="number" min="0" max="16777215" class="form-control" v-model="isisRedistributeDraft.metric" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.isisDefaultInfoMetric') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.isisRedistributeRouteMap') }}</label><div class="form-control"><input class="form-control" v-model="isisRedistributeDraft.routeMap" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /></div></div>
         </div>
       </DraggableModal>
 
@@ -13530,12 +15768,12 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="rpkiCacheModalVisible" :title="rpkiCacheModalTitle" width="760px" @confirm="saveRpkiCacheModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="rpkiCacheDraft.address" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheAddress')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheAddress') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCachePort') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="rpkiCacheDraft.port" :disabled="writeDisabled" style="width:220px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCachePort') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCachePreference') }}</label><div style="flex:1;"><input type="number" min="1" max="255" class="form-control" v-model="rpkiCacheDraft.preference" :disabled="writeDisabled" style="width:220px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCachePreference') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheSourceAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="rpkiCacheDraft.sourceAddress" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheSourceAddress')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheSourceAddress') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheSshUsername') }}</label><div style="flex:1;"><input class="form-control" v-model="rpkiCacheDraft.sshUsername" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheSshUsername')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheSshUsername') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheSshKey') }}</label><div style="flex:1;"><input class="form-control" v-model="rpkiCacheDraft.sshKey" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheSshKey')" style="width:320px;" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheSshKey') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheAddress') }}</label><div class="form-control"><input class="form-control" v-model="rpkiCacheDraft.address" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheAddress')" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheAddress') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCachePort') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="rpkiCacheDraft.port" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCachePort') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCachePreference') }}</label><div class="form-control"><input type="number" min="1" max="255" class="form-control" v-model="rpkiCacheDraft.preference" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCachePreference') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheSourceAddress') }}</label><div class="form-control"><input class="form-control" v-model="rpkiCacheDraft.sourceAddress" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheSourceAddress')" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheSourceAddress') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheSshUsername') }}</label><div class="form-control"><input class="form-control" v-model="rpkiCacheDraft.sshUsername" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheSshUsername')" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheSshUsername') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.rpkiCacheSshKey') }}</label><div class="form-control"><input class="form-control" v-model="rpkiCacheDraft.sshKey" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.rpkiCacheSshKey')" /><div class="form-hint">{{ t('vrf.protocolHints.rpkiCacheSshKey') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13548,27 +15786,26 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="ospfv3AreaModalVisible" :title="ospfv3AreaModalTitle" width="900px" @confirm="saveOspfv3AreaModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaId') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3AreaDraft.area" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfArea')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaValue') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaType') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3AreaDraft.areaType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="nssa">nssa</option><option value="stub">stub</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaType') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaId') }}</label><div class="form-control"><input class="form-control" v-model="ospfv3AreaDraft.area" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfArea')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaValue') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaType') }}</label><div class="form-control"><select class="form-control" v-model="ospfv3AreaDraft.areaType" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="nssa">nssa</option><option value="stub">stub</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaType') }}</div></div></div>
 
           <div class="form-row" v-if="ospfv3AreaDraft.areaType === 'nssa'"><label class="form-label">nssa</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="ospfv3AreaDraft.nssaDefaultInformationOriginate" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3AreaTypeNssaDefaultInfoOriginate') }}</label><label><input type="checkbox" v-model="ospfv3AreaDraft.nssaNoSummary" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3AreaTypeNoSummary') }}</label></div></div>
-          <div class="form-row" v-if="ospfv3AreaDraft.areaType === 'stub'"><label class="form-label">stub</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfv3AreaDraft.stubNoSummary" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3AreaTypeNoSummary') }}</label></div></div>
+          <div class="form-row" v-if="ospfv3AreaDraft.areaType === 'stub'"><label class="form-label">stub</label><div class="form-control"><label><input type="checkbox" v-model="ospfv3AreaDraft.stubNoSummary" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3AreaTypeNoSummary') }}</label></div></div>
 
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaExportList') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3AreaDraft.exportList" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaExportList') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaImportList') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3AreaDraft.importList" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaImportList') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaExportList') }}</label><div class="form-control"><input class="form-control" v-model="ospfv3AreaDraft.exportList" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaExportList') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaImportList') }}</label><div class="form-control"><input class="form-control" v-model="ospfv3AreaDraft.importList" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaImportList') }}</div></div></div>
 
           <DataTable :columns="OSPFV3_AREA_RANGE_TABLE_COLUMNS" :data="ospfv3AreaDraft.ranges" row-key="__id" :actions="STATIC_MODAL_COLLECTION_TABLE_ACTIONS" :disabled="writeDisabled" :page-size="100" @create="openOspfv3AreaRangeCreate" @edit="openOspfv3AreaRangeEdit" @delete="requestOspfv3AreaRangeDelete">
             <template #prefix="{ value }">{{ value || '-' }}</template>
             <template #action="{ value }">{{ value || '-' }}</template>
           </DataTable>
-          <div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaRangeRow') }}</div>
         </div>
       </DraggableModal>
 
       <DraggableModal v-model:visible="ospfv3AreaRangeModalVisible" :title="ospfv3AreaRangeModalTitle" width="760px" @confirm="saveOspfv3AreaRangeModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaRangePrefix') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3AreaRangeDraft.prefix" :disabled="writeDisabled" placeholder="2001:db8::/64" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaRangePrefix') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaRangeAction') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3AreaRangeDraft.action" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="advertise">advertise</option><option value="not-advertise">not-advertise</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaRangeAction') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaRangePrefix') }}</label><div class="form-control"><input class="form-control" v-model="ospfv3AreaRangeDraft.prefix" :disabled="writeDisabled" placeholder="2001:db8::/64" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaRangePrefix') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3AreaRangeAction') }}</label><div class="form-control"><select class="form-control" v-model="ospfv3AreaRangeDraft.action" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="advertise">advertise</option><option value="not-advertise">not-advertise</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3AreaRangeAction') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13588,20 +15825,20 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="ospfv3InterfaceModalVisible" :title="ospfv3InterfaceModalTitle" width="900px" @confirm="saveOspfv3InterfaceModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfName') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3InterfaceDraft.name" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') || t('vrf.protocolPlaceholders.ospfInterface') }}</option><option v-for="opt in interfaceOptions" :key="'ospfv3-if-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3InterfaceName') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfArea') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3InterfaceDraft.area" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfArea')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfArea') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfBfdProfile') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3InterfaceDraft.bfdProfile" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="opt in bfdProfileOptions" :key="'ospfv3-if-bfd-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfBfdProfile') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfCost') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.cost" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfCost') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfDeadInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.deadInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfDeadInterval') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfHelloInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.helloInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfHelloInterval') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfIfmtu') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.ifmtu" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfIfmtu') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfInstanceId') }}</label><div style="flex:1;"><input type="number" min="0" max="255" class="form-control" v-model="ospfv3InterfaceDraft.instanceId" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfInstanceId') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfMtuIgnore') }}</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfv3InterfaceDraft.mtuIgnore" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3IfMtuIgnore') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfMtuIgnore') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfNetwork') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3InterfaceDraft.network" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="broadcast">broadcast</option><option value="point-to-point">point-to-point</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfNetwork') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfPassive') }}</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfv3InterfaceDraft.passive" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3IfPassive') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfPassive') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfPriority') }}</label><div style="flex:1;"><input type="number" min="0" max="255" class="form-control" v-model="ospfv3InterfaceDraft.priority" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfPriority') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfRetransmitInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.retransmitInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfRetransmitInterval') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfTransmitDelay') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.transmitDelay" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfTransmitDelay') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfName') }}</label><div class="form-control"><select class="form-control" v-model="ospfv3InterfaceDraft.name" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') || t('vrf.protocolPlaceholders.ospfInterface') }}</option><option v-for="opt in interfaceOptions" :key="'ospfv3-if-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3InterfaceName') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfArea') }}</label><div class="form-control"><input class="form-control" v-model="ospfv3InterfaceDraft.area" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfArea')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfArea') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfBfdProfile') }}</label><div class="form-control"><select class="form-control" v-model="ospfv3InterfaceDraft.bfdProfile" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="opt in bfdProfileOptions" :key="'ospfv3-if-bfd-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfBfdProfile') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfCost') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.cost" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfCost') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfDeadInterval') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.deadInterval" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfDeadInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfHelloInterval') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.helloInterval" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfHelloInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfIfmtu') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.ifmtu" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfIfmtu') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfInstanceId') }}</label><div class="form-control"><input type="number" min="0" max="255" class="form-control" v-model="ospfv3InterfaceDraft.instanceId" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfInstanceId') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfMtuIgnore') }}</label><div class="form-control"><label><input type="checkbox" v-model="ospfv3InterfaceDraft.mtuIgnore" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3IfMtuIgnore') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfMtuIgnore') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfNetwork') }}</label><div class="form-control"><select class="form-control" v-model="ospfv3InterfaceDraft.network" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="broadcast">broadcast</option><option value="point-to-point">point-to-point</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfNetwork') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfPassive') }}</label><div class="form-control"><label><input type="checkbox" v-model="ospfv3InterfaceDraft.passive" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfv3IfPassive') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfPassive') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfPriority') }}</label><div class="form-control"><input type="number" min="0" max="255" class="form-control" v-model="ospfv3InterfaceDraft.priority" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfPriority') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfRetransmitInterval') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.retransmitInterval" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfRetransmitInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3IfTransmitDelay') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfv3InterfaceDraft.transmitDelay" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3IfTransmitDelay') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13614,10 +15851,10 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="ospfv3RedistributeModalVisible" :title="ospfv3RedistributeModalTitle" width="760px" @confirm="saveOspfv3RedistributeModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeProtocol') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3RedistributeDraft.protocol" :disabled="writeDisabled || ospfv3RedistributeModalMode === 'edit'" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="protocol in OSPFV3_REDISTRIBUTE_PROTOCOLS" :key="'ospfv3-redistribute-opt-' + protocol" :value="protocol">{{ protocol }}</option></select></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeMetric') }}</label><div style="flex:1;"><input type="number" min="0" max="16777214" class="form-control" v-model="ospfv3RedistributeDraft.metric" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3RedistributeMetric') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeMetricType') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfv3RedistributeDraft.metricType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3RedistributeMetricType') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeRouteMap') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfv3RedistributeDraft.routeMap" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3RedistributeRouteMap') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeProtocol') }}</label><div class="form-control"><select class="form-control" v-model="ospfv3RedistributeDraft.protocol" :disabled="writeDisabled || ospfv3RedistributeModalMode === 'edit'"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="protocol in OSPFV3_REDISTRIBUTE_PROTOCOLS" :key="'ospfv3-redistribute-opt-' + protocol" :value="protocol">{{ protocol }}</option></select></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeMetric') }}</label><div class="form-control"><input type="number" min="0" max="16777214" class="form-control" v-model="ospfv3RedistributeDraft.metric" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3RedistributeMetric') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeMetricType') }}</label><div class="form-control"><select class="form-control" v-model="ospfv3RedistributeDraft.metricType" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="1">1</option><option value="2">2</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfv3RedistributeMetricType') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfv3RedistributeRouteMap') }}</label><div class="form-control"><input class="form-control" v-model="ospfv3RedistributeDraft.routeMap" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfv3RedistributeRouteMap') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13630,28 +15867,28 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="ospfInterfaceModalVisible" :title="ospfInterfaceModalTitle" width="920px" @confirm="saveOspfInterfaceModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfName') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfInterfaceDraft.name" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') || t('vrf.protocolPlaceholders.ospfInterface') }}</option><option v-for="opt in interfaceOptions" :key="'ospf-if-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfName') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfArea') }}</label><div style="flex:1;"><input class="form-control" v-model="ospfInterfaceDraft.area" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfArea')" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfArea') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfName') }}</label><div class="form-control"><select class="form-control" v-model="ospfInterfaceDraft.name" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') || t('vrf.protocolPlaceholders.ospfInterface') }}</option><option v-for="opt in interfaceOptions" :key="'ospf-if-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfName') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfArea') }}</label><div class="form-control"><input class="form-control" v-model="ospfInterfaceDraft.area" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfArea')" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfArea') }}</div></div></div>
 
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfAuthentication') }}</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfInterfaceDraft.authenticationType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="md5">md5</option><option value="plaintext-password">plaintext-password</option></select><input v-if="ospfInterfaceDraft.authenticationType === 'md5'" type="number" min="1" max="255" class="form-control" v-model="ospfInterfaceDraft.md5KeyId" :disabled="writeDisabled" placeholder="key-id" style="width:260px;" /><input v-if="ospfInterfaceDraft.authenticationType === 'md5'" class="form-control" v-model="ospfInterfaceDraft.md5Key" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfIfMd5Key')" style="width:260px;" /><input v-if="ospfInterfaceDraft.authenticationType === 'plaintext-password'" class="form-control" v-model="ospfInterfaceDraft.plaintextPassword" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfIfPlaintextPassword')" style="width:260px;" /><div class="form-hint" style="width:100%;">{{ t('vrf.protocolHints.ospfIfAuthentication') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfAuthentication') }}</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfInterfaceDraft.authenticationType" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="md5">md5</option><option value="plaintext-password">plaintext-password</option></select><input v-if="ospfInterfaceDraft.authenticationType === 'md5'" type="number" min="1" max="255" class="form-control" v-model="ospfInterfaceDraft.md5KeyId" :disabled="writeDisabled" placeholder="key-id" /><input v-if="ospfInterfaceDraft.authenticationType === 'md5'" class="form-control" v-model="ospfInterfaceDraft.md5Key" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfIfMd5Key')" /><input v-if="ospfInterfaceDraft.authenticationType === 'plaintext-password'" class="form-control" v-model="ospfInterfaceDraft.plaintextPassword" :disabled="writeDisabled" :placeholder="t('vrf.protocolPlaceholders.ospfIfPlaintextPassword')" /><div class="form-hint" style="width:100%;">{{ t('vrf.protocolHints.ospfIfAuthentication') }}</div></div></div>
 
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfBandwidth') }}</label><div style="flex:1;"><input type="number" min="1" max="100000" class="form-control" v-model="ospfInterfaceDraft.bandwidth" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfBandwidth') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfBfdProfile') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfInterfaceDraft.bfdProfile" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="opt in bfdProfileOptions" :key="'ospf-if-bfd-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfBfdProfile') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfCost') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.cost" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfCost') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfDeadInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.deadInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfDeadInterval') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfHelloInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.helloInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfHelloInterval') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfHelloMultiplier') }}</label><div style="flex:1;"><input type="number" min="1" max="10" class="form-control" v-model="ospfInterfaceDraft.helloMultiplier" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfHelloMultiplier') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfBandwidth') }}</label><div class="form-control"><input type="number" min="1" max="100000" class="form-control" v-model="ospfInterfaceDraft.bandwidth" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfBandwidth') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfBfdProfile') }}</label><div class="form-control"><select class="form-control" v-model="ospfInterfaceDraft.bfdProfile" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option v-for="opt in bfdProfileOptions" :key="'ospf-if-bfd-'+opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfBfdProfile') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfCost') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.cost" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfCost') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfDeadInterval') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.deadInterval" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfDeadInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfHelloInterval') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.helloInterval" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfHelloInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfHelloMultiplier') }}</label><div class="form-control"><input type="number" min="1" max="10" class="form-control" v-model="ospfInterfaceDraft.helloMultiplier" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfHelloMultiplier') }}</div></div></div>
 
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfLdpSync') }}</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfInterfaceDraft.ldpSyncMode" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><input v-if="ospfInterfaceDraft.ldpSyncMode" type="number" min="0" max="10000" class="form-control" v-model="ospfInterfaceDraft.ldpSyncHolddown" :disabled="writeDisabled" placeholder="holddown" style="width:260px;" /><div class="form-hint" style="width:100%;">{{ t('vrf.protocolHints.ospfIfLdpSync') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfLdpSync') }}</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfInterfaceDraft.ldpSyncMode" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">enable</option><option value="disable">disable</option></select><input v-if="ospfInterfaceDraft.ldpSyncMode" type="number" min="0" max="10000" class="form-control" v-model="ospfInterfaceDraft.ldpSyncHolddown" :disabled="writeDisabled" placeholder="holddown" /><div class="form-hint" style="width:100%;">{{ t('vrf.protocolHints.ospfIfLdpSync') }}</div></div></div>
 
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfMtuIgnore') }}</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfInterfaceDraft.mtuIgnore" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfIfMtuIgnore') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfIfMtuIgnore') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfNetwork') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfInterfaceDraft.network" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="broadcast">broadcast</option><option value="non-broadcast">non-broadcast</option><option value="point-to-multipoint">point-to-multipoint</option><option value="point-to-point">point-to-point</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfNetwork') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfMtuIgnore') }}</label><div class="form-control"><label><input type="checkbox" v-model="ospfInterfaceDraft.mtuIgnore" :disabled="writeDisabled" /> {{ t('vrf.protocols.ospfIfMtuIgnore') }}</label><div class="form-hint">{{ t('vrf.protocolHints.ospfIfMtuIgnore') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfNetwork') }}</label><div class="form-control"><select class="form-control" v-model="ospfInterfaceDraft.network" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="broadcast">broadcast</option><option value="non-broadcast">non-broadcast</option><option value="point-to-multipoint">point-to-multipoint</option><option value="point-to-point">point-to-point</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfNetwork') }}</div></div></div>
 
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfPassive') }}</label><div style="flex:1;"><select class="form-control" v-model="ospfInterfaceDraft.passiveMode" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">passive</option><option value="disable">passive disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfPassive') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfPriority') }}</label><div style="flex:1;"><input type="number" min="0" max="255" class="form-control" v-model="ospfInterfaceDraft.priority" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfPriority') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfRetransmitInterval') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.retransmitInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfRetransmitInterval') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfRetransmitWindow') }}</label><div style="flex:1;"><input type="number" min="20" max="1000" class="form-control" v-model="ospfInterfaceDraft.retransmitWindow" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfRetransmitWindow') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfTransmitDelay') }}</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.transmitDelay" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfTransmitDelay') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfPassive') }}</label><div class="form-control"><select class="form-control" v-model="ospfInterfaceDraft.passiveMode" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="enable">passive</option><option value="disable">passive disable</option></select><div class="form-hint">{{ t('vrf.protocolHints.ospfIfPassive') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfPriority') }}</label><div class="form-control"><input type="number" min="0" max="255" class="form-control" v-model="ospfInterfaceDraft.priority" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfPriority') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfRetransmitInterval') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.retransmitInterval" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfRetransmitInterval') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfRetransmitWindow') }}</label><div class="form-control"><input type="number" min="20" max="1000" class="form-control" v-model="ospfInterfaceDraft.retransmitWindow" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfRetransmitWindow') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.protocols.ospfIfTransmitDelay') }}</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfInterfaceDraft.transmitDelay" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.protocolHints.ospfIfTransmitDelay') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13664,22 +15901,22 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="ospfVirtualLinkModalVisible" :title="ospfVirtualLinkModalTitle" width="820px" @confirm="saveOspfVirtualLinkModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">peer</label><div style="flex:1;"><input class="form-control" v-model="ospfVirtualLinkDraft.peer" :disabled="writeDisabled" placeholder="3.3.3.3" style="width:260px;" /><div class="form-hint">OSPF 邻居 Router ID（点分十进制）。</div></div></div>
-          <div class="form-row"><label class="form-label">authentication</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfVirtualLinkDraft.authenticationType" :disabled="writeDisabled" style="width:260px;"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="md5">md5</option><option value="plaintext-password">plaintext-password</option></select><input v-if="ospfVirtualLinkDraft.authenticationType === 'md5'" type="number" min="1" max="255" class="form-control" v-model="ospfVirtualLinkDraft.md5KeyId" :disabled="writeDisabled" placeholder="key-id" style="width:260px;" /><input v-if="ospfVirtualLinkDraft.authenticationType === 'md5'" class="form-control" v-model="ospfVirtualLinkDraft.md5Key" :disabled="writeDisabled" placeholder="md5-key(<=16)" style="width:260px;" /><input v-if="ospfVirtualLinkDraft.authenticationType === 'plaintext-password'" class="form-control" v-model="ospfVirtualLinkDraft.plaintextPassword" :disabled="writeDisabled" placeholder="plaintext-password(<=8)" style="width:260px;" /><div class="form-hint" style="width:100%;">md5: key-id 范围 1-255，md5-key 长度不超过 16；plaintext-password 长度不超过 8。</div></div></div>
-          <div class="form-row"><label class="form-label">dead-interval</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.deadInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">范围 1-65535，默认 40。</div></div></div>
-          <div class="form-row"><label class="form-label">hello-interval</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.helloInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">范围 1-65535，默认 10。</div></div></div>
-          <div class="form-row"><label class="form-label">retransmit-interval</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.retransmitInterval" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">范围 1-65535，默认 5。</div></div></div>
-          <div class="form-row"><label class="form-label">retransmit-window</label><div style="flex:1;"><input type="number" min="20" max="1000" class="form-control" v-model="ospfVirtualLinkDraft.retransmitWindow" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">范围 20-1000，默认 50。</div></div></div>
-          <div class="form-row"><label class="form-label">transmit-delay</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.transmitDelay" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">范围 1-65535，默认 1。</div></div></div>
+          <div class="form-row"><label class="form-label">peer</label><div class="form-control"><input class="form-control" v-model="ospfVirtualLinkDraft.peer" :disabled="writeDisabled" placeholder="3.3.3.3" /><div class="form-hint">OSPF 邻居 Router ID（点分十进制）。</div></div></div>
+          <div class="form-row"><label class="form-label">authentication</label><div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><select class="form-control" v-model="ospfVirtualLinkDraft.authenticationType" :disabled="writeDisabled"><option value="">{{ t('vrf.form.unsetOption') }}</option><option value="md5">md5</option><option value="plaintext-password">plaintext-password</option></select><input v-if="ospfVirtualLinkDraft.authenticationType === 'md5'" type="number" min="1" max="255" class="form-control" v-model="ospfVirtualLinkDraft.md5KeyId" :disabled="writeDisabled" placeholder="key-id" /><input v-if="ospfVirtualLinkDraft.authenticationType === 'md5'" class="form-control" v-model="ospfVirtualLinkDraft.md5Key" :disabled="writeDisabled" placeholder="md5-key(<=16)" /><input v-if="ospfVirtualLinkDraft.authenticationType === 'plaintext-password'" class="form-control" v-model="ospfVirtualLinkDraft.plaintextPassword" :disabled="writeDisabled" placeholder="plaintext-password(<=8)" /><div class="form-hint" style="width:100%;">md5: key-id 范围 1-255，md5-key 长度不超过 16；plaintext-password 长度不超过 8。</div></div></div>
+          <div class="form-row"><label class="form-label">dead-interval</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.deadInterval" :disabled="writeDisabled" /><div class="form-hint">范围 1-65535，默认 40。</div></div></div>
+          <div class="form-row"><label class="form-label">hello-interval</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.helloInterval" :disabled="writeDisabled" /><div class="form-hint">范围 1-65535，默认 10。</div></div></div>
+          <div class="form-row"><label class="form-label">retransmit-interval</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.retransmitInterval" :disabled="writeDisabled" /><div class="form-hint">范围 1-65535，默认 5。</div></div></div>
+          <div class="form-row"><label class="form-label">retransmit-window</label><div class="form-control"><input type="number" min="20" max="1000" class="form-control" v-model="ospfVirtualLinkDraft.retransmitWindow" :disabled="writeDisabled" /><div class="form-hint">范围 20-1000，默认 50。</div></div></div>
+          <div class="form-row"><label class="form-label">transmit-delay</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="ospfVirtualLinkDraft.transmitDelay" :disabled="writeDisabled" /><div class="form-hint">范围 1-65535，默认 1。</div></div></div>
         </div>
       </DraggableModal>
 
       <DraggableModal v-model:visible="ospfRangeModalVisible" :title="ospfRangeModalTitle" width="760px" @confirm="saveOspfRangeModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">prefix</label><div style="flex:1;"><input class="form-control" v-model="ospfRangeDraft.prefix" :disabled="writeDisabled" placeholder="1.1.1.0/24" style="width:260px;" /><div class="form-hint">必填，网段格式 x.x.x.x/x。</div></div></div>
-          <div class="form-row"><label class="form-label">cost</label><div style="flex:1;"><input type="number" min="0" max="16777215" class="form-control" v-model="ospfRangeDraft.cost" :disabled="writeDisabled" style="width:260px;" /><div class="form-hint">可选，范围 0-16777215。</div></div></div>
-          <div class="form-row"><label class="form-label">not-advertise</label><div style="flex:1;"><label><input type="checkbox" v-model="ospfRangeDraft.notAdvertise" :disabled="writeDisabled" /> 启用</label><div class="form-hint">可选，启用后通告抑制。</div></div></div>
-          <div class="form-row"><label class="form-label">substitute</label><div style="flex:1;"><input class="form-control" v-model="ospfRangeDraft.substitute" :disabled="writeDisabled" placeholder="2.2.0.0/16" style="width:260px;" /><div class="form-hint">可选，替代前缀，格式 x.x.x.x/x。</div></div></div>
+          <div class="form-row"><label class="form-label">prefix</label><div class="form-control"><input class="form-control" v-model="ospfRangeDraft.prefix" :disabled="writeDisabled" placeholder="1.1.1.0/24" /><div class="form-hint">必填，网段格式 x.x.x.x/x。</div></div></div>
+          <div class="form-row"><label class="form-label">cost</label><div class="form-control"><input type="number" min="0" max="16777215" class="form-control" v-model="ospfRangeDraft.cost" :disabled="writeDisabled" /><div class="form-hint">可选，范围 0-16777215。</div></div></div>
+          <div class="form-row"><label class="form-label">not-advertise</label><div class="form-control"><label><input type="checkbox" v-model="ospfRangeDraft.notAdvertise" :disabled="writeDisabled" /> 启用</label><div class="form-hint">可选，启用后通告抑制。</div></div></div>
+          <div class="form-row"><label class="form-label">substitute</label><div class="form-control"><input class="form-control" v-model="ospfRangeDraft.substitute" :disabled="writeDisabled" placeholder="2.2.0.0/16" /><div class="form-hint">可选，替代前缀，格式 x.x.x.x/x。</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13708,14 +15945,14 @@ export default defineComponent({
         <div style="display:flex;flex-direction:column;gap:10px;">
           <div class="form-row">
             <label class="form-label">command</label>
-            <div style="flex:1;">
+            <div class="form-control">
               <input class="form-control" v-model="ospfItemDraft.command" :disabled="writeDisabled" placeholder="redistribute babel metric-type" />
               <div class="form-hint">输入分支内配置路径，不带等号和值。</div>
             </div>
           </div>
           <div class="form-row">
             <label class="form-label">value</label>
-            <div style="flex:1;">
+            <div class="form-control">
               <input class="form-control" v-model="ospfItemDraft.value" :disabled="writeDisabled" placeholder="1（可留空）" />
               <div class="form-hint">留空表示开关项，有值时将生成 command = value。</div>
             </div>
@@ -13736,13 +15973,13 @@ export default defineComponent({
 
       <DraggableModal v-model:visible="evpnVniModalVisible" :title="t('vrf.modals.evpnVni')" width="760px" @confirm="saveEvpnVniModal">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.vni') }}</label><div style="flex:1;"><input type="number" min="1" max="16777215" class="form-control" v-model="evpnVniDraft.vni" :disabled="writeDisabled" placeholder="1-16777215" style="width:220px;" /><div class="form-hint">{{ getEvpnHint('vniNote') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.rd') }}</label><div style="flex:1;"><input class="form-control" v-model="evpnVniDraft.rd" :disabled="writeDisabled" placeholder="65000:100" style="width:320px;" /><div class="form-hint">{{ getEvpnHint('rd') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.routeTargetBoth') }}</label><div style="flex:1;"><input class="form-control" v-model="evpnVniDraft.routeTargetBoth" :disabled="writeDisabled" placeholder="target:65000:100" style="width:420px;" /><div class="form-hint">{{ getEvpnHint('routeTarget') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.routeTargetExport') }}</label><div style="flex:1;"><input class="form-control" v-model="evpnVniDraft.routeTargetExport" :disabled="writeDisabled" placeholder="target:65000:100" style="width:420px;" /></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.routeTargetImport') }}</label><div style="flex:1;"><input class="form-control" v-model="evpnVniDraft.routeTargetImport" :disabled="writeDisabled" placeholder="target:65000:100" style="width:420px;" /></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.advertiseDefaultGw') }}</label><div style="flex:1;"><input type="checkbox" v-model="evpnVniDraft.advertiseDefaultGw" :disabled="writeDisabled" /><div class="form-hint">{{ getEvpnHint('advertiseDefaultGw') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.advertiseSviIp') }}</label><div style="flex:1;"><input type="checkbox" v-model="evpnVniDraft.advertiseSviIp" :disabled="writeDisabled" /><div class="form-hint">{{ getEvpnHint('advertiseSviIp') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.vni') }}</label><div class="form-control"><input type="number" min="1" max="16777215" class="form-control" v-model="evpnVniDraft.vni" :disabled="writeDisabled" placeholder="1-16777215" /><div class="form-hint">{{ getEvpnHint('vniNote') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.rd') }}</label><div class="form-control"><input class="form-control" v-model="evpnVniDraft.rd" :disabled="writeDisabled" placeholder="65000:100" /><div class="form-hint">{{ getEvpnHint('rd') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.routeTargetBoth') }}</label><div class="form-control"><input class="form-control" v-model="evpnVniDraft.routeTargetBoth" :disabled="writeDisabled" placeholder="target:65000:100" /><div class="form-hint">{{ getEvpnHint('routeTarget') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.routeTargetExport') }}</label><div class="form-control"><input class="form-control" v-model="evpnVniDraft.routeTargetExport" :disabled="writeDisabled" placeholder="target:65000:100" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.routeTargetImport') }}</label><div class="form-control"><input class="form-control" v-model="evpnVniDraft.routeTargetImport" :disabled="writeDisabled" placeholder="target:65000:100" /></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.advertiseDefaultGw') }}</label><div class="form-control"><input type="checkbox" v-model="evpnVniDraft.advertiseDefaultGw" :disabled="writeDisabled" /><div class="form-hint">{{ getEvpnHint('advertiseDefaultGw') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.advertiseSviIp') }}</label><div class="form-control"><input type="checkbox" v-model="evpnVniDraft.advertiseSviIp" :disabled="writeDisabled" /><div class="form-hint">{{ getEvpnHint('advertiseSviIp') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -13751,71 +15988,70 @@ export default defineComponent({
           <TabGroup v-model="bgpNeighborModalTab" :tabs="BGP_NEIGHBOR_MODAL_TABS">
             <template #basic>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.neighborAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.address" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborAddress') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.remoteAs') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.remoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborRemoteAs') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroup') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.peerGroup" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfacePeerGroup') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.description') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.description" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.description') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.neighborAddress') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.address" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborAddress') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.remoteAs') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.remoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborRemoteAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroup') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.peerGroup" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfacePeerGroup') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.description') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.description" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.description') }}</div></div></div>
               </div>
             </template>
             <template #session>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAs') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.localAs" min="1" max="4294967294" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAs') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsNoPrepend') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localAsNoPrepend" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsNoPrepend') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsReplaceAs') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localAsReplaceAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsReplaceAs') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRole') }}</label><div style="flex:1;"><select class="form-control" v-model="bgpCollectionDraft.localRole" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_LOCAL_ROLE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRole') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRoleStrict') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localRoleStrict" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRoleStrict') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPort') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.port" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPort') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborAdvertisementInterval') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.advertisementInterval" min="0" max="600" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborAdvertisementInterval') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborEbgpMultihop') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.ebgpMultihop" min="1" max="255" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborEbgpMultihop') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassword') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.password" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassword') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborUpdateSource') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.updateSource" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborUpdateSource') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTtlSecurityHops') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.ttlSecurityHops" min="1" max="254" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTtlSecurityHops') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAs') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.localAs" min="1" max="4294967294" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsNoPrepend') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.localAsNoPrepend" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsNoPrepend') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsReplaceAs') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.localAsReplaceAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsReplaceAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRole') }}</label><div class="form-control"><select class="form-control" v-model="bgpCollectionDraft.localRole" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_LOCAL_ROLE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRole') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRoleStrict') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.localRoleStrict" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRoleStrict') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPort') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.port" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPort') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborAdvertisementInterval') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.advertisementInterval" min="0" max="600" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborAdvertisementInterval') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborEbgpMultihop') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.ebgpMultihop" min="1" max="255" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborEbgpMultihop') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassword') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.password" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassword') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborUpdateSource') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.updateSource" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborUpdateSource') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTtlSecurityHops') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.ttlSecurityHops" min="1" max="254" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTtlSecurityHops') }}</div></div></div>
               </div>
             </template>
             <template #timers>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTimersConnect') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.timersConnect" min="0" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTimersConnect') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTimersHoldtime') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.timersHoldtime" min="0" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTimersHoldtime') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTimersKeepalive') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.timersKeepalive" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTimersKeepalive') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTimersConnect') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.timersConnect" min="0" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTimersConnect') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTimersHoldtime') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.timersHoldtime" min="0" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTimersHoldtime') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTimersKeepalive') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.timersKeepalive" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTimersKeepalive') }}</div></div></div>
               </div>
             </template>
             <template #capability>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborGracefulRestart') }}</label><div style="flex:1;"><select class="form-control" v-model="bgpCollectionDraft.gracefulRestart" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_GRACEFUL_RESTART_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborGracefulRestart') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityDynamic') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilityDynamic" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityDynamic') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityExtendedNexthop') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilityExtendedNexthop" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityExtendedNexthop') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilitySoftwareVersion') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilitySoftwareVersion" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilitySoftwareVersion') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassive') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.passive" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassive') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborShutdown') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.shutdown" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborShutdown') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborSolo') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.solo" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborSolo') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableConnectedCheck') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.disableConnectedCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableConnectedCheck') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborEnforceFirstAs') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.enforceFirstAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborEnforceFirstAs') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableCapabilityNegotiation') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.disableCapabilityNegotiation" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableCapabilityNegotiation') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborStrictCapabilityMatch') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.strictCapabilityMatch" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborStrictCapabilityMatch') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborOverrideCapability') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.overrideCapability" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborOverrideCapability') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborGracefulRestart') }}</label><div class="form-control"><select class="form-control" v-model="bgpCollectionDraft.gracefulRestart" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_GRACEFUL_RESTART_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborGracefulRestart') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityDynamic') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.capabilityDynamic" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityDynamic') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityExtendedNexthop') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.capabilityExtendedNexthop" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityExtendedNexthop') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilitySoftwareVersion') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.capabilitySoftwareVersion" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilitySoftwareVersion') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassive') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.passive" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassive') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborShutdown') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.shutdown" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborShutdown') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborSolo') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.solo" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborSolo') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableConnectedCheck') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.disableConnectedCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableConnectedCheck') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborEnforceFirstAs') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.enforceFirstAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborEnforceFirstAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableCapabilityNegotiation') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.disableCapabilityNegotiation" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableCapabilityNegotiation') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborStrictCapabilityMatch') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.strictCapabilityMatch" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborStrictCapabilityMatch') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborOverrideCapability') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.overrideCapability" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborOverrideCapability') }}</div></div></div>
               </div>
             </template>
             <template #bfd>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfd') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.bfd" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfd') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdCheckControlPlaneFailure') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.bfdCheckControlPlaneFailure" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdCheckControlPlaneFailure') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdProfile') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.bfdProfile" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdProfile') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfd') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.bfd" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfd') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdCheckControlPlaneFailure') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.bfdCheckControlPlaneFailure" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdCheckControlPlaneFailure') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdProfile') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.bfdProfile" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdProfile') }}</div></div></div>
               </div>
             </template>
             <template #interface>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-row"><label class="form-label">interface peer-group</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.interfacePeerGroup" :disabled="writeDisabled" /><div class="form-hint">邻居使用 interface 模式时的 peer-group。</div></div></div>
-                <div class="form-row"><label class="form-label">interface remote-as</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.interfaceRemoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">支持 ASN 或 external/internal。</div></div></div>
-                <div class="form-row"><label class="form-label">interface source-interface</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.interfaceSourceInterface" :disabled="writeDisabled" placeholder="eth0" /><div class="form-hint">用于建立会话的源接口。</div></div></div>
-                <div class="form-row"><label class="form-label">interface v6only peer-group</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.interfaceV6OnlyPeerGroup" :disabled="writeDisabled" /><div class="form-hint">IPv6 link-local only 模式 peer-group。</div></div></div>
-                <div class="form-row"><label class="form-label">interface v6only remote-as</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.interfaceV6OnlyRemoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">支持 ASN 或 external/internal。</div></div></div>
+                <div class="form-row"><label class="form-label">interface peer-group</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.interfacePeerGroup" :disabled="writeDisabled" /><div class="form-hint">邻居使用 interface 模式时的 peer-group。</div></div></div>
+                <div class="form-row"><label class="form-label">interface remote-as</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.interfaceRemoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">支持 ASN 或 external/internal。</div></div></div>
+                <div class="form-row"><label class="form-label">interface source-interface</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.interfaceSourceInterface" :disabled="writeDisabled" placeholder="eth0" /><div class="form-hint">用于建立会话的源接口。</div></div></div>
+                <div class="form-row"><label class="form-label">interface v6only peer-group</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.interfaceV6OnlyPeerGroup" :disabled="writeDisabled" /><div class="form-hint">IPv6 link-local only 模式 peer-group。</div></div></div>
+                <div class="form-row"><label class="form-label">interface v6only remote-as</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.interfaceV6OnlyRemoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">支持 ASN 或 external/internal。</div></div></div>
               </div>
             </template>
             <template #path-attribute>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-section-title" style="margin-top:4px;">path-attribute</div>
-                <div class="form-row"><label class="form-label">discard</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeDiscard" :disabled="writeDisabled" placeholder="例如: 1, 2, 99" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
-                <div class="form-row"><label class="form-label">treat-as-withdraw</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeTreatAsWithdraw" :disabled="writeDisabled" placeholder="例如: 10, 200" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
+                <div class="form-row"><label class="form-label">discard</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeDiscard" :disabled="writeDisabled" placeholder="例如: 1, 2, 99" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
+                <div class="form-row"><label class="form-label">treat-as-withdraw</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeTreatAsWithdraw" :disabled="writeDisabled" placeholder="例如: 10, 200" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
               </div>
             </template>
             <template #address-family>
@@ -13836,8 +16072,8 @@ export default defineComponent({
                 <div v-if="bgpNeighborModalAfTab === 'l2vpn-evpn'" style="display:flex;flex-direction:column;gap:10px;">
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnAllowasInNumber') }}</label>
-                    <div style="flex:1;">
-                      <input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].allowasInNumber" :disabled="writeDisabled" style="width:220px;" />
+                    <div class="form-control">
+                      <input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].allowasInNumber" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnAllowasInNumber') }}</div>
                     </div>
                   </div>
@@ -13860,35 +16096,35 @@ export default defineComponent({
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteMapExport') }}</label>
-                    <div style="flex:1;">
-                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapExport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                    <div class="form-control">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapExport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteMapExport') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteMapImport') }}</label>
-                    <div style="flex:1;">
-                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapImport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                    <div class="form-control">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapImport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteMapImport') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteReflectorClient') }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeReflectorClient" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteReflectorClient') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteServerClient') }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeServerClient" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteServerClient') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnSoftReconfigurationInbound') }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].softReconfiguration" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnSoftReconfigurationInbound') }}</div>
                     </div>
@@ -13897,98 +16133,98 @@ export default defineComponent({
                 <div v-else-if="['ipv4-flowspec', 'ipv6-flowspec'].includes(bgpNeighborModalAfTab)" style="display:flex;flex-direction:column;gap:10px;">
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecFilterListExport') }}</label>
-                    <div style="flex:1;">
-                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListExport" :disabled="writeDisabled" style="width:280px;" />
+                    <div class="form-control">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListExport" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecFilterListExport') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecFilterListImport') }}</label>
-                    <div style="flex:1;">
-                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListImport" :disabled="writeDisabled" style="width:280px;" />
+                    <div class="form-control">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListImport" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecFilterListImport') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecPrefixListExport') }}</label>
-                    <div style="flex:1;">
-                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListExport" :disabled="writeDisabled" style="width:280px;" />
+                    <div class="form-control">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListExport" :disabled="writeDisabled" />
                       <div class="form-hint">{{ bgpNeighborModalAfTab === 'ipv6-flowspec' ? t('vrf.bgp.hints.afFlowspecPrefixListExportV6') : t('vrf.bgp.hints.afFlowspecPrefixListExportV4') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecPrefixListImport') }}</label>
-                    <div style="flex:1;">
-                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListImport" :disabled="writeDisabled" style="width:280px;" />
+                    <div class="form-control">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListImport" :disabled="writeDisabled" />
                       <div class="form-hint">{{ bgpNeighborModalAfTab === 'ipv6-flowspec' ? t('vrf.bgp.hints.afFlowspecPrefixListImportV6') : t('vrf.bgp.hints.afFlowspecPrefixListImportV4') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecRouteMapExport') }}</label>
-                    <div style="flex:1;">
-                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapExport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                    <div class="form-control">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapExport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecRouteMapExport') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecRouteMapImport') }}</label>
-                    <div style="flex:1;">
-                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapImport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                    <div class="form-control">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapImport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecRouteMapImport') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecRouteReflectorClient') }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeReflectorClient" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecRouteReflectorClient') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecRouteServerClient') }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeServerClient" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecRouteServerClient') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afFlowspecSoftReconfigurationInbound') }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].softReconfiguration" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afFlowspecSoftReconfigurationInbound') }}</div>
                     </div>
                   </div>
                 </div>
                 <div v-else>
-                  <div class="form-row"><label class="form-label">addpath-tx-all</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].addpathTxAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxAll') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">addpath-tx-per-as</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].addpathTxPerAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxPerAs') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">allowas-in number</label><div style="flex:1;"><input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].allowasInNumber" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAllowasInNumber') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">as-override</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].asOverride" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAsOverride') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">addpath-tx-all</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].addpathTxAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxAll') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">addpath-tx-per-as</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].addpathTxPerAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxPerAs') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">allowas-in number</label><div class="form-control"><input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].allowasInNumber" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAllowasInNumber') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">as-override</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].asOverride" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAsOverride') }}</div></div></div>
                   <div class="form-row"><label class="form-label">attribute-unchanged</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].attributeUnchangedAsPath" :disabled="writeDisabled" /> as-path</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].attributeUnchangedMed" :disabled="writeDisabled" /> med</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].attributeUnchangedNextHop" :disabled="writeDisabled" /> next-hop</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericAttributeUnchanged') }}</div></div></div>
                   <div class="form-row" v-if="['ipv4-unicast','ipv4-multicast','ipv6-unicast','ipv6-multicast'].includes(bgpNeighborModalAfTab)"><label class="form-label">capability orf prefix-list</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].capabilityOrfPrefixListReceive" :disabled="writeDisabled" /> receive</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].capabilityOrfPrefixListSend" :disabled="writeDisabled" /> send</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericCapabilityOrfPrefixList') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">conditionally-advertise advertise-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].conditionallyAdvertiseAdvertiseMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyAdvertiseMap') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">conditionally-advertise exist-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].conditionallyAdvertiseExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyExistMap') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">conditionally-advertise non-exist-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].conditionallyAdvertiseNonExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyNonExistMap') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">default-originate route-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].defaultOriginateRouteMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDefaultOriginateRouteMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">conditionally-advertise advertise-map</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].conditionallyAdvertiseAdvertiseMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyAdvertiseMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">conditionally-advertise exist-map</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].conditionallyAdvertiseExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyExistMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">conditionally-advertise non-exist-map</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].conditionallyAdvertiseNonExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyNonExistMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">default-originate route-map</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].defaultOriginateRouteMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDefaultOriginateRouteMap') }}</div></div></div>
                   <div class="form-row"><label class="form-label">disable-send-community</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].disableSendCommunityStandard" :disabled="writeDisabled" /> standard</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].disableSendCommunityExtended" :disabled="writeDisabled" /> extended</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericDisableSendCommunity') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">distribute-list export</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].distributeListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">distribute-list import</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].distributeListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">filter-list export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">filter-list import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">maximum-prefix</label><div style="flex:1;"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].maximumPrefix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">maximum-prefix-out</label><div style="flex:1;"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].maximumPrefixOut" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
-                  <div class="form-row" v-if="bgpNeighborModalAfTab.startsWith('ipv6-')"><label class="form-label">nexthop-local unchanged</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].nexthopLocalUnchanged" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericNexthopLocalUnchanged') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">distribute-list export</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].distributeListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">distribute-list import</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].distributeListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">filter-list export</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">filter-list import</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].filterListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">maximum-prefix</label><div class="form-control"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].maximumPrefix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">maximum-prefix-out</label><div class="form-control"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].maximumPrefixOut" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
+                  <div class="form-row" v-if="bgpNeighborModalAfTab.startsWith('ipv6-')"><label class="form-label">nexthop-local unchanged</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].nexthopLocalUnchanged" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericNexthopLocalUnchanged') }}</div></div></div>
                   <div class="form-row"><label class="form-label">nexthop-self</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].nexthopSelf" :disabled="writeDisabled" /> enable</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].nexthopSelfForce" :disabled="writeDisabled" /> force</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericNexthopSelf') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">prefix-list export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListExport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpNeighborModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">prefix-list import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListImport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpNeighborModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">remove-private-as all</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].removePrivateAsAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRemovePrivateAsAll') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">route-map export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">route-map import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">route-reflector-client</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeReflectorClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteReflectorClient') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">route-server-client</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeServerClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteServerClient') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">soft-reconfiguration inbound</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].softReconfiguration" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericSoftReconfigurationInbound') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">unsuppress-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].unsuppressMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericUnsuppressMap') }}</div></div></div>
-                  <div class="form-row"><label class="form-label">weight</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].weight" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericWeight') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">prefix-list export</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListExport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpNeighborModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">prefix-list import</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].prefixListImport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpNeighborModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">remove-private-as all</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].removePrivateAsAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRemovePrivateAsAll') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">route-map export</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">route-map import</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeMapImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">route-reflector-client</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeReflectorClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteReflectorClient') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">route-server-client</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].routeServerClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteServerClient') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">soft-reconfiguration inbound</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].softReconfiguration" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericSoftReconfigurationInbound') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">unsuppress-map</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].unsuppressMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericUnsuppressMap') }}</div></div></div>
+                  <div class="form-row"><label class="form-label">weight</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpNeighborModalAfTab].weight" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericWeight') }}</div></div></div>
                 </div>
               </div>
             </template>
@@ -13998,51 +16234,50 @@ export default defineComponent({
           <TabGroup v-model="bgpPeerGroupModalTab" :tabs="BGP_PEER_GROUP_MODAL_TABS">
             <template #basic>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroupName') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.peerGroupName') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.remoteAs') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.remoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">{{ t('vrf.bgp.hints.peerGroupRemoteAs') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.description') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.description" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.description') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroupName') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.peerGroupName') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.remoteAs') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.remoteAs" :disabled="writeDisabled" placeholder="1-4294967294 | external | internal" /><div class="form-hint">{{ t('vrf.bgp.hints.peerGroupRemoteAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.description') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.description" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.description') }}</div></div></div>
               </div>
             </template>
             <template #session>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAs') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.localAs" min="1" max="4294967294" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAs') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsNoPrepend') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localAsNoPrepend" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsNoPrepend') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsReplaceAs') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localAsReplaceAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsReplaceAs') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRole') }}</label><div style="flex:1;"><select class="form-control" v-model="bgpCollectionDraft.localRole" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_LOCAL_ROLE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRole') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRoleStrict') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.localRoleStrict" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRoleStrict') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPort') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.port" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPort') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborEbgpMultihop') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.ebgpMultihop" min="1" max="255" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborEbgpMultihop') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassword') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.password" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassword') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborUpdateSource') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.updateSource" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborUpdateSource') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTtlSecurityHops') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.ttlSecurityHops" min="1" max="254" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTtlSecurityHops') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAs') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.localAs" min="1" max="4294967294" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsNoPrepend') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.localAsNoPrepend" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsNoPrepend') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalAsReplaceAs') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.localAsReplaceAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalAsReplaceAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRole') }}</label><div class="form-control"><select class="form-control" v-model="bgpCollectionDraft.localRole" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_LOCAL_ROLE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRole') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborLocalRoleStrict') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.localRoleStrict" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborLocalRoleStrict') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPort') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.port" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPort') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborEbgpMultihop') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.ebgpMultihop" min="1" max="255" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborEbgpMultihop') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassword') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.password" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassword') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborUpdateSource') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.updateSource" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborUpdateSource') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborTtlSecurityHops') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.ttlSecurityHops" min="1" max="254" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborTtlSecurityHops') }}</div></div></div>
               </div>
             </template>
             <template #capability>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborGracefulRestart') }}</label><div style="flex:1;"><select class="form-control" v-model="bgpCollectionDraft.gracefulRestart" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_GRACEFUL_RESTART_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborGracefulRestart') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityDynamic') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilityDynamic" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityDynamic') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityExtendedNexthop') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilityExtendedNexthop" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityExtendedNexthop') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilitySoftwareVersion') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.capabilitySoftwareVersion" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilitySoftwareVersion') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassive') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.passive" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassive') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborShutdown') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.shutdown" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborShutdown') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborSolo') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.solo" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborSolo') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableConnectedCheck') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.disableConnectedCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableConnectedCheck') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableCapabilityNegotiation') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.disableCapabilityNegotiation" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableCapabilityNegotiation') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborOverrideCapability') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.overrideCapability" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborOverrideCapability') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborGracefulRestart') }}</label><div class="form-control"><select class="form-control" v-model="bgpCollectionDraft.gracefulRestart" :disabled="writeDisabled"><option value="">{{ t('vrf.form.selectProtocol') }}</option><option v-for="opt in BGP_NEIGHBOR_GRACEFUL_RESTART_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select><div class="form-hint">{{ t('vrf.bgp.hints.neighborGracefulRestart') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityDynamic') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.capabilityDynamic" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityDynamic') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilityExtendedNexthop') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.capabilityExtendedNexthop" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilityExtendedNexthop') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborCapabilitySoftwareVersion') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.capabilitySoftwareVersion" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborCapabilitySoftwareVersion') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborPassive') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.passive" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborPassive') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborShutdown') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.shutdown" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborShutdown') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborSolo') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.solo" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborSolo') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableConnectedCheck') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.disableConnectedCheck" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableConnectedCheck') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborDisableCapabilityNegotiation') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.disableCapabilityNegotiation" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborDisableCapabilityNegotiation') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborOverrideCapability') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.overrideCapability" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborOverrideCapability') }}</div></div></div>
               </div>
             </template>
             <template #bfd>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfd') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.bfd" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfd') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdCheckControlPlaneFailure') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.bfdCheckControlPlaneFailure" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdCheckControlPlaneFailure') }}</div></div></div>
-                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdProfile') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.bfdProfile" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdProfile') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfd') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.bfd" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfd') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdCheckControlPlaneFailure') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.bfdCheckControlPlaneFailure" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdCheckControlPlaneFailure') }}</div></div></div>
+                <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.neighborBfdProfile') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.bfdProfile" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.neighborBfdProfile') }}</div></div></div>
               </div>
             </template>
             <template #path-attribute>
               <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="form-section-title" style="margin-top:4px;">path-attribute</div>
-                <div class="form-row"><label class="form-label">discard</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeDiscard" :disabled="writeDisabled" placeholder="例如: 1, 2, 99" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
-                <div class="form-row"><label class="form-label">treat-as-withdraw</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeTreatAsWithdraw" :disabled="writeDisabled" placeholder="例如: 10, 200" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
+                <div class="form-row"><label class="form-label">discard</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeDiscard" :disabled="writeDisabled" placeholder="例如: 1, 2, 99" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
+                <div class="form-row"><label class="form-label">treat-as-withdraw</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.pathAttributeTreatAsWithdraw" :disabled="writeDisabled" placeholder="例如: 10, 200" /><div class="form-hint">属性编号列表，范围 1-255，逗号或空格分隔。</div></div></div>
               </div>
             </template>
             <template #address-family>
@@ -14059,8 +16294,8 @@ export default defineComponent({
                 <div v-if="bgpPeerGroupModalAfTab === 'l2vpn-evpn'" style="display:flex;flex-direction:column;gap:10px;">
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnAllowasInNumber') }}</label>
-                    <div style="flex:1;">
-                      <input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].allowasInNumber" :disabled="writeDisabled" style="width:220px;" />
+                    <div class="form-control">
+                      <input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].allowasInNumber" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnAllowasInNumber') }}</div>
                     </div>
                   </div>
@@ -14083,97 +16318,97 @@ export default defineComponent({
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteMapExport') }}</label>
-                    <div style="flex:1;">
-                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapExport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                    <div class="form-control">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapExport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteMapExport') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteMapImport') }}</label>
-                    <div style="flex:1;">
-                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapImport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" style="width:280px;" />
+                    <div class="form-control">
+                      <input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapImport" :disabled="writeDisabled" :placeholder="t('vrf.form.routeMapPlaceholder')" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteMapImport') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteReflectorClient') }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeReflectorClient" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteReflectorClient') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnRouteServerClient') }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeServerClient" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnRouteServerClient') }}</div>
                     </div>
                   </div>
                   <div class="form-row">
                     <label class="form-label">{{ t('vrf.bgp.fields.afL2vpnEvpnSoftReconfigurationInbound') }}</label>
-                    <div style="flex:1;">
+                    <div class="form-control">
                       <input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].softReconfiguration" :disabled="writeDisabled" />
                       <div class="form-hint">{{ t('vrf.bgp.hints.afL2vpnEvpnSoftReconfigurationInbound') }}</div>
                     </div>
                   </div>
                 </div>
                 <div v-else>
-                <div class="form-row"><label class="form-label">addpath-tx-all</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].addpathTxAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxAll') }}</div></div></div>
-                <div class="form-row"><label class="form-label">addpath-tx-per-as</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].addpathTxPerAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxPerAs') }}</div></div></div>
-                <div class="form-row"><label class="form-label">allowas-in number</label><div style="flex:1;"><input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].allowasInNumber" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAllowasInNumber') }}</div></div></div>
-                <div class="form-row"><label class="form-label">as-override</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].asOverride" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAsOverride') }}</div></div></div>
+                <div class="form-row"><label class="form-label">addpath-tx-all</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].addpathTxAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxAll') }}</div></div></div>
+                <div class="form-row"><label class="form-label">addpath-tx-per-as</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].addpathTxPerAs" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAddpathTxPerAs') }}</div></div></div>
+                <div class="form-row"><label class="form-label">allowas-in number</label><div class="form-control"><input type="number" min="1" max="10" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].allowasInNumber" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAllowasInNumber') }}</div></div></div>
+                <div class="form-row"><label class="form-label">as-override</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].asOverride" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericAsOverride') }}</div></div></div>
                 <div class="form-row"><label class="form-label">attribute-unchanged</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].attributeUnchangedAsPath" :disabled="writeDisabled" /> as-path</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].attributeUnchangedMed" :disabled="writeDisabled" /> med</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].attributeUnchangedNextHop" :disabled="writeDisabled" /> next-hop</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericAttributeUnchanged') }}</div></div></div>
                 <div class="form-row" v-if="['ipv4-unicast','ipv6-unicast'].includes(bgpPeerGroupModalAfTab)"><label class="form-label">capability orf prefix-list</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].capabilityOrfPrefixListReceive" :disabled="writeDisabled" /> receive</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].capabilityOrfPrefixListSend" :disabled="writeDisabled" /> send</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericCapabilityOrfPrefixList') }}</div></div></div>
-                <div class="form-row"><label class="form-label">conditionally-advertise advertise-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].conditionallyAdvertiseAdvertiseMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyAdvertiseMap') }}</div></div></div>
-                <div class="form-row"><label class="form-label">conditionally-advertise exist-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].conditionallyAdvertiseExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyExistMap') }}</div></div></div>
-                <div class="form-row"><label class="form-label">conditionally-advertise non-exist-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].conditionallyAdvertiseNonExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyNonExistMap') }}</div></div></div>
-                <div class="form-row" v-if="['ipv4-unicast','ipv6-unicast'].includes(bgpPeerGroupModalAfTab)"><label class="form-label">default-originate route-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].defaultOriginateRouteMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDefaultOriginateRouteMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">conditionally-advertise advertise-map</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].conditionallyAdvertiseAdvertiseMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyAdvertiseMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">conditionally-advertise exist-map</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].conditionallyAdvertiseExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyExistMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">conditionally-advertise non-exist-map</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].conditionallyAdvertiseNonExistMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericConditionallyNonExistMap') }}</div></div></div>
+                <div class="form-row" v-if="['ipv4-unicast','ipv6-unicast'].includes(bgpPeerGroupModalAfTab)"><label class="form-label">default-originate route-map</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].defaultOriginateRouteMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDefaultOriginateRouteMap') }}</div></div></div>
                 <div class="form-row"><label class="form-label">disable-send-community</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].disableSendCommunityStandard" :disabled="writeDisabled" /> standard</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].disableSendCommunityExtended" :disabled="writeDisabled" /> extended</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericDisableSendCommunity') }}</div></div></div>
-                <div class="form-row"><label class="form-label">distribute-list export</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].distributeListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
-                <div class="form-row"><label class="form-label">distribute-list import</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].distributeListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
-                <div class="form-row"><label class="form-label">filter-list export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].filterListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
-                <div class="form-row"><label class="form-label">filter-list import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].filterListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
-                <div class="form-row"><label class="form-label">maximum-prefix</label><div style="flex:1;"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].maximumPrefix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
-                <div class="form-row"><label class="form-label">maximum-prefix-out</label><div style="flex:1;"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].maximumPrefixOut" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
-                <div class="form-row" v-if="bgpPeerGroupModalAfTab.startsWith('ipv6-')"><label class="form-label">nexthop-local unchanged</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].nexthopLocalUnchanged" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericNexthopLocalUnchanged') }}</div></div></div>
+                <div class="form-row"><label class="form-label">distribute-list export</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].distributeListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
+                <div class="form-row"><label class="form-label">distribute-list import</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].distributeListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericDistributeList') }}</div></div></div>
+                <div class="form-row"><label class="form-label">filter-list export</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].filterListExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
+                <div class="form-row"><label class="form-label">filter-list import</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].filterListImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericFilterList') }}</div></div></div>
+                <div class="form-row"><label class="form-label">maximum-prefix</label><div class="form-control"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].maximumPrefix" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
+                <div class="form-row"><label class="form-label">maximum-prefix-out</label><div class="form-control"><input type="number" min="1" max="4294967295" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].maximumPrefixOut" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericMaximumPrefix') }}</div></div></div>
+                <div class="form-row" v-if="bgpPeerGroupModalAfTab.startsWith('ipv6-')"><label class="form-label">nexthop-local unchanged</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].nexthopLocalUnchanged" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericNexthopLocalUnchanged') }}</div></div></div>
                 <div class="form-row"><label class="form-label">nexthop-self</label><div style="flex:1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].nexthopSelf" :disabled="writeDisabled" /> enable</label><label><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].nexthopSelfForce" :disabled="writeDisabled" /> force</label><div class="form-hint" style="width:100%;">{{ t('vrf.bgp.hints.afGenericNexthopSelf') }}</div></div></div>
-                <div class="form-row"><label class="form-label">prefix-list export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].prefixListExport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpPeerGroupModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
-                <div class="form-row"><label class="form-label">prefix-list import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].prefixListImport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpPeerGroupModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
-                <div class="form-row"><label class="form-label">remove-private-as all</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].removePrivateAsAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRemovePrivateAsAll') }}</div></div></div>
-                <div class="form-row"><label class="form-label">route-map export</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
-                <div class="form-row"><label class="form-label">route-map import</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
-                <div class="form-row"><label class="form-label">route-reflector-client</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeReflectorClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteReflectorClient') }}</div></div></div>
-                <div class="form-row"><label class="form-label">route-server-client</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeServerClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteServerClient') }}</div></div></div>
-                <div class="form-row"><label class="form-label">soft-reconfiguration inbound</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].softReconfiguration" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericSoftReconfigurationInbound') }}</div></div></div>
-                <div class="form-row"><label class="form-label">unsuppress-map</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].unsuppressMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericUnsuppressMap') }}</div></div></div>
-                <div class="form-row"><label class="form-label">weight</label><div style="flex:1;"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].weight" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericWeight') }}</div></div></div>
+                <div class="form-row"><label class="form-label">prefix-list export</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].prefixListExport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpPeerGroupModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
+                <div class="form-row"><label class="form-label">prefix-list import</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].prefixListImport" :disabled="writeDisabled" /><div class="form-hint">{{ bgpPeerGroupModalAfTab.startsWith('ipv6-') ? t('vrf.bgp.hints.afGenericPrefixListV6') : t('vrf.bgp.hints.afGenericPrefixListV4') }}</div></div></div>
+                <div class="form-row"><label class="form-label">remove-private-as all</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].removePrivateAsAll" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRemovePrivateAsAll') }}</div></div></div>
+                <div class="form-row"><label class="form-label">route-map export</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapExport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">route-map import</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeMapImport" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">route-reflector-client</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeReflectorClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteReflectorClient') }}</div></div></div>
+                <div class="form-row"><label class="form-label">route-server-client</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].routeServerClient" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericRouteServerClient') }}</div></div></div>
+                <div class="form-row"><label class="form-label">soft-reconfiguration inbound</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].softReconfiguration" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericSoftReconfigurationInbound') }}</div></div></div>
+                <div class="form-row"><label class="form-label">unsuppress-map</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].unsuppressMap" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericUnsuppressMap') }}</div></div></div>
+                <div class="form-row"><label class="form-label">weight</label><div class="form-control"><input type="number" min="1" max="65535" class="form-control" v-model="bgpCollectionDraft.afPolicies[bgpPeerGroupModalAfTab].weight" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.afGenericWeight') }}</div></div></div>
                 </div>
               </div>
             </template>
           </TabGroup>
         </div>
         <div v-else-if="bgpCollectionType === 'interface'" style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.interfaceName') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfaceName') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroup') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.peerGroup" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfacePeerGroup') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.interfaceMplsForwarding') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.mplsForwarding" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfaceMplsForwarding') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.interfaceName') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfaceName') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroup') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.peerGroup" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfacePeerGroup') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.interfaceMplsForwarding') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.mplsForwarding" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.interfaceMplsForwarding') }}</div></div></div>
         </div>
         <div v-else-if="bgpCollectionType === 'listen'" style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.listenRange') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.range" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.listenRange') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroup') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.peerGroup" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.listenPeerGroup') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.listenRange') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.range" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.listenRange') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.peerGroup') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.peerGroup" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.listenPeerGroup') }}</div></div></div>
         </div>
         <div v-else-if="bgpCollectionType === 'bmp'" style="display:flex;flex-direction:column;gap:10px;">
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.bmpTargetName') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpTargetName') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.bmpAddress') }}</label><div style="flex:1;"><input class="form-control" v-model="bgpCollectionDraft.address" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpTargetAddress') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.bmpPort') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.port" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpPort') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.placeholders.bmpMinRetry') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.minRetry" min="100" max="86400000" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMinRetry') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.placeholders.bmpMaxRetry') }}</label><div style="flex:1;"><input type="number" class="form-control" v-model="bgpCollectionDraft.maxRetry" min="100" max="4294967295" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMaxRetry') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMirror') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.mirror" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMirror') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV4LocalRib') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV4LocalRib" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV4PostPolicy') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV4PostPolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV4PrePolicy') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV4PrePolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV6LocalRib') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV6LocalRib" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV6PostPolicy') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV6PostPolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
-          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV6PrePolicy') }}</label><div style="flex:1;"><input type="checkbox" v-model="bgpCollectionDraft.monitorV6PrePolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.bmpTargetName') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.name" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpTargetName') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.bmpAddress') }}</label><div class="form-control"><input class="form-control" v-model="bgpCollectionDraft.address" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpTargetAddress') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.columns.bmpPort') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.port" min="1" max="65535" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpPort') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.placeholders.bmpMinRetry') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.minRetry" min="100" max="86400000" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMinRetry') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.placeholders.bmpMaxRetry') }}</label><div class="form-control"><input type="number" class="form-control" v-model="bgpCollectionDraft.maxRetry" min="100" max="4294967295" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMaxRetry') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMirror') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.mirror" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMirror') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV4LocalRib') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.monitorV4LocalRib" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV4PostPolicy') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.monitorV4PostPolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV4PrePolicy') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.monitorV4PrePolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV6LocalRib') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.monitorV6LocalRib" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV6PostPolicy') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.monitorV6PostPolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
+          <div class="form-row"><label class="form-label">{{ t('vrf.bgp.fields.bmpMonitorV6PrePolicy') }}</label><div class="form-control"><input type="checkbox" v-model="bgpCollectionDraft.monitorV6PrePolicy" :disabled="writeDisabled" /><div class="form-hint">{{ t('vrf.bgp.hints.bmpMonitor') }}</div></div></div>
         </div>
       </DraggableModal>
 
@@ -14188,22 +16423,22 @@ export default defineComponent({
         <div style="display:flex;flex-direction:column;gap:10px;">
           <div class="form-row">
             <label class="form-label">Network</label>
-            <div style="flex:1;">
-              <input class="form-control" v-model="bgpVpnNetworkDraft.network" :disabled="writeDisabled" :placeholder="bgpVpnNetworkDraft.afKey === 'ipv6-vpn' ? '2001:db8::/64' : '1.1.1.0/24'" style="width:280px;" />
+            <div class="form-control">
+              <input class="form-control" v-model="bgpVpnNetworkDraft.network" :disabled="writeDisabled" :placeholder="bgpVpnNetworkDraft.afKey === 'ipv6-vpn' ? '2001:db8::/64' : '1.1.1.0/24'" />
               <div class="form-hint">取值范围：{{ bgpVpnNetworkDraft.afKey === 'ipv6-vpn' ? 'IPv6 CIDR（如 2001:db8::/64）' : 'IPv4 CIDR（如 1.1.1.0/24）' }}。默认值：无（必填）。</div>
             </div>
           </div>
           <div class="form-row">
             <label class="form-label">Label</label>
-            <div style="flex:1;">
-              <input type="number" min="0" max="1048575" class="form-control" v-model="bgpVpnNetworkDraft.label" :disabled="writeDisabled" placeholder="0-1048575" style="width:220px;" />
+            <div class="form-control">
+              <input type="number" min="0" max="1048575" class="form-control" v-model="bgpVpnNetworkDraft.label" :disabled="writeDisabled" placeholder="0-1048575" />
               <div class="form-hint">取值范围：0-1048575。默认值：无（可选）。</div>
             </div>
           </div>
           <div class="form-row">
             <label class="form-label">RD</label>
-            <div style="flex:1;">
-              <input class="form-control" v-model="bgpVpnNetworkDraft.rd" :disabled="writeDisabled" placeholder="65000:100" style="width:280px;" />
+            <div class="form-control">
+              <input class="form-control" v-model="bgpVpnNetworkDraft.rd" :disabled="writeDisabled" placeholder="65000:100" />
               <div class="form-hint">取值范围：ASN:NN 或 IPv4:NN（如 65000:100、192.0.2.1:100）。默认值：无（可选）。</div>
             </div>
           </div>
@@ -14214,6 +16449,357 @@ export default defineComponent({
         <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
           <div v-for="name in bgpVpnNetworkDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpLuAggregateModalVisible" :title="bgpLuAggregateModalTitle" width="760px" @confirm="saveBgpLuAggregateModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddress') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpLuAggregateDraft.prefix" :disabled="writeDisabled" :placeholder="bgpLuAggregateDraft.afKey === 'ipv6-labeled-unicast' ? '2001:db8::/64' : '1.1.1.0/24'" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddress') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddressAsSet') }}</label>
+            <div class="form-control">
+              <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" v-model="bgpLuAggregateDraft.asSet" :disabled="writeDisabled" /> {{ t('vrf.bgp.fields.aggregateAddressAsSet') }}</label>
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddressAsSet') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddressRouteMap') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpLuAggregateDraft.routeMap" :disabled="writeDisabled" placeholder="route-map name" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddressRouteMap') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddressSummaryOnly') }}</label>
+            <div class="form-control">
+              <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" v-model="bgpLuAggregateDraft.summaryOnly" :disabled="writeDisabled" /> {{ t('vrf.bgp.fields.aggregateAddressSummaryOnly') }}</label>
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddressSummaryOnly') }}</div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpLuAggregateDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmBgpLuAggregateDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpLuAggregateDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpLuNetworkModalVisible" :title="bgpLuNetworkModalTitle" width="760px" @confirm="saveBgpLuNetworkModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.networkPrefix') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpLuNetworkDraft.prefix" :disabled="writeDisabled" :placeholder="bgpLuNetworkDraft.afKey === 'ipv6-labeled-unicast' ? '2001:db8::/64' : '1.1.1.0/24'" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.networkPrefix') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.networkBackdoor') }}</label>
+            <div class="form-control">
+              <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" v-model="bgpLuNetworkDraft.backdoor" :disabled="writeDisabled" /> {{ t('vrf.bgp.fields.networkBackdoor') }}</label>
+              <div class="form-hint">{{ t('vrf.bgp.hints.networkBackdoor') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.networkRouteMap') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpLuNetworkDraft.routeMap" :disabled="writeDisabled" placeholder="route-map name" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.networkRouteMap') }}</div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpLuNetworkDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmBgpLuNetworkDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpLuNetworkDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpMcAggregateModalVisible" :title="bgpMcAggregateModalTitle" width="760px" @confirm="saveBgpMcAggregateModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddress') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpMcAggregateDraft.prefix" :disabled="writeDisabled" :placeholder="bgpMcAggregateDraft.afKey === 'ipv6-multicast' ? '2001:db8::/64' : '1.1.1.0/24'" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddress') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddressAsSet') }}</label>
+            <div class="form-control">
+              <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" v-model="bgpMcAggregateDraft.asSet" :disabled="writeDisabled" /> {{ t('vrf.bgp.fields.aggregateAddressAsSet') }}</label>
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddressAsSet') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddressRouteMap') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpMcAggregateDraft.routeMap" :disabled="writeDisabled" placeholder="route-map name" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddressRouteMap') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddressSummaryOnly') }}</label>
+            <div class="form-control">
+              <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" v-model="bgpMcAggregateDraft.summaryOnly" :disabled="writeDisabled" /> {{ t('vrf.bgp.fields.aggregateAddressSummaryOnly') }}</label>
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddressSummaryOnly') }}</div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpMcAggregateDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmBgpMcAggregateDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpMcAggregateDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpMcNetworkModalVisible" :title="bgpMcNetworkModalTitle" width="760px" @confirm="saveBgpMcNetworkModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.networkPrefix') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpMcNetworkDraft.prefix" :disabled="writeDisabled" :placeholder="bgpMcNetworkDraft.afKey === 'ipv6-multicast' ? '2001:db8::/64' : '1.1.1.0/24'" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.networkPrefix') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.networkBackdoor') }}</label>
+            <div class="form-control">
+              <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" v-model="bgpMcNetworkDraft.backdoor" :disabled="writeDisabled" /> {{ t('vrf.bgp.fields.networkBackdoor') }}</label>
+              <div class="form-hint">{{ t('vrf.bgp.hints.networkBackdoor') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.networkPathLimit') }}</label>
+            <div class="form-control">
+              <input type="number" class="form-control" v-model="bgpMcNetworkDraft.pathLimit" :disabled="writeDisabled" min="1" max="256" placeholder="1-256" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.networkPathLimit') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.networkRouteMap') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpMcNetworkDraft.routeMap" :disabled="writeDisabled" placeholder="route-map name" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.networkRouteMap') }}</div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpMcNetworkDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmBgpMcNetworkDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpMcNetworkDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpUcAggregateModalVisible" :title="bgpUcAggregateModalTitle" width="760px" @confirm="saveBgpUcAggregateModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddress') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpUcAggregateDraft.prefix" :disabled="writeDisabled" :placeholder="bgpUcAggregateDraft.afKey === 'ipv6-unicast' ? '2001:db8::/64' : '1.1.1.0/24'" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddress') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddressAsSet') }}</label>
+            <div class="form-control">
+              <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" v-model="bgpUcAggregateDraft.asSet" :disabled="writeDisabled" /> {{ t('vrf.bgp.fields.aggregateAddressAsSet') }}</label>
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddressAsSet') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddressRouteMap') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpUcAggregateDraft.routeMap" :disabled="writeDisabled" placeholder="route-map name" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddressRouteMap') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.aggregateAddressSummaryOnly') }}</label>
+            <div class="form-control">
+              <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" v-model="bgpUcAggregateDraft.summaryOnly" :disabled="writeDisabled" /> {{ t('vrf.bgp.fields.aggregateAddressSummaryOnly') }}</label>
+              <div class="form-hint">{{ t('vrf.bgp.hints.aggregateAddressSummaryOnly') }}</div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpUcAggregateDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmBgpUcAggregateDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpUcAggregateDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpUcDistancePrefixModalVisible" :title="bgpUcDistancePrefixModalTitle" width="760px" @confirm="saveBgpUcDistancePrefixModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.distancePrefix') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpUcDistancePrefixDraft.prefix" :disabled="writeDisabled" :placeholder="bgpUcDistancePrefixDraft.afKey === 'ipv6-unicast' ? '2001:db8::/64' : '1.1.1.0/24'" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.distancePrefix') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.distancePrefixValue') }}</label>
+            <div class="form-control">
+              <input type="number" class="form-control" v-model="bgpUcDistancePrefixDraft.distance" :disabled="writeDisabled" min="1" max="255" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.distanceExternal') }}</div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpUcDistancePrefixDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmBgpUcDistancePrefixDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpUcDistancePrefixDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpUcNetworkModalVisible" :title="bgpUcNetworkModalTitle" width="760px" @confirm="saveBgpUcNetworkModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.networkPrefix') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpUcNetworkDraft.prefix" :disabled="writeDisabled" :placeholder="bgpUcNetworkDraft.afKey === 'ipv6-unicast' ? '2001:db8::/64' : '1.1.1.0/24'" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.networkPrefix') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.networkPathLimit') }}</label>
+            <div class="form-control">
+              <input type="number" class="form-control" v-model="bgpUcNetworkDraft.pathLimit" :disabled="writeDisabled" min="1" max="256" placeholder="1-256" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.networkPathLimit') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.networkRouteMap') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpUcNetworkDraft.routeMap" :disabled="writeDisabled" placeholder="route-map name" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.networkRouteMap') }}</div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpUcNetworkDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmBgpUcNetworkDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpUcNetworkDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpUcRedistributeModalVisible" :title="bgpUcRedistributeModalTitle" width="760px" @confirm="saveBgpUcRedistributeModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.redistributeProtocol') }}</label>
+            <div class="form-control">
+              <select class="form-control" v-model="bgpUcRedistributeDraft.protocol" :disabled="writeDisabled">
+                <option value="">{{ t('vrf.form.unsetOption') }}</option>
+                <option value="babel">babel</option>
+                <option value="connected">connected</option>
+                <option value="isis">isis</option>
+                <option value="kernel">kernel</option>
+                <option value="nhrp">nhrp</option>
+                <option value="ospfv3">ospfv3</option>
+                <option value="ripng">ripng</option>
+                <option value="static">static</option>
+                <option value="table">table</option>
+              </select>
+              <div class="form-hint">{{ t('vrf.bgp.hints.redistribute') }}</div>
+            </div>
+          </div>
+          <div v-if="bgpUcRedistributeDraft.protocol === 'table'" class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.redistributeTableId') }}</label>
+            <div class="form-control">
+              <input type="number" class="form-control" v-model="bgpUcRedistributeDraft.tableId" :disabled="writeDisabled" min="1" max="200" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.redistributeTableId') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.redistributeMetric') }}</label>
+            <div class="form-control">
+              <input type="number" class="form-control" v-model="bgpUcRedistributeDraft.metric" :disabled="writeDisabled" min="1" max="4294967295" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.redistributeMetric') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.redistributeRouteMap') }}</label>
+            <div class="form-control">
+              <select class="form-control" v-model="bgpUcRedistributeDraft.routeMap" :disabled="writeDisabled">
+                <option value="">{{ t('vrf.form.unsetOption') }}</option>
+                <option v-for="opt in routeMapOptions" :key="'uc-red-rm-' + opt.value" :value="opt.value">{{ opt.label }}</option>
+              </select>
+              <div class="form-hint">{{ t('vrf.bgp.hints.redistributeRouteMap') }}</div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpUcRedistributeDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmBgpUcRedistributeDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpUcRedistributeDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpParamsConfederationPeersModalVisible" :title="bgpParamsConfederationPeersModalTitle" width="760px" @confirm="saveBgpParamsConfederationPeersModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.confederationPeersAsNumber') }}</label>
+            <div class="form-control">
+              <input type="number" class="form-control" v-model="bgpParamsConfederationPeersDraft.asNumber" :disabled="writeDisabled" min="1" max="4294967295" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.confederationPeersAsNumber') }}</div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpParamsConfederationPeersDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmBgpParamsConfederationPeersDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpParamsConfederationPeersDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpParamsDistancePrefixModalVisible" :title="bgpParamsDistancePrefixModalTitle" width="760px" @confirm="saveBgpParamsDistancePrefixModal">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.distancePrefix') }}</label>
+            <div class="form-control">
+              <input class="form-control" v-model="bgpParamsDistancePrefixDraft.prefix" :disabled="writeDisabled" placeholder="1.1.1.0/24" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.distancePrefix') }}</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">{{ t('vrf.bgp.fields.distanceValue') }}</label>
+            <div class="form-control">
+              <input type="number" class="form-control" v-model="bgpParamsDistancePrefixDraft.distance" :disabled="writeDisabled" min="1" max="255" />
+              <div class="form-hint">{{ t('vrf.bgp.hints.distanceValue') }}</div>
+            </div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="bgpParamsDistancePrefixDeleteVisible" :title="t('vrf.modals.confirmDelete')" width="520px" @confirm="confirmBgpParamsDistancePrefixDelete">
+        <div>{{ t('vrf.modals.deleteConfirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;max-height:220px;overflow:auto;">
+          <div v-for="name in bgpParamsDistancePrefixDeletePreview" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
     </div>

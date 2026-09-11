@@ -90,6 +90,7 @@ import PrefixListPage from '/src/pages/PrefixListPage.js';
 import PrefixList6Page from '/src/pages/PrefixList6Page.js';
 import RouteMapPage from '/src/pages/RouteMapPage.js';
 import PkiPage from '/src/pages/PkiPage.js';
+import PkiToolPage from '/src/pages/PkiToolPage.js';
 import ConntrackPage from '/src/pages/ConntrackPage.js';
 import SourceNatPage from '/src/pages/SourceNatPage.js';
 import DestinationNatPage from '/src/pages/DestinationNatPage.js';
@@ -233,6 +234,7 @@ const componentMap = {
   PrefixList6Page,
   RouteMapPage,
   PkiPage,
+  PkiToolPage,
   ConntrackPage,
   SourceNatPage,
   DestinationNatPage,

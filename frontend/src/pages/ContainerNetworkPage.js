@@ -36,6 +36,7 @@ export default defineComponent({
     const saving = ref(false);
 
     const networkList = ref([]);
+    const selectedNetworks = ref([]);
     const showEditModal = ref(false);
     const editingNetwork = ref(null);
 

@@ -33,6 +33,8 @@ const ICON_MAP = {
   diff: '▤',
   commit: '✓',
   discard: '✕',
+  view: '👁',
+  download: '⬇',
 };
 
 export default defineComponent({

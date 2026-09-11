@@ -15,7 +15,7 @@ async function request(method, url, data = null, query = null) {
     if (qs) fullUrl += '?' + qs;
   }
 
-  const options = { method, headers };
+  const options = { method, headers, cache: 'no-store' };
   if (data !== undefined && ['POST', 'PUT', 'PATCH'].includes(method)) {
     options.body = JSON.stringify(data);
   }
@@ -196,4 +196,16 @@ export const notificationApi = {
   markAllRead: () => api.post('/notifications/mark-all-read', {}),
   delete: (id) => api.delete(`/notifications/${id}`),
   deleteRead: () => api.delete('/notifications/read'),
+};
+
+export const pkiFileApi = {
+  list: (query) => api.get('/pki-files', query),
+  read: (filename) => api.post('/pki-files/read', { filename }),
+  delete: (filename) => api.post('/pki-files', { filename }),
+  download: (filename) => {
+    const token = getToken();
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return fetch(`/api/pki-files/download?filename=${encodeURIComponent(filename)}`, { headers });
+  },
 };

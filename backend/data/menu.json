@@ -637,9 +637,28 @@
         "label": "PKI",
         "label_en": "PKI",
         "icon": "",
-        "children": [],
-        "route": "/system/pki",
-        "component": "PkiPage"
+        "children": [
+          {
+            "id": "pki-management",
+            "label": "PKI",
+            "label_en": "PKI",
+            "icon": "",
+            "children": [],
+            "route": "/system/pki",
+            "component": "PkiPage"
+          },
+          {
+            "id": "pki-tool",
+            "label": "PKI工具",
+            "label_en": "PKI Tool",
+            "icon": "",
+            "children": [],
+            "route": "/system/pki-tool",
+            "component": "PkiToolPage"
+          }
+        ],
+        "route": null,
+        "component": null
       },
       {
         "id": "table-size",

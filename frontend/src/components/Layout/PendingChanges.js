@@ -58,6 +58,7 @@ export default defineComponent({
         '/system/interfaces/ethernet': 'interfaces ethernet',
         '/routing/policy-route': 'policy route',
         '/firewall': 'firewall',
+        '/system/pki': 'pki',
       };
       for (const [routePrefix, configPath] of Object.entries(pathMap)) {
         if (route.path.startsWith(routePrefix)) return configPath;

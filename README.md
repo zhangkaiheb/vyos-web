@@ -1,4 +1,4 @@
-# VyOS Web Config
+# VyOS Web
 
 一个面向 VyOS 的 Web 配置系统，目标是将常用命令行配置能力以可视化方式提供出来，同时保持与 VyOS 原生命令结构的一致性。
 

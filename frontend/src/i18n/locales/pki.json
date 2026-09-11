@@ -17,6 +17,108 @@
         "selectOneOpenSSH": "请选择 one open s s h",
         "selectOneOpenVPN": "请选择 one open v p n"
       }
+    },
+    "pkiTool": {
+      "title": "PKI 工具",
+      "description": "生成和管理 PKI 证书、密钥和参数",
+      "generateSuccess": "生成成功",
+      "installSuccess": "证书生成完成，请提交配置",
+      "generateResult": "生成结果",
+      "output": "输出结果",
+      "types": {
+        "ca": "CA 证书",
+        "certificate": "证书",
+        "crl": "证书吊销列表",
+        "dh": "DH 参数",
+        "keyPair": "密钥对",
+        "openvpn": "OpenVPN 密钥",
+        "sshKey": "SSH 密钥",
+        "wireguard": "WireGuard 密钥"
+      },
+      "typeDescriptions": {
+        "ca": "生成 CA 证书",
+        "certificate": "生成证书请求",
+        "crl": "为指定 CA 生成证书吊销列表",
+        "dh": "生成 Diffie-Hellman 参数",
+        "keyPair": "生成密钥对",
+        "openvpn": "生成 OpenVPN 共享密钥",
+        "sshKey": "生成 SSH 密钥",
+        "wireguard": "生成 WireGuard 密钥"
+      },
+      "actions": {
+        "generate": "生成",
+        "file": "写入文件",
+        "install": "安装到配置",
+        "sign": "签名",
+        "selfSigned": "自签名"
+      },
+      "form": {
+        "action": "操作",
+        "filename": "文件名",
+        "filenamePlaceholder": "输入文件名",
+        "filenameRequired": "文件名为必填项",
+        "installName": "安装名称",
+        "installNamePlaceholder": "输入安装到配置中的名称",
+        "installNameRequired": "安装名称为必填项",
+        "keyType": "密钥类型",
+        "keyBits": "密钥位数",
+        "countryCode": "国家代码",
+        "state": "州/省",
+        "locality": "城市",
+        "organization": "组织名称",
+        "commonName": "通用名称",
+        "commonNamePlaceholder": "例如: vyos.io",
+        "validityDays": "有效期（天）",
+        "certType": "证书类型",
+        "dhBits": "DH 参数位数",
+        "caName": "CA 名称",
+        "caNamePlaceholder": "输入 CA 名称",
+        "wgSubType": "WireGuard 类型",
+        "wgInterface": "WireGuard 接口",
+        "wgInterfacePlaceholder": "例如: wg0",
+        "wgPeer": "WireGuard 对端",
+        "wgPeerPlaceholder": "输入对端名称",
+        "signCaName": "签名 CA",
+        "signCaNamePlaceholder": "输入用于签名的 CA 名称",
+        "signAction": "签名后操作",
+        "certAction": "证书操作",
+        "crlAction": "CRL 操作",
+        "hasCertRequest": "已有证书请求",
+        "certRequestPem": "证书请求 PEM",
+        "certRequestPemPlaceholder": "粘贴证书请求内容",
+        "configureSAN": "配置主题备用名称 (SAN)",
+        "subjectAltNames": "主题备用名称",
+        "subjectAltNamesPlaceholder": "逗号分隔的 SAN 列表",
+        "encryptKey": "加密私钥",
+        "passphrase": "密码短语",
+        "passphrasePlaceholder": "输入密码短语"
+      },
+      "certTypes": {
+        "server": "服务器",
+        "client": "客户端"
+      },
+      "wgSubTypes": {
+        "keyPair": "密钥对",
+        "presharedKey": "预共享密钥"
+      },
+      "files": {
+        "title": "文件管理",
+        "certName": "证书",
+        "fileName": "文件名",
+        "fileType": "类型",
+        "fileSize": "大小",
+        "modifiedTime": "修改时间",
+        "download": "下载",
+        "delete": "删除",
+        "batchDelete": "删除",
+        "files": "个文件",
+        "confirmDelete": "确定删除文件",
+        "confirmDeleteTitle": "删除确认",
+        "confirmBatchDelete": "确定删除",
+        "viewContent": "查看内容",
+        "copy": "拷贝",
+        "copySuccess": "已复制到剪贴板"
+      }
     }
   },
   "en": {
@@ -36,6 +138,107 @@
         "selectOneKeyPair": "Select One Key Pair",
         "selectOneOpenSSH": "Select One Open S S H",
         "selectOneOpenVPN": "Select One Open V P N"
+      }
+    },
+    "pkiTool": {
+      "title": "PKI Tool",
+      "description": "Generate and manage PKI certificates, keys and parameters",
+      "generateSuccess": "Generated successfully",
+      "installSuccess": "Certificate generated, please commit configuration",
+      "generateResult": "Generate Result",
+      "output": "Output",
+      "types": {
+        "ca": "CA Certificate",
+        "certificate": "Certificate",
+        "crl": "Certificate Revocation List",
+        "dh": "DH Parameters",
+        "keyPair": "Key Pair",
+        "openvpn": "OpenVPN Key",
+        "sshKey": "SSH Key",
+        "wireguard": "WireGuard Key"
+      },
+      "typeDescriptions": {
+        "ca": "Generate CA certificate",
+        "certificate": "Generate certificate request",
+        "crl": "Generate CRL for specified CA",
+        "dh": "Generate Diffie-Hellman parameters",
+        "keyPair": "Generate key pair",
+        "openvpn": "Generate OpenVPN shared secret",
+        "sshKey": "Generate SSH key",
+        "wireguard": "Generate WireGuard key"
+      },
+      "actions": {
+        "generate": "Generate",
+        "file": "Write to File",
+        "install": "Install to Config",
+        "sign": "Sign",
+        "selfSigned": "Self-Signed"
+      },
+      "form": {
+        "action": "Action",
+        "filename": "Filename",
+        "filenamePlaceholder": "Enter filename",
+        "filenameRequired": "Filename is required",
+        "installName": "Install Name",
+        "installNamePlaceholder": "Enter name to install in config",
+        "keyType": "Key Type",
+        "keyBits": "Key Bits",
+        "countryCode": "Country Code",
+        "state": "State",
+        "locality": "Locality",
+        "organization": "Organization",
+        "commonName": "Common Name",
+        "commonNamePlaceholder": "e.g., vyos.io",
+        "validityDays": "Validity (Days)",
+        "certType": "Certificate Type",
+        "dhBits": "DH Parameter Bits",
+        "caName": "CA Name",
+        "caNamePlaceholder": "Enter CA name",
+        "wgSubType": "WireGuard Type",
+        "wgInterface": "WireGuard Interface",
+        "wgInterfacePlaceholder": "e.g., wg0",
+        "wgPeer": "WireGuard Peer",
+        "wgPeerPlaceholder": "Enter peer name",
+        "signCaName": "Signing CA",
+        "signCaNamePlaceholder": "Enter CA name for signing",
+        "signAction": "Post-Sign Action",
+        "certAction": "Certificate Action",
+        "crlAction": "CRL Action",
+        "hasCertRequest": "Have Certificate Request",
+        "certRequestPem": "Certificate Request PEM",
+        "certRequestPemPlaceholder": "Paste certificate request content",
+        "configureSAN": "Configure Subject Alternative Names (SAN)",
+        "subjectAltNames": "Subject Alternative Names",
+        "subjectAltNamesPlaceholder": "Comma-separated SAN list",
+        "encryptKey": "Encrypt Private Key",
+        "passphrase": "Passphrase",
+        "passphrasePlaceholder": "Enter passphrase"
+      },
+      "certTypes": {
+        "server": "Server",
+        "client": "Client"
+      },
+      "wgSubTypes": {
+        "keyPair": "Key Pair",
+        "presharedKey": "Pre-shared Key"
+      },
+      "files": {
+        "title": "File Management",
+        "certName": "Certificate",
+        "fileName": "File Name",
+        "fileType": "Type",
+        "fileSize": "Size",
+        "modifiedTime": "Modified Time",
+        "download": "Download",
+        "delete": "Delete",
+        "batchDelete": "Delete",
+        "files": "file(s)",
+        "confirmDelete": "Confirm delete file",
+        "confirmDeleteTitle": "Delete Confirmation",
+        "confirmBatchDelete": "Confirm delete",
+        "viewContent": "View Content",
+        "copy": "Copy",
+        "copySuccess": "Copied to clipboard"
       }
     }
   },
@@ -57,6 +260,101 @@
         "selectOneOpenSSH": "Select One Open S S H",
         "selectOneOpenVPN": "Select One Open V P N"
       }
+    },
+    "pkiTool": {
+      "title": "PKI 工具",
+      "description": "生成和管理 PKI 憑證、金鑰和參數",
+      "generateSuccess": "生成成功",
+      "output": "輸出結果",
+      "types": {
+        "ca": "CA 憑證",
+        "certificate": "憑證",
+        "crl": "憑證吊銷清單",
+        "dh": "DH 參數",
+        "keyPair": "金鑰對",
+        "openvpn": "OpenVPN 金鑰",
+        "sshKey": "SSH 金鑰",
+        "wireguard": "WireGuard 金鑰"
+      },
+      "typeDescriptions": {
+        "ca": "生成 CA 憑證",
+        "certificate": "生成憑證請求",
+        "crl": "為指定 CA 生成憑證吊銷清單",
+        "dh": "生成 Diffie-Hellman 參數",
+        "keyPair": "生成金鑰對",
+        "openvpn": "生成 OpenVPN 共用金鑰",
+        "sshKey": "生成 SSH 金鑰",
+        "wireguard": "生成 WireGuard 金鑰"
+      },
+      "actions": {
+        "generate": "生成",
+        "file": "寫入檔案",
+        "install": "安裝到設定",
+        "sign": "簽章",
+        "selfSigned": "自行簽章"
+      },
+      "form": {
+        "action": "操作",
+        "filename": "檔案名稱",
+        "filenamePlaceholder": "輸入檔案名稱",
+        "filenameRequired": "檔案名稱為必填項",
+        "installName": "安裝名稱",
+        "installNamePlaceholder": "輸入安裝到設定中的名稱",
+        "installNameRequired": "安裝名稱為必填項",
+        "keyType": "金鑰類型",
+        "keyBits": "金鑰位數",
+        "countryCode": "國家代碼",
+        "state": "州/省",
+        "locality": "城市",
+        "organization": "組織名稱",
+        "commonName": "通用名稱",
+        "commonNamePlaceholder": "例如: vyos.io",
+        "validityDays": "有效期（天）",
+        "certType": "憑證類型",
+        "dhBits": "DH 參數位數",
+        "caName": "CA 名稱",
+        "caNamePlaceholder": "輸入 CA 名稱",
+        "wgSubType": "WireGuard 類型",
+        "wgInterface": "WireGuard 介面",
+        "wgInterfacePlaceholder": "例如: wg0",
+        "wgPeer": "WireGuard 對端",
+        "wgPeerPlaceholder": "輸入對端名稱",
+        "signCaName": "簽章 CA",
+        "signCaNamePlaceholder": "輸入用於簽章的 CA 名稱",
+        "signAction": "簽章後操作",
+        "certAction": "憑證操作",
+        "crlAction": "CRL 操作",
+        "hasCertRequest": "已有憑證請求",
+        "certRequestPem": "憑證請求 PEM",
+        "certRequestPemPlaceholder": "貼上憑證請求內容",
+        "configureSAN": "設定主題備用名稱 (SAN)",
+        "subjectAltNames": "主題備用名稱",
+        "subjectAltNamesPlaceholder": "逗號分隔的 SAN 清單",
+        "encryptKey": "加密私鑰",
+        "passphrase": "密碼短語",
+        "passphrasePlaceholder": "輸入密碼短語"
+      },
+      "certTypes": {
+        "server": "伺服器",
+        "client": "用戶端"
+      },
+      "wgSubTypes": {
+        "keyPair": "金鑰對",
+        "presharedKey": "預共用金鑰"
+      },
+      "files": {
+        "title": "檔案管理",
+        "fileName": "檔案名稱",
+        "fileType": "類型",
+        "fileSize": "大小",
+        "modifiedTime": "修改時間",
+        "download": "下載",
+        "delete": "刪除",
+        "batchDelete": "刪除",
+        "files": "個檔案",
+        "confirmDelete": "確定刪除檔案",
+        "confirmBatchDelete": "確定刪除"
+      }
     }
   },
   "ru": {
@@ -77,6 +375,18 @@
         "selectOneOpenSSH": "Select One Open S S H",
         "selectOneOpenVPN": "Select One Open V P N"
       }
+    },
+    "pkiTool": {
+      "title": "Инструмент PKI",
+      "description": "Генерация и управление сертификатами, ключами и параметрами PKI",
+      "generateSuccess": "Успешно сгенерировано",
+      "output": "Результат",
+      "types": { "ca": "Сертификат CA", "certificate": "Сертификат", "crl": "Список отзыва сертификатов", "dh": "Параметры DH", "keyPair": "Пара ключей", "openvpn": "Ключ OpenVPN", "sshKey": "Ключ SSH", "wireguard": "Ключ WireGuard" },
+      "typeDescriptions": { "ca": "Генерация сертификата CA", "certificate": "Генерация запроса сертификата", "crl": "Генерация CRL для указанного CA", "dh": "Генерация параметров Diffie-Hellman", "keyPair": "Генерация пары ключей", "openvpn": "Генерация общего секрета OpenVPN", "sshKey": "Генерация ключа SSH", "wireguard": "Генерация ключа WireGuard" },
+      "actions": { "generate": "Генерировать", "file": "Записать в файл", "install": "Установить в конфигурацию", "sign": "Подписать", "selfSigned": "Самоподписанный" },
+      "form": { "action": "Действие", "filename": "Имя файла", "filenamePlaceholder": "Введите имя файла", "installName": "Имя установки", "installNamePlaceholder": "Введите имя для установки в конфигурацию", "keyType": "Тип ключа", "keyBits": "Разрядность ключа", "countryCode": "Код страны", "state": "Область", "locality": "Город", "organization": "Организация", "commonName": "Общее имя", "commonNamePlaceholder": "Например: vyos.io", "validityDays": "Срок действия (дни)", "certType": "Тип сертификата", "dhBits": "Разрядность параметров DH", "caName": "Имя CA", "caNamePlaceholder": "Введите имя CA", "wgSubType": "Тип WireGuard", "wgInterface": "Интерфейс WireGuard", "wgInterfacePlaceholder": "Например: wg0", "wgPeer": "Узел WireGuard", "wgPeerPlaceholder": "Введите имя узла", "signCaName": "Подписывающий CA", "signCaNamePlaceholder": "Введите имя CA для подписи", "signAction": "Действие после подписи", "certAction": "Действие с сертификатом", "crlAction": "Действие CRL", "hasCertRequest": "Есть запрос сертификата", "certRequestPem": "PEM запроса сертификата", "certRequestPemPlaceholder": "Вставьте содержимое запроса сертификата", "configureSAN": "Настроить альтернативные имена (SAN)", "subjectAltNames": "Альтернативные имена", "subjectAltNamesPlaceholder": "Список SAN через запятую", "encryptKey": "Зашифровать закрытый ключ", "passphrase": "Парольная фраза", "passphrasePlaceholder": "Введите парольную фразу" },
+      "certTypes": { "server": "Сервер", "client": "Клиент" },
+      "wgSubTypes": { "keyPair": "Пара ключей", "presharedKey": "Общий ключ" }
     }
   },
   "de": {
@@ -97,6 +407,18 @@
         "selectOneOpenSSH": "Select One Open S S H",
         "selectOneOpenVPN": "Select One Open V P N"
       }
+    },
+    "pkiTool": {
+      "title": "PKI-Werkzeug",
+      "description": "PKI-Zertifikate, Schlüssel und Parameter generieren und verwalten",
+      "generateSuccess": "Erfolgreich generiert",
+      "output": "Ausgabe",
+      "types": { "ca": "CA-Zertifikat", "certificate": "Zertifikat", "crl": "Zertifikatsperrliste", "dh": "DH-Parameter", "keyPair": "Schlüsselpaar", "openvpn": "OpenVPN-Schlüssel", "sshKey": "SSH-Schlüssel", "wireguard": "WireGuard-Schlüssel" },
+      "typeDescriptions": { "ca": "CA-Zertifikat generieren", "certificate": "Zertifikatsanfrage generieren", "crl": "CRL für angegebene CA generieren", "dh": "Diffie-Hellman-Parameter generieren", "keyPair": "Schlüsselpaar generieren", "openvpn": "OpenVPN Shared Secret generieren", "sshKey": "SSH-Schlüssel generieren", "wireguard": "WireGuard-Schlüssel generieren" },
+      "actions": { "generate": "Generieren", "file": "In Datei schreiben", "install": "In Konfiguration installieren", "sign": "Signieren", "selfSigned": "Selbstsigniert" },
+      "form": { "action": "Aktion", "filename": "Dateiname", "filenamePlaceholder": "Dateiname eingeben", "installName": "Installationsname", "installNamePlaceholder": "Name für Installation in Konfiguration eingeben", "keyType": "Schlüsseltyp", "keyBits": "Schlüsselbits", "countryCode": "Ländercode", "state": "Bundesland", "locality": "Ort", "organization": "Organisation", "commonName": "Allgemeiner Name", "commonNamePlaceholder": "z.B.: vyos.io", "validityDays": "Gültigkeit (Tage)", "certType": "Zertifikatstyp", "dhBits": "DH-Parameter-Bits", "caName": "CA-Name", "caNamePlaceholder": "CA-Name eingeben", "wgSubType": "WireGuard-Typ", "wgInterface": "WireGuard-Schnittstelle", "wgInterfacePlaceholder": "z.B.: wg0", "wgPeer": "WireGuard-Peer", "wgPeerPlaceholder": "Peer-Name eingeben", "signCaName": "Signierende CA", "signCaNamePlaceholder": "CA-Name für Signierung eingeben", "signAction": "Aktion nach Signierung", "certAction": "Zertifikatsaktion", "crlAction": "CRL-Aktion", "hasCertRequest": "Zertifikatsanfrage vorhanden", "certRequestPem": "Zertifikatsanfrage PEM", "certRequestPemPlaceholder": "Zertifikatsanfrageinhalt einfügen", "configureSAN": "Subject Alternative Names (SAN) konfigurieren", "subjectAltNames": "Subject Alternative Names", "subjectAltNamesPlaceholder": "Kommagetrennte SAN-Liste", "encryptKey": "Privaten Schlüssel verschlüsseln", "passphrase": "Passphrase", "passphrasePlaceholder": "Passphrase eingeben" },
+      "certTypes": { "server": "Server", "client": "Client" },
+      "wgSubTypes": { "keyPair": "Schlüsselpaar", "presharedKey": "Pre-Shared Key" }
     }
   },
   "fr": {
@@ -117,6 +439,18 @@
         "selectOneOpenSSH": "Select One Open S S H",
         "selectOneOpenVPN": "Select One Open V P N"
       }
+    },
+    "pkiTool": {
+      "title": "Outil PKI",
+      "description": "Générer et gérer les certificats, clés et paramètres PKI",
+      "generateSuccess": "Généré avec succès",
+      "output": "Résultat",
+      "types": { "ca": "Certificat CA", "certificate": "Certificat", "crl": "Liste de révocation de certificats", "dh": "Paramètres DH", "keyPair": "Paire de clés", "openvpn": "Clé OpenVPN", "sshKey": "Clé SSH", "wireguard": "Clé WireGuard" },
+      "typeDescriptions": { "ca": "Générer un certificat CA", "certificate": "Générer une demande de certificat", "crl": "Générer une CRL pour le CA spécifié", "dh": "Générer des paramètres Diffie-Hellman", "keyPair": "Générer une paire de clés", "openvpn": "Générer un secret partagé OpenVPN", "sshKey": "Générer une clé SSH", "wireguard": "Générer une clé WireGuard" },
+      "actions": { "generate": "Générer", "file": "Écrire dans un fichier", "install": "Installer dans la configuration", "sign": "Signer", "selfSigned": "Auto-signé" },
+      "form": { "action": "Action", "filename": "Nom du fichier", "filenamePlaceholder": "Entrez le nom du fichier", "installName": "Nom d'installation", "installNamePlaceholder": "Entrez le nom à installer dans la configuration", "keyType": "Type de clé", "keyBits": "Bits de la clé", "countryCode": "Code pays", "state": "État", "locality": "Localité", "organization": "Organisation", "commonName": "Nom commun", "commonNamePlaceholder": "Ex: vyos.io", "validityDays": "Validité (jours)", "certType": "Type de certificat", "dhBits": "Bits des paramètres DH", "caName": "Nom du CA", "caNamePlaceholder": "Entrez le nom du CA", "wgSubType": "Type WireGuard", "wgInterface": "Interface WireGuard", "wgInterfacePlaceholder": "Ex: wg0", "wgPeer": "Pair WireGuard", "wgPeerPlaceholder": "Entrez le nom du pair", "signCaName": "CA signataire", "signCaNamePlaceholder": "Entrez le nom du CA pour la signature", "signAction": "Action après signature", "certAction": "Action de certificat", "crlAction": "Action CRL", "hasCertRequest": "Demande de certificat existante", "certRequestPem": "PEM de demande de certificat", "certRequestPemPlaceholder": "Collez le contenu de la demande de certificat", "configureSAN": "Configurer les noms alternatifs (SAN)", "subjectAltNames": "Noms alternatifs", "subjectAltNamesPlaceholder": "Liste SAN séparée par des virgules", "encryptKey": "Chiffrer la clé privée", "passphrase": "Phrase de passe", "passphrasePlaceholder": "Entrez la phrase de passe" },
+      "certTypes": { "server": "Serveur", "client": "Client" },
+      "wgSubTypes": { "keyPair": "Paire de clés", "presharedKey": "Clé pré-partagée" }
     }
   },
   "ko": {
@@ -137,6 +471,18 @@
         "selectOneOpenSSH": "Select One Open S S H",
         "selectOneOpenVPN": "Select One Open V P N"
       }
+    },
+    "pkiTool": {
+      "title": "PKI 도구",
+      "description": "PKI 인증서, 키 및 매개변수 생성 및 관리",
+      "generateSuccess": "성공적으로 생성됨",
+      "output": "출력",
+      "types": { "ca": "CA 인증서", "certificate": "인증서", "crl": "인증서 폐기 목록", "dh": "DH 매개변수", "keyPair": "키 쌍", "openvpn": "OpenVPN 키", "sshKey": "SSH 키", "wireguard": "WireGuard 키" },
+      "typeDescriptions": { "ca": "CA 인증서 생성", "certificate": "인증서 요청 생성", "crl": "지정된 CA에 대한 CRL 생성", "dh": "Diffie-Hellman 매개변수 생성", "keyPair": "키 쌍 생성", "openvpn": "OpenVPN 공유 비밀 생성", "sshKey": "SSH 키 생성", "wireguard": "WireGuard 키 생성" },
+      "actions": { "generate": "생성", "file": "파일에 쓰기", "install": "구성에 설치", "sign": "서명", "selfSigned": "자체 서명" },
+      "form": { "action": "작업", "filename": "파일 이름", "filenamePlaceholder": "파일 이름 입력", "installName": "설치 이름", "installNamePlaceholder": "구성에 설치할 이름 입력", "keyType": "키 유형", "keyBits": "키 비트", "countryCode": "국가 코드", "state": "주/도", "locality": "시/군/구", "organization": "조직", "commonName": "공통 이름", "commonNamePlaceholder": "예: vyos.io", "validityDays": "유효 기간 (일)", "certType": "인증서 유형", "dhBits": "DH 매개변수 비트", "caName": "CA 이름", "caNamePlaceholder": "CA 이름 입력", "wgSubType": "WireGuard 유형", "wgInterface": "WireGuard 인터페이스", "wgInterfacePlaceholder": "예: wg0", "wgPeer": "WireGuard 피어", "wgPeerPlaceholder": "피어 이름 입력", "signCaName": "서명 CA", "signCaNamePlaceholder": "서명에 사용할 CA 이름 입력", "signAction": "서명 후 작업", "certAction": "인증서 작업", "crlAction": "CRL 작업", "hasCertRequest": "인증서 요청 있음", "certRequestPem": "인증서 요청 PEM", "certRequestPemPlaceholder": "인증서 요청 내용 붙여넣기", "configureSAN": "대체 이름 (SAN) 구성", "subjectAltNames": "대체 이름", "subjectAltNamesPlaceholder": "쉼표로 구분된 SAN 목록", "encryptKey": "개인 키 암호화", "passphrase": "암호", "passphrasePlaceholder": "암호 입력" },
+      "certTypes": { "server": "서버", "client": "클라이언트" },
+      "wgSubTypes": { "keyPair": "키 쌍", "presharedKey": "사전 공유 키" }
     }
   }
 }
