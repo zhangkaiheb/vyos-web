@@ -1000,6 +1000,9 @@ export default defineComponent({
           </template>
           <template #x509>
             <ConfigForm v-model="x509Data" :schema="x509Schema" :disabled="writeDisabled" :showAdvanced="true" />
+            <div style="text-align:right;padding:16px 0;">
+              <ToolbarButton icon="save" primary :disabled="writeDisabled" @click="saveX509">{{ $t('app.confirm') }}</ToolbarButton>
+            </div>
           </template>
         </TabGroup>
       </div>

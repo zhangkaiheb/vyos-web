@@ -25,11 +25,18 @@ function resolveRulePaths(routePath) {
         op: `${family} ${type} filter`,
       };
     }
-    if (family === 'bridge' && ['forward', 'input', 'output'].includes(type)) {
+    if (family === 'bridge' && ['forward', 'input', 'output', 'prerouting'].includes(type)) {
       return {
         base: `firewall bridge ${type} filter`,
         rule: `firewall bridge ${type} filter rule`,
         op: `bridge ${type} filter`,
+      };
+    }
+    if (family === 'bridge' && type === 'name') {
+      return {
+        base: 'firewall bridge name',
+        rule: 'firewall bridge name',
+        op: 'bridge name',
       };
     }
   }

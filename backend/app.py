@@ -653,7 +653,7 @@ class VyOSWebApp:
         auth_dir = '/config/auth'
         raw_files = []
         file_map = {}  # base_name -> file_info
-        
+
         if os.path.isdir(auth_dir):
             for f in os.listdir(auth_dir):
                 fpath = os.path.join(auth_dir, f)
@@ -671,7 +671,7 @@ class VyOSWebApp:
                     }
                     raw_files.append(file_info)
                     file_map[name_without_ext] = file_info
-        
+
         # Group files by base name: merge cert+key into one row
         grouped = {}
         for f in raw_files:
@@ -695,19 +695,17 @@ class VyOSWebApp:
                 g['mtime'] = f['mtime']
             elif f['name'].endswith('.key'):
                 g['key_name'] = f['name']
-                # If no cert found yet, use key's type/size/mtime
                 if not g['cert_name']:
                     g['type'] = f['type']
                     g['size'] = f['size']
                     g['mtime'] = f['mtime']
             else:
-                # Other files (csr, etc.)
                 if not g['cert_name'] and not g['key_name']:
                     g['cert_name'] = f['name']
                     g['type'] = f['type']
                     g['size'] = f['size']
                     g['mtime'] = f['mtime']
-        
+
         files = []
         for base, g in grouped.items():
             files.append({
@@ -719,7 +717,7 @@ class VyOSWebApp:
                 'size': g['size'],
                 'mtime': g['mtime'],
             })
-        
+
         return {'success': True, 'data': files}
 
     def _detect_file_type(self, fpath):

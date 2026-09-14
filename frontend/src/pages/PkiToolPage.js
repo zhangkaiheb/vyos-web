@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
 import { opModeApi, pkiFileApi } from '/src/api/index.js';
 import { showError, errorState } from '/src/components/Layout/ErrorDisplay.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
@@ -91,11 +91,51 @@ export default defineComponent({
       wgPeer: '',
     });
 
+    // CA 列表（用于签名 CA 下拉框）
+    const caList = ref([]);
+
+    async function loadCaList() {
+      try {
+        const res = await configStore.getConfig('pki ca');
+        if (res.success && res.data && typeof res.data === 'object') {
+          caList.value = Object.keys(res.data);
+        } else {
+          caList.value = [];
+        }
+      } catch (e) {
+        caList.value = [];
+      }
+    }
+
     const keyTypes = computed(() => [
       { value: 'rsa', label: 'RSA' },
       { value: 'dsa', label: 'DSA' },
       { value: 'ec', label: 'EC' },
     ]);
+
+    // 密钥位数选项（根据密钥类型动态变化）
+    const keyBitsOptions = computed(() => {
+      const keyType = formData.value.keyType;
+      if (keyType === 'ec') {
+        return [224, 256, 384, 521];
+      } else {
+        // rsa, dsa
+        return [512, 1024, 2048, 4096];
+      }
+    });
+
+    // 监听密钥类型变化，自动调整密钥位数默认值
+    watch(() => formData.value.keyType, (newType) => {
+      if (newType === 'ec') {
+        if (!keyBitsOptions.value.includes(formData.value.keyBits)) {
+          formData.value.keyBits = 256;
+        }
+      } else {
+        if (!keyBitsOptions.value.includes(formData.value.keyBits)) {
+          formData.value.keyBits = 2048;
+        }
+      }
+    });
 
     const certTypes = computed(() => [
       { value: 'server', label: t('pkiTool.certTypes.server') },
@@ -595,6 +635,7 @@ export default defineComponent({
           inputs.push({ prompt: 'Enter locality:', default: data.locality, value: data.locality });
           inputs.push({ prompt: 'Enter organization name:', default: data.organization, value: data.organization });
           inputs.push({ prompt: 'Enter common name:', default: data.commonName, value: data.commonName });
+          inputs.push({ prompt: 'Enter how many days certificate will be valid:', default: 365, value: data.validityDays });
           inputs.push({ prompt: 'Do you want to configure Subject Alternative Names? [y/N]', default: 'N', value: data.configureSan ? 'y' : 'N' });
           if (data.configureSan) {
             inputs.push({ prompt: 'Enter Subject Alternative Names (comma-separated):', default: '', value: data.subjectAltNames });
@@ -710,7 +751,7 @@ export default defineComponent({
             generateResultFiles.value = [];
             generateResultTabs.value = [];
             generateResultActiveTab.value = '';
-            
+
             // 后端返回 certContent 和 keyContent
             if (response.certContent || response.keyContent) {
               if (response.certContent) {
@@ -731,8 +772,31 @@ export default defineComponent({
                 generateResultActiveTab.value = generateResultTabs.value[0].key;
               }
             } else {
-              // 降级：使用 output
-              generateResultContent.value = result;
+              // 签名操作：从 PTY 输出中解析证书和私钥
+              const outputText = typeof result === 'string' ? result : '';
+              const certMatch = outputText.match(/-----BEGIN CERTIFICATE-----[\s\S]*?-----END CERTIFICATE-----/);
+              const keyMatch = outputText.match(/-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----[\s\S]*?-----END (?:RSA |EC |DSA )?PRIVATE KEY-----/);
+              if (certMatch || keyMatch) {
+                if (certMatch) {
+                  generateResultTabs.value.push({
+                    key: 'certificate',
+                    title: 'Certificate',
+                    content: certMatch[0],
+                  });
+                }
+                if (keyMatch) {
+                  generateResultTabs.value.push({
+                    key: 'private-key',
+                    title: 'Private Key',
+                    content: keyMatch[0],
+                  });
+                }
+                if (generateResultTabs.value.length > 0) {
+                  generateResultActiveTab.value = generateResultTabs.value[0].key;
+                }
+              } else {
+                generateResultContent.value = outputText;
+              }
             }
             generateResultModal.value = true;
           }
@@ -867,6 +931,7 @@ export default defineComponent({
 
     onMounted(() => {
       loadFileList();
+      loadCaList();
     });
 
     return {
@@ -879,10 +944,12 @@ export default defineComponent({
       formData,
       TABS,
       keyTypes,
+      keyBitsOptions,
       certTypes,
       wgSubTypes,
       certSubActions,
       crlSubActions,
+      caList,
       // 文件管理
       fileList,
       fileLoading,
@@ -1290,7 +1357,10 @@ export default defineComponent({
           <div v-if="formData.type === 'ca' && formData.action === 'sign'" class="form-row">
             <label class="form-label">{{ t('pkiTool.form.signCaName') }}</label>
             <div class="form-control">
-              <input v-model="formData.signCaName" type="text" class="form-input" :placeholder="t('pkiTool.form.signCaNamePlaceholder')" />
+              <select v-model="formData.signCaName" class="form-select">
+                <option value="">{{ t('pkiTool.form.signCaNamePlaceholder') }}</option>
+                <option v-for="ca in caList" :key="ca" :value="ca">{{ ca }}</option>
+              </select>
             </div>
           </div>
 
@@ -1320,7 +1390,10 @@ export default defineComponent({
           <div v-if="formData.type === 'certificate' && formData.action === 'sign'" class="form-row">
             <label class="form-label">{{ t('pkiTool.form.signCaName') }}</label>
             <div class="form-control">
-              <input v-model="formData.signCaName" type="text" class="form-input" :placeholder="t('pkiTool.form.signCaNamePlaceholder')" />
+              <select v-model="formData.signCaName" class="form-select">
+                <option value="">{{ t('pkiTool.form.signCaNamePlaceholder') }}</option>
+                <option v-for="ca in caList" :key="ca" :value="ca">{{ ca }}</option>
+              </select>
             </div>
           </div>
 
@@ -1412,7 +1485,9 @@ export default defineComponent({
           <div v-if="['ca', 'certificate', 'key-pair', 'ssh-key'].includes(formData.type) && !formData.hasCertRequest" class="form-row">
             <label class="form-label">{{ t('pkiTool.form.keyBits') }}</label>
             <div class="form-control">
-              <input v-model.number="formData.keyBits" type="number" class="form-input" min="1024" max="8192" />
+              <select v-model.number="formData.keyBits" class="form-select">
+                <option v-for="bits in keyBitsOptions" :key="bits" :value="bits">{{ bits }}</option>
+              </select>
             </div>
           </div>
 

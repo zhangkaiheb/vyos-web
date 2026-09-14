@@ -398,7 +398,7 @@ export default defineComponent({
       </template>
       <DataTable v-else :columns="columns" :data="data" :loading="loading" :disabled="writeDisabled"
                  @selection-change="selected = $event" :selectable="true" :externalToolbar="true" />
-      <DraggableModal v-model:visible="modalVisible" :title="modalTitle" width="600px" @confirm="save">
+      <DraggableModal v-model:visible="modalVisible" :title="modalTitle" width="820px" @confirm="save">
         <ConfigForm v-model="editingItem" :schema="isDynamic ? dynamicFormSchema : formSchema" :disabled="writeDisabled" :showAdvanced="true" />
       </DraggableModal>
       <DraggableModal v-model:visible="deleteModalVisible" :title="$t('firewall.confirmDelete')" width="400px" @confirm="confirmRemove">

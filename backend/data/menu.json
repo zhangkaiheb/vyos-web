@@ -1108,8 +1108,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/ipv4/input",
-            "component": "RuleTablePage",
-            "hidden": true
+            "component": "RuleTablePage"
           },
           {
             "id": "output",
@@ -1228,6 +1227,24 @@
             "icon": "",
             "children": [],
             "route": "/firewall/bridge/output",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "prerouting",
+            "label": "预路由规则",
+            "label_en": "Prerouting",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/bridge/prerouting",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "name",
+            "label": "自定义规则",
+            "label_en": "Custom",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/bridge/name",
             "component": "RuleTablePage"
           }
         ],

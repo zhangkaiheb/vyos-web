@@ -1096,55 +1096,89 @@ class ConfigService:
     def compare_config(self, user, left='working', right='active', path=''):
         """Compare working config against active config and return VyOS-style diff.
         
-        Uses vyatta-cfg-cmd-wrapper subprocess to get working config with diff markers:
-        + (added), - (deleted), > (modified)
+        Uses ConfigSession.diff() to get diff from the user's session, falling back
+        to vyatta-cfg-cmd-wrapper for CLI sessions.
         """
         try:
             token = _get_token(user)
             _logger.info(f'[compare_config] START: token={token[:20]}..., path={path}')
-            
+
             path_list = path.split() if path else []
-            
-            # Use subprocess to avoid ConfigSession C library state corruption
-            # vyatta-cfg-cmd-wrapper show configuration commands returns working config with diff markers
+
+            # Try using ConfigSession first (same session as PKI install etc.)
+            try:
+                session = _get_config_session(token)
+                diff_output = session.diff()
+                _logger.info(f'[compare_config] ConfigSession.diff() returned: {repr(diff_output[:200]) if diff_output else "empty"}')
+                if diff_output:
+                    # Parse diff output - it may be a string with + / - markers
+                    diff_lines = []
+                    for line in diff_output.split('\n'):
+                        stripped = line.strip()
+                        if stripped and stripped[0] in ('+', '-', '>'):
+                            diff_lines.append(line.rstrip())
+                    if path_list:
+                        # Filter to only lines under the specified path
+                        path_prefix = ' '.join(path_list)
+                        filtered = []
+                        in_section = False
+                        section_indent = -1
+                        for line in diff_lines:
+                            stripped = line.strip()
+                            indent = len(line) - len(line.lstrip()) if stripped else 999
+                            if stripped.startswith(path_prefix + ' ') or stripped == path_prefix + ' {':
+                                in_section = True
+                                section_indent = indent
+                                filtered.append(line)
+                                continue
+                            if in_section:
+                                if indent <= section_indent and not stripped.startswith('{'):
+                                    in_section = False
+                                    continue
+                                filtered.append(line)
+                        diff_lines = filtered
+                    _logger.info(f'[compare_config] SUCCESS via ConfigSession: found {len(diff_lines)} diff lines')
+                    return {'success': True, 'diff': diff_lines}
+            except Exception as e:
+                _logger.warning(f'[compare_config] ConfigSession.diff() failed: {e}, falling back to vyatta-cfg-cmd-wrapper')
+
+            # Fallback: use vyatta-cfg-cmd-wrapper for CLI sessions
             cmd = ['/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper', 'show', 'configuration', 'commands']
             if path_list:
                 cmd.extend(path_list)
-            
+
             _logger.info(f'[compare_config] Running: {" ".join(cmd)}')
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-            
+
             if result.returncode != 0:
                 _logger.warning(f'[compare_config] Command failed: rc={result.returncode}, stderr={result.stderr[:200]}')
                 return {'success': True, 'diff': []}
-            
+
             raw_text = result.stdout
             if not raw_text or not raw_text.strip():
                 _logger.info(f'[compare_config] No working config changes')
                 return {'success': True, 'diff': []}
-            
+
             # Extract lines with diff markers (+, -, >)
             diff_lines = []
             if path_list:
-                # Filter to only lines under the specified path
                 path_prefix = ' '.join(path_list)
                 in_section = False
                 section_indent = -1
                 for line in raw_text.split('\n'):
                     stripped = line.strip()
                     indent = len(line) - len(line.lstrip()) if stripped else 999
-                    
+
                     if not stripped:
                         continue
-                    
-                    # Check if this line starts a matching section
+
                     if stripped.startswith(path_prefix + ' ') or stripped == path_prefix + ' {':
                         in_section = True
                         section_indent = indent
                         if stripped[0] in ('+', '-', '>'):
                             diff_lines.append(line.rstrip())
                         continue
-                    
+
                     if in_section:
                         if indent <= section_indent and not stripped.startswith('{'):
                             in_section = False
@@ -1156,7 +1190,7 @@ class ConfigService:
                     stripped = line.strip()
                     if stripped and stripped[0] in ('+', '-', '>'):
                         diff_lines.append(line.rstrip())
-            
+
             _logger.info(f'[compare_config] SUCCESS: found {len(diff_lines)} diff lines')
             return {'success': True, 'diff': diff_lines}
         except Exception as e:

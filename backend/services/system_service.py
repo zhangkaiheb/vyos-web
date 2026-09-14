@@ -387,6 +387,7 @@ class SystemService:
         # Parse command args to detect action
         filename = None
         install_name = None
+        sign_ca_name = None
         action = 'generate'
         if 'file' in cmd_args:
             idx = cmd_args.index('file')
@@ -398,6 +399,11 @@ class SystemService:
             if idx + 1 < len(cmd_args):
                 install_name = cmd_args[idx + 1]
                 action = 'install'
+        elif 'sign' in cmd_args:
+            idx = cmd_args.index('sign')
+            if idx + 1 < len(cmd_args):
+                sign_ca_name = cmd_args[idx + 1]
+                action = 'sign'
 
         # Validate filename for file action
         if action == 'file':
@@ -424,7 +430,15 @@ class SystemService:
 
         # For install action, use Python PKI API + set VyOS config
         if action == 'install':
-            return self._install_pki(cert_type, input_lines, install_name)
+            return self._install_pki(cert_type, input_lines, install_name, user=user)
+
+        # For sign action, use PTY interactive command
+        if action == 'sign':
+            cmd_parts = ['/opt/vyatta/bin/vyatta-op-cmd-wrapper', 'generate', 'pki', cert_type, 'sign', sign_ca_name]
+            import logging
+            _pki_logger = logging.getLogger('pki')
+            _pki_logger.info(f'[PKI] Running: {" ".join(cmd_parts)} with {len(input_lines)} inputs')
+            return _run_interactive_command(cmd_parts, input_lines=input_lines, timeout=120)
 
         # For generate action, use Python PKI API and return content
         if action == 'generate':
@@ -449,13 +463,67 @@ class SystemService:
         except ImportError as e:
             return {'success': False, 'message': f'无法导入 VyOS PKI 模块: {e}', 'output': '', 'returncode': -1}
 
-        # Parse input lines - frontend sends 9 inputs for CA:
-        # p0=keyType, p1=keyBits, p2=country, p3=state, p4=locality,
-        # p5=organization, p6=commonName, p7=validityDays, p8=encryptKey(y/N)
+        # Parse input lines
         p = {}
         for i, line in enumerate(input_lines):
             p[f'p{i}'] = line.strip() if line else ''
 
+        # DH parameters: only needs key size
+        if cert_type == 'dh':
+            try:
+                from vyos.pki import create_dh_parameters, encode_dh_parameters
+                key_size = int(p.get('p0', '2048') or '2048')
+                dh_obj = create_dh_parameters(key_size)
+                dh_pem = encode_dh_parameters(dh_obj)
+                return {
+                    'success': True,
+                    'output': dh_pem,
+                    'returncode': 0,
+                    'certContent': dh_pem,
+                    'keyContent': '',
+                }
+            except Exception as e:
+                return {'success': False, 'message': f'DH参数生成失败: {e}', 'output': str(e), 'returncode': -1}
+
+        # Key pair: only needs key type and size
+        if cert_type == 'key-pair':
+            key_type = p.get('p0', 'rsa') or 'rsa'
+            key_size = int(p.get('p1', '2048') or '2048')
+            encrypt_key = (p.get('p2', 'N') or 'N').lower() in ('y', 'yes', 'true', '1')
+            passphrase = p.get('p3', '') if encrypt_key else None
+            try:
+                private_key = create_private_key(key_type, key_size)
+                key_pem = encode_private_key(private_key, passphrase=passphrase)
+                return {
+                    'success': True,
+                    'output': key_pem,
+                    'returncode': 0,
+                    'certContent': '',
+                    'keyContent': key_pem,
+                }
+            except Exception as e:
+                return {'success': False, 'message': f'密钥对生成失败: {e}', 'output': str(e), 'returncode': -1}
+
+        # SSH key: only needs key type and size
+        if cert_type == 'ssh-key':
+            key_type = p.get('p0', 'rsa') or 'rsa'
+            key_size = int(p.get('p1', '2048') or '2048')
+            encrypt_key = (p.get('p2', 'N') or 'N').lower() in ('y', 'yes', 'true', '1')
+            passphrase = p.get('p3', '') if encrypt_key else None
+            try:
+                private_key = create_private_key(key_type, key_size)
+                key_pem = encode_private_key(private_key, passphrase=passphrase)
+                return {
+                    'success': True,
+                    'output': key_pem,
+                    'returncode': 0,
+                    'certContent': '',
+                    'keyContent': key_pem,
+                }
+            except Exception as e:
+                return {'success': False, 'message': f'SSH密钥生成失败: {e}', 'output': str(e), 'returncode': -1}
+
+        # Certificate/CA: full input parsing
         key_type = p.get('p0', 'rsa') or 'rsa'
         key_size = int(p.get('p1', '2048') or '2048')
         country = p.get('p2', 'CN') or 'CN'
@@ -478,7 +546,6 @@ class SystemService:
             cert_pem = encode_certificate(cert)
             key_pem = encode_private_key(private_key, passphrase=passphrase)
 
-            # encode_certificate/encode_private_key already return full PEM with headers
             return {
                 'success': True,
                 'output': cert_pem,
@@ -550,22 +617,81 @@ class SystemService:
         except Exception as e:
             return {'success': False, 'message': f'生成失败: {e}', 'output': str(e), 'returncode': -1}
 
-    def _install_pki(self, cert_type, input_lines, install_name):
-        """Generate PKI via pki.py script (non-interactive, same as CLI: run generate pki ca install <name>)."""
+    def _install_pki(self, cert_type, input_lines, install_name, user=None):
+        """Generate PKI using Python API and install into VyOS config via user's ConfigSession."""
         import logging
         _pki_logger = logging.getLogger('pki_install')
 
-        # Actual command: /usr/libexec/vyos/op_mode/pki.py generate_pki --pki-type ca --name <name> --install
-        cmd = [
-            '/usr/libexec/vyos/op_mode/pki.py',
-            'generate_pki',
-            '--pki-type', cert_type,
-            '--name', install_name,
-            '--install'
-        ]
-        _pki_logger.info(f'[PKI install] Running: {" ".join(cmd)}')
+        try:
+            import sys
+            sys.path.insert(0, '/usr/lib/python3/dist-packages')
+            from vyos.pki import (
+                create_private_key, create_certificate_request,
+                create_certificate, encode_certificate, encode_private_key
+            )
+        except ImportError as e:
+            return {'success': False, 'message': f'无法导入 VyOS PKI 模块: {e}', 'output': '', 'returncode': -1}
 
-        return _run_command(cmd, timeout=120)
+        # Parse input lines (same format as _generate_pki_content)
+        p = {}
+        for i, line in enumerate(input_lines):
+            p[f'p{i}'] = line.strip() if line else ''
+
+        key_type = p.get('p0', 'rsa') or 'rsa'
+        key_size = int(p.get('p1', '2048') or '2048')
+        country = p.get('p2', 'CN') or 'CN'
+        state = p.get('p3', '') or ''
+        locality = p.get('p4', '') or ''
+        organization = p.get('p5', '') or ''
+        common_name = p.get('p6', 'vyos.io') or 'vyos.io'
+        valid_days = int(p.get('p7', '1825') or '1825')
+        encrypt_key = (p.get('p8', 'N') or 'N').lower() in ('y', 'yes', 'true', '1')
+        passphrase = p.get('p9', '') if encrypt_key else None
+
+        try:
+            private_key = create_private_key(key_type, key_size)
+            subject = {
+                'country': country, 'state': state, 'locality': locality,
+                'organization': organization, 'common_name': common_name,
+            }
+            cert_req = create_certificate_request(subject, private_key, None)
+            cert = create_certificate(cert_req, cert_req, private_key, valid_days, None, True, False)
+            cert_pem = encode_certificate(cert)
+            key_pem = encode_private_key(private_key, passphrase=passphrase)
+        except Exception as e:
+            return {'success': False, 'message': f'证书生成失败: {e}', 'output': str(e), 'returncode': -1}
+
+        # Build config paths
+        prefix = 'ca' if cert_type == 'ca' else 'certificate'
+        base_list = ['pki', prefix, install_name]
+        cert_pem_oneline = ''.join(cert_pem.strip().split('\n')[1:-1])
+        key_pem_oneline = ''.join(key_pem.strip().split('\n')[1:-1])
+
+        _pki_logger.info(f'[PKI install] Setting config for {" ".join(base_list)}')
+
+        # Reuse user's ConfigSession so frontend compare/commit can see the changes
+        try:
+            from services.config_service import _get_config_session, _get_token
+            token = _get_token(user) if user else str(os.getpid())
+            session = _get_config_session(token)
+
+            session.set(base_list + ['certificate'], cert_pem_oneline)
+            session.set(base_list + ['private', 'key'], key_pem_oneline)
+
+            _pki_logger.info(f'[PKI install] Config set successfully via user session')
+            return {
+                'success': True,
+                'output': f'PKI {prefix} "{install_name}" 已安装到配置。请使用 "compare" 查看待提交的更改，然后 "commit" 提交。',
+                'returncode': 0
+            }
+        except Exception as e:
+            _pki_logger.error(f'[PKI install] Failed: {e}', exc_info=True)
+            return {
+                'success': False,
+                'message': f'设置配置失败: {str(e)}',
+                'output': str(e),
+                'returncode': -1
+            }
 
     def _generate_ssh(self, args):
         return _run_command(['python3', '/usr/libexec/vyos/op_mode/generate_ssh_server_key.py'], timeout=30)
