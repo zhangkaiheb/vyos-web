@@ -340,6 +340,58 @@ export const FIREWALL_RULE_SCHEMA = [
     "advanced": true
   },
   {
+    "key": "icmpv6",
+    "title": "ICMPv6",
+    "help": "firewall.rule.help.icmpv6",
+    "type": "group",
+    "children": [
+      {
+        "key": "code",
+        "title": "Code",
+        "help": "firewall.rule.help.icmpv6-code",
+        "type": "number",
+        "min": 0,
+        "max": 255
+      },
+      {
+        "key": "type",
+        "title": "Type",
+        "help": "firewall.rule.help.icmpv6-type",
+        "type": "number",
+        "min": 0,
+        "max": 255
+      },
+      {
+        "key": "type-name",
+        "title": "类型名称",
+        "help": "firewall.rule.help.icmpv6-type-name",
+        "type": "select",
+        "default": "",
+        "options": [
+          "destination-unreachable",
+          "packet-too-big",
+          "time-exceeded",
+          "parameter-problem",
+          "echo-request",
+          "echo-reply",
+          "mld-listener-query",
+          "mld-listener-report",
+          "mld-listener-reduction",
+          "nd-router-solicit",
+          "nd-router-advert",
+          "nd-neighbor-solicit",
+          "nd-neighbor-advert",
+          "nd-redirect",
+          "router-renumbering",
+          "ind-neighbor-solicit",
+          "ind-neighbor-advert",
+          "mld2-listener-report"
+        ]
+      }
+    ],
+    "advanced": true
+  },
+  {
     "key": "inbound-interface",
     "title": "入接口",
     "help": "firewall.rule.help.inbound-interface",
@@ -815,6 +867,55 @@ export const FIREWALL_RULE_SCHEMA = [
           }
         ],
         "advanced": true
+      }
+    ],
+    "advanced": true
+  },
+  {
+    "key": "set",
+    "title": "设置",
+    "help": "firewall.rule.help.set",
+    "type": "group",
+    "children": [
+      {
+        "key": "connection-mark",
+        "title": "连接标记",
+        "help": "firewall.rule.help.set-connection-mark",
+        "type": "number",
+        "min": 0,
+        "max": 2147483647
+      },
+      {
+        "key": "dscp",
+        "title": "DSCP",
+        "help": "firewall.rule.help.set-dscp",
+        "type": "number",
+        "min": 0,
+        "max": 63
+      },
+      {
+        "key": "mark",
+        "title": "包标记",
+        "help": "firewall.rule.help.set-mark",
+        "type": "number",
+        "min": 1,
+        "max": 2147483647
+      },
+      {
+        "key": "tcp-mss",
+        "title": "TCP MSS",
+        "help": "firewall.rule.help.set-tcp-mss",
+        "type": "number",
+        "min": 500,
+        "max": 1460
+      },
+      {
+        "key": "ttl",
+        "title": "TTL",
+        "help": "firewall.rule.help.set-ttl",
+        "type": "number",
+        "min": 0,
+        "max": 255
       }
     ],
     "advanced": true

@@ -235,6 +235,12 @@ export default defineComponent({
           parts.push(field.help);
         }
       }
+      // number 类型根据 min/max 自动生成取值范围提示
+      if (field.type === 'number' && (field.min !== undefined || field.max !== undefined)) {
+        const min = field.min !== undefined ? field.min : '';
+        const max = field.max !== undefined ? field.max : '';
+        parts.push(`取值范围: ${min} - ${max}`);
+      }
       // date/time 类型附加格式提示
       if (field.type === 'date') {
         parts.push('YYYY-MM-dd');

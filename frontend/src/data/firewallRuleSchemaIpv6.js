@@ -483,6 +483,7 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
     "title": "日志选项",
     "help": "firewall.rule.help.ipv6.log-options",
     "type": "group",
+    "showWhen": { "log": true },
     "children": [
       {
         "key": "group",

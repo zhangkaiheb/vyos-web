@@ -236,75 +236,114 @@ export default defineComponent({
 
     const ruleSchema = [RULE_NUMBER_FIELD, ...FIREWALL_RULE_SCHEMA];
 
-    const tabs = computed(() => [
-      { key: 'basic', title: t('firewall.tabs.basic') },
-      { key: 'source', title: t('firewall.tabs.source') },
-      { key: 'destination', title: t('firewall.tabs.destination') },
-      { key: 'time', title: t('firewall.tabs.time') },
-      { key: 'tcp', title: t('firewall.tabs.tcp') },
-      { key: 'log', title: t('firewall.tabs.log') },
-      { key: 'dynamic', title: t('firewall.tabs.dynamic') },
-      { key: 'advanced', title: t('firewall.tabs.advanced') },
-    ]);
+    const tabs = computed(() => {
+      const isInputRule = route.path.includes('/input');
+      const isOutputRule = route.path.includes('/output');
+      const isPreroutingRule = route.path.includes('/prerouting');
+      return [
+        { key: 'basic', title: t('firewall.tabs.basic') },
+        { key: 'source', title: isOutputRule ? '源' : t('firewall.tabs.source') },
+        { key: 'destination', title: (isInputRule || isPreroutingRule) ? '目的' : t('firewall.tabs.destination') },
+        { key: 'time', title: t('firewall.tabs.time') },
+        { key: 'tcp', title: t('firewall.tabs.tcp') },
+        { key: 'log', title: t('firewall.tabs.log') },
+        { key: 'dynamic', title: t('firewall.tabs.dynamic') },
+        { key: 'advanced', title: t('firewall.tabs.advanced') },
+      ];
+    });
     const activeTab = ref('basic');
 
     const tabSchemas = computed(() => {
       const map = new Map(FIREWALL_RULE_SCHEMA.map(f => [f.key, f]));
       const get = (key) => map.get(key);
+      const isInputRule = route.path.includes('/input');
+      const isOutputRule = route.path.includes('/output');
+      const isPreroutingRule = route.path.includes('/prerouting');
+      const isBridge = route.path.includes('/bridge');
+      const proto = editingItem.value?.protocol || '';
+      const showIcmp = proto === '' || proto === 'all' || proto === 'icmp';
+      const showIcmpv6 = isBridge && (proto === '' || proto === 'all' || proto === 'icmpv6' || proto === 'ipv6-icmp');
+      const destinationFields = [get('destination')];
+      if (!isInputRule && !isPreroutingRule) {
+        destinationFields.push(get('outbound-interface'));
+      }
+      const sourceFields = [get('source')];
+      if (!isOutputRule) {
+        sourceFields.push(get('inbound-interface'));
+      }
+      // Override action options for prerouting rules
+      let actionField = get('action');
+      if (isPreroutingRule) {
+        actionField = { ...actionField, options: ['accept', 'continue', 'jump', 'reject', 'return', 'drop', 'queue', 'notrack'] };
+      }
+      const basicFields = [
+        RULE_NUMBER_FIELD,
+        actionField,
+        get('description'),
+        get('protocol'),
+        get('disable'),
+      ];
+      if (!isPreroutingRule) {
+        basicFields.push(get('state'));
+      }
       return {
-        basic: [
-          RULE_NUMBER_FIELD,
-          get('action'),
-          get('description'),
-          get('protocol'),
-          get('disable'),
-          get('state'),
-        ].filter(Boolean),
-        source: [get('source'), get('inbound-interface')].filter(Boolean),
-        destination: [get('destination'), get('outbound-interface')].filter(Boolean),
+        basic: basicFields.filter(Boolean),
+        source: sourceFields.filter(Boolean),
+        destination: destinationFields.filter(Boolean),
         time: [get('time')].filter(Boolean),
         tcp: [get('tcp')].filter(Boolean),
         log: [get('log'), get('log-options')].filter(Boolean),
         dynamic: [get('add-address-to-group')].filter(Boolean),
         advanced: [
-          get('connection-status'),
-          get('conntrack-helper'),
-          get('icmp'),
+          ...(isPreroutingRule ? [] : [get('connection-status'), get('conntrack-helper')]),
+          ...(showIcmp ? [get('icmp')] : []),
+          ...(showIcmpv6 ? [get('icmpv6')] : []),
           get('fragment'),
           get('ipsec'),
           get('dscp'),
           get('dscp-exclude'),
-          get('packet-length'),
-          get('packet-length-exclude'),
-          get('packet-type'),
+          ...(isPreroutingRule ? [] : [get('packet-length'), get('packet-length-exclude'), get('packet-type')]),
           get('mark'),
           get('connection-mark'),
           get('queue'),
           get('queue-options'),
           get('limit'),
-          get('offload-target'),
+          ...((isInputRule || isOutputRule) ? [] : [get('offload-target')]),
           get('jump-target'),
           get('recent'),
           get('ttl'),
-          get('synproxy'),
+          ...(isPreroutingRule ? [] : [get('synproxy')]),
+          ...(isInputRule ? [] : [get('set')]),
         ].filter(Boolean),
       };
     });
 
-    const columns = computed(() => [
-      { key: 'rule', title: t('firewall.columns.rule') },
-      { key: 'description', title: t('firewall.columns.description') },
-      { key: 'inbound-interface', title: t('firewall.columns.inboundInterface') },
-      { key: 'outbound-interface', title: t('firewall.columns.outboundInterface') },
-      { key: 'protocol', title: t('firewall.columns.protocol') },
-      { key: 'source', title: t('firewall.columns.source') },
-      { key: 'destination', title: t('firewall.columns.destination') },
-      { key: 'packets', title: t('firewall.columns.packets') },
-      { key: 'bytes', title: t('firewall.columns.bytes') },
-      { key: 'log', title: t('firewall.columns.log') },
-      { key: 'action', title: t('firewall.columns.action') },
-      { key: 'disable', title: t('firewall.columns.disable') },
-    ]);
+    const columns = computed(() => {
+      const isInputRule = route.path.includes('/input');
+      const isOutputRule = route.path.includes('/output');
+      const isPreroutingRule = route.path.includes('/prerouting');
+      const cols = [
+        { key: 'rule', title: t('firewall.columns.rule') },
+        { key: 'description', title: t('firewall.columns.description') },
+      ];
+      if (!isOutputRule) {
+        cols.push({ key: 'inbound-interface', title: t('firewall.columns.inboundInterface') });
+      }
+      if (!isInputRule && !isPreroutingRule) {
+        cols.push({ key: 'outbound-interface', title: t('firewall.columns.outboundInterface') });
+      }
+      cols.push(
+        { key: 'protocol', title: t('firewall.columns.protocol') },
+        { key: 'source', title: t('firewall.columns.source') },
+        { key: 'destination', title: t('firewall.columns.destination') },
+        { key: 'packets', title: t('firewall.columns.packets') },
+        { key: 'bytes', title: t('firewall.columns.bytes') },
+        { key: 'log', title: t('firewall.columns.log') },
+        { key: 'action', title: t('firewall.columns.action') },
+        { key: 'disable', title: t('firewall.columns.disable') },
+      );
+      return cols;
+    });
 
     const tableData = computed(() => {
       const statMap = {};

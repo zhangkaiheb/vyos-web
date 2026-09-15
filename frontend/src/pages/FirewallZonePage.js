@@ -1,6 +1,6 @@
 import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { useConfigStore } from '/src/stores/config.js';
-import { configApi } from '/src/api/index.js';
+import { configApi, interfaceApi, api } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
@@ -38,11 +38,10 @@ export default defineComponent({
       { key: 'description', title: t('rule.description'), dataIndex: 'description', width: 200 },
       { key: 'default_action', title: t('firewall.zone.defaultAction'), dataIndex: 'default_action', width: 100 },
       { key: 'default_firewall', title: t('firewall.zone.defaultFirewall'), dataIndex: 'default_firewall', width: 150 },
-      { key: 'default_log', title: t('firewall.zone.defaultLog'), dataIndex: 'default_log', width: 80 },
+      { key: 'default_log', title: t('firewall.zone.defaultActionLog'), dataIndex: 'default_log', width: 80 },
       { key: 'local_zone', title: t('firewall.zone.localZone'), dataIndex: 'local_zone', width: 80 },
       { key: 'member_interfaces', title: t('firewall.zone.memberInterfaces'), dataIndex: 'member_interfaces', width: 200 },
       { key: 'member_vrfs', title: t('firewall.zone.memberVrfs'), dataIndex: 'member_vrfs', width: 120 },
-      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ]);
 
     const fromColumns = computed(() => [
@@ -58,6 +57,8 @@ export default defineComponent({
     const editingZone = ref(null);
     const showFromModal = ref(false);
     const editingFrom = ref(null);
+    const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
 
     const zoneSchema = computed(() => [
       { key: 'name', title: t('firewall.zone.zoneName'), type: 'text', required: true, help: t('firewall.zone.zoneNameHelp') },
@@ -66,25 +67,43 @@ export default defineComponent({
         { value: 'drop', label: t('firewall.zone.dropDefault') },
         { value: 'reject', label: t('firewall.zone.rejectNotify') },
       ], help: t('firewall.zone.defaultActionHelp') },
+      { key: 'default_log', title: t('firewall.zone.defaultActionLog'), type: 'checkbox', help: t('firewall.zone.defaultLogHelp') },
       { key: 'default_firewall_name', title: t('firewall.zone.defaultIpv4Ruleset'), type: 'text', help: t('firewall.zone.defaultIpv4RulesetHelp') },
       { key: 'default_firewall_ipv6_name', title: t('firewall.zone.defaultIpv6Ruleset'), type: 'text', help: t('firewall.zone.defaultIpv6RulesetHelp') },
-      { key: 'default_log', title: t('firewall.zone.defaultLog'), type: 'checkbox', help: t('firewall.zone.defaultLogHelp') },
       { key: 'local_zone', title: t('firewall.zone.localZone'), type: 'checkbox', help: t('firewall.zone.localZoneHelp') },
     ]);
 
-    const fromSchema = computed(() => [
-      { key: 'zone', title: t('firewall.zone.sourceZone'), type: 'text', required: true, help: t('firewall.zone.sourceZoneHelp') },
+    const fromSchema = computed(() => {
+      const zoneOptions = zones.value
+        .filter(z => z.name && z.name !== editingZone.value?.name)
+        .map(z => ({ value: z.name, label: z.name }));
+      return [
+        { key: 'zone', title: t('firewall.zone.sourceZone'), type: 'select', required: true, options: zoneOptions, help: t('firewall.zone.sourceZoneHelp') },
+        { key: 'firewall_name', title: t('firewall.zone.ipv4Ruleset'), type: 'text', help: t('firewall.zone.ipv4RulesetHelp') },
+        { key: 'firewall_ipv6_name', title: t('firewall.zone.ipv6Ruleset'), type: 'text', help: t('firewall.zone.ipv6RulesetHelp') },
+      ];
+    });
+
+    const intraSchema = computed(() => [
+      { key: 'action', title: t('rule.action'), type: 'select', options: [
+        { value: '', label: '' },
+        { value: 'accept', label: t('firewall.zone.accept') },
+        { value: 'drop', label: t('firewall.zone.drop') },
+      ], help: t('firewall.zone.intraZoneActionHelp') },
       { key: 'firewall_name', title: t('firewall.zone.ipv4Ruleset'), type: 'text', help: t('firewall.zone.ipv4RulesetHelp') },
       { key: 'firewall_ipv6_name', title: t('firewall.zone.ipv6Ruleset'), type: 'text', help: t('firewall.zone.ipv6RulesetHelp') },
     ]);
 
-    const intraSchema = computed(() => [
-      { key: 'action', title: t('rule.action'), type: 'select', options: [
-        { value: 'accept', label: t('rule.actionAccept') },
-        { value: 'drop', label: t('rule.actionDrop') },
-      ], help: t('firewall.zone.intraZoneActionHelp') },
-      { key: 'firewall_name', title: t('firewall.zone.ipv4Ruleset'), type: 'text', help: t('firewall.zone.ipv4RulesetHelp') },
-      { key: 'firewall_ipv6_name', title: t('firewall.zone.ipv6Ruleset'), type: 'text', help: t('firewall.zone.ipv6RulesetHelp') },
+    const tabs = computed(() => [
+      { key: 'basic', title: t('firewall.tabs.basic') },
+      { key: 'members', title: t('firewall.zone.memberInterfaces') },
+      { key: 'intra', title: t('firewall.zone.intraZoneFiltering') },
+    ]);
+    const activeTab = ref('basic');
+
+    const memberSchema = computed(() => [
+      { key: 'member_interfaces', title: t('firewall.zone.interface'), type: 'multi-select', options: interfaceOptions.value, placeholder: t('firewall.zone.interfacePlaceholder'), help: t('firewall.zone.interfaceTitle') },
+      { key: 'member_vrfs', title: 'VRF', type: 'multi-select', options: vrfOptions.value, placeholder: t('firewall.zone.vrfPlaceholder'), help: t('firewall.zone.vrfTitle') },
     ]);
 
     const commandPath = computed(() => 'firewall zone');
@@ -106,8 +125,8 @@ export default defineComponent({
           default_firewall_ipv6_name: defaultFw['ipv6-name'] || '',
           default_log: zone['default-log'] !== undefined,
           local_zone: zone['local-zone'] !== undefined,
-          member_interfaces: toArray(member.interface).join(', '),
-          member_vrfs: toArray(member.vrf).join(', '),
+          member_interfaces: toArray(member.interface),
+          member_vrfs: toArray(member.vrf),
           from_zones: Object.entries(fromZones).map(([z, f]) => ({
             _zone: z,
             zone: z,
@@ -137,9 +156,9 @@ export default defineComponent({
         if (z.local_zone) zone['local-zone'] = '';
 
         const member = {};
-        const interfaces = z.member_interfaces ? String(z.member_interfaces).split(',').map(s => s.trim()).filter(Boolean) : [];
+        const interfaces = Array.isArray(z.member_interfaces) ? z.member_interfaces.filter(Boolean) : [];
         if (interfaces.length) member.interface = interfaces;
-        const vrfs = z.member_vrfs ? String(z.member_vrfs).split(',').map(s => s.trim()).filter(Boolean) : [];
+        const vrfs = Array.isArray(z.member_vrfs) ? z.member_vrfs.filter(Boolean) : [];
         if (vrfs.length) member.vrf = vrfs;
         if (Object.keys(member).length) zone.member = member;
 
@@ -197,9 +216,10 @@ export default defineComponent({
         name: '', description: '', default_action: 'drop',
         default_firewall_name: '', default_firewall_ipv6_name: '',
         default_log: false, local_zone: false,
-        member_interfaces: '', member_vrfs: '',
+        member_interfaces: [], member_vrfs: [],
         from_zones: [], intra_action: '', intra_firewall_name: '', intra_firewall_ipv6_name: '',
       };
+      activeTab.value = 'basic';
       showZoneModal.value = true;
     }
 
@@ -208,6 +228,7 @@ export default defineComponent({
       const row = zones.value.find(z => z.name === selected.value[0]);
       if (!row) return showError({ message: t('firewall.zone.zoneNotFound') });
       editingZone.value = JSON.parse(JSON.stringify(row));
+      activeTab.value = 'basic';
       showZoneModal.value = true;
     }
 
@@ -249,8 +270,8 @@ export default defineComponent({
       showFromModal.value = false;
     }
 
-    function removeFrom(idx) {
-      editingZone.value.from_zones.splice(idx, 1);
+    function removeFrom(record) {
+      editingZone.value.from_zones = editingZone.value.from_zones.filter(z => z.zone !== record.zone);
     }
 
     function editZoneByRecord(record) {
@@ -267,8 +288,34 @@ export default defineComponent({
       showFromModal.value = true;
     }
 
+    async function loadOptions() {
+      try {
+        const ifRes = await interfaceApi.ethernet();
+        const ifaces = ifRes.interfaces || [];
+        interfaceOptions.value = ifaces.map(iface => ({
+          value: iface.name || iface,
+          label: iface.name || iface,
+        }));
+
+        try {
+          const vrfRes = await api.get('/config', { path: 'vrf' });
+          const vrfData = vrfRes.data || {};
+          const vrfNameData = vrfData.name || vrfData;
+          vrfOptions.value = Object.keys(vrfNameData)
+            .filter(name => typeof vrfNameData[name] === 'object')
+            .map(name => ({ value: name, label: name }));
+        } catch (e) {
+          vrfOptions.value = [];
+        }
+      } catch (err) {
+        interfaceOptions.value = [];
+        vrfOptions.value = [];
+      }
+    }
+
     onMounted(() => {
       load();
+      loadOptions();
       window.addEventListener('config-committed', load);
       onMenuRefresh(load);
     });
@@ -277,7 +324,8 @@ export default defineComponent({
       
       loading, saving, zones, selected,
       showZoneModal, editingZone, showFromModal, editingFrom,
-      zoneColumns, fromColumns, zoneSchema, fromSchema, intraSchema,
+      zoneColumns, fromColumns, zoneSchema, fromSchema, intraSchema, memberSchema,
+      tabs, activeTab,
       commandPath,
       load, save,
       createZone, editZone, removeZone, saveZone,
@@ -294,50 +342,36 @@ export default defineComponent({
       </div>
 
       <DataTable :columns="zoneColumns" :data="zones" rowKey="name" :externalToolbar="true" @selection-change="selected = $event" :selectable="true" :loading="loading">
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'default_log'">
-            <span>{{ record.default_log ? $t('app.yes') : $t('app.no') }}</span>
-          </template>
-          <template v-if="column.key === 'local_zone'">
-            <span>{{ record.local_zone ? $t('app.yes') : $t('app.no') }}</span>
-          </template>
-          <template v-if="column.key === 'actions'">
-            <a @click="editZoneByRecord(record)">{{ $t('app.edit') }}</a>
-            <a @click="removeZoneByRecord(record)" style="color:#ff4d4f;margin-left:8px">{{ $t('app.delete') }}</a>
-          </template>
+        <template #default_log="{ row }">
+          <span>{{ row.default_log ? $t('app.yes') : $t('app.no') }}</span>
+        </template>
+        <template #local_zone="{ row }">
+          <span>{{ row.local_zone ? $t('app.yes') : $t('app.no') }}</span>
+        </template>
+        <template #member_interfaces="{ row }">
+          <span>{{ Array.isArray(row.member_interfaces) ? row.member_interfaces.join(', ') : row.member_interfaces }}</span>
+        </template>
+        <template #member_vrfs="{ row }">
+          <span>{{ Array.isArray(row.member_vrfs) ? row.member_vrfs.join(', ') : row.member_vrfs }}</span>
         </template>
       </DataTable>
 
       <DraggableModal v-model:visible="showZoneModal" :title="editingZone && editingZone._name ? $t('firewall.zone.editZone') : $t('firewall.zone.createZone')" @confirm="saveZone" @close="showZoneModal = false" width="700px">
-        <ConfigForm :schema="zoneSchema" v-model="editingZone" />
-
-        <div style="font-weight:bold;margin:16px 0 8px;">{{ $t('firewall.zone.memberInterfaces') }}</div>
-        <div class="form-row"><label class="form-label">{{ $t('firewall.zone.interface') }}</label><input class="form-control" v-model="editingZone.member_interfaces" :placeholder="$t('firewall.zone.interfacePlaceholder')" :title="$t('firewall.zone.interfaceTitle')" /></div>
-        <div class="form-row"><label class="form-label">VRF</label><input class="form-control" v-model="editingZone.member_vrfs" :placeholder="$t('firewall.zone.vrfPlaceholder')" :title="$t('firewall.zone.vrfTitle')" /></div>
-
-        <div style="font-weight:bold;margin:16px 0 8px;">{{ $t('firewall.zone.intraZoneFiltering') }}</div>
-        <div class="form-row"><label class="form-label">{{ $t('rule.action') }}</label>
-          <select class="form-control" v-model="editingZone.intra_action" :title="$t('firewall.zone.intraZoneActionTitle')">
-            <option value="">{{ $t('firewall.zone.notSet') }}</option>
-            <option value="accept">{{ $t('rule.actionAccept') }}</option>
-            <option value="drop">{{ $t('rule.actionDrop') }}</option>
-          </select>
-        </div>
-        <div class="form-row"><label class="form-label">{{ $t('firewall.zone.ipv4Ruleset') }}</label><input class="form-control" v-model="editingZone.intra_firewall_name" :title="$t('firewall.zone.intraIpv4RulesetTitle')" /></div>
-        <div class="form-row"><label class="form-label">{{ $t('firewall.zone.ipv6Ruleset') }}</label><input class="form-control" v-model="editingZone.intra_firewall_ipv6_name" :title="$t('firewall.zone.intraIpv6RulesetTitle')" /></div>
-
-        <div style="font-weight:bold;margin:16px 0 8px;">{{ $t('firewall.zone.sourceZoneFirewall') }}</div>
-        <div class="toolbar" style="margin-bottom:8px;">
-          <ToolbarButton icon="create" @click="createFrom">{{ $t('app.add') }}</ToolbarButton>
-        </div>
-        <DataTable :columns="fromColumns" :data="editingZone.from_zones" rowKey="zone" :externalToolbar="true" :selectable="false">
-          <template #bodyCell="{ column, record, index }">
-            <template v-if="column.key === 'actions'">
-              <a @click="editFromByRecord(record)" style="margin-right:8px">{{ $t('app.edit') }}</a>
-              <a @click="removeFrom(index)" style="color:#ff4d4f">{{ $t('app.delete') }}</a>
-            </template>
+        <TabGroup v-model="activeTab" :tabs="tabs">
+          <template #basic>
+            <ConfigForm :schema="zoneSchema" v-model="editingZone" />
           </template>
-        </DataTable>
+          <template #members>
+            <ConfigForm :schema="memberSchema" v-model="editingZone" />
+          </template>
+          <template #intra>
+            <ConfigForm :schema="intraSchema" v-model="editingZone" />
+            <div style="font-weight:bold;margin:16px 0 8px;">{{ $t('firewall.zone.sourceZoneFirewall') }}</div>
+            <DataTable :columns="fromColumns" :data="editingZone.from_zones" rowKey="zone"
+                       :actions="['create', 'edit', 'delete']" :selectable="false"
+                       @create="createFrom" @edit="editFromByRecord" @delete="removeFrom" />
+          </template>
+        </TabGroup>
       </DraggableModal>
 
       <DraggableModal v-model:visible="showFromModal" :title="editingFrom && editingFrom._zone ? $t('firewall.zone.editSourceZone') : $t('firewall.zone.addSourceZone')" @confirm="saveFrom" @close="showFromModal = false">
