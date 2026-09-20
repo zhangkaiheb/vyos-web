@@ -276,10 +276,31 @@ Tab 切换组件，只渲染当前激活的 tab panel（性能优化）。
 
 ### i18n
 
-- 语言文件在 `frontend/src/i18n/locales/` 下，按功能模块分 JSON 文件
+- 语言文件在 `frontend/src/i18n/locales/` 下，按功能模块分 JSON 文件（共 123 个）
+- 7 种语言：zh-CN, en, zh-TW, ru, de, fr, ko
 - 使用 `useI18n()` 获取 `t()` 函数
 - 帮助文本 key 格式：`module.section.help.field_name`（如 `firewall.rule.help.action`）
 - 新增字段时需同时更新对应 locale JSON 文件
+
+#### ConfigForm 自动翻译机制
+
+`ConfigForm.js` 的 `translateField()` 函数自动翻译 schema 中的 `title`、`placeholder`、`help` 和 `options.label`：
+- 当值包含 `.` 时，视为 i18n key 并调用 `t()` 翻译
+- 如果 `t()` 返回原始 key（说明 locale 中不存在），则保留原始 key 显示
+- **常见 bug**：列标题或表单标签显示原始 i18n key（如 `ethernet.columns.mode`），说明该 key 在 locale 文件中缺失
+
+#### 后端返回值的翻译
+
+后端 API 返回的数据值（如接口类型）应使用英文标识符，由前端负责翻译：
+- 后端 `_detect_interface_type()` 返回 `ethernet`/`vlan`/`qinq`（非中文）
+- 前端 DataTable 列定义使用 `render: (val) => t(\`ethernet.type.${val}\`)` 翻译
+- 这样不同语言环境下能正确显示对应翻译
+
+#### 翻译覆盖率
+
+当前翻译覆盖率（截至 2026-09-20）：
+- ru: ~85.6%, ko: ~85.4%, de: ~82.2%, fr: ~81.0%
+- 剩余未翻译主要是数字、范围、IP 地址和技术缩写（如 BGP、NAT、SSH），这些在技术文档中通常保持英文
 
 ### API Layer
 
@@ -353,6 +374,8 @@ Tab 切换组件，只渲染当前激活的 tab panel（性能优化）。
 - `loadNameList` 必须使用 `false` 参数读取 running config（而非 session config）
 - `get_config_dict` 的 key_mangling 将 `-` 转换为 `_`（如 `default-action` → `default_action`）
 - 桥接防火墙预路由规则重复问题：检查 menu.json 而非 generate_menu.py
+- `firewall.options.*` 翻译键（如 `forward`、`defaultAction`、`rulesetLabel`）必须存在于 locale 文件中，否则页面显示原始 key
+- 防火墙选项页面使用 `FirewallIpv4OptionsPage.js`、`FirewallIpv6OptionsPage.js`、`FirewallBridgeOptionsPage.js`
 
 ### Custom Rule Pages
 - 名称标签使用 `firewall.options.rulesetLabel` 翻译（避免影响选项页面的 `nameName`）
@@ -364,20 +387,32 @@ Tab 切换组件，只渲染当前激活的 tab panel（性能优化）。
 - 翻译 key 路径必须完整（如 `firewall.options.createName` 而非 `firewall.createName`）
 - 新增翻译需同时更新所有 7 种语言文件
 - 使用 `rulesetLabel` 而非修改 `nameName` 以避免影响其他页面
+- 列标题显示原始 i18n key（如 `ethernet.columns.mode`）= locale 文件中缺少该 key
+- 后端返回数据值应使用英文标识符（如 `ethernet`/`vlan`/`qinq`），前端负责翻译
+- 翻译 key 缺失时 `t()` 返回原始 key 字符串，不会报错
+- 新增页面/字段时必须同步添加所有语言的翻译，否则会出现 key 泄漏
+
+### 后端返回值国际化
+- 后端服务函数（如 `_detect_interface_type`）不要硬编码中文返回值
+- 应返回英文标识符，由前端 `render` 函数通过 `t()` 翻译
+- 这样多语言环境下才能正确显示
 
 ## Development Workflow
 
-1. **后端修改**：修改 Python 文件后需重启 Flask 应用
+1. **后端修改**：修改 Python 文件后需重启 WSGI 应用
    ```bash
-   pkill -f "python3 scripts/run_server.py"
-   cd /opt/vyos-web-config && nohup python3 scripts/run_server.py --host 0.0.0.0 --port 8080 > /tmp/flask_server.log 2>&1 &
+   # 找到并杀掉旧进程
+   ps aux | grep run_server | grep -v grep
+   kill <PID>
+   # 重新启动
+   cd /opt/vyos-web-config && nohup python3 scripts/run_server.py --host 0.0.0.0 --port 8080 --ssl --ssl-port 8443 > /tmp/wsgi.log 2>&1 &
    ```
 
 2. **前端修改**：修改 JS/CSS 文件后需更新 `index.html` 中的版本号
 
 3. **日志查看**：
    ```bash
-   tail -f /tmp/flask_server.log
+   tail -f /tmp/wsgi.log
    ```
 
 4. **API 测试**：
