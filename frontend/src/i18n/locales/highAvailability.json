@@ -289,6 +289,53 @@
           "v3": "VRRPv3"
         }
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "转发",
+        "input": "入站",
+        "name": "名称",
+        "output": "出站",
+        "prerouting": "预路由",
+        "filter": "过滤",
+        "raw": "原始",
+        "defaultAction": "默认动作",
+        "defaultActionHelp": "不匹配任何规则的数据包的默认动作",
+        "defaultLog": "默认日志",
+        "defaultLogHelp": "启用匹配默认动作的数据包日志记录",
+        "description": "描述",
+        "descriptionHelp": "此防火墙链的描述",
+        "disableConntrack": "禁用连接跟踪",
+        "disableConntrackHelp": "禁用此链的连接跟踪",
+        "defaultJumpTarget": "默认跳转目标",
+        "defaultJumpTargetHelp": "没有规则匹配时跳转的目标链",
+        "nameName": "名称",
+        "accept": "接受",
+        "drop": "丢弃",
+        "reject": "拒绝",
+        "return": "返回",
+        "continue": "继续",
+        "jump": "跳转",
+        "createName": "创建名称",
+        "editName": "编辑名称",
+        "confirmDelete": "确定要删除名称 {name} 吗？",
+        "rulesetLabel": "规则集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太网",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "协议"
+      }
     }
   },
   "en": {
@@ -580,6 +627,53 @@
           "v2": "VRRPv2",
           "v3": "VRRPv3"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Forward",
+        "input": "Input",
+        "name": "Name",
+        "output": "Output",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Default Action",
+        "defaultActionHelp": "Default action for packets that do not match any rule",
+        "defaultLog": "Default Log",
+        "defaultLogHelp": "Enable logging for packets matching the default action",
+        "description": "Description",
+        "descriptionHelp": "Description of this firewall chain",
+        "disableConntrack": "Disable Conntrack",
+        "disableConntrackHelp": "Disable connection tracking for this chain",
+        "defaultJumpTarget": "Default Jump Target",
+        "defaultJumpTargetHelp": "Target chain to jump to when no rule matches",
+        "nameName": "Name",
+        "accept": "Accept",
+        "drop": "Drop",
+        "reject": "Reject",
+        "return": "Return",
+        "continue": "Continue",
+        "jump": "Jump",
+        "createName": "Create Name",
+        "editName": "Edit Name",
+        "confirmDelete": "Are you sure you want to delete name {name}?",
+        "rulesetLabel": "Ruleset"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocol"
       }
     }
   },
@@ -873,574 +967,668 @@
           "v3": "VRRPv3"
         }
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "轉發",
+        "input": "入站",
+        "name": "名稱",
+        "output": "出站",
+        "prerouting": "預路由",
+        "filter": "過濾",
+        "raw": "原始",
+        "defaultAction": "預設動作",
+        "defaultActionHelp": "不符合任何規則的資料封包的預設動作",
+        "defaultLog": "預設日誌",
+        "defaultLogHelp": "啟用符合預設動作的資料封包日誌記錄",
+        "description": "描述",
+        "descriptionHelp": "此防火牆鏈的描述",
+        "disableConntrack": "停用連線追蹤",
+        "disableConntrackHelp": "停用此鏈的連線追蹤",
+        "defaultJumpTarget": "預設跳轉目標",
+        "defaultJumpTargetHelp": "沒有規則符合時跳轉的目標鏈",
+        "nameName": "名稱",
+        "accept": "接受",
+        "drop": "丟棄",
+        "reject": "拒絕",
+        "return": "返回",
+        "continue": "繼續",
+        "jump": "跳轉",
+        "createName": "建立名稱",
+        "editName": "編輯名稱",
+        "confirmDelete": "確定要刪除名稱 {name} 嗎？",
+        "rulesetLabel": "規則集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太網",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "協議"
+      }
     }
   },
   "ru": {
     "highAvailability": {
       "tabs": {
-        "virtualServer": "Virtual Server",
-        "vrrpGroup": "VRRP Group",
-        "vrrpSync": "VRRP Sync Group",
-        "vrrpGlobal": "VRRP Global Parameters"
+        "virtualServer": "Виртуальный сервер",
+        "vrrpGroup": "Группа VRRP",
+        "vrrpSync": "Группа синхронизации VRRP",
+        "vrrpGlobal": "Глобальные параметры VRRP"
       },
       "columns": {
-        "name": "Name",
-        "address": "Virtual Address",
-        "port": "Port",
-        "protocol": "Protocol",
-        "algorithm": "Algorithm",
-        "realServerCount": "Real Servers",
+        "name": "Имя",
+        "address": "Виртуальный адрес",
+        "port": "Порт",
+        "protocol": "Протокол",
+        "algorithm": "Алгоритм",
+        "realServerCount": "Реальные серверы",
         "vrid": "VRID",
-        "interface": "Interface",
-        "priority": "Priority",
-        "addressCount": "Virtual Addresses",
-        "memberCount": "Members",
-        "connectionTimeout": "Connection Timeout",
-        "healthCheckScript": "Health Check Script"
+        "interface": "Интерфейс",
+        "priority": "Приоритет",
+        "addressCount": "Виртуальные адреса",
+        "memberCount": "Участники",
+        "connectionTimeout": "Тайм-аут подключения",
+        "healthCheckScript": "Скрипт проверки работоспособности"
       },
       "vsSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., vs01"
+          "title": "Имя",
+          "placeholder": "например, vs01"
         },
         "address": {
-          "title": "Virtual Address",
-          "placeholder": "1.1.1.1 or h:h:h:h:h:h:h:h"
+          "title": "Виртуальный адрес",
+          "placeholder": "1.1.1.1 или h:h:h:h:h:h:h:h"
         },
         "port": {
-          "title": "Port",
+          "title": "Порт",
           "placeholder": "0-65535"
         },
         "protocol": {
-          "title": "Protocol"
+          "title": "Протокол"
         },
         "algorithm": {
-          "title": "Scheduling Algorithm",
-          "help": "Default: least-connection"
+          "title": "Алгоритм планирования",
+          "help": "По умолчанию: наименьшее количество подключений"
         },
         "forwardMethod": {
-          "title": "Forward Method",
-          "help": "Default: nat"
+          "title": "Метод пересылки",
+          "help": "По умолчанию: nat"
         },
         "delayLoop": {
-          "title": "Health Check Interval",
-          "placeholder": "1-600 seconds",
-          "help": "Default: 10 seconds"
+          "title": "Интервал проверки работоспособности",
+          "placeholder": "1-600 секунд",
+          "help": "По умолчанию: 10 секунд"
         },
         "persistenceTimeout": {
-          "title": "Persistence Timeout",
-          "placeholder": "1-86400 seconds",
-          "help": "Default: 300 seconds"
+          "title": "Тайм-аут постоянства",
+          "placeholder": "1-86400 секунд",
+          "help": "По умолчанию: 300 секунд"
         },
         "fwmark": {
-          "title": "Firewall Mark",
+          "title": "Метка брандмауэра",
           "placeholder": "1-2147483647"
         }
       },
       "vrrpGroupSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., vg01"
+          "title": "Имя",
+          "placeholder": "например, vg01"
         },
         "vrid": {
           "title": "VRID",
           "placeholder": "1-255"
         },
         "interface": {
-          "title": "Interface",
-          "placeholder": "e.g., eth0"
+          "title": "Интерфейс",
+          "placeholder": "например, eth0"
         },
         "priority": {
-          "title": "Priority",
-          "help": "Default: 100, range 1-255"
+          "title": "Приоритет",
+          "help": "По умолчанию: 100, диапазон 1-255"
         },
         "advertiseInterval": {
-          "title": "Advertisement Interval",
-          "help": "Default: 1 second"
+          "title": "Интервал объявления",
+          "help": "По умолчанию: 1 секунда"
         },
         "preemptDelay": {
-          "title": "Preempt Delay",
-          "help": "Default: 0 seconds, range 0-1000"
+          "title": "Задержка вытеснения",
+          "help": "По умолчанию: 0 секунд, диапазон 0-1000"
         },
         "helloSourceAddress": {
-          "title": "Hello Source Address",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "Исходный адрес Hello",
+          "placeholder": "Адрес IPv4/IPv6"
         },
         "peerAddress": {
-          "title": "Unicast Peer Address",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "Адрес партнёра unicast",
+          "placeholder": "Адрес IPv4/IPv6"
         },
         "description": {
-          "title": "Description"
+          "title": "Описание"
         },
         "disable": {
-          "title": "Disable"
+          "title": "Отключить"
         },
         "noPreempt": {
-          "title": "Disable Preempt"
+          "title": "Отключить вытеснение"
         },
         "rfc3768Compatibility": {
-          "title": "RFC3768 Compatibility",
-          "help": "Use VRRP virtual MAC address"
+          "title": "Совместимость с RFC 3768",
+          "help": "Использовать виртуальный MAC-адрес VRRP"
         },
         "authType": {
-          "title": "Authentication Type",
-          "help": "plaintext-password or ah"
+          "title": "Тип аутентификации",
+          "help": "Пароль открытым текстом или AH"
         },
         "authPassword": {
-          "title": "Authentication Password",
-          "placeholder": "Up to 8 characters"
+          "title": "Пароль аутентификации",
+          "placeholder": "До 8 символов"
         },
         "garpInterval": {
-          "title": "GARP Interval",
-          "help": "Default: 0 seconds, range 0-1000 (microsecond precision)"
+          "title": "Интервал GARP",
+          "help": "По умолчанию: 0 секунд, диапазон 0-1000 (микросекундная точность)"
         },
         "garpMasterDelay": {
-          "title": "GARP Master Delay",
-          "help": "Default: 5 seconds, range 1-1000"
+          "title": "Задержка мастера GARP",
+          "help": "По умолчанию: 5 секунд, диапазон 1-1000"
         },
         "garpMasterRefresh": {
-          "title": "GARP Master Refresh",
-          "help": "Default: 5 seconds, 0=no refresh, range 0 or 1-255"
+          "title": "Обновление мастера GARP",
+          "help": "По умолчанию: 5 секунд, 0=без обновления, диапазон 0 или 1-255"
         },
         "garpMasterRefreshRepeat": {
-          "title": "GARP Master Refresh Repeat",
-          "help": "Default: 1, range 1-255"
+          "title": "Повтор обновления мастера GARP",
+          "help": "По умолчанию: 1, диапазон 1-255"
         },
         "garpMasterRepeat": {
-          "title": "GARP Master Repeat",
-          "help": "Default: 5, range 1-255"
+          "title": "Повтор мастера GARP",
+          "help": "По умолчанию: 5, диапазон 1-255"
         },
         "healthCheckFailureCount": {
-          "title": "Health Check Failure Count",
-          "help": "Default: 3"
+          "title": "Количество сбоев проверки работоспособности",
+          "help": "По умолчанию: 3"
         },
         "healthCheckInterval": {
-          "title": "Health Check Interval",
-          "help": "Default: 60 seconds"
+          "title": "Интервал проверки работоспособности",
+          "help": "По умолчанию: 60 секунд"
         },
         "healthCheckPing": {
-          "title": "Health Check Ping Target",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "Цель ping проверки работоспособности",
+          "placeholder": "Адрес IPv4/IPv6"
         },
         "healthCheckScript": {
-          "title": "Health Check Script",
-          "placeholder": "Script file path"
+          "title": "Скрипт проверки работоспособности",
+          "placeholder": "Путь к файлу скрипта"
         },
         "trackExcludeInterface": {
-          "title": "Exclude Interface Tracking",
-          "help": "Disable master interface state tracking"
+          "title": "Исключить отслеживание интерфейса",
+          "help": "Отключить отслеживание состояния главного интерфейса"
         },
         "transitionScriptBackup": {
-          "title": "Backup Transition Script",
-          "placeholder": "Script path"
+          "title": "Сценарий перехода резервного копирования",
+          "placeholder": "Путь к скрипту"
         },
         "transitionScriptFault": {
-          "title": "Fault Transition Script",
-          "placeholder": "Script path"
+          "title": "Скрипт перехода при сбое",
+          "placeholder": "Путь к скрипту"
         },
         "transitionScriptMaster": {
-          "title": "Master Transition Script",
-          "placeholder": "Script path"
+          "title": "Сценарий перехода мастера",
+          "placeholder": "Путь к скрипту"
         },
         "transitionScriptStop": {
-          "title": "Stop Transition Script",
-          "placeholder": "Script path"
+          "title": "Скрипт перехода остановки",
+          "placeholder": "Путь к скрипту"
         }
       },
       "syncGroupSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., sg01"
+          "title": "Имя",
+          "placeholder": "например, sg01"
         },
         "members": {
-          "title": "Members (comma separated)",
+          "title": "Участники (через запятую)",
           "placeholder": "vg01,vg02"
         }
       },
       "vrrpGlobalSchema": {
         "startupDelay": {
-          "title": "Startup Delay",
-          "placeholder": "1-600 seconds",
-          "help": "Range 1-600 seconds"
+          "title": "Задержка запуска",
+          "placeholder": "1-600 секунд",
+          "help": "Диапазон 1-600 секунд"
         },
         "version": {
-          "title": "VRRP Version",
-          "help": "IPv6 always uses VRRPv3"
+          "title": "Версия VRRP",
+          "help": "IPv6 всегда использует VRRPv3"
         },
         "garpInterval": {
-          "title": "GARP Interval",
-          "help": "Default: 0, range 0-1000 seconds (microsecond precision)"
+          "title": "Интервал GARP",
+          "help": "По умолчанию: 0, диапазон 0-1000 секунд (микросекундная точность)"
         },
         "garpMasterDelay": {
-          "title": "GARP Master Delay",
-          "help": "Default: 5, range 1-1000 seconds"
+          "title": "Задержка мастера GARP",
+          "help": "По умолчанию: 5, диапазон 1-1000 секунд"
         },
         "garpMasterRefresh": {
-          "title": "GARP Master Refresh",
-          "help": "Default: 5, 0=no refresh, range 0 or 1-255"
+          "title": "Обновление мастера GARP",
+          "help": "По умолчанию: 5, 0=без обновления, диапазон 0 или 1-255"
         },
         "garpMasterRefreshRepeat": {
-          "title": "GARP Master Refresh Repeat",
-          "help": "Default: 1, range 1-255"
+          "title": "Повтор обновления мастера GARP",
+          "help": "По умолчанию: 1, диапазон 1-255"
         },
         "garpMasterRepeat": {
-          "title": "GARP Master Repeat",
-          "help": "Default: 5, range 1-255"
+          "title": "Повтор мастера GARP",
+          "help": "По умолчанию: 5, диапазон 1-255"
         }
       },
       "rsSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., rs01"
+          "title": "Имя",
+          "placeholder": "например, rs01"
         },
         "port": {
-          "title": "Port",
+          "title": "Порт",
           "placeholder": "0-65535"
         },
         "connectionTimeout": {
-          "title": "Connection Timeout",
-          "placeholder": "1-86400 seconds",
-          "help": "Default: 300 seconds"
+          "title": "Тайм-аут подключения",
+          "placeholder": "1-86400 секунд",
+          "help": "По умолчанию: 300 секунд"
         },
         "healthCheckScript": {
-          "title": "Health Check Script",
-          "placeholder": "Script file path"
+          "title": "Скрипт проверки работоспособности",
+          "placeholder": "Путь к файлу скрипта"
         }
       },
       "buttons": {
-        "create": "Create",
-        "edit": "Edit",
-        "delete": "Delete",
-        "refresh": "Refresh"
+        "create": "Создать",
+        "edit": "Редактировать",
+        "delete": "Удалить",
+        "refresh": "Обновить"
       },
       "modals": {
-        "virtualServer": "Virtual Server",
-        "realServer": "Real Server",
-        "edit": "Edit",
-        "create": "Create",
-        "confirmDelete": "Confirm Delete"
+        "virtualServer": "Виртуальный сервер",
+        "realServer": "Реальный сервер",
+        "edit": "Редактировать",
+        "create": "Создать",
+        "confirmDelete": "Подтвердить удаление"
       },
       "messages": {
-        "selectVS": "Please select a virtual server",
-        "selectRS": "Please select a real server",
-        "selectVRRPGroup": "Please select a VRRP group",
-        "selectSyncGroup": "Please select a sync group",
-        "enterName": "Please enter name",
-        "enterAddress": "Please enter virtual address",
-        "enterVRID": "Please enter VRID",
-        "enterInterface": "Please enter interface",
-        "enterMembers": "Please enter members",
-        "nameExists": "Name already exists",
-        "confirmDeleteVS": "Confirm delete the following virtual servers?",
-        "confirmDeleteRS": "Confirm delete the following real servers?",
-        "confirmDeleteVRRP": "Confirm delete the following VRRP groups?",
-        "confirmDeleteSync": "Confirm delete the following sync groups?"
+        "selectVS": "Выберите виртуальный сервер",
+        "selectRS": "Выберите реальный сервер",
+        "selectVRRPGroup": "Выберите группу VRRP",
+        "selectSyncGroup": "Выберите группу синхронизации",
+        "enterName": "Введите имя",
+        "enterAddress": "Введите виртуальный адрес",
+        "enterVRID": "Введите VRID",
+        "enterInterface": "Введите интерфейс",
+        "enterMembers": "Введите участников",
+        "nameExists": "Имя уже существует",
+        "confirmDeleteVS": "Подтвердить удаление следующих виртуальных серверов?",
+        "confirmDeleteRS": "Подтвердить удаление следующих реальных серверов?",
+        "confirmDeleteVRRP": "Подтвердить удаление следующих групп VRRP?",
+        "confirmDeleteSync": "Подтвердить удаление следующих групп синхронизации?"
       },
       "options": {
         "algorithm": {
           "roundRobin": "Round Robin",
-          "weightedRoundRobin": "Weighted Round Robin",
-          "leastConnection": "Least Connection",
-          "weightedLeastConnection": "Weighted Least Connection",
-          "sourceHashing": "Source Hashing",
-          "destinationHashing": "Destination Hashing",
-          "localityBasedLeastConnection": "Locality-Based Least Connection"
+          "weightedRoundRobin": "Взвешенный Round Robin",
+          "leastConnection": "Наименьшее количество соединений",
+          "weightedLeastConnection": "Взвешенное наименьшее количество соединений",
+          "sourceHashing": "Хеширование источника",
+          "destinationHashing": "Хэширование назначения",
+          "localityBasedLeastConnection": "Наименьшее количество соединений на основе локализации"
         },
         "forwardMethod": {
-          "direct": "Direct Routing",
+          "direct": "Прямая маршрутизация",
           "nat": "NAT",
-          "tunnel": "Tunneling"
+          "tunnel": "Туннелирование"
         },
         "protocol": {
           "tcp": "TCP",
           "udp": "UDP"
         },
         "authType": {
-          "pass": "Simple Password",
-          "ah": "AH (Authentication Header)"
+          "pass": "Простой пароль",
+          "ah": "AH (Заголовок аутентификации)"
         },
         "vrrpVersion": {
           "v2": "VRRPv2",
           "v3": "VRRPv3"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Переадресация",
+        "input": "Входящие",
+        "name": "Имя",
+        "output": "Исходящие",
+        "prerouting": "Премаршрутизация",
+        "filter": "Фильтр",
+        "raw": "Сырой",
+        "defaultAction": "Действие по умолчанию",
+        "defaultActionHelp": "Действие по умолчанию для пакетов, не соответствующих ни одному правилу",
+        "defaultLog": "Журнал по умолчанию",
+        "defaultLogHelp": "Включить ведение журнала для пакетов, соответствующих действию по умолчанию",
+        "description": "Описание",
+        "descriptionHelp": "Описание этой цепочки межсетевого экрана",
+        "disableConntrack": "Отключить отслеживание соединений",
+        "disableConntrackHelp": "Отключить отслеживание соединений для этой цепочки",
+        "defaultJumpTarget": "Цель перехода по умолчанию",
+        "defaultJumpTargetHelp": "Целевая цепочка для перехода при отсутствии совпадений",
+        "nameName": "Имя",
+        "accept": "Принять",
+        "drop": "Отбросить",
+        "reject": "Отклонить",
+        "return": "Вернуть",
+        "continue": "Продолжить",
+        "jump": "Перейти",
+        "createName": "Создать имя",
+        "editName": "Редактировать имя",
+        "confirmDelete": "Вы уверены, что хотите удалить имя {name}?",
+        "rulesetLabel": "Набор правил"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Режим"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Протокол"
       }
     }
   },
   "de": {
     "highAvailability": {
       "tabs": {
-        "virtualServer": "Virtual Server",
-        "vrrpGroup": "VRRP Group",
-        "vrrpSync": "VRRP Sync Group",
-        "vrrpGlobal": "VRRP Global Parameters"
+        "virtualServer": "Virtueller Server",
+        "vrrpGroup": "VRRP-Gruppe",
+        "vrrpSync": "VRRP-Synchronisierungsgruppe",
+        "vrrpGlobal": "VRRP-Globalparameter"
       },
       "columns": {
         "name": "Name",
-        "address": "Virtual Address",
+        "address": "Virtuelle Adresse",
         "port": "Port",
-        "protocol": "Protocol",
-        "algorithm": "Algorithm",
-        "realServerCount": "Real Servers",
+        "protocol": "Protokoll",
+        "algorithm": "Algorithmus",
+        "realServerCount": "Echte Server",
         "vrid": "VRID",
-        "interface": "Interface",
-        "priority": "Priority",
-        "addressCount": "Virtual Addresses",
-        "memberCount": "Members",
-        "connectionTimeout": "Connection Timeout",
-        "healthCheckScript": "Health Check Script"
+        "interface": "Schnittstelle",
+        "priority": "Priorität",
+        "addressCount": "Virtuelle Adressen",
+        "memberCount": "Mitglieder",
+        "connectionTimeout": "Verbindungs-Timeout",
+        "healthCheckScript": "Gesundheitsprüfungsskript"
       },
       "vsSchema": {
         "name": {
           "title": "Name",
-          "placeholder": "e.g., vs01"
+          "placeholder": "z.B. vs01"
         },
         "address": {
-          "title": "Virtual Address",
-          "placeholder": "1.1.1.1 or h:h:h:h:h:h:h:h"
+          "title": "Virtuelle Adresse",
+          "placeholder": "1.1.1.1 oder h:h:h:h:h:h:h:h"
         },
         "port": {
           "title": "Port",
           "placeholder": "0-65535"
         },
         "protocol": {
-          "title": "Protocol"
+          "title": "Protokoll"
         },
         "algorithm": {
-          "title": "Scheduling Algorithm",
-          "help": "Default: least-connection"
+          "title": "Scheduling-Algorithmus",
+          "help": "Standard: least-connection"
         },
         "forwardMethod": {
-          "title": "Forward Method",
-          "help": "Default: nat"
+          "title": "Weiterleitungsmethode",
+          "help": "Standard: nat"
         },
         "delayLoop": {
-          "title": "Health Check Interval",
-          "placeholder": "1-600 seconds",
-          "help": "Default: 10 seconds"
+          "title": "Gesundheitsprüfungsintervall",
+          "placeholder": "1-600 Sekunden",
+          "help": "Standard: 10 Sekunden"
         },
         "persistenceTimeout": {
-          "title": "Persistence Timeout",
-          "placeholder": "1-86400 seconds",
-          "help": "Default: 300 seconds"
+          "title": "Persistenz-Timeout",
+          "placeholder": "1-86400 Sekunden",
+          "help": "Standard: 300 Sekunden"
         },
         "fwmark": {
-          "title": "Firewall Mark",
+          "title": "Firewall-Markierung",
           "placeholder": "1-2147483647"
         }
       },
       "vrrpGroupSchema": {
         "name": {
           "title": "Name",
-          "placeholder": "e.g., vg01"
+          "placeholder": "z.B. vg01"
         },
         "vrid": {
           "title": "VRID",
           "placeholder": "1-255"
         },
         "interface": {
-          "title": "Interface",
-          "placeholder": "e.g., eth0"
+          "title": "Schnittstelle",
+          "placeholder": "z.B. eth0"
         },
         "priority": {
-          "title": "Priority",
-          "help": "Default: 100, range 1-255"
+          "title": "Priorität",
+          "help": "Standard: 100, Bereich 1-255"
         },
         "advertiseInterval": {
-          "title": "Advertisement Interval",
-          "help": "Default: 1 second"
+          "title": "Ankündigungsintervall",
+          "help": "Standard: 1 Sekunde"
         },
         "preemptDelay": {
-          "title": "Preempt Delay",
-          "help": "Default: 0 seconds, range 0-1000"
+          "title": "Vorverzögerung",
+          "help": "Standard: 0 Sekunden, Bereich 0-1000"
         },
         "helloSourceAddress": {
-          "title": "Hello Source Address",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "Hello-Quelladresse",
+          "placeholder": "IPv4/IPv6-Adresse"
         },
         "peerAddress": {
-          "title": "Unicast Peer Address",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "Unicast-Peer-Adresse",
+          "placeholder": "IPv4/IPv6-Adresse"
         },
         "description": {
-          "title": "Description"
+          "title": "Beschreibung"
         },
         "disable": {
-          "title": "Disable"
+          "title": "Deaktivieren"
         },
         "noPreempt": {
-          "title": "Disable Preempt"
+          "title": "Preempt deaktivieren"
         },
         "rfc3768Compatibility": {
-          "title": "RFC3768 Compatibility",
-          "help": "Use VRRP virtual MAC address"
+          "title": "RFC 3768-Kompatibilität",
+          "help": "Virtuelle VRRP-MAC-Adresse verwenden"
         },
         "authType": {
-          "title": "Authentication Type",
-          "help": "plaintext-password or ah"
+          "title": "Authentifizierungstyp",
+          "help": "Klartext-Passwort oder AH"
         },
         "authPassword": {
-          "title": "Authentication Password",
-          "placeholder": "Up to 8 characters"
+          "title": "Authentifizierungs-Passwort",
+          "placeholder": "Bis zu 8 Zeichen"
         },
         "garpInterval": {
-          "title": "GARP Interval",
-          "help": "Default: 0 seconds, range 0-1000 (microsecond precision)"
+          "title": "GARP-Intervall",
+          "help": "Standard: 0 Sekunden, Bereich 0-1000 (Mikrosekundengenauigkeit)"
         },
         "garpMasterDelay": {
-          "title": "GARP Master Delay",
-          "help": "Default: 5 seconds, range 1-1000"
+          "title": "GARP-Master-Verzögerung",
+          "help": "Standard: 5 Sekunden, Bereich 1-1000"
         },
         "garpMasterRefresh": {
-          "title": "GARP Master Refresh",
-          "help": "Default: 5 seconds, 0=no refresh, range 0 or 1-255"
+          "title": "GARP-Master-Aktualisierung",
+          "help": "Standard: 5 Sekunden, 0=keine Aktualisierung, Bereich 0 oder 1-255"
         },
         "garpMasterRefreshRepeat": {
-          "title": "GARP Master Refresh Repeat",
-          "help": "Default: 1, range 1-255"
+          "title": "GARP-Master-Aktualisierungswiederholung",
+          "help": "Standard: 1, Bereich 1-255"
         },
         "garpMasterRepeat": {
-          "title": "GARP Master Repeat",
-          "help": "Default: 5, range 1-255"
+          "title": "GARP-Master-Wiederholung",
+          "help": "Standard: 5, Bereich 1-255"
         },
         "healthCheckFailureCount": {
-          "title": "Health Check Failure Count",
-          "help": "Default: 3"
+          "title": "Anzahl der Gesundheitsprüfungsfehler",
+          "help": "Standard: 3"
         },
         "healthCheckInterval": {
-          "title": "Health Check Interval",
-          "help": "Default: 60 seconds"
+          "title": "Gesundheitsprüfungsintervall",
+          "help": "Standard: 60 Sekunden"
         },
         "healthCheckPing": {
-          "title": "Health Check Ping Target",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "Gesundheitsprüfungs-Ping-Ziel",
+          "placeholder": "IPv4/IPv6-Adresse"
         },
         "healthCheckScript": {
-          "title": "Health Check Script",
-          "placeholder": "Script file path"
+          "title": "Gesundheitsprüfungsskript",
+          "placeholder": "Skriptdateipfad"
         },
         "trackExcludeInterface": {
-          "title": "Exclude Interface Tracking",
-          "help": "Disable master interface state tracking"
+          "title": "Schnittstellenverfolgung ausschließen",
+          "help": "Master-Schnittstellenstatus-Verfolgung deaktivieren"
         },
         "transitionScriptBackup": {
-          "title": "Backup Transition Script",
-          "placeholder": "Script path"
+          "title": "Backup-Übergangsskript",
+          "placeholder": "Skriptpfad"
         },
         "transitionScriptFault": {
-          "title": "Fault Transition Script",
-          "placeholder": "Script path"
+          "title": "Fehlerübergangsskript",
+          "placeholder": "Skriptpfad"
         },
         "transitionScriptMaster": {
-          "title": "Master Transition Script",
-          "placeholder": "Script path"
+          "title": "Master-Übergangsskript",
+          "placeholder": "Skriptpfad"
         },
         "transitionScriptStop": {
-          "title": "Stop Transition Script",
-          "placeholder": "Script path"
+          "title": "Stoppübergangsskript",
+          "placeholder": "Skriptpfad"
         }
       },
       "syncGroupSchema": {
         "name": {
           "title": "Name",
-          "placeholder": "e.g., sg01"
+          "placeholder": "z.B. sg01"
         },
         "members": {
-          "title": "Members (comma separated)",
+          "title": "Mitglieder (durch Komma getrennt)",
           "placeholder": "vg01,vg02"
         }
       },
       "vrrpGlobalSchema": {
         "startupDelay": {
-          "title": "Startup Delay",
-          "placeholder": "1-600 seconds",
-          "help": "Range 1-600 seconds"
+          "title": "Startverzögerung",
+          "placeholder": "1-600 Sekunden",
+          "help": "Bereich 1-600 Sekunden"
         },
         "version": {
-          "title": "VRRP Version",
-          "help": "IPv6 always uses VRRPv3"
+          "title": "VRRP-Version",
+          "help": "IPv6 verwendet immer VRRPv3"
         },
         "garpInterval": {
-          "title": "GARP Interval",
-          "help": "Default: 0, range 0-1000 seconds (microsecond precision)"
+          "title": "GARP-Intervall",
+          "help": "Standard: 0, Bereich 0-1000 Sekunden (Mikrosekundengenauigkeit)"
         },
         "garpMasterDelay": {
-          "title": "GARP Master Delay",
-          "help": "Default: 5, range 1-1000 seconds"
+          "title": "GARP-Master-Verzögerung",
+          "help": "Standard: 5, Bereich 1-1000 Sekunden"
         },
         "garpMasterRefresh": {
-          "title": "GARP Master Refresh",
-          "help": "Default: 5, 0=no refresh, range 0 or 1-255"
+          "title": "GARP-Master-Aktualisierung",
+          "help": "Standard: 5, 0=keine Aktualisierung, Bereich 0 oder 1-255"
         },
         "garpMasterRefreshRepeat": {
-          "title": "GARP Master Refresh Repeat",
-          "help": "Default: 1, range 1-255"
+          "title": "GARP-Master-Aktualisierungswiederholung",
+          "help": "Standard: 1, Bereich 1-255"
         },
         "garpMasterRepeat": {
-          "title": "GARP Master Repeat",
-          "help": "Default: 5, range 1-255"
+          "title": "GARP-Master-Wiederholung",
+          "help": "Standard: 5, Bereich 1-255"
         }
       },
       "rsSchema": {
         "name": {
           "title": "Name",
-          "placeholder": "e.g., rs01"
+          "placeholder": "z.B. rs01"
         },
         "port": {
           "title": "Port",
           "placeholder": "0-65535"
         },
         "connectionTimeout": {
-          "title": "Connection Timeout",
-          "placeholder": "1-86400 seconds",
-          "help": "Default: 300 seconds"
+          "title": "Verbindungs-Timeout",
+          "placeholder": "1-86400 Sekunden",
+          "help": "Standard: 300 Sekunden"
         },
         "healthCheckScript": {
-          "title": "Health Check Script",
-          "placeholder": "Script file path"
+          "title": "Gesundheitsprüfungsskript",
+          "placeholder": "Skriptdateipfad"
         }
       },
       "buttons": {
-        "create": "Create",
-        "edit": "Edit",
-        "delete": "Delete",
-        "refresh": "Refresh"
+        "create": "Erstellen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "refresh": "Aktualisieren"
       },
       "modals": {
-        "virtualServer": "Virtual Server",
-        "realServer": "Real Server",
-        "edit": "Edit",
-        "create": "Create",
-        "confirmDelete": "Confirm Delete"
+        "virtualServer": "Virtueller Server",
+        "realServer": "Echter Server",
+        "edit": "Bearbeiten",
+        "create": "Erstellen",
+        "confirmDelete": "Löschen bestätigen"
       },
       "messages": {
-        "selectVS": "Please select a virtual server",
-        "selectRS": "Please select a real server",
-        "selectVRRPGroup": "Please select a VRRP group",
-        "selectSyncGroup": "Please select a sync group",
-        "enterName": "Please enter name",
-        "enterAddress": "Please enter virtual address",
-        "enterVRID": "Please enter VRID",
-        "enterInterface": "Please enter interface",
-        "enterMembers": "Please enter members",
-        "nameExists": "Name already exists",
-        "confirmDeleteVS": "Confirm delete the following virtual servers?",
-        "confirmDeleteRS": "Confirm delete the following real servers?",
-        "confirmDeleteVRRP": "Confirm delete the following VRRP groups?",
-        "confirmDeleteSync": "Confirm delete the following sync groups?"
+        "selectVS": "Bitte einen virtuellen Server auswählen",
+        "selectRS": "Bitte einen echten Server auswählen",
+        "selectVRRPGroup": "Bitte eine VRRP-Gruppe auswählen",
+        "selectSyncGroup": "Bitte eine Synchronisationsgruppe auswählen",
+        "enterName": "Bitte Namen eingeben",
+        "enterAddress": "Bitte virtuelle Adresse eingeben",
+        "enterVRID": "Bitte VRID eingeben",
+        "enterInterface": "Bitte Schnittstelle eingeben",
+        "enterMembers": "Bitte Mitglieder eingeben",
+        "nameExists": "Name existiert bereits",
+        "confirmDeleteVS": "Löschen der folgenden virtuellen Server bestätigen?",
+        "confirmDeleteRS": "Löschen der folgenden echten Server bestätigen?",
+        "confirmDeleteVRRP": "Löschen der folgenden VRRP-Gruppen bestätigen?",
+        "confirmDeleteSync": "Löschen der folgenden Synchronisationsgruppen bestätigen?"
       },
       "options": {
         "algorithm": {
           "roundRobin": "Round Robin",
-          "weightedRoundRobin": "Weighted Round Robin",
-          "leastConnection": "Least Connection",
-          "weightedLeastConnection": "Weighted Least Connection",
-          "sourceHashing": "Source Hashing",
-          "destinationHashing": "Destination Hashing",
-          "localityBasedLeastConnection": "Locality-Based Least Connection"
+          "weightedRoundRobin": "Gewichteter Round Robin",
+          "leastConnection": "Wenigste Verbindungen",
+          "weightedLeastConnection": "Gewichtete geringste Verbindung",
+          "sourceHashing": "Quell-Hashing",
+          "destinationHashing": "Ziel-Hashing",
+          "localityBasedLeastConnection": "Standortbasierte wenigste Verbindungen"
         },
         "forwardMethod": {
-          "direct": "Direct Routing",
+          "direct": "Direkte Routing",
           "nat": "NAT",
           "tunnel": "Tunneling"
         },
@@ -1449,82 +1637,129 @@
           "udp": "UDP"
         },
         "authType": {
-          "pass": "Simple Password",
-          "ah": "AH (Authentication Header)"
+          "pass": "Einfaches Passwort",
+          "ah": "AH (Authentifizierungsheader)"
         },
         "vrrpVersion": {
           "v2": "VRRPv2",
           "v3": "VRRPv3"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Weiterleitung",
+        "input": "Eingehend",
+        "name": "Name",
+        "output": "Ausgehend",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Standardaktion",
+        "defaultActionHelp": "Standardaktion für Pakete, die mit keiner Regel übereinstimmen",
+        "defaultLog": "Standardprotokoll",
+        "defaultLogHelp": "Protokollierung für Pakete aktivieren, die der Standardaktion entsprechen",
+        "description": "Beschreibung",
+        "descriptionHelp": "Beschreibung dieser Firewall-Kette",
+        "disableConntrack": "Verbindungsverfolgung deaktivieren",
+        "disableConntrackHelp": "Verbindungsverfolgung für diese Kette deaktivieren",
+        "defaultJumpTarget": "Standard-Sprungziel",
+        "defaultJumpTargetHelp": "Zielkette zum Sprung bei keiner Übereinstimmung",
+        "nameName": "Name",
+        "accept": "Akzeptieren",
+        "drop": "Verwerfen",
+        "reject": "Zurückweisen",
+        "return": "Zurückkehren",
+        "continue": "Fortsetzen",
+        "jump": "Springen",
+        "createName": "Name erstellen",
+        "editName": "Name bearbeiten",
+        "confirmDelete": "Möchten Sie den Namen {name} wirklich löschen?",
+        "rulesetLabel": "Regelsatz"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Modus"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protokoll"
       }
     }
   },
   "fr": {
     "highAvailability": {
       "tabs": {
-        "virtualServer": "Virtual Server",
-        "vrrpGroup": "VRRP Group",
-        "vrrpSync": "VRRP Sync Group",
-        "vrrpGlobal": "VRRP Global Parameters"
+        "virtualServer": "Serveur virtuel",
+        "vrrpGroup": "Groupe VRRP",
+        "vrrpSync": "Groupe de synchronisation VRRP",
+        "vrrpGlobal": "Paramètres globaux VRRP"
       },
       "columns": {
-        "name": "Name",
-        "address": "Virtual Address",
+        "name": "Nom",
+        "address": "Adresse virtuelle",
         "port": "Port",
-        "protocol": "Protocol",
-        "algorithm": "Algorithm",
-        "realServerCount": "Real Servers",
+        "protocol": "Protocole",
+        "algorithm": "Algorithme",
+        "realServerCount": "Serveurs réels",
         "vrid": "VRID",
         "interface": "Interface",
-        "priority": "Priority",
-        "addressCount": "Virtual Addresses",
-        "memberCount": "Members",
-        "connectionTimeout": "Connection Timeout",
-        "healthCheckScript": "Health Check Script"
+        "priority": "Priorité",
+        "addressCount": "Adresses virtuelles",
+        "memberCount": "Membres",
+        "connectionTimeout": "Délai d'expiration de connexion",
+        "healthCheckScript": "Script de vérification de santé"
       },
       "vsSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., vs01"
+          "title": "Nom",
+          "placeholder": "par ex. vs01"
         },
         "address": {
-          "title": "Virtual Address",
-          "placeholder": "1.1.1.1 or h:h:h:h:h:h:h:h"
+          "title": "Adresse virtuelle",
+          "placeholder": "1.1.1.1 ou h:h:h:h:h:h:h:h"
         },
         "port": {
           "title": "Port",
           "placeholder": "0-65535"
         },
         "protocol": {
-          "title": "Protocol"
+          "title": "Protocole"
         },
         "algorithm": {
-          "title": "Scheduling Algorithm",
-          "help": "Default: least-connection"
+          "title": "Algorithme de planification",
+          "help": "Par défaut : least-connection"
         },
         "forwardMethod": {
-          "title": "Forward Method",
-          "help": "Default: nat"
+          "title": "Méthode de transfert",
+          "help": "Par défaut : nat"
         },
         "delayLoop": {
-          "title": "Health Check Interval",
-          "placeholder": "1-600 seconds",
-          "help": "Default: 10 seconds"
+          "title": "Intervalle de vérification de santé",
+          "placeholder": "1-600 secondes",
+          "help": "Par défaut : 10 secondes"
         },
         "persistenceTimeout": {
-          "title": "Persistence Timeout",
-          "placeholder": "1-86400 seconds",
-          "help": "Default: 300 seconds"
+          "title": "Délai d'expiration de la persistance",
+          "placeholder": "1-86400 secondes",
+          "help": "Par défaut : 300 secondes"
         },
         "fwmark": {
-          "title": "Firewall Mark",
+          "title": "Marque de pare-feu",
           "placeholder": "1-2147483647"
         }
       },
       "vrrpGroupSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., vg01"
+          "title": "Nom",
+          "placeholder": "par ex. vg01"
         },
         "vrid": {
           "title": "VRID",
@@ -1532,514 +1767,608 @@
         },
         "interface": {
           "title": "Interface",
-          "placeholder": "e.g., eth0"
+          "placeholder": "par ex. eth0"
         },
         "priority": {
-          "title": "Priority",
-          "help": "Default: 100, range 1-255"
+          "title": "Priorité",
+          "help": "Par défaut : 100, plage 1-255"
         },
         "advertiseInterval": {
-          "title": "Advertisement Interval",
-          "help": "Default: 1 second"
+          "title": "Intervalle d'annonce",
+          "help": "Par défaut : 1 seconde"
         },
         "preemptDelay": {
-          "title": "Preempt Delay",
-          "help": "Default: 0 seconds, range 0-1000"
+          "title": "Délai de préemption",
+          "help": "Par défaut : 0 secondes, plage 0-1000"
         },
         "helloSourceAddress": {
-          "title": "Hello Source Address",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "Adresse source Hello",
+          "placeholder": "Adresse IPv4/IPv6"
         },
         "peerAddress": {
-          "title": "Unicast Peer Address",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "Adresse de pair unicast",
+          "placeholder": "Adresse IPv4/IPv6"
         },
         "description": {
           "title": "Description"
         },
         "disable": {
-          "title": "Disable"
+          "title": "Désactiver"
         },
         "noPreempt": {
-          "title": "Disable Preempt"
+          "title": "Désactiver Preempt"
         },
         "rfc3768Compatibility": {
-          "title": "RFC3768 Compatibility",
-          "help": "Use VRRP virtual MAC address"
+          "title": "Compatibilité RFC 3768",
+          "help": "Utiliser l'adresse MAC virtuelle VRRP"
         },
         "authType": {
-          "title": "Authentication Type",
-          "help": "plaintext-password or ah"
+          "title": "Type d'authentification",
+          "help": "Mot de passe en texte clair ou AH"
         },
         "authPassword": {
-          "title": "Authentication Password",
-          "placeholder": "Up to 8 characters"
+          "title": "Mot de passe d'authentification",
+          "placeholder": "Jusqu'à 8 caractères"
         },
         "garpInterval": {
-          "title": "GARP Interval",
-          "help": "Default: 0 seconds, range 0-1000 (microsecond precision)"
+          "title": "Intervalle GARP",
+          "help": "Par défaut : 0 secondes, plage 0-1000 (précision microseconde)"
         },
         "garpMasterDelay": {
-          "title": "GARP Master Delay",
-          "help": "Default: 5 seconds, range 1-1000"
+          "title": "Délai maître GARP",
+          "help": "Par défaut : 5 secondes, plage 1-1000"
         },
         "garpMasterRefresh": {
-          "title": "GARP Master Refresh",
-          "help": "Default: 5 seconds, 0=no refresh, range 0 or 1-255"
+          "title": "Actualisation maître GARP",
+          "help": "Par défaut : 5 secondes, 0=pas de rafraîchissement, plage 0 ou 1-255"
         },
         "garpMasterRefreshRepeat": {
-          "title": "GARP Master Refresh Repeat",
-          "help": "Default: 1, range 1-255"
+          "title": "Répétition d'actualisation maître GARP",
+          "help": "Par défaut : 1, plage 1-255"
         },
         "garpMasterRepeat": {
-          "title": "GARP Master Repeat",
-          "help": "Default: 5, range 1-255"
+          "title": "Répétition maître GARP",
+          "help": "Par défaut : 5, plage 1-255"
         },
         "healthCheckFailureCount": {
-          "title": "Health Check Failure Count",
-          "help": "Default: 3"
+          "title": "Nombre de défaillances de vérification de santé",
+          "help": "Par défaut : 3"
         },
         "healthCheckInterval": {
-          "title": "Health Check Interval",
-          "help": "Default: 60 seconds"
+          "title": "Intervalle de vérification de santé",
+          "help": "Par défaut : 60 secondes"
         },
         "healthCheckPing": {
-          "title": "Health Check Ping Target",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "Cible de ping de vérification de santé",
+          "placeholder": "Adresse IPv4/IPv6"
         },
         "healthCheckScript": {
-          "title": "Health Check Script",
-          "placeholder": "Script file path"
+          "title": "Script de vérification de santé",
+          "placeholder": "Chemin du fichier de script"
         },
         "trackExcludeInterface": {
-          "title": "Exclude Interface Tracking",
-          "help": "Disable master interface state tracking"
+          "title": "Exclure le suivi d'interface",
+          "help": "Désactiver le suivi de l'état de l'interface principale"
         },
         "transitionScriptBackup": {
-          "title": "Backup Transition Script",
-          "placeholder": "Script path"
+          "title": "Script de transition de sauvegarde",
+          "placeholder": "Chemin du script"
         },
         "transitionScriptFault": {
-          "title": "Fault Transition Script",
-          "placeholder": "Script path"
+          "title": "Script de transition de défaillance",
+          "placeholder": "Chemin du script"
         },
         "transitionScriptMaster": {
-          "title": "Master Transition Script",
-          "placeholder": "Script path"
+          "title": "Script de transition maître",
+          "placeholder": "Chemin du script"
         },
         "transitionScriptStop": {
-          "title": "Stop Transition Script",
-          "placeholder": "Script path"
+          "title": "Script de transition d'arrêt",
+          "placeholder": "Chemin du script"
         }
       },
       "syncGroupSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., sg01"
+          "title": "Nom",
+          "placeholder": "par ex. sg01"
         },
         "members": {
-          "title": "Members (comma separated)",
+          "title": "Membres (séparés par des virgules)",
           "placeholder": "vg01,vg02"
         }
       },
       "vrrpGlobalSchema": {
         "startupDelay": {
-          "title": "Startup Delay",
-          "placeholder": "1-600 seconds",
-          "help": "Range 1-600 seconds"
+          "title": "Délai de démarrage",
+          "placeholder": "1-600 secondes",
+          "help": "Plage 1-600 secondes"
         },
         "version": {
-          "title": "VRRP Version",
-          "help": "IPv6 always uses VRRPv3"
+          "title": "Version VRRP",
+          "help": "IPv6 utilise toujours VRRPv3"
         },
         "garpInterval": {
-          "title": "GARP Interval",
-          "help": "Default: 0, range 0-1000 seconds (microsecond precision)"
+          "title": "Intervalle GARP",
+          "help": "Par défaut : 0, plage 0-1000 secondes (précision microseconde)"
         },
         "garpMasterDelay": {
-          "title": "GARP Master Delay",
-          "help": "Default: 5, range 1-1000 seconds"
+          "title": "Délai maître GARP",
+          "help": "Par défaut : 5, plage 1-1000 secondes"
         },
         "garpMasterRefresh": {
-          "title": "GARP Master Refresh",
-          "help": "Default: 5, 0=no refresh, range 0 or 1-255"
+          "title": "Actualisation maître GARP",
+          "help": "Par défaut : 5, 0=pas de rafraîchissement, plage 0 ou 1-255"
         },
         "garpMasterRefreshRepeat": {
-          "title": "GARP Master Refresh Repeat",
-          "help": "Default: 1, range 1-255"
+          "title": "Répétition d'actualisation maître GARP",
+          "help": "Par défaut : 1, plage 1-255"
         },
         "garpMasterRepeat": {
-          "title": "GARP Master Repeat",
-          "help": "Default: 5, range 1-255"
+          "title": "Répétition maître GARP",
+          "help": "Par défaut : 5, plage 1-255"
         }
       },
       "rsSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., rs01"
+          "title": "Nom",
+          "placeholder": "par ex. rs01"
         },
         "port": {
           "title": "Port",
           "placeholder": "0-65535"
         },
         "connectionTimeout": {
-          "title": "Connection Timeout",
-          "placeholder": "1-86400 seconds",
-          "help": "Default: 300 seconds"
+          "title": "Délai d'expiration de connexion",
+          "placeholder": "1-86400 secondes",
+          "help": "Par défaut : 300 secondes"
         },
         "healthCheckScript": {
-          "title": "Health Check Script",
-          "placeholder": "Script file path"
+          "title": "Script de vérification de santé",
+          "placeholder": "Chemin du fichier de script"
         }
       },
       "buttons": {
-        "create": "Create",
-        "edit": "Edit",
-        "delete": "Delete",
-        "refresh": "Refresh"
+        "create": "Créer",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "refresh": "Actualiser"
       },
       "modals": {
-        "virtualServer": "Virtual Server",
-        "realServer": "Real Server",
-        "edit": "Edit",
-        "create": "Create",
-        "confirmDelete": "Confirm Delete"
+        "virtualServer": "Serveur virtuel",
+        "realServer": "Serveur réel",
+        "edit": "Modifier",
+        "create": "Créer",
+        "confirmDelete": "Confirmer la suppression"
       },
       "messages": {
-        "selectVS": "Please select a virtual server",
-        "selectRS": "Please select a real server",
-        "selectVRRPGroup": "Please select a VRRP group",
-        "selectSyncGroup": "Please select a sync group",
-        "enterName": "Please enter name",
-        "enterAddress": "Please enter virtual address",
-        "enterVRID": "Please enter VRID",
-        "enterInterface": "Please enter interface",
-        "enterMembers": "Please enter members",
-        "nameExists": "Name already exists",
-        "confirmDeleteVS": "Confirm delete the following virtual servers?",
-        "confirmDeleteRS": "Confirm delete the following real servers?",
-        "confirmDeleteVRRP": "Confirm delete the following VRRP groups?",
-        "confirmDeleteSync": "Confirm delete the following sync groups?"
+        "selectVS": "Veuillez sélectionner un serveur virtuel",
+        "selectRS": "Veuillez sélectionner un serveur réel",
+        "selectVRRPGroup": "Veuillez sélectionner un groupe VRRP",
+        "selectSyncGroup": "Veuillez sélectionner un groupe de synchronisation",
+        "enterName": "Veuillez entrer le nom",
+        "enterAddress": "Veuillez entrer l'adresse virtuelle",
+        "enterVRID": "Veuillez entrer le VRID",
+        "enterInterface": "Veuillez entrer l'interface",
+        "enterMembers": "Veuillez entrer les membres",
+        "nameExists": "Le nom existe déjà",
+        "confirmDeleteVS": "Confirmer la suppression des serveurs virtuels suivants?",
+        "confirmDeleteRS": "Confirmer la suppression des serveurs réels suivants?",
+        "confirmDeleteVRRP": "Confirmer la suppression des groupes VRRP suivants?",
+        "confirmDeleteSync": "Confirmer la suppression des groupes de synchronisation suivants?"
       },
       "options": {
         "algorithm": {
           "roundRobin": "Round Robin",
-          "weightedRoundRobin": "Weighted Round Robin",
-          "leastConnection": "Least Connection",
-          "weightedLeastConnection": "Weighted Least Connection",
-          "sourceHashing": "Source Hashing",
-          "destinationHashing": "Destination Hashing",
-          "localityBasedLeastConnection": "Locality-Based Least Connection"
+          "weightedRoundRobin": "Round Robin pondéré",
+          "leastConnection": "Moins de connexions",
+          "weightedLeastConnection": "Connexion la moins pondérée",
+          "sourceHashing": "Hachage source",
+          "destinationHashing": "Hachage de destination",
+          "localityBasedLeastConnection": "Moins de connexions basé sur la localité"
         },
         "forwardMethod": {
-          "direct": "Direct Routing",
+          "direct": "Routage direct",
           "nat": "NAT",
-          "tunnel": "Tunneling"
+          "tunnel": "Tunnelisation"
         },
         "protocol": {
           "tcp": "TCP",
           "udp": "UDP"
         },
         "authType": {
-          "pass": "Simple Password",
-          "ah": "AH (Authentication Header)"
+          "pass": "Mot de passe simple",
+          "ah": "AH (En-tête d'authentification)"
         },
         "vrrpVersion": {
           "v2": "VRRPv2",
           "v3": "VRRPv3"
         }
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Transfert",
+        "input": "Entrant",
+        "name": "Nom",
+        "output": "Sortant",
+        "prerouting": "Prerouting",
+        "filter": "Filtre",
+        "raw": "Brut",
+        "defaultAction": "Action par défaut",
+        "defaultActionHelp": "Action par défaut pour les paquets ne correspondant à aucune règle",
+        "defaultLog": "Journal par défaut",
+        "defaultLogHelp": "Activer la journalisation pour les paquets correspondant à l'action par défaut",
+        "description": "Description",
+        "descriptionHelp": "Description de cette chaîne de pare-feu",
+        "disableConntrack": "Désactiver le suivi de connexion",
+        "disableConntrackHelp": "Désactiver le suivi de connexion pour cette chaîne",
+        "defaultJumpTarget": "Cible de saut par défaut",
+        "defaultJumpTargetHelp": "Chaîne cible vers laquelle sauter en cas d'absence de correspondance",
+        "nameName": "Nom",
+        "accept": "Accepter",
+        "drop": "Supprimer",
+        "reject": "Rejeter",
+        "return": "Retour",
+        "continue": "Continuer",
+        "jump": "Sauter",
+        "createName": "Créer un nom",
+        "editName": "Modifier le nom",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer le nom {name} ?",
+        "rulesetLabel": "Ensemble de règles"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocole"
+      }
     }
   },
   "ko": {
     "highAvailability": {
       "tabs": {
-        "virtualServer": "Virtual Server",
-        "vrrpGroup": "VRRP Group",
-        "vrrpSync": "VRRP Sync Group",
-        "vrrpGlobal": "VRRP Global Parameters"
+        "virtualServer": "가상 서버",
+        "vrrpGroup": "VRRP 그룹",
+        "vrrpSync": "VRRP 동기화 그룹",
+        "vrrpGlobal": "VRRP 전역 매개변수"
       },
       "columns": {
-        "name": "Name",
-        "address": "Virtual Address",
-        "port": "Port",
-        "protocol": "Protocol",
-        "algorithm": "Algorithm",
-        "realServerCount": "Real Servers",
+        "name": "이름",
+        "address": "가상 주소",
+        "port": "포트",
+        "protocol": "프로토콜",
+        "algorithm": "알고리즘",
+        "realServerCount": "실제 서버",
         "vrid": "VRID",
-        "interface": "Interface",
-        "priority": "Priority",
-        "addressCount": "Virtual Addresses",
-        "memberCount": "Members",
-        "connectionTimeout": "Connection Timeout",
-        "healthCheckScript": "Health Check Script"
+        "interface": "인터페이스",
+        "priority": "우선순위",
+        "addressCount": "가상 주소",
+        "memberCount": "멤버",
+        "connectionTimeout": "연결 타임아웃",
+        "healthCheckScript": "상태 확인 스크립트"
       },
       "vsSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., vs01"
+          "title": "이름",
+          "placeholder": "예: vs01"
         },
         "address": {
-          "title": "Virtual Address",
-          "placeholder": "1.1.1.1 or h:h:h:h:h:h:h:h"
+          "title": "가상 주소",
+          "placeholder": "1.1.1.1 또는 h:h:h:h:h:h:h:h"
         },
         "port": {
-          "title": "Port",
+          "title": "포트",
           "placeholder": "0-65535"
         },
         "protocol": {
-          "title": "Protocol"
+          "title": "프로토콜"
         },
         "algorithm": {
-          "title": "Scheduling Algorithm",
-          "help": "Default: least-connection"
+          "title": "스케줄링 알고리즘",
+          "help": "기본값: least-connection"
         },
         "forwardMethod": {
-          "title": "Forward Method",
-          "help": "Default: nat"
+          "title": "포워딩 방법",
+          "help": "기본값: nat"
         },
         "delayLoop": {
-          "title": "Health Check Interval",
-          "placeholder": "1-600 seconds",
-          "help": "Default: 10 seconds"
+          "title": "상태 확인 간격",
+          "placeholder": "1-600 초",
+          "help": "기본값: 10초"
         },
         "persistenceTimeout": {
-          "title": "Persistence Timeout",
-          "placeholder": "1-86400 seconds",
-          "help": "Default: 300 seconds"
+          "title": "지속성 시간 초과",
+          "placeholder": "1-86400 초",
+          "help": "기본값: 300초"
         },
         "fwmark": {
-          "title": "Firewall Mark",
+          "title": "방화벽 마크",
           "placeholder": "1-2147483647"
         }
       },
       "vrrpGroupSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., vg01"
+          "title": "이름",
+          "placeholder": "예: vg01"
         },
         "vrid": {
           "title": "VRID",
           "placeholder": "1-255"
         },
         "interface": {
-          "title": "Interface",
-          "placeholder": "e.g., eth0"
+          "title": "인터페이스",
+          "placeholder": "예: eth0"
         },
         "priority": {
-          "title": "Priority",
-          "help": "Default: 100, range 1-255"
+          "title": "우선순위",
+          "help": "기본값: 100, 범위 1-255"
         },
         "advertiseInterval": {
-          "title": "Advertisement Interval",
-          "help": "Default: 1 second"
+          "title": "광고 간격",
+          "help": "기본값: 1초"
         },
         "preemptDelay": {
-          "title": "Preempt Delay",
-          "help": "Default: 0 seconds, range 0-1000"
+          "title": "선점 지연",
+          "help": "기본값: 0초, 범위 0-1000"
         },
         "helloSourceAddress": {
-          "title": "Hello Source Address",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "Hello 소스 주소",
+          "placeholder": "IPv4/IPv6 주소"
         },
         "peerAddress": {
-          "title": "Unicast Peer Address",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "유니캐스트 피어 주소",
+          "placeholder": "IPv4/IPv6 주소"
         },
         "description": {
-          "title": "Description"
+          "title": "설명"
         },
         "disable": {
-          "title": "Disable"
+          "title": "비활성화"
         },
         "noPreempt": {
-          "title": "Disable Preempt"
+          "title": "선점 비활성화"
         },
         "rfc3768Compatibility": {
-          "title": "RFC3768 Compatibility",
-          "help": "Use VRRP virtual MAC address"
+          "title": "RFC 3768 호환성",
+          "help": "VRRP 가상 MAC 주소 사용"
         },
         "authType": {
-          "title": "Authentication Type",
-          "help": "plaintext-password or ah"
+          "title": "인증 유형",
+          "help": "평문 비밀번호 또는 AH"
         },
         "authPassword": {
-          "title": "Authentication Password",
-          "placeholder": "Up to 8 characters"
+          "title": "인증 비밀번호",
+          "placeholder": "최대 8자"
         },
         "garpInterval": {
-          "title": "GARP Interval",
-          "help": "Default: 0 seconds, range 0-1000 (microsecond precision)"
+          "title": "GARP 간격",
+          "help": "기본값: 0초, 범위 0-1000 (마이크로초 정밀도)"
         },
         "garpMasterDelay": {
-          "title": "GARP Master Delay",
-          "help": "Default: 5 seconds, range 1-1000"
+          "title": "GARP 마스터 지연",
+          "help": "기본값: 5초, 범위 1-1000"
         },
         "garpMasterRefresh": {
-          "title": "GARP Master Refresh",
-          "help": "Default: 5 seconds, 0=no refresh, range 0 or 1-255"
+          "title": "GARP 마스터 새로 고침",
+          "help": "기본값: 5초, 0=새로 고침 없음, 범위 0 또는 1-255"
         },
         "garpMasterRefreshRepeat": {
-          "title": "GARP Master Refresh Repeat",
-          "help": "Default: 1, range 1-255"
+          "title": "GARP 마스터 새로 고침 반복",
+          "help": "기본값: 1, 범위 1-255"
         },
         "garpMasterRepeat": {
-          "title": "GARP Master Repeat",
-          "help": "Default: 5, range 1-255"
+          "title": "GARP 마스터 반복",
+          "help": "기본값: 5, 범위 1-255"
         },
         "healthCheckFailureCount": {
-          "title": "Health Check Failure Count",
-          "help": "Default: 3"
+          "title": "상태 확인 실패 횟수",
+          "help": "기본값: 3"
         },
         "healthCheckInterval": {
-          "title": "Health Check Interval",
-          "help": "Default: 60 seconds"
+          "title": "상태 확인 간격",
+          "help": "기본값: 60초"
         },
         "healthCheckPing": {
-          "title": "Health Check Ping Target",
-          "placeholder": "IPv4/IPv6 address"
+          "title": "상태 확인 핑 대상",
+          "placeholder": "IPv4/IPv6 주소"
         },
         "healthCheckScript": {
-          "title": "Health Check Script",
-          "placeholder": "Script file path"
+          "title": "상태 확인 스크립트",
+          "placeholder": "스크립트 파일 경로"
         },
         "trackExcludeInterface": {
-          "title": "Exclude Interface Tracking",
-          "help": "Disable master interface state tracking"
+          "title": "인터페이스 추적 제외",
+          "help": "마스터 인터페이스 상태 추적 비활성화"
         },
         "transitionScriptBackup": {
-          "title": "Backup Transition Script",
-          "placeholder": "Script path"
+          "title": "백업 전환 스크립트",
+          "placeholder": "스크립트 경로"
         },
         "transitionScriptFault": {
-          "title": "Fault Transition Script",
-          "placeholder": "Script path"
+          "title": "장애 전환 스크립트",
+          "placeholder": "스크립트 경로"
         },
         "transitionScriptMaster": {
-          "title": "Master Transition Script",
-          "placeholder": "Script path"
+          "title": "마스터 전환 스크립트",
+          "placeholder": "스크립트 경로"
         },
         "transitionScriptStop": {
-          "title": "Stop Transition Script",
-          "placeholder": "Script path"
+          "title": "중지 전환 스크립트",
+          "placeholder": "스크립트 경로"
         }
       },
       "syncGroupSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., sg01"
+          "title": "이름",
+          "placeholder": "예: sg01"
         },
         "members": {
-          "title": "Members (comma separated)",
+          "title": "멤버(쉼표로 구분)",
           "placeholder": "vg01,vg02"
         }
       },
       "vrrpGlobalSchema": {
         "startupDelay": {
-          "title": "Startup Delay",
-          "placeholder": "1-600 seconds",
-          "help": "Range 1-600 seconds"
+          "title": "시작 지연",
+          "placeholder": "1-600 초",
+          "help": "범위 1-600초"
         },
         "version": {
-          "title": "VRRP Version",
-          "help": "IPv6 always uses VRRPv3"
+          "title": "VRRP 버전",
+          "help": "IPv6는 항상 VRRPv3을 사용합니다"
         },
         "garpInterval": {
-          "title": "GARP Interval",
-          "help": "Default: 0, range 0-1000 seconds (microsecond precision)"
+          "title": "GARP 간격",
+          "help": "기본값: 0, 범위 0-1000초 (마이크로초 정밀도)"
         },
         "garpMasterDelay": {
-          "title": "GARP Master Delay",
-          "help": "Default: 5, range 1-1000 seconds"
+          "title": "GARP 마스터 지연",
+          "help": "기본값: 5, 범위 1-1000초"
         },
         "garpMasterRefresh": {
-          "title": "GARP Master Refresh",
-          "help": "Default: 5, 0=no refresh, range 0 or 1-255"
+          "title": "GARP 마스터 새로 고침",
+          "help": "기본값: 5, 0=새로 고침 없음, 범위 0 또는 1-255"
         },
         "garpMasterRefreshRepeat": {
-          "title": "GARP Master Refresh Repeat",
-          "help": "Default: 1, range 1-255"
+          "title": "GARP 마스터 새로 고침 반복",
+          "help": "기본값: 1, 범위 1-255"
         },
         "garpMasterRepeat": {
-          "title": "GARP Master Repeat",
-          "help": "Default: 5, range 1-255"
+          "title": "GARP 마스터 반복",
+          "help": "기본값: 5, 범위 1-255"
         }
       },
       "rsSchema": {
         "name": {
-          "title": "Name",
-          "placeholder": "e.g., rs01"
+          "title": "이름",
+          "placeholder": "예: rs01"
         },
         "port": {
-          "title": "Port",
+          "title": "포트",
           "placeholder": "0-65535"
         },
         "connectionTimeout": {
-          "title": "Connection Timeout",
-          "placeholder": "1-86400 seconds",
-          "help": "Default: 300 seconds"
+          "title": "연결 타임아웃",
+          "placeholder": "1-86400 초",
+          "help": "기본값: 300초"
         },
         "healthCheckScript": {
-          "title": "Health Check Script",
-          "placeholder": "Script file path"
+          "title": "상태 확인 스크립트",
+          "placeholder": "스크립트 파일 경로"
         }
       },
       "buttons": {
-        "create": "Create",
-        "edit": "Edit",
-        "delete": "Delete",
-        "refresh": "Refresh"
+        "create": "생성",
+        "edit": "편집",
+        "delete": "삭제",
+        "refresh": "새로고침"
       },
       "modals": {
-        "virtualServer": "Virtual Server",
-        "realServer": "Real Server",
-        "edit": "Edit",
-        "create": "Create",
-        "confirmDelete": "Confirm Delete"
+        "virtualServer": "가상 서버",
+        "realServer": "실제 서버",
+        "edit": "편집",
+        "create": "생성",
+        "confirmDelete": "삭제 확인"
       },
       "messages": {
-        "selectVS": "Please select a virtual server",
-        "selectRS": "Please select a real server",
-        "selectVRRPGroup": "Please select a VRRP group",
-        "selectSyncGroup": "Please select a sync group",
-        "enterName": "Please enter name",
-        "enterAddress": "Please enter virtual address",
-        "enterVRID": "Please enter VRID",
-        "enterInterface": "Please enter interface",
-        "enterMembers": "Please enter members",
-        "nameExists": "Name already exists",
-        "confirmDeleteVS": "Confirm delete the following virtual servers?",
-        "confirmDeleteRS": "Confirm delete the following real servers?",
-        "confirmDeleteVRRP": "Confirm delete the following VRRP groups?",
-        "confirmDeleteSync": "Confirm delete the following sync groups?"
+        "selectVS": "가상 서버를 선택해 주세요",
+        "selectRS": "실제 서버를 선택해 주세요",
+        "selectVRRPGroup": "VRRP 그룹을 선택해 주세요",
+        "selectSyncGroup": "동기화 그룹을 선택해 주세요",
+        "enterName": "이름을 입력해 주세요",
+        "enterAddress": "가상 주소를 입력해 주세요",
+        "enterVRID": "VRID를 입력해 주세요",
+        "enterInterface": "인터페이스를 입력해 주세요",
+        "enterMembers": "멤버를 입력해 주세요",
+        "nameExists": "이름이 이미 존재합니다",
+        "confirmDeleteVS": "다음 가상 서버를 삭제하시겠습니까?",
+        "confirmDeleteRS": "다음 실제 서버를 삭제하시겠습니까?",
+        "confirmDeleteVRRP": "다음 VRRP 그룹을 삭제하시겠습니까?",
+        "confirmDeleteSync": "다음 동기화 그룹을 삭제하시겠습니까?"
       },
       "options": {
         "algorithm": {
           "roundRobin": "Round Robin",
-          "weightedRoundRobin": "Weighted Round Robin",
-          "leastConnection": "Least Connection",
-          "weightedLeastConnection": "Weighted Least Connection",
-          "sourceHashing": "Source Hashing",
-          "destinationHashing": "Destination Hashing",
-          "localityBasedLeastConnection": "Locality-Based Least Connection"
+          "weightedRoundRobin": "가중치 Round Robin",
+          "leastConnection": "최소 연결",
+          "weightedLeastConnection": "가중치 최소 연결",
+          "sourceHashing": "소스 해싱",
+          "destinationHashing": "대상 해싱",
+          "localityBasedLeastConnection": "지역 기반 최소 연결"
         },
         "forwardMethod": {
-          "direct": "Direct Routing",
+          "direct": "직접 라우팅",
           "nat": "NAT",
-          "tunnel": "Tunneling"
+          "tunnel": "터널링"
         },
         "protocol": {
           "tcp": "TCP",
           "udp": "UDP"
         },
         "authType": {
-          "pass": "Simple Password",
-          "ah": "AH (Authentication Header)"
+          "pass": "단순 비밀번호",
+          "ah": "AH (인증 헤더)"
         },
         "vrrpVersion": {
           "v2": "VRRPv2",
           "v3": "VRRPv3"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "전달",
+        "input": "수신",
+        "name": "이름",
+        "output": "송신",
+        "prerouting": "프리라우팅",
+        "filter": "필터",
+        "raw": "Raw",
+        "defaultAction": "기본 동작",
+        "defaultActionHelp": "어떤 규칙과도 일치하지 않는 패킷에 대한 기본 동작",
+        "defaultLog": "기본 로그",
+        "defaultLogHelp": "기본 동작과 일치하는 패킷에 대한 로깅 활성화",
+        "description": "설명",
+        "descriptionHelp": "이 방화벽 체인에 대한 설명",
+        "disableConntrack": "연결 추적 비활성화",
+        "disableConntrackHelp": "이 체인의 연결 추적 비활성화",
+        "defaultJumpTarget": "기본 점프 대상",
+        "defaultJumpTargetHelp": "일치하는 규칙이 없을 때 점프할 대상 체인",
+        "nameName": "이름",
+        "accept": "수락",
+        "drop": "드롭",
+        "reject": "거부",
+        "return": "반환",
+        "continue": "계속",
+        "jump": "점프",
+        "createName": "이름 생성",
+        "editName": "이름 편집",
+        "confirmDelete": "이름 {name}을(를) 삭제하시겠습니까?",
+        "rulesetLabel": "규칙 집합"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "모드"
+      },
+      "type": {
+        "ethernet": "이더넷",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "프로토콜"
       }
     }
   }

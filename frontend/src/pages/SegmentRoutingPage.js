@@ -253,7 +253,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="deleteModalVisible" :title="t('segmentRouting.modals.confirmDelete')" width="400px" @confirm="confirmDeleteInterface">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('segmentRouting.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteInterface">
         <div>{{ t('segmentRouting.messages.confirmDeleteInterface') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteName }}</div>

@@ -196,7 +196,7 @@ export default defineComponent({
           </template>
         </TabGroup>
       </DraggableModal>
-      <DraggableModal v-model:visible="deleteModalVisible" :title="t('config.confirmDelete')" width="400px" @confirm="confirmDeleteRule">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteRule">
         <div>{{ t('staticNat.confirmDelete') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteRuleId }}</div>

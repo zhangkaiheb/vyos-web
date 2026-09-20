@@ -359,7 +359,7 @@ export default defineComponent({
           <input type="checkbox" v-model="serverForm.nts" :title="t('ntp.labels.ntsTitle')" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="deleteModalVisible" :title="t('ntp.modals.confirmDelete')" width="400px" @confirm="confirmDeleteServer">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('ntp.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteServer">
         <div>{{ t('ntp.messages.confirmDeleteServers') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>

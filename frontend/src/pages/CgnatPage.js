@@ -471,21 +471,21 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Delete Confirmation Modals -->
-      <DraggableModal v-model:visible="deleteModalVisible" :title="t('cgnat.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRule">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('cgnat.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveRule">
         <div>{{ t('cgnat.messages.confirmDeleteRule') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="id in pendingDeleteNames" :key="id" style="padding:2px 0;">{{ id }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="extPoolDeleteModalVisible" :title="t('cgnat.modals.confirmDelete')" width="400px" @confirm="confirmRemoveExtPool">
+      <DraggableModal v-model:visible="extPoolDeleteModalVisible" :title="t('cgnat.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveExtPool">
         <div>{{ t('cgnat.messages.confirmDeleteExtPool') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteExtPoolNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="intPoolDeleteModalVisible" :title="t('cgnat.modals.confirmDelete')" width="400px" @confirm="confirmRemoveIntPool">
+      <DraggableModal v-model:visible="intPoolDeleteModalVisible" :title="t('cgnat.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveIntPool">
         <div>{{ t('cgnat.messages.confirmDeleteIntPool') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteIntPoolNames" :key="name" style="padding:2px 0;">{{ name }}</div>

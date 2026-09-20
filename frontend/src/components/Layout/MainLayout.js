@@ -8,7 +8,11 @@ import { emitMenuRefresh } from '/src/utils/eventBus.js';
 import { locale } from '/src/i18n/index.js';
 
 function getLabel(item) {
-  return locale.value === 'en' ? (item.label_en || item.label) : item.label;
+  const loc = locale.value;
+  const langMap = { 'en': 'label_en', 'zh-TW': 'label_tw', 'ru': 'label_ru', 'de': 'label_de', 'fr': 'label_fr', 'ko': 'label_ko' };
+  const field = langMap[loc];
+  if (field && item[field]) return item[field];
+  return item.label;
 }
 
 export default defineComponent({

@@ -657,7 +657,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Delete Interface Confirmation Modal -->
-      <DraggableModal v-model:visible="deleteInterfaceModalVisible" :title="t('pim6.modals.confirmDelete')" width="400px" @confirm="confirmDeleteInterface">
+      <DraggableModal v-model:visible="deleteInterfaceModalVisible" :title="t('pim6.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteInterface">
         <div>{{ t('pim6.messages.confirmDeleteInterface') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteInterfaceName }}</div>
@@ -665,7 +665,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Delete Join Confirmation Modal -->
-      <DraggableModal v-model:visible="deleteJoinModalVisible" :title="t('pim6.modals.confirmDelete')" width="400px" @confirm="confirmDeleteJoin">
+      <DraggableModal v-model:visible="deleteJoinModalVisible" :title="t('pim6.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteJoin">
         <div>{{ t('pim6.messages.confirmDeleteMldJoin') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteJoinName }}</div>
@@ -673,7 +673,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Delete RP Confirmation Modal -->
-      <DraggableModal v-model:visible="deleteRpModalVisible" :title="t('pim6.modals.confirmDelete')" width="400px" @confirm="confirmDeleteRp">
+      <DraggableModal v-model:visible="deleteRpModalVisible" :title="t('pim6.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteRp">
         <div>{{ t('pim6.messages.confirmDeleteRpAddress') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteRpName }}</div>

@@ -186,7 +186,7 @@ export default defineComponent({
       />
 
       <!-- Delete confirmation dialog -->
-      <DraggableModal v-model:visible="showDeleteModal" :title="t('dnsserver.modals.confirmDelete')" @confirm="confirmDelete" @close="showDeleteModal = false" width="400px">
+      <DraggableModal v-model:visible="showDeleteModal" :title="t('dnsserver.modals.confirmDelete')" header-icon="delete" @confirm="confirmDelete" @close="showDeleteModal = false" width="400px">
         <div style="padding: 20px 0;">
           {{ t('dnsserver.modals.deleteConfirm', { count: deleteTargetKeys.length }) }}
         </div>

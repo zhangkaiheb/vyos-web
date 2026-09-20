@@ -26,6 +26,53 @@
       "select_to_edit": "请选择_to_编辑",
       "type_title": "类型_title",
       "vrf_title": "vrf_title"
+    },
+    "firewall": {
+      "options": {
+        "forward": "转发",
+        "input": "入站",
+        "name": "名称",
+        "output": "出站",
+        "prerouting": "预路由",
+        "filter": "过滤",
+        "raw": "原始",
+        "defaultAction": "默认动作",
+        "defaultActionHelp": "不匹配任何规则的数据包的默认动作",
+        "defaultLog": "默认日志",
+        "defaultLogHelp": "启用匹配默认动作的数据包日志记录",
+        "description": "描述",
+        "descriptionHelp": "此防火墙链的描述",
+        "disableConntrack": "禁用连接跟踪",
+        "disableConntrackHelp": "禁用此链的连接跟踪",
+        "defaultJumpTarget": "默认跳转目标",
+        "defaultJumpTargetHelp": "没有规则匹配时跳转的目标链",
+        "nameName": "名称",
+        "accept": "接受",
+        "drop": "丢弃",
+        "reject": "拒绝",
+        "return": "返回",
+        "continue": "继续",
+        "jump": "跳转",
+        "createName": "创建名称",
+        "editName": "编辑名称",
+        "confirmDelete": "确定要删除名称 {name} 吗？",
+        "rulesetLabel": "规则集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太网",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "协议"
+      }
     }
   },
   "en": {
@@ -55,6 +102,53 @@
       "select_to_edit": "Select_to_edit",
       "type_title": "Type_title",
       "vrf_title": "Vrf_title"
+    },
+    "firewall": {
+      "options": {
+        "forward": "Forward",
+        "input": "Input",
+        "name": "Name",
+        "output": "Output",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Default Action",
+        "defaultActionHelp": "Default action for packets that do not match any rule",
+        "defaultLog": "Default Log",
+        "defaultLogHelp": "Enable logging for packets matching the default action",
+        "description": "Description",
+        "descriptionHelp": "Description of this firewall chain",
+        "disableConntrack": "Disable Conntrack",
+        "disableConntrackHelp": "Disable connection tracking for this chain",
+        "defaultJumpTarget": "Default Jump Target",
+        "defaultJumpTargetHelp": "Target chain to jump to when no rule matches",
+        "nameName": "Name",
+        "accept": "Accept",
+        "drop": "Drop",
+        "reject": "Reject",
+        "return": "Return",
+        "continue": "Continue",
+        "jump": "Jump",
+        "createName": "Create Name",
+        "editName": "Edit Name",
+        "confirmDelete": "Are you sure you want to delete name {name}?",
+        "rulesetLabel": "Ruleset"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocol"
+      }
     }
   },
   "zh-TW": {
@@ -84,122 +178,357 @@
       "select_to_edit": "Select_to_edit",
       "type_title": "Type_title",
       "vrf_title": "Vrf_title"
+    },
+    "firewall": {
+      "options": {
+        "forward": "轉發",
+        "input": "入站",
+        "name": "名稱",
+        "output": "出站",
+        "prerouting": "預路由",
+        "filter": "過濾",
+        "raw": "原始",
+        "defaultAction": "預設動作",
+        "defaultActionHelp": "不符合任何規則的資料封包的預設動作",
+        "defaultLog": "預設日誌",
+        "defaultLogHelp": "啟用符合預設動作的資料封包日誌記錄",
+        "description": "描述",
+        "descriptionHelp": "此防火牆鏈的描述",
+        "disableConntrack": "停用連線追蹤",
+        "disableConntrackHelp": "停用此鏈的連線追蹤",
+        "defaultJumpTarget": "預設跳轉目標",
+        "defaultJumpTargetHelp": "沒有規則符合時跳轉的目標鏈",
+        "nameName": "名稱",
+        "accept": "接受",
+        "drop": "丟棄",
+        "reject": "拒絕",
+        "return": "返回",
+        "continue": "繼續",
+        "jump": "跳轉",
+        "createName": "建立名稱",
+        "editName": "編輯名稱",
+        "confirmDelete": "確定要刪除名稱 {name} 嗎？",
+        "rulesetLabel": "規則集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太網",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "協議"
+      }
     }
   },
   "ru": {
     "containerNetwork": {
-      "bridge_default": "Bridge_default",
-      "description_title": "Description_title",
-      "disable_dns": "Disable_dns",
-      "disable_dns_title": "Disable_dns_title",
-      "edit_network": "Edit_network",
-      "enter_name": "Enter_name",
-      "gateway_address": "Gateway_address",
-      "gateway_placeholder": "Gateway_placeholder",
-      "gateway_title": "Gateway_title",
-      "load_failed": "Load_failed",
-      "macvlan_settings": "Macvlan_settings",
-      "mode_title": "Mode_title",
-      "mtu_title": "Mtu_title",
-      "name_title": "Name_title",
-      "new_network": "New_network",
-      "not_found": "Not_found",
-      "parent_interface": "Parent_interface",
-      "parent_interface_title": "Parent_interface_title",
-      "prefix_placeholder": "Prefix_placeholder",
-      "prefix_title": "Prefix_title",
-      "save_failed": "Save_failed",
-      "select_to_delete": "Select_to_delete",
-      "select_to_edit": "Select_to_edit",
-      "type_title": "Type_title",
-      "vrf_title": "Vrf_title"
+      "bridge_default": "Мост_по умолчанию",
+      "description_title": "Заголовок описания",
+      "disable_dns": "Отключить DNS",
+      "disable_dns_title": "Заголовок отключения DNS",
+      "edit_network": "Редактировать сеть",
+      "enter_name": "Введите имя",
+      "gateway_address": "Адрес шлюза",
+      "gateway_placeholder": "Заполнитель шлюза",
+      "gateway_title": "Заголовок шлюза",
+      "load_failed": "Ошибка загрузки",
+      "macvlan_settings": "Настройки Macvlan",
+      "mode_title": "Заголовок режима",
+      "mtu_title": "Заголовок MTU",
+      "name_title": "Заголовок имени",
+      "new_network": "Новая сеть",
+      "not_found": "Не найдено",
+      "parent_interface": "Родительский интерфейс",
+      "parent_interface_title": "Заголовок родительского интерфейса",
+      "prefix_placeholder": "Введите префикс",
+      "prefix_title": "Префикс",
+      "save_failed": "Не удалось сохранить",
+      "select_to_delete": "Выбрать для удаления",
+      "select_to_edit": "Выбрать для редактирования",
+      "type_title": "Заголовок типа",
+      "vrf_title": "Заголовок VRF"
+    },
+    "firewall": {
+      "options": {
+        "forward": "Переадресация",
+        "input": "Входящие",
+        "name": "Имя",
+        "output": "Исходящие",
+        "prerouting": "Премаршрутизация",
+        "filter": "Фильтр",
+        "raw": "Сырой",
+        "defaultAction": "Действие по умолчанию",
+        "defaultActionHelp": "Действие по умолчанию для пакетов, не соответствующих ни одному правилу",
+        "defaultLog": "Журнал по умолчанию",
+        "defaultLogHelp": "Включить ведение журнала для пакетов, соответствующих действию по умолчанию",
+        "description": "Описание",
+        "descriptionHelp": "Описание этой цепочки межсетевого экрана",
+        "disableConntrack": "Отключить отслеживание соединений",
+        "disableConntrackHelp": "Отключить отслеживание соединений для этой цепочки",
+        "defaultJumpTarget": "Цель перехода по умолчанию",
+        "defaultJumpTargetHelp": "Целевая цепочка для перехода при отсутствии совпадений",
+        "nameName": "Имя",
+        "accept": "Принять",
+        "drop": "Отбросить",
+        "reject": "Отклонить",
+        "return": "Вернуть",
+        "continue": "Продолжить",
+        "jump": "Перейти",
+        "createName": "Создать имя",
+        "editName": "Редактировать имя",
+        "confirmDelete": "Вы уверены, что хотите удалить имя {name}?",
+        "rulesetLabel": "Набор правил"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Режим"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Протокол"
+      }
     }
   },
   "de": {
     "containerNetwork": {
-      "bridge_default": "Bridge_default",
-      "description_title": "Description_title",
-      "disable_dns": "Disable_dns",
-      "disable_dns_title": "Disable_dns_title",
-      "edit_network": "Edit_network",
-      "enter_name": "Enter_name",
-      "gateway_address": "Gateway_address",
-      "gateway_placeholder": "Gateway_placeholder",
-      "gateway_title": "Gateway_title",
-      "load_failed": "Load_failed",
-      "macvlan_settings": "Macvlan_settings",
-      "mode_title": "Mode_title",
-      "mtu_title": "Mtu_title",
-      "name_title": "Name_title",
-      "new_network": "New_network",
-      "not_found": "Not_found",
-      "parent_interface": "Parent_interface",
-      "parent_interface_title": "Parent_interface_title",
-      "prefix_placeholder": "Prefix_placeholder",
-      "prefix_title": "Prefix_title",
-      "save_failed": "Save_failed",
-      "select_to_delete": "Select_to_delete",
-      "select_to_edit": "Select_to_edit",
-      "type_title": "Type_title",
-      "vrf_title": "Vrf_title"
+      "bridge_default": "Bridge_Standard",
+      "description_title": "Beschreibungstitel",
+      "disable_dns": "DNS deaktivieren",
+      "disable_dns_title": "DNS-Deaktivierungstitel",
+      "edit_network": "Netzwerk bearbeiten",
+      "enter_name": "Name eingeben",
+      "gateway_address": "Gateway-Adresse",
+      "gateway_placeholder": "Gateway-Platzhalter",
+      "gateway_title": "Gateway-Titel",
+      "load_failed": "Laden_fehlgeschlagen",
+      "macvlan_settings": "Macvlan-Einstellungen",
+      "mode_title": "Modus-Titel",
+      "mtu_title": "MTU-Titel",
+      "name_title": "Name-Titel",
+      "new_network": "Neues_Netzwerk",
+      "not_found": "Nicht gefunden",
+      "parent_interface": "Übergeordnete Schnittstelle",
+      "parent_interface_title": "Titel der übergeordneten Schnittstelle",
+      "prefix_placeholder": "Präfix eingeben",
+      "prefix_title": "Präfix",
+      "save_failed": "Speichern fehlgeschlagen",
+      "select_to_delete": "Zum Löschen auswählen",
+      "select_to_edit": "Zum Bearbeiten auswählen",
+      "type_title": "Typ-Titel",
+      "vrf_title": "VRF-Titel"
+    },
+    "firewall": {
+      "options": {
+        "forward": "Weiterleitung",
+        "input": "Eingehend",
+        "name": "Name",
+        "output": "Ausgehend",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Standardaktion",
+        "defaultActionHelp": "Standardaktion für Pakete, die mit keiner Regel übereinstimmen",
+        "defaultLog": "Standardprotokoll",
+        "defaultLogHelp": "Protokollierung für Pakete aktivieren, die der Standardaktion entsprechen",
+        "description": "Beschreibung",
+        "descriptionHelp": "Beschreibung dieser Firewall-Kette",
+        "disableConntrack": "Verbindungsverfolgung deaktivieren",
+        "disableConntrackHelp": "Verbindungsverfolgung für diese Kette deaktivieren",
+        "defaultJumpTarget": "Standard-Sprungziel",
+        "defaultJumpTargetHelp": "Zielkette zum Sprung bei keiner Übereinstimmung",
+        "nameName": "Name",
+        "accept": "Akzeptieren",
+        "drop": "Verwerfen",
+        "reject": "Zurückweisen",
+        "return": "Zurückkehren",
+        "continue": "Fortsetzen",
+        "jump": "Springen",
+        "createName": "Name erstellen",
+        "editName": "Name bearbeiten",
+        "confirmDelete": "Möchten Sie den Namen {name} wirklich löschen?",
+        "rulesetLabel": "Regelsatz"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Modus"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protokoll"
+      }
     }
   },
   "fr": {
     "containerNetwork": {
-      "bridge_default": "Bridge_default",
-      "description_title": "Description_title",
-      "disable_dns": "Disable_dns",
-      "disable_dns_title": "Disable_dns_title",
-      "edit_network": "Edit_network",
-      "enter_name": "Enter_name",
-      "gateway_address": "Gateway_address",
-      "gateway_placeholder": "Gateway_placeholder",
-      "gateway_title": "Gateway_title",
-      "load_failed": "Load_failed",
-      "macvlan_settings": "Macvlan_settings",
-      "mode_title": "Mode_title",
-      "mtu_title": "Mtu_title",
-      "name_title": "Name_title",
-      "new_network": "New_network",
-      "not_found": "Not_found",
-      "parent_interface": "Parent_interface",
-      "parent_interface_title": "Parent_interface_title",
-      "prefix_placeholder": "Prefix_placeholder",
-      "prefix_title": "Prefix_title",
-      "save_failed": "Save_failed",
-      "select_to_delete": "Select_to_delete",
-      "select_to_edit": "Select_to_edit",
-      "type_title": "Type_title",
-      "vrf_title": "Vrf_title"
+      "bridge_default": "Pont_par défaut",
+      "description_title": "Titre de description",
+      "disable_dns": "Désactiver DNS",
+      "disable_dns_title": "Titre de désactivation DNS",
+      "edit_network": "Modifier le réseau",
+      "enter_name": "Entrez le nom",
+      "gateway_address": "Adresse de passerelle",
+      "gateway_placeholder": "Espace réservé de passerelle",
+      "gateway_title": "Titre de passerelle",
+      "load_failed": "Échec_du_chargement",
+      "macvlan_settings": "Paramètres Macvlan",
+      "mode_title": "Titre du mode",
+      "mtu_title": "Titre MTU",
+      "name_title": "Titre du nom",
+      "new_network": "Nouveau_réseau",
+      "not_found": "Non trouvé",
+      "parent_interface": "Interface parent",
+      "parent_interface_title": "Titre de l'interface parent",
+      "prefix_placeholder": "Entrez le préfixe",
+      "prefix_title": "Préfixe",
+      "save_failed": "Échec de l'enregistrement",
+      "select_to_delete": "Sélectionner pour supprimer",
+      "select_to_edit": "Sélectionner pour modifier",
+      "type_title": "Titre de type",
+      "vrf_title": "Titre VRF"
+    },
+    "firewall": {
+      "options": {
+        "forward": "Transfert",
+        "input": "Entrant",
+        "name": "Nom",
+        "output": "Sortant",
+        "prerouting": "Prerouting",
+        "filter": "Filtre",
+        "raw": "Brut",
+        "defaultAction": "Action par défaut",
+        "defaultActionHelp": "Action par défaut pour les paquets ne correspondant à aucune règle",
+        "defaultLog": "Journal par défaut",
+        "defaultLogHelp": "Activer la journalisation pour les paquets correspondant à l'action par défaut",
+        "description": "Description",
+        "descriptionHelp": "Description de cette chaîne de pare-feu",
+        "disableConntrack": "Désactiver le suivi de connexion",
+        "disableConntrackHelp": "Désactiver le suivi de connexion pour cette chaîne",
+        "defaultJumpTarget": "Cible de saut par défaut",
+        "defaultJumpTargetHelp": "Chaîne cible vers laquelle sauter en cas d'absence de correspondance",
+        "nameName": "Nom",
+        "accept": "Accepter",
+        "drop": "Supprimer",
+        "reject": "Rejeter",
+        "return": "Retour",
+        "continue": "Continuer",
+        "jump": "Sauter",
+        "createName": "Créer un nom",
+        "editName": "Modifier le nom",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer le nom {name} ?",
+        "rulesetLabel": "Ensemble de règles"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocole"
+      }
     }
   },
   "ko": {
     "containerNetwork": {
-      "bridge_default": "Bridge_default",
-      "description_title": "Description_title",
-      "disable_dns": "Disable_dns",
-      "disable_dns_title": "Disable_dns_title",
-      "edit_network": "Edit_network",
-      "enter_name": "Enter_name",
-      "gateway_address": "Gateway_address",
-      "gateway_placeholder": "Gateway_placeholder",
-      "gateway_title": "Gateway_title",
-      "load_failed": "Load_failed",
-      "macvlan_settings": "Macvlan_settings",
-      "mode_title": "Mode_title",
-      "mtu_title": "Mtu_title",
-      "name_title": "Name_title",
-      "new_network": "New_network",
-      "not_found": "Not_found",
-      "parent_interface": "Parent_interface",
-      "parent_interface_title": "Parent_interface_title",
-      "prefix_placeholder": "Prefix_placeholder",
-      "prefix_title": "Prefix_title",
-      "save_failed": "Save_failed",
-      "select_to_delete": "Select_to_delete",
-      "select_to_edit": "Select_to_edit",
-      "type_title": "Type_title",
-      "vrf_title": "Vrf_title"
+      "bridge_default": "브리지_기본값",
+      "description_title": "설명 제목",
+      "disable_dns": "DNS 비활성화",
+      "disable_dns_title": "DNS 비활성화 제목",
+      "edit_network": "네트워크 편집",
+      "enter_name": "이름 입력",
+      "gateway_address": "게이트웨이 주소",
+      "gateway_placeholder": "게이트웨이 자리 표시자",
+      "gateway_title": "게이트웨이 제목",
+      "load_failed": "로드_실패",
+      "macvlan_settings": "Macvlan 설정",
+      "mode_title": "모드 제목",
+      "mtu_title": "MTU 제목",
+      "name_title": "이름 제목",
+      "new_network": "새_네트워크",
+      "not_found": "찾을 수 없음",
+      "parent_interface": "부모 인터페이스",
+      "parent_interface_title": "부모 인터페이스 제목",
+      "prefix_placeholder": "접두사 입력",
+      "prefix_title": "접두사",
+      "save_failed": "저장 실패",
+      "select_to_delete": "삭제할 항목 선택",
+      "select_to_edit": "편집할 항목 선택",
+      "type_title": "유형 제목",
+      "vrf_title": "VRF 제목"
+    },
+    "firewall": {
+      "options": {
+        "forward": "전달",
+        "input": "수신",
+        "name": "이름",
+        "output": "송신",
+        "prerouting": "프리라우팅",
+        "filter": "필터",
+        "raw": "Raw",
+        "defaultAction": "기본 동작",
+        "defaultActionHelp": "어떤 규칙과도 일치하지 않는 패킷에 대한 기본 동작",
+        "defaultLog": "기본 로그",
+        "defaultLogHelp": "기본 동작과 일치하는 패킷에 대한 로깅 활성화",
+        "description": "설명",
+        "descriptionHelp": "이 방화벽 체인에 대한 설명",
+        "disableConntrack": "연결 추적 비활성화",
+        "disableConntrackHelp": "이 체인의 연결 추적 비활성화",
+        "defaultJumpTarget": "기본 점프 대상",
+        "defaultJumpTargetHelp": "일치하는 규칙이 없을 때 점프할 대상 체인",
+        "nameName": "이름",
+        "accept": "수락",
+        "drop": "드롭",
+        "reject": "거부",
+        "return": "반환",
+        "continue": "계속",
+        "jump": "점프",
+        "createName": "이름 생성",
+        "editName": "이름 편집",
+        "confirmDelete": "이름 {name}을(를) 삭제하시겠습니까?",
+        "rulesetLabel": "규칙 집합"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "모드"
+      },
+      "type": {
+        "ethernet": "이더넷",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "프로토콜"
+      }
     }
   }
 }

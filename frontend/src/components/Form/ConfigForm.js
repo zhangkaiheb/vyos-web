@@ -38,6 +38,7 @@ export default defineComponent({
     const advancedOpen = ref({ '': false });
     const fieldErrors = ref({});
     const suggestionsCache = ref({});
+    const suggestionsVersion = ref(0);
     const activeTab = ref('');
 
     function suggestionKey(path, key) {
@@ -65,6 +66,7 @@ export default defineComponent({
         const staticSuggestions = field.suggestions || [];
         const combined = Array.from(new Set([...staticSuggestions, ...list]));
         suggestionsCache.value[key] = combined;
+        suggestionsVersion.value++;
         // Auto-select first option if field value is empty and noAutoFill is not set
         const formObj = getFormObj(path);
         if (formObj && combined.length && (formObj[field.key] === undefined || formObj[field.key] === null) && !field.noAutoFill) {
@@ -77,20 +79,24 @@ export default defineComponent({
     }
 
     // Preload suggestions for dynamic fields on mount
+    // Preload suggestions for dynamic fields on mount
+    // Only preload for the currently visible tab to avoid loading all tabs at once
     onMounted(async () => {
+      const tasks = [];
       const collect = (schema, path, formObj) => {
         for (const field of schema) {
           if (field.type === 'tab') {
-            // Tab children share the same flat form object
-            collect(field.children || [], path, formObj);
+            // Don't preload tab children - they will be loaded when the tab is activated
+            continue;
           } else if (field.type === 'group') {
             collect(field.children || [], [...path, field.key], formObj?.[field.key] || {});
           } else if (field.dynamic) {
-            loadSuggestions(path, field);
+            tasks.push(loadSuggestions(path, field));
           }
         }
       };
       collect(props.schema, [], form.value);
+      await Promise.all(tasks);
     });
 
     function initForm() {
@@ -347,6 +353,9 @@ export default defineComponent({
       if (field.type === 'select') {
         // For dynamic select fields, get options from suggestionsCache
         const sKey = suggestionKey(path, field.key);
+        if (field.dynamic && !suggestionsCache.value[sKey]) {
+          loadSuggestions(path, field);
+        }
         const dynamicOpts = field.dynamic ? (suggestionsCache.value[sKey] || []) : [];
         const options = dynamicOpts.length > 0 
           ? dynamicOpts.map(o => ({ value: o, label: o }))

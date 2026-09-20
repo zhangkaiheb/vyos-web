@@ -644,14 +644,14 @@ export default defineComponent({
         </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemove">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemove">
         <div>{{ $t('interface.vxlan.delete_confirm') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="vlanDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmDeleteVlan">
+      <DraggableModal v-model:visible="vlanDeleteModalVisible" :title="$t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteVlan">
         <div>{{ $t('interface.vxlan.delete_vlan_confirm') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-if="pendingDeleteVlanIndex >= 0 && vlanToVni[pendingDeleteVlanIndex]" style="padding:2px 0;">

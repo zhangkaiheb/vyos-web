@@ -105,6 +105,53 @@
       "errors": {
         "loadFailed": "加载失败"
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "转发",
+        "input": "入站",
+        "name": "名称",
+        "output": "出站",
+        "prerouting": "预路由",
+        "filter": "过滤",
+        "raw": "原始",
+        "defaultAction": "默认动作",
+        "defaultActionHelp": "不匹配任何规则的数据包的默认动作",
+        "defaultLog": "默认日志",
+        "defaultLogHelp": "启用匹配默认动作的数据包日志记录",
+        "description": "描述",
+        "descriptionHelp": "此防火墙链的描述",
+        "disableConntrack": "禁用连接跟踪",
+        "disableConntrackHelp": "禁用此链的连接跟踪",
+        "defaultJumpTarget": "默认跳转目标",
+        "defaultJumpTargetHelp": "没有规则匹配时跳转的目标链",
+        "nameName": "名称",
+        "accept": "接受",
+        "drop": "丢弃",
+        "reject": "拒绝",
+        "return": "返回",
+        "continue": "继续",
+        "jump": "跳转",
+        "createName": "创建名称",
+        "editName": "编辑名称",
+        "confirmDelete": "确定要删除名称 {name} 吗？",
+        "rulesetLabel": "规则集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太网",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "协议"
+      }
     }
   },
   "en": {
@@ -212,6 +259,53 @@
       },
       "errors": {
         "loadFailed": "Load failed"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Forward",
+        "input": "Input",
+        "name": "Name",
+        "output": "Output",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Default Action",
+        "defaultActionHelp": "Default action for packets that do not match any rule",
+        "defaultLog": "Default Log",
+        "defaultLogHelp": "Enable logging for packets matching the default action",
+        "description": "Description",
+        "descriptionHelp": "Description of this firewall chain",
+        "disableConntrack": "Disable Conntrack",
+        "disableConntrackHelp": "Disable connection tracking for this chain",
+        "defaultJumpTarget": "Default Jump Target",
+        "defaultJumpTargetHelp": "Target chain to jump to when no rule matches",
+        "nameName": "Name",
+        "accept": "Accept",
+        "drop": "Drop",
+        "reject": "Reject",
+        "return": "Return",
+        "continue": "Continue",
+        "jump": "Jump",
+        "createName": "Create Name",
+        "editName": "Edit Name",
+        "confirmDelete": "Are you sure you want to delete name {name}?",
+        "rulesetLabel": "Ruleset"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocol"
       }
     }
   },
@@ -321,437 +415,672 @@
       "errors": {
         "loadFailed": "Load failed"
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "轉發",
+        "input": "入站",
+        "name": "名稱",
+        "output": "出站",
+        "prerouting": "預路由",
+        "filter": "過濾",
+        "raw": "原始",
+        "defaultAction": "預設動作",
+        "defaultActionHelp": "不符合任何規則的資料封包的預設動作",
+        "defaultLog": "預設日誌",
+        "defaultLogHelp": "啟用符合預設動作的資料封包日誌記錄",
+        "description": "描述",
+        "descriptionHelp": "此防火牆鏈的描述",
+        "disableConntrack": "停用連線追蹤",
+        "disableConntrackHelp": "停用此鏈的連線追蹤",
+        "defaultJumpTarget": "預設跳轉目標",
+        "defaultJumpTargetHelp": "沒有規則符合時跳轉的目標鏈",
+        "nameName": "名稱",
+        "accept": "接受",
+        "drop": "丟棄",
+        "reject": "拒絕",
+        "return": "返回",
+        "continue": "繼續",
+        "jump": "跳轉",
+        "createName": "建立名稱",
+        "editName": "編輯名稱",
+        "confirmDelete": "確定要刪除名稱 {name} 嗎？",
+        "rulesetLabel": "規則集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太網",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "協議"
+      }
     }
   },
   "ru": {
     "controlPanel": {
       "categories": {
-        "system": "System Information",
-        "users": "Users",
-        "hardware": "Hardware",
-        "tools": "Tools"
+        "system": "Информация о системе",
+        "users": "Пользователи",
+        "hardware": "Оборудование",
+        "tools": "Инструменты"
       },
       "widgets": {
-        "cpu": "CPU",
-        "memory": "Memory",
-        "disk": "Disk",
-        "login": "Current Login",
-        "version": "System Version",
-        "date": "System Time",
-        "users": "Current Users",
-        "storageScsi": "SCSI Storage Devices",
-        "storageNvme": "NVMe Storage Devices",
-        "storageSmart": "SMART Information",
-        "usb": "USB Devices",
-        "image": "System Image",
-        "systemLoginUsers": "System Login Users",
-        "webshell": "Web Shell"
+        "cpu": "ЦП",
+        "memory": "Память",
+        "disk": "Диск",
+        "login": "Текущий вход",
+        "version": "Версия системы",
+        "date": "Системное время",
+        "users": "Текущие пользователи",
+        "storageScsi": "Устройства хранения SCSI",
+        "storageNvme": "Устройства хранения NVMe",
+        "storageSmart": "Информация SMART",
+        "usb": "Устройства USB",
+        "image": "Образ системы",
+        "systemLoginUsers": "Пользователи входа в систему",
+        "webshell": "Веб-оболочка"
       },
       "header": {
-        "loading": "Loading...",
-        "refresh": "Refresh",
-        "expand": "Expand",
-        "collapse": "Collapse",
-        "close": "Close"
+        "loading": "Загрузка...",
+        "refresh": "Обновить",
+        "expand": "Развернуть",
+        "collapse": "Свернуть",
+        "close": "Закрыть"
       },
       "buttons": {
-        "addWidget": "Add Widget",
-        "refreshAll": "Refresh All"
+        "addWidget": "Добавить виджет",
+        "refreshAll": "Обновить все"
       },
       "cpu": {
-        "model": "Model",
-        "sockets": "Sockets",
-        "cores": "Total Cores",
-        "currentMhz": "Current Frequency"
+        "model": "Модель",
+        "sockets": "Сокеты",
+        "cores": "Всего ядер",
+        "currentMhz": "Текущая частота"
       },
       "memory": {
-        "total": "Total",
-        "used": "Used",
-        "free": "Free"
+        "total": "Всего",
+        "used": "Использовано",
+        "free": "Свободно"
       },
       "disk": {
-        "size": "Total Capacity",
-        "model": "Model",
-        "partitions": "Partitions"
+        "size": "Общая ёмкость",
+        "model": "Модель",
+        "partitions": "Разделы"
       },
       "storageScsi": {
-        "address": "Address",
-        "type": "Type",
-        "vendor": "Vendor",
-        "product": "Product",
-        "revision": "Revision",
-        "device": "Device"
+        "address": "Адрес",
+        "type": "Тип",
+        "vendor": "Производитель",
+        "product": "Продукт",
+        "revision": "Ревизия",
+        "device": "Устройство"
       },
       "storageNvme": {
-        "noDevice": "No NVMe Device"
+        "noDevice": "Нет устройства NVMe"
       },
       "storageSmart": {
-        "vendor": "Vendor",
-        "product": "Product",
-        "userCapacity": "User Capacity",
-        "currentTemperature": "Current Temperature"
+        "vendor": "Производитель",
+        "product": "Продукт",
+        "userCapacity": "Ёмкость пользователя",
+        "currentTemperature": "Текущая температура"
       },
       "usb": {
-        "noData": "No Data"
+        "noData": "Нет данных"
       },
       "users": {
-        "name": "Name",
-        "line": "Line",
-        "time": "Time",
-        "comment": "Comment"
+        "name": "Имя",
+        "line": "Линия",
+        "time": "Время",
+        "comment": "Комментарий"
       },
       "version": {
-        "version": "Version",
-        "releaseTrain": "Release Train",
-        "architecture": "Architecture",
-        "systemType": "System Type"
+        "version": "Версия",
+        "releaseTrain": "Поезд выпусков",
+        "architecture": "Архитектура",
+        "systemType": "Тип системы"
       },
       "image": {
-        "name": "Name",
-        "version": "Version",
-        "storageReadOnly": "Read-Only Storage",
-        "storageReadWrite": "Read-Write Storage",
-        "storageTotal": "Total Storage"
+        "name": "Имя",
+        "version": "Версия",
+        "storageReadOnly": "Хранилище только для чтения",
+        "storageReadWrite": "Хранилище для чтения и записи",
+        "storageTotal": "Общий объём хранилища"
       },
       "systemLoginUsers": {
-        "username": "Username",
-        "type": "Type",
-        "locked": "Locked",
+        "username": "Имя пользователя",
+        "type": "Тип",
+        "locked": "Заблокировано",
         "tty": "Tty",
-        "from": "From",
-        "lastLogin": "Last Login"
+        "from": "От",
+        "lastLogin": "Последний вход"
       },
       "modal": {
-        "title": "Add Widget",
-        "searchPlaceholder": "Search widgets...",
-        "noMatch": "No matching widgets found"
+        "title": "Добавить виджет",
+        "searchPlaceholder": "Поиск виджетов...",
+        "noMatch": "Не найдено подходящих виджетов"
       },
       "errors": {
-        "loadFailed": "Load failed"
+        "loadFailed": "Ошибка загрузки"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Переадресация",
+        "input": "Входящие",
+        "name": "Имя",
+        "output": "Исходящие",
+        "prerouting": "Премаршрутизация",
+        "filter": "Фильтр",
+        "raw": "Сырой",
+        "defaultAction": "Действие по умолчанию",
+        "defaultActionHelp": "Действие по умолчанию для пакетов, не соответствующих ни одному правилу",
+        "defaultLog": "Журнал по умолчанию",
+        "defaultLogHelp": "Включить ведение журнала для пакетов, соответствующих действию по умолчанию",
+        "description": "Описание",
+        "descriptionHelp": "Описание этой цепочки межсетевого экрана",
+        "disableConntrack": "Отключить отслеживание соединений",
+        "disableConntrackHelp": "Отключить отслеживание соединений для этой цепочки",
+        "defaultJumpTarget": "Цель перехода по умолчанию",
+        "defaultJumpTargetHelp": "Целевая цепочка для перехода при отсутствии совпадений",
+        "nameName": "Имя",
+        "accept": "Принять",
+        "drop": "Отбросить",
+        "reject": "Отклонить",
+        "return": "Вернуть",
+        "continue": "Продолжить",
+        "jump": "Перейти",
+        "createName": "Создать имя",
+        "editName": "Редактировать имя",
+        "confirmDelete": "Вы уверены, что хотите удалить имя {name}?",
+        "rulesetLabel": "Набор правил"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Режим"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Протокол"
       }
     }
   },
   "de": {
     "controlPanel": {
       "categories": {
-        "system": "System Information",
-        "users": "Users",
+        "system": "Systeminformationen",
+        "users": "Benutzer",
         "hardware": "Hardware",
-        "tools": "Tools"
+        "tools": "Werkzeuge"
       },
       "widgets": {
         "cpu": "CPU",
-        "memory": "Memory",
-        "disk": "Disk",
-        "login": "Current Login",
-        "version": "System Version",
-        "date": "System Time",
-        "users": "Current Users",
-        "storageScsi": "SCSI Storage Devices",
-        "storageNvme": "NVMe Storage Devices",
-        "storageSmart": "SMART Information",
-        "usb": "USB Devices",
-        "image": "System Image",
-        "systemLoginUsers": "System Login Users",
-        "webshell": "Web Shell"
+        "memory": "Speicher",
+        "disk": "Festplatte",
+        "login": "Aktuelle Anmeldung",
+        "version": "Systemversion",
+        "date": "Systemzeit",
+        "users": "Aktuelle Benutzer",
+        "storageScsi": "SCSI-Speichergeräte",
+        "storageNvme": "NVMe-Speichergeräte",
+        "storageSmart": "SMART-Informationen",
+        "usb": "USB-Geräte",
+        "image": "Systemabbild",
+        "systemLoginUsers": "System-Anmeldebenutzer",
+        "webshell": "Web-Shell"
       },
       "header": {
-        "loading": "Loading...",
-        "refresh": "Refresh",
-        "expand": "Expand",
-        "collapse": "Collapse",
-        "close": "Close"
+        "loading": "Laden...",
+        "refresh": "Aktualisieren",
+        "expand": "Erweitern",
+        "collapse": "Einklappen",
+        "close": "Schließen"
       },
       "buttons": {
-        "addWidget": "Add Widget",
-        "refreshAll": "Refresh All"
+        "addWidget": "Widget hinzufügen",
+        "refreshAll": "Alle aktualisieren"
       },
       "cpu": {
-        "model": "Model",
+        "model": "Modell",
         "sockets": "Sockets",
-        "cores": "Total Cores",
-        "currentMhz": "Current Frequency"
+        "cores": "Gesamtkerne",
+        "currentMhz": "Aktuelle Frequenz"
       },
       "memory": {
-        "total": "Total",
-        "used": "Used",
-        "free": "Free"
+        "total": "Gesamt",
+        "used": "Verwendet",
+        "free": "Frei"
       },
       "disk": {
-        "size": "Total Capacity",
-        "model": "Model",
-        "partitions": "Partitions"
+        "size": "Gesamtkapazität",
+        "model": "Modell",
+        "partitions": "Partitionen"
       },
       "storageScsi": {
-        "address": "Address",
-        "type": "Type",
-        "vendor": "Vendor",
-        "product": "Product",
+        "address": "Adresse",
+        "type": "Typ",
+        "vendor": "Hersteller",
+        "product": "Produkt",
         "revision": "Revision",
-        "device": "Device"
+        "device": "Gerät"
       },
       "storageNvme": {
-        "noDevice": "No NVMe Device"
+        "noDevice": "Kein NVMe-Gerät"
       },
       "storageSmart": {
-        "vendor": "Vendor",
-        "product": "Product",
-        "userCapacity": "User Capacity",
-        "currentTemperature": "Current Temperature"
+        "vendor": "Hersteller",
+        "product": "Produkt",
+        "userCapacity": "Benutzerkapazität",
+        "currentTemperature": "Aktuelle Temperatur"
       },
       "usb": {
-        "noData": "No Data"
+        "noData": "Keine Daten"
       },
       "users": {
         "name": "Name",
-        "line": "Line",
-        "time": "Time",
-        "comment": "Comment"
+        "line": "Linie",
+        "time": "Zeit",
+        "comment": "Kommentar"
       },
       "version": {
         "version": "Version",
-        "releaseTrain": "Release Train",
-        "architecture": "Architecture",
-        "systemType": "System Type"
+        "releaseTrain": "Release-Zug",
+        "architecture": "Architektur",
+        "systemType": "Systemtyp"
       },
       "image": {
         "name": "Name",
         "version": "Version",
-        "storageReadOnly": "Read-Only Storage",
-        "storageReadWrite": "Read-Write Storage",
-        "storageTotal": "Total Storage"
+        "storageReadOnly": "Nur-Lese-Speicher",
+        "storageReadWrite": "Lese-Schreib-Speicher",
+        "storageTotal": "Gesamtspeicher"
       },
       "systemLoginUsers": {
-        "username": "Username",
-        "type": "Type",
-        "locked": "Locked",
+        "username": "Benutzername",
+        "type": "Typ",
+        "locked": "Gesperrt",
         "tty": "Tty",
-        "from": "From",
-        "lastLogin": "Last Login"
+        "from": "Von",
+        "lastLogin": "Letzte Anmeldung"
       },
       "modal": {
-        "title": "Add Widget",
-        "searchPlaceholder": "Search widgets...",
-        "noMatch": "No matching widgets found"
+        "title": "Widget hinzufügen",
+        "searchPlaceholder": "Widgets suchen...",
+        "noMatch": "Keine passenden Widgets gefunden"
       },
       "errors": {
-        "loadFailed": "Load failed"
+        "loadFailed": "Laden fehlgeschlagen"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Weiterleitung",
+        "input": "Eingehend",
+        "name": "Name",
+        "output": "Ausgehend",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Standardaktion",
+        "defaultActionHelp": "Standardaktion für Pakete, die mit keiner Regel übereinstimmen",
+        "defaultLog": "Standardprotokoll",
+        "defaultLogHelp": "Protokollierung für Pakete aktivieren, die der Standardaktion entsprechen",
+        "description": "Beschreibung",
+        "descriptionHelp": "Beschreibung dieser Firewall-Kette",
+        "disableConntrack": "Verbindungsverfolgung deaktivieren",
+        "disableConntrackHelp": "Verbindungsverfolgung für diese Kette deaktivieren",
+        "defaultJumpTarget": "Standard-Sprungziel",
+        "defaultJumpTargetHelp": "Zielkette zum Sprung bei keiner Übereinstimmung",
+        "nameName": "Name",
+        "accept": "Akzeptieren",
+        "drop": "Verwerfen",
+        "reject": "Zurückweisen",
+        "return": "Zurückkehren",
+        "continue": "Fortsetzen",
+        "jump": "Springen",
+        "createName": "Name erstellen",
+        "editName": "Name bearbeiten",
+        "confirmDelete": "Möchten Sie den Namen {name} wirklich löschen?",
+        "rulesetLabel": "Regelsatz"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Modus"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protokoll"
       }
     }
   },
   "fr": {
     "controlPanel": {
       "categories": {
-        "system": "System Information",
-        "users": "Users",
-        "hardware": "Hardware",
-        "tools": "Tools"
+        "system": "Informations du système",
+        "users": "Utilisateurs",
+        "hardware": "Matériel",
+        "tools": "Outils"
       },
       "widgets": {
         "cpu": "CPU",
-        "memory": "Memory",
-        "disk": "Disk",
-        "login": "Current Login",
-        "version": "System Version",
-        "date": "System Time",
-        "users": "Current Users",
-        "storageScsi": "SCSI Storage Devices",
-        "storageNvme": "NVMe Storage Devices",
-        "storageSmart": "SMART Information",
-        "usb": "USB Devices",
-        "image": "System Image",
-        "systemLoginUsers": "System Login Users",
-        "webshell": "Web Shell"
+        "memory": "Mémoire",
+        "disk": "Disque",
+        "login": "Connexion actuelle",
+        "version": "Version du système",
+        "date": "Heure du système",
+        "users": "Utilisateurs actuels",
+        "storageScsi": "Périphériques de stockage SCSI",
+        "storageNvme": "Périphériques de stockage NVMe",
+        "storageSmart": "Informations SMART",
+        "usb": "Périphériques USB",
+        "image": "Image du système",
+        "systemLoginUsers": "Utilisateurs de connexion système",
+        "webshell": "Shell Web"
       },
       "header": {
-        "loading": "Loading...",
-        "refresh": "Refresh",
-        "expand": "Expand",
-        "collapse": "Collapse",
-        "close": "Close"
+        "loading": "Chargement...",
+        "refresh": "Actualiser",
+        "expand": "Développer",
+        "collapse": "Réduire",
+        "close": "Fermer"
       },
       "buttons": {
-        "addWidget": "Add Widget",
-        "refreshAll": "Refresh All"
+        "addWidget": "Ajouter un widget",
+        "refreshAll": "Tout actualiser"
       },
       "cpu": {
-        "model": "Model",
+        "model": "Modèle",
         "sockets": "Sockets",
-        "cores": "Total Cores",
-        "currentMhz": "Current Frequency"
+        "cores": "Total des cœurs",
+        "currentMhz": "Fréquence actuelle"
       },
       "memory": {
         "total": "Total",
-        "used": "Used",
-        "free": "Free"
+        "used": "Utilisé",
+        "free": "Libre"
       },
       "disk": {
-        "size": "Total Capacity",
-        "model": "Model",
+        "size": "Capacité totale",
+        "model": "Modèle",
         "partitions": "Partitions"
       },
       "storageScsi": {
-        "address": "Address",
+        "address": "Adresse",
         "type": "Type",
-        "vendor": "Vendor",
-        "product": "Product",
-        "revision": "Revision",
-        "device": "Device"
+        "vendor": "Fournisseur",
+        "product": "Produit",
+        "revision": "Révision",
+        "device": "Appareil"
       },
       "storageNvme": {
-        "noDevice": "No NVMe Device"
+        "noDevice": "Aucun périphérique NVMe"
       },
       "storageSmart": {
-        "vendor": "Vendor",
-        "product": "Product",
-        "userCapacity": "User Capacity",
-        "currentTemperature": "Current Temperature"
+        "vendor": "Fournisseur",
+        "product": "Produit",
+        "userCapacity": "Capacité utilisateur",
+        "currentTemperature": "Température actuelle"
       },
       "usb": {
-        "noData": "No Data"
+        "noData": "Aucune donnée"
       },
       "users": {
-        "name": "Name",
-        "line": "Line",
-        "time": "Time",
-        "comment": "Comment"
+        "name": "Nom",
+        "line": "Ligne",
+        "time": "Temps",
+        "comment": "Commentaire"
       },
       "version": {
         "version": "Version",
-        "releaseTrain": "Release Train",
+        "releaseTrain": "Train de versions",
         "architecture": "Architecture",
-        "systemType": "System Type"
+        "systemType": "Type de système"
       },
       "image": {
-        "name": "Name",
+        "name": "Nom",
         "version": "Version",
-        "storageReadOnly": "Read-Only Storage",
-        "storageReadWrite": "Read-Write Storage",
-        "storageTotal": "Total Storage"
+        "storageReadOnly": "Stockage en lecture seule",
+        "storageReadWrite": "Stockage en lecture-écriture",
+        "storageTotal": "Stockage total"
       },
       "systemLoginUsers": {
-        "username": "Username",
+        "username": "Nom d'utilisateur",
         "type": "Type",
-        "locked": "Locked",
+        "locked": "Verrouillé",
         "tty": "Tty",
-        "from": "From",
-        "lastLogin": "Last Login"
+        "from": "De",
+        "lastLogin": "Dernière connexion"
       },
       "modal": {
-        "title": "Add Widget",
-        "searchPlaceholder": "Search widgets...",
-        "noMatch": "No matching widgets found"
+        "title": "Ajouter un widget",
+        "searchPlaceholder": "Rechercher des widgets...",
+        "noMatch": "Aucun widget correspondant trouvé"
       },
       "errors": {
-        "loadFailed": "Load failed"
+        "loadFailed": "Échec du chargement"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Transfert",
+        "input": "Entrant",
+        "name": "Nom",
+        "output": "Sortant",
+        "prerouting": "Prerouting",
+        "filter": "Filtre",
+        "raw": "Brut",
+        "defaultAction": "Action par défaut",
+        "defaultActionHelp": "Action par défaut pour les paquets ne correspondant à aucune règle",
+        "defaultLog": "Journal par défaut",
+        "defaultLogHelp": "Activer la journalisation pour les paquets correspondant à l'action par défaut",
+        "description": "Description",
+        "descriptionHelp": "Description de cette chaîne de pare-feu",
+        "disableConntrack": "Désactiver le suivi de connexion",
+        "disableConntrackHelp": "Désactiver le suivi de connexion pour cette chaîne",
+        "defaultJumpTarget": "Cible de saut par défaut",
+        "defaultJumpTargetHelp": "Chaîne cible vers laquelle sauter en cas d'absence de correspondance",
+        "nameName": "Nom",
+        "accept": "Accepter",
+        "drop": "Supprimer",
+        "reject": "Rejeter",
+        "return": "Retour",
+        "continue": "Continuer",
+        "jump": "Sauter",
+        "createName": "Créer un nom",
+        "editName": "Modifier le nom",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer le nom {name} ?",
+        "rulesetLabel": "Ensemble de règles"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocole"
       }
     }
   },
   "ko": {
     "controlPanel": {
       "categories": {
-        "system": "System Information",
-        "users": "Users",
-        "hardware": "Hardware",
-        "tools": "Tools"
+        "system": "시스템 정보",
+        "users": "사용자",
+        "hardware": "하드웨어",
+        "tools": "도구"
       },
       "widgets": {
         "cpu": "CPU",
-        "memory": "Memory",
-        "disk": "Disk",
-        "login": "Current Login",
-        "version": "System Version",
-        "date": "System Time",
-        "users": "Current Users",
-        "storageScsi": "SCSI Storage Devices",
-        "storageNvme": "NVMe Storage Devices",
-        "storageSmart": "SMART Information",
-        "usb": "USB Devices",
-        "image": "System Image",
-        "systemLoginUsers": "System Login Users",
-        "webshell": "Web Shell"
+        "memory": "메모리",
+        "disk": "디스크",
+        "login": "현재 로그인",
+        "version": "시스템 버전",
+        "date": "시스템 시간",
+        "users": "현재 사용자",
+        "storageScsi": "SCSI 저장 장치",
+        "storageNvme": "NVMe 저장소 장치",
+        "storageSmart": "SMART 정보",
+        "usb": "USB 장치",
+        "image": "시스템 이미지",
+        "systemLoginUsers": "시스템 로그인 사용자",
+        "webshell": "웹 셸"
       },
       "header": {
-        "loading": "Loading...",
-        "refresh": "Refresh",
-        "expand": "Expand",
-        "collapse": "Collapse",
-        "close": "Close"
+        "loading": "로딩 중...",
+        "refresh": "새로고침",
+        "expand": "확장",
+        "collapse": "접기",
+        "close": "닫기"
       },
       "buttons": {
-        "addWidget": "Add Widget",
-        "refreshAll": "Refresh All"
+        "addWidget": "위젯 추가",
+        "refreshAll": "전체 새로고침"
       },
       "cpu": {
-        "model": "Model",
-        "sockets": "Sockets",
-        "cores": "Total Cores",
-        "currentMhz": "Current Frequency"
+        "model": "모델",
+        "sockets": "소켓",
+        "cores": "총 코어",
+        "currentMhz": "현재 주파수"
       },
       "memory": {
-        "total": "Total",
-        "used": "Used",
-        "free": "Free"
+        "total": "합계",
+        "used": "사용됨",
+        "free": "무료"
       },
       "disk": {
-        "size": "Total Capacity",
-        "model": "Model",
-        "partitions": "Partitions"
+        "size": "총 용량",
+        "model": "모델",
+        "partitions": "파티션"
       },
       "storageScsi": {
-        "address": "Address",
-        "type": "Type",
-        "vendor": "Vendor",
-        "product": "Product",
-        "revision": "Revision",
-        "device": "Device"
+        "address": "주소",
+        "type": "유형",
+        "vendor": "공급업체",
+        "product": "제품",
+        "revision": "리비전",
+        "device": "장치"
       },
       "storageNvme": {
-        "noDevice": "No NVMe Device"
+        "noDevice": "NVMe 장치 없음"
       },
       "storageSmart": {
-        "vendor": "Vendor",
-        "product": "Product",
-        "userCapacity": "User Capacity",
-        "currentTemperature": "Current Temperature"
+        "vendor": "공급업체",
+        "product": "제품",
+        "userCapacity": "사용자 용량",
+        "currentTemperature": "현재 온도"
       },
       "usb": {
-        "noData": "No Data"
+        "noData": "데이터 없음"
       },
       "users": {
-        "name": "Name",
-        "line": "Line",
-        "time": "Time",
-        "comment": "Comment"
+        "name": "이름",
+        "line": "라인",
+        "time": "시간",
+        "comment": "주석"
       },
       "version": {
-        "version": "Version",
-        "releaseTrain": "Release Train",
-        "architecture": "Architecture",
-        "systemType": "System Type"
+        "version": "버전",
+        "releaseTrain": "릴리스 트레인",
+        "architecture": "아키텍처",
+        "systemType": "시스템 유형"
       },
       "image": {
-        "name": "Name",
-        "version": "Version",
-        "storageReadOnly": "Read-Only Storage",
-        "storageReadWrite": "Read-Write Storage",
-        "storageTotal": "Total Storage"
+        "name": "이름",
+        "version": "버전",
+        "storageReadOnly": "읽기 전용 저장소",
+        "storageReadWrite": "읽기-쓰기 저장소",
+        "storageTotal": "총 저장소"
       },
       "systemLoginUsers": {
-        "username": "Username",
-        "type": "Type",
-        "locked": "Locked",
+        "username": "사용자 이름",
+        "type": "유형",
+        "locked": "잠김",
         "tty": "Tty",
-        "from": "From",
-        "lastLogin": "Last Login"
+        "from": "출발",
+        "lastLogin": "마지막 로그인"
       },
       "modal": {
-        "title": "Add Widget",
-        "searchPlaceholder": "Search widgets...",
-        "noMatch": "No matching widgets found"
+        "title": "위젯 추가",
+        "searchPlaceholder": "위젯 검색...",
+        "noMatch": "일치하는 위젯을 찾을 수 없습니다"
       },
       "errors": {
-        "loadFailed": "Load failed"
+        "loadFailed": "로드 실패"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "전달",
+        "input": "수신",
+        "name": "이름",
+        "output": "송신",
+        "prerouting": "프리라우팅",
+        "filter": "필터",
+        "raw": "Raw",
+        "defaultAction": "기본 동작",
+        "defaultActionHelp": "어떤 규칙과도 일치하지 않는 패킷에 대한 기본 동작",
+        "defaultLog": "기본 로그",
+        "defaultLogHelp": "기본 동작과 일치하는 패킷에 대한 로깅 활성화",
+        "description": "설명",
+        "descriptionHelp": "이 방화벽 체인에 대한 설명",
+        "disableConntrack": "연결 추적 비활성화",
+        "disableConntrackHelp": "이 체인의 연결 추적 비활성화",
+        "defaultJumpTarget": "기본 점프 대상",
+        "defaultJumpTargetHelp": "일치하는 규칙이 없을 때 점프할 대상 체인",
+        "nameName": "이름",
+        "accept": "수락",
+        "drop": "드롭",
+        "reject": "거부",
+        "return": "반환",
+        "continue": "계속",
+        "jump": "점프",
+        "createName": "이름 생성",
+        "editName": "이름 편집",
+        "confirmDelete": "이름 {name}을(를) 삭제하시겠습니까?",
+        "rulesetLabel": "규칙 집합"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "모드"
+      },
+      "type": {
+        "ethernet": "이더넷",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "프로토콜"
       }
     }
   }

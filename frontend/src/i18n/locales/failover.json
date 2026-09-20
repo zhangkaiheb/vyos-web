@@ -69,6 +69,53 @@
         "timeoutPlaceholder": "默认: 10 秒",
         "policy": "策略"
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "转发",
+        "input": "入站",
+        "name": "名称",
+        "output": "出站",
+        "prerouting": "预路由",
+        "filter": "过滤",
+        "raw": "原始",
+        "defaultAction": "默认动作",
+        "defaultActionHelp": "不匹配任何规则的数据包的默认动作",
+        "defaultLog": "默认日志",
+        "defaultLogHelp": "启用匹配默认动作的数据包日志记录",
+        "description": "描述",
+        "descriptionHelp": "此防火墙链的描述",
+        "disableConntrack": "禁用连接跟踪",
+        "disableConntrackHelp": "禁用此链的连接跟踪",
+        "defaultJumpTarget": "默认跳转目标",
+        "defaultJumpTargetHelp": "没有规则匹配时跳转的目标链",
+        "nameName": "名称",
+        "accept": "接受",
+        "drop": "丢弃",
+        "reject": "拒绝",
+        "return": "返回",
+        "continue": "继续",
+        "jump": "跳转",
+        "createName": "创建名称",
+        "editName": "编辑名称",
+        "confirmDelete": "确定要删除名称 {name} 吗？",
+        "rulesetLabel": "规则集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太网",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "协议"
+      }
     }
   },
   "en": {
@@ -140,6 +187,53 @@
         "timeout": "Timeout",
         "timeoutPlaceholder": "Default: 10 seconds",
         "policy": "Policy"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Forward",
+        "input": "Input",
+        "name": "Name",
+        "output": "Output",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Default Action",
+        "defaultActionHelp": "Default action for packets that do not match any rule",
+        "defaultLog": "Default Log",
+        "defaultLogHelp": "Enable logging for packets matching the default action",
+        "description": "Description",
+        "descriptionHelp": "Description of this firewall chain",
+        "disableConntrack": "Disable Conntrack",
+        "disableConntrackHelp": "Disable connection tracking for this chain",
+        "defaultJumpTarget": "Default Jump Target",
+        "defaultJumpTargetHelp": "Target chain to jump to when no rule matches",
+        "nameName": "Name",
+        "accept": "Accept",
+        "drop": "Drop",
+        "reject": "Reject",
+        "return": "Return",
+        "continue": "Continue",
+        "jump": "Jump",
+        "createName": "Create Name",
+        "editName": "Edit Name",
+        "confirmDelete": "Are you sure you want to delete name {name}?",
+        "rulesetLabel": "Ruleset"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocol"
       }
     }
   },
@@ -213,293 +307,528 @@
         "timeoutPlaceholder": "Default: 10 seconds",
         "policy": "Policy"
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "轉發",
+        "input": "入站",
+        "name": "名稱",
+        "output": "出站",
+        "prerouting": "預路由",
+        "filter": "過濾",
+        "raw": "原始",
+        "defaultAction": "預設動作",
+        "defaultActionHelp": "不符合任何規則的資料封包的預設動作",
+        "defaultLog": "預設日誌",
+        "defaultLogHelp": "啟用符合預設動作的資料封包日誌記錄",
+        "description": "描述",
+        "descriptionHelp": "此防火牆鏈的描述",
+        "disableConntrack": "停用連線追蹤",
+        "disableConntrackHelp": "停用此鏈的連線追蹤",
+        "defaultJumpTarget": "預設跳轉目標",
+        "defaultJumpTargetHelp": "沒有規則符合時跳轉的目標鏈",
+        "nameName": "名稱",
+        "accept": "接受",
+        "drop": "丟棄",
+        "reject": "拒絕",
+        "return": "返回",
+        "continue": "繼續",
+        "jump": "跳轉",
+        "createName": "建立名稱",
+        "editName": "編輯名稱",
+        "confirmDelete": "確定要刪除名稱 {name} 嗎？",
+        "rulesetLabel": "規則集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太網",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "協議"
+      }
     }
   },
   "ru": {
     "failover": {
       "validation": {
-        "ipv4Format": "Invalid IPv4 address format",
-        "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
-        "prefixLength": "Prefix length must be between 0-32",
-        "metricRange": "Metric must be between 1-255"
+        "ipv4Format": "Неверный формат адреса IPv4",
+        "networkFormat": "Неверный формат сети (например, 192.168.1.0/24)",
+        "prefixLength": "Длина префикса должна быть между 0-32",
+        "metricRange": "Метрика должна быть между 1-255"
       },
       "columns": {
-        "routePrefix": "Route Prefix",
-        "nextHopCount": "Next Hop Count",
-        "nextHopAddress": "Next Hop Address",
-        "interface": "Interface",
-        "metric": "Metric",
-        "onlink": "On Link",
-        "checkTarget": "Check Target",
-        "type": "Type",
-        "port": "Port",
-        "timeout": "Timeout",
-        "policy": "Policy"
+        "routePrefix": "Префикс маршрута",
+        "nextHopCount": "Счетчик следующих прыжков",
+        "nextHopAddress": "Адрес следующего прыжка",
+        "interface": "Интерфейс",
+        "metric": "Метрика",
+        "onlink": "На канале",
+        "checkTarget": "Цель проверки",
+        "type": "Тип",
+        "port": "Порт",
+        "timeout": "Тайм-аут",
+        "policy": "Политика"
       },
       "labels": {
-        "yes": "Yes",
-        "no": "No",
-        "defaultIcmp": "Default (icmp)",
-        "defaultAnyAvailable": "Default (any-available)",
-        "anyAvailable": "Any Available",
-        "allAvailable": "All Available"
+        "yes": "Да",
+        "no": "Нет",
+        "defaultIcmp": "По умолчанию (icmp)",
+        "defaultAnyAvailable": "По умолчанию (любой доступный)",
+        "anyAvailable": "Любой доступный",
+        "allAvailable": "Все доступные"
       },
       "tabs": {
-        "failoverRoutes": "Failover Routes"
+        "failoverRoutes": "Маршруты резервирования"
       },
       "messages": {
-        "saved": "Saved",
-        "enterRoutePrefix": "Please enter route prefix",
-        "enterNextHopAddress": "Please enter next hop address",
-        "enterCheckTarget": "Please enter check target",
-        "confirmDeleteRoute": "Confirm delete the following route?"
+        "saved": "Сохранено",
+        "enterRoutePrefix": "Введите префикс маршрута",
+        "enterNextHopAddress": "Введите адрес следующего прыжка",
+        "enterCheckTarget": "Введите цель проверки",
+        "confirmDeleteRoute": "Подтвердить удаление следующего маршрута?"
       },
       "modal": {
-        "editRoute": "Edit Failover Route",
-        "addRoute": "Add Failover Route",
-        "editNextHop": "Edit Next Hop",
-        "addNextHop": "Add Next Hop",
-        "editCheck": "Edit Check Target",
-        "addCheck": "Add Check Target",
-        "confirmDelete": "Confirm Delete"
+        "editRoute": "Редактировать маршрут резервирования",
+        "addRoute": "Добавить резервный маршрут",
+        "editNextHop": "Редактировать следующий узел",
+        "addNextHop": "Добавить следующий прыжок",
+        "editCheck": "Редактировать цель проверки",
+        "addCheck": "Добавить цель проверки",
+        "confirmDelete": "Подтвердить удаление"
       },
       "form": {
-        "routePrefix": "Route Prefix *",
-        "routePrefixPlaceholder": "e.g., 1.1.1.1/32",
-        "nextHopList": "Next Hop List",
-        "addNextHop": "Add Next Hop",
-        "nextHopAddress": "Next Hop Address *",
-        "ipv4Address": "IPv4 Address",
-        "interface": "Interface",
-        "selectInterface": "Select an interface",
-        "metric": "Metric",
+        "routePrefix": "Префикс маршрута *",
+        "routePrefixPlaceholder": "например, 1.1.1.1/32",
+        "nextHopList": "Список следующих прыжков",
+        "addNextHop": "Добавить следующий прыжок",
+        "nextHopAddress": "Адрес следующего прыжка *",
+        "ipv4Address": "Адрес IPv4",
+        "interface": "Интерфейс",
+        "selectInterface": "Выбрать интерфейс",
+        "metric": "Метрика",
         "metricPlaceholder": "1-255",
-        "onlink": "On Link",
-        "checkTargets": "Check Targets",
-        "addCheck": "Add Check",
-        "checkTarget": "Check Target *",
-        "checkType": "Check Type",
-        "port": "Port",
-        "portPlaceholder": "Port number",
-        "timeout": "Timeout",
-        "timeoutPlaceholder": "Default: 10 seconds",
-        "policy": "Policy"
+        "onlink": "На канале",
+        "checkTargets": "Цели проверки",
+        "addCheck": "Добавить проверку",
+        "checkTarget": "Цель проверки *",
+        "checkType": "Тип проверки",
+        "port": "Порт",
+        "portPlaceholder": "Номер порта",
+        "timeout": "Тайм-аут",
+        "timeoutPlaceholder": "По умолчанию: 10 секунд",
+        "policy": "Политика"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Переадресация",
+        "input": "Входящие",
+        "name": "Имя",
+        "output": "Исходящие",
+        "prerouting": "Премаршрутизация",
+        "filter": "Фильтр",
+        "raw": "Сырой",
+        "defaultAction": "Действие по умолчанию",
+        "defaultActionHelp": "Действие по умолчанию для пакетов, не соответствующих ни одному правилу",
+        "defaultLog": "Журнал по умолчанию",
+        "defaultLogHelp": "Включить ведение журнала для пакетов, соответствующих действию по умолчанию",
+        "description": "Описание",
+        "descriptionHelp": "Описание этой цепочки межсетевого экрана",
+        "disableConntrack": "Отключить отслеживание соединений",
+        "disableConntrackHelp": "Отключить отслеживание соединений для этой цепочки",
+        "defaultJumpTarget": "Цель перехода по умолчанию",
+        "defaultJumpTargetHelp": "Целевая цепочка для перехода при отсутствии совпадений",
+        "nameName": "Имя",
+        "accept": "Принять",
+        "drop": "Отбросить",
+        "reject": "Отклонить",
+        "return": "Вернуть",
+        "continue": "Продолжить",
+        "jump": "Перейти",
+        "createName": "Создать имя",
+        "editName": "Редактировать имя",
+        "confirmDelete": "Вы уверены, что хотите удалить имя {name}?",
+        "rulesetLabel": "Набор правил"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Режим"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Протокол"
       }
     }
   },
   "de": {
     "failover": {
       "validation": {
-        "ipv4Format": "Invalid IPv4 address format",
-        "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
-        "prefixLength": "Prefix length must be between 0-32",
-        "metricRange": "Metric must be between 1-255"
+        "ipv4Format": "Ungültiges IPv4-Adressformat",
+        "networkFormat": "Ungültiges Netzwerkformat (z.B. 192.168.1.0/24)",
+        "prefixLength": "Die Präfixlänge muss zwischen 0-32 liegen",
+        "metricRange": "Metrik muss zwischen 1-255 liegen"
       },
       "columns": {
-        "routePrefix": "Route Prefix",
-        "nextHopCount": "Next Hop Count",
-        "nextHopAddress": "Next Hop Address",
-        "interface": "Interface",
-        "metric": "Metric",
-        "onlink": "On Link",
-        "checkTarget": "Check Target",
-        "type": "Type",
+        "routePrefix": "Routenpräfix",
+        "nextHopCount": "Nächster-Hop-Zähler",
+        "nextHopAddress": "Nächster-Hop-Adresse",
+        "interface": "Schnittstelle",
+        "metric": "Metrik",
+        "onlink": "Auf Link",
+        "checkTarget": "Prüfziel",
+        "type": "Typ",
         "port": "Port",
         "timeout": "Timeout",
-        "policy": "Policy"
+        "policy": "Richtlinie"
       },
       "labels": {
-        "yes": "Yes",
-        "no": "No",
-        "defaultIcmp": "Default (icmp)",
-        "defaultAnyAvailable": "Default (any-available)",
-        "anyAvailable": "Any Available",
-        "allAvailable": "All Available"
+        "yes": "Ja",
+        "no": "Nein",
+        "defaultIcmp": "Standard (icmp)",
+        "defaultAnyAvailable": "Standard (beliebig verfügbar)",
+        "anyAvailable": "Beliebig verfügbar",
+        "allAvailable": "Alle verfügbaren"
       },
       "tabs": {
-        "failoverRoutes": "Failover Routes"
+        "failoverRoutes": "Failover-Routen"
       },
       "messages": {
-        "saved": "Saved",
-        "enterRoutePrefix": "Please enter route prefix",
-        "enterNextHopAddress": "Please enter next hop address",
-        "enterCheckTarget": "Please enter check target",
-        "confirmDeleteRoute": "Confirm delete the following route?"
+        "saved": "Gespeichert",
+        "enterRoutePrefix": "Bitte Routenpräfix eingeben",
+        "enterNextHopAddress": "Bitte Nächster-Hop-Adresse eingeben",
+        "enterCheckTarget": "Bitte Prüfziel eingeben",
+        "confirmDeleteRoute": "Löschen der folgenden Route bestätigen?"
       },
       "modal": {
-        "editRoute": "Edit Failover Route",
-        "addRoute": "Add Failover Route",
-        "editNextHop": "Edit Next Hop",
-        "addNextHop": "Add Next Hop",
-        "editCheck": "Edit Check Target",
-        "addCheck": "Add Check Target",
-        "confirmDelete": "Confirm Delete"
+        "editRoute": "Failover-Route bearbeiten",
+        "addRoute": "Failover-Route hinzufügen",
+        "editNextHop": "Next Hop bearbeiten",
+        "addNextHop": "Nächsten Hop hinzufügen",
+        "editCheck": "Prüfziel bearbeiten",
+        "addCheck": "Prüfziel hinzufügen",
+        "confirmDelete": "Löschen bestätigen"
       },
       "form": {
-        "routePrefix": "Route Prefix *",
-        "routePrefixPlaceholder": "e.g., 1.1.1.1/32",
-        "nextHopList": "Next Hop List",
-        "addNextHop": "Add Next Hop",
-        "nextHopAddress": "Next Hop Address *",
-        "ipv4Address": "IPv4 Address",
-        "interface": "Interface",
-        "selectInterface": "Select an interface",
-        "metric": "Metric",
+        "routePrefix": "Routenpräfix *",
+        "routePrefixPlaceholder": "z.B. 1.1.1.1/32",
+        "nextHopList": "Nächster-Hop-Liste",
+        "addNextHop": "Nächsten Hop hinzufügen",
+        "nextHopAddress": "Nächster-Hop-Adresse *",
+        "ipv4Address": "IPv4-Adresse",
+        "interface": "Schnittstelle",
+        "selectInterface": "Eine Schnittstelle auswählen",
+        "metric": "Metrik",
         "metricPlaceholder": "1-255",
-        "onlink": "On Link",
-        "checkTargets": "Check Targets",
-        "addCheck": "Add Check",
-        "checkTarget": "Check Target *",
-        "checkType": "Check Type",
+        "onlink": "Auf Link",
+        "checkTargets": "Prüfziele",
+        "addCheck": "Prüfung hinzufügen",
+        "checkTarget": "Prüfziel *",
+        "checkType": "Prüftyp",
         "port": "Port",
-        "portPlaceholder": "Port number",
+        "portPlaceholder": "Portnummer",
         "timeout": "Timeout",
-        "timeoutPlaceholder": "Default: 10 seconds",
-        "policy": "Policy"
+        "timeoutPlaceholder": "Standard: 10 Sekunden",
+        "policy": "Richtlinie"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Weiterleitung",
+        "input": "Eingehend",
+        "name": "Name",
+        "output": "Ausgehend",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Standardaktion",
+        "defaultActionHelp": "Standardaktion für Pakete, die mit keiner Regel übereinstimmen",
+        "defaultLog": "Standardprotokoll",
+        "defaultLogHelp": "Protokollierung für Pakete aktivieren, die der Standardaktion entsprechen",
+        "description": "Beschreibung",
+        "descriptionHelp": "Beschreibung dieser Firewall-Kette",
+        "disableConntrack": "Verbindungsverfolgung deaktivieren",
+        "disableConntrackHelp": "Verbindungsverfolgung für diese Kette deaktivieren",
+        "defaultJumpTarget": "Standard-Sprungziel",
+        "defaultJumpTargetHelp": "Zielkette zum Sprung bei keiner Übereinstimmung",
+        "nameName": "Name",
+        "accept": "Akzeptieren",
+        "drop": "Verwerfen",
+        "reject": "Zurückweisen",
+        "return": "Zurückkehren",
+        "continue": "Fortsetzen",
+        "jump": "Springen",
+        "createName": "Name erstellen",
+        "editName": "Name bearbeiten",
+        "confirmDelete": "Möchten Sie den Namen {name} wirklich löschen?",
+        "rulesetLabel": "Regelsatz"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Modus"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protokoll"
       }
     }
   },
   "fr": {
     "failover": {
       "validation": {
-        "ipv4Format": "Invalid IPv4 address format",
-        "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
-        "prefixLength": "Prefix length must be between 0-32",
-        "metricRange": "Metric must be between 1-255"
+        "ipv4Format": "Format d'adresse IPv4 invalide",
+        "networkFormat": "Format de réseau invalide (par ex. 192.168.1.0/24)",
+        "prefixLength": "La longueur du préfixe doit être entre 0-32",
+        "metricRange": "La métrique doit être comprise entre 1 et 255"
       },
       "columns": {
-        "routePrefix": "Route Prefix",
-        "nextHopCount": "Next Hop Count",
-        "nextHopAddress": "Next Hop Address",
+        "routePrefix": "Préfixe de route",
+        "nextHopCount": "Compteur de sauts suivants",
+        "nextHopAddress": "Adresse du saut suivant",
         "interface": "Interface",
-        "metric": "Metric",
-        "onlink": "On Link",
-        "checkTarget": "Check Target",
+        "metric": "Métrique",
+        "onlink": "Sur le lien",
+        "checkTarget": "Cible de vérification",
         "type": "Type",
         "port": "Port",
-        "timeout": "Timeout",
-        "policy": "Policy"
+        "timeout": "Délai d'attente",
+        "policy": "Politique"
       },
       "labels": {
-        "yes": "Yes",
-        "no": "No",
-        "defaultIcmp": "Default (icmp)",
-        "defaultAnyAvailable": "Default (any-available)",
-        "anyAvailable": "Any Available",
-        "allAvailable": "All Available"
+        "yes": "Oui",
+        "no": "Non",
+        "defaultIcmp": "Par défaut (icmp)",
+        "defaultAnyAvailable": "Par défaut (tout disponible)",
+        "anyAvailable": "N'importe lequel disponible",
+        "allAvailable": "Tous disponibles"
       },
       "tabs": {
-        "failoverRoutes": "Failover Routes"
+        "failoverRoutes": "Routes de basculement"
       },
       "messages": {
-        "saved": "Saved",
-        "enterRoutePrefix": "Please enter route prefix",
-        "enterNextHopAddress": "Please enter next hop address",
-        "enterCheckTarget": "Please enter check target",
-        "confirmDeleteRoute": "Confirm delete the following route?"
+        "saved": "Enregistré",
+        "enterRoutePrefix": "Veuillez entrer le préfixe de route",
+        "enterNextHopAddress": "Veuillez entrer l'adresse du saut suivant",
+        "enterCheckTarget": "Veuillez entrer la cible de vérification",
+        "confirmDeleteRoute": "Confirmer la suppression de la route suivante?"
       },
       "modal": {
-        "editRoute": "Edit Failover Route",
-        "addRoute": "Add Failover Route",
-        "editNextHop": "Edit Next Hop",
-        "addNextHop": "Add Next Hop",
-        "editCheck": "Edit Check Target",
-        "addCheck": "Add Check Target",
-        "confirmDelete": "Confirm Delete"
+        "editRoute": "Modifier la route de basculement",
+        "addRoute": "Ajouter une route de basculement",
+        "editNextHop": "Modifier le prochain saut",
+        "addNextHop": "Ajouter le prochain saut",
+        "editCheck": "Modifier la cible de vérification",
+        "addCheck": "Ajouter une cible de vérification",
+        "confirmDelete": "Confirmer la suppression"
       },
       "form": {
-        "routePrefix": "Route Prefix *",
-        "routePrefixPlaceholder": "e.g., 1.1.1.1/32",
-        "nextHopList": "Next Hop List",
-        "addNextHop": "Add Next Hop",
-        "nextHopAddress": "Next Hop Address *",
-        "ipv4Address": "IPv4 Address",
+        "routePrefix": "Préfixe de route *",
+        "routePrefixPlaceholder": "par ex. 1.1.1.1/32",
+        "nextHopList": "Liste des sauts suivants",
+        "addNextHop": "Ajouter le prochain saut",
+        "nextHopAddress": "Adresse du saut suivant *",
+        "ipv4Address": "Adresse IPv4",
         "interface": "Interface",
-        "selectInterface": "Select an interface",
-        "metric": "Metric",
+        "selectInterface": "Sélectionner une interface",
+        "metric": "Métrique",
         "metricPlaceholder": "1-255",
-        "onlink": "On Link",
-        "checkTargets": "Check Targets",
-        "addCheck": "Add Check",
-        "checkTarget": "Check Target *",
-        "checkType": "Check Type",
+        "onlink": "Sur le lien",
+        "checkTargets": "Cibles de vérification",
+        "addCheck": "Ajouter une vérification",
+        "checkTarget": "Cible de vérification *",
+        "checkType": "Type de vérification",
         "port": "Port",
-        "portPlaceholder": "Port number",
-        "timeout": "Timeout",
-        "timeoutPlaceholder": "Default: 10 seconds",
-        "policy": "Policy"
+        "portPlaceholder": "Numéro de port",
+        "timeout": "Délai d'attente",
+        "timeoutPlaceholder": "Par défaut : 10 secondes",
+        "policy": "Politique"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Transfert",
+        "input": "Entrant",
+        "name": "Nom",
+        "output": "Sortant",
+        "prerouting": "Prerouting",
+        "filter": "Filtre",
+        "raw": "Brut",
+        "defaultAction": "Action par défaut",
+        "defaultActionHelp": "Action par défaut pour les paquets ne correspondant à aucune règle",
+        "defaultLog": "Journal par défaut",
+        "defaultLogHelp": "Activer la journalisation pour les paquets correspondant à l'action par défaut",
+        "description": "Description",
+        "descriptionHelp": "Description de cette chaîne de pare-feu",
+        "disableConntrack": "Désactiver le suivi de connexion",
+        "disableConntrackHelp": "Désactiver le suivi de connexion pour cette chaîne",
+        "defaultJumpTarget": "Cible de saut par défaut",
+        "defaultJumpTargetHelp": "Chaîne cible vers laquelle sauter en cas d'absence de correspondance",
+        "nameName": "Nom",
+        "accept": "Accepter",
+        "drop": "Supprimer",
+        "reject": "Rejeter",
+        "return": "Retour",
+        "continue": "Continuer",
+        "jump": "Sauter",
+        "createName": "Créer un nom",
+        "editName": "Modifier le nom",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer le nom {name} ?",
+        "rulesetLabel": "Ensemble de règles"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocole"
       }
     }
   },
   "ko": {
     "failover": {
       "validation": {
-        "ipv4Format": "Invalid IPv4 address format",
-        "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
-        "prefixLength": "Prefix length must be between 0-32",
-        "metricRange": "Metric must be between 1-255"
+        "ipv4Format": "잘못된 IPv4 주소 형식",
+        "networkFormat": "잘못된 네트워크 형식(예: 192.168.1.0/24)",
+        "prefixLength": "접두사 길이는 0-32 사이여야 합니다",
+        "metricRange": "메트릭은 1-255 사이여야 합니다"
       },
       "columns": {
-        "routePrefix": "Route Prefix",
-        "nextHopCount": "Next Hop Count",
-        "nextHopAddress": "Next Hop Address",
-        "interface": "Interface",
-        "metric": "Metric",
-        "onlink": "On Link",
-        "checkTarget": "Check Target",
-        "type": "Type",
-        "port": "Port",
-        "timeout": "Timeout",
-        "policy": "Policy"
+        "routePrefix": "경로 접두사",
+        "nextHopCount": "다음 홉 수",
+        "nextHopAddress": "다음 홉 주소",
+        "interface": "인터페이스",
+        "metric": "메트릭",
+        "onlink": "링크 시",
+        "checkTarget": "검사 대상",
+        "type": "유형",
+        "port": "포트",
+        "timeout": "타임아웃",
+        "policy": "정책"
       },
       "labels": {
-        "yes": "Yes",
-        "no": "No",
-        "defaultIcmp": "Default (icmp)",
-        "defaultAnyAvailable": "Default (any-available)",
-        "anyAvailable": "Any Available",
-        "allAvailable": "All Available"
+        "yes": "예",
+        "no": "아니요",
+        "defaultIcmp": "기본값 (icmp)",
+        "defaultAnyAvailable": "기본값 (사용 가능한 모든 항목)",
+        "anyAvailable": "사용 가능한 아무거나",
+        "allAvailable": "사용 가능한 모든"
       },
       "tabs": {
-        "failoverRoutes": "Failover Routes"
+        "failoverRoutes": "페일오버 경로"
       },
       "messages": {
-        "saved": "Saved",
-        "enterRoutePrefix": "Please enter route prefix",
-        "enterNextHopAddress": "Please enter next hop address",
-        "enterCheckTarget": "Please enter check target",
-        "confirmDeleteRoute": "Confirm delete the following route?"
+        "saved": "저장됨",
+        "enterRoutePrefix": "경로 접두사를 입력해 주세요",
+        "enterNextHopAddress": "다음 홉 주소를 입력해 주세요",
+        "enterCheckTarget": "확인 대상을 입력해 주세요",
+        "confirmDeleteRoute": "다음 경로를 삭제하시겠습니까?"
       },
       "modal": {
-        "editRoute": "Edit Failover Route",
-        "addRoute": "Add Failover Route",
-        "editNextHop": "Edit Next Hop",
-        "addNextHop": "Add Next Hop",
-        "editCheck": "Edit Check Target",
-        "addCheck": "Add Check Target",
-        "confirmDelete": "Confirm Delete"
+        "editRoute": "페일오버 경로 편집",
+        "addRoute": "페일오버 라우트 추가",
+        "editNextHop": "다음 홉 편집",
+        "addNextHop": "다음 홉 추가",
+        "editCheck": "검사 대상 편집",
+        "addCheck": "검사 대상 추가",
+        "confirmDelete": "삭제 확인"
       },
       "form": {
-        "routePrefix": "Route Prefix *",
-        "routePrefixPlaceholder": "e.g., 1.1.1.1/32",
-        "nextHopList": "Next Hop List",
-        "addNextHop": "Add Next Hop",
-        "nextHopAddress": "Next Hop Address *",
-        "ipv4Address": "IPv4 Address",
-        "interface": "Interface",
-        "selectInterface": "Select an interface",
-        "metric": "Metric",
+        "routePrefix": "경로 접두사 *",
+        "routePrefixPlaceholder": "예: 1.1.1.1/32",
+        "nextHopList": "다음 홉 목록",
+        "addNextHop": "다음 홉 추가",
+        "nextHopAddress": "다음 홉 주소 *",
+        "ipv4Address": "IPv4 주소",
+        "interface": "인터페이스",
+        "selectInterface": "인터페이스 선택",
+        "metric": "메트릭",
         "metricPlaceholder": "1-255",
-        "onlink": "On Link",
-        "checkTargets": "Check Targets",
-        "addCheck": "Add Check",
-        "checkTarget": "Check Target *",
-        "checkType": "Check Type",
-        "port": "Port",
-        "portPlaceholder": "Port number",
-        "timeout": "Timeout",
-        "timeoutPlaceholder": "Default: 10 seconds",
-        "policy": "Policy"
+        "onlink": "링크 시",
+        "checkTargets": "검사 대상",
+        "addCheck": "검사 추가",
+        "checkTarget": "검사 대상 *",
+        "checkType": "검사 유형",
+        "port": "포트",
+        "portPlaceholder": "포트 번호",
+        "timeout": "타임아웃",
+        "timeoutPlaceholder": "기본값: 10초",
+        "policy": "정책"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "전달",
+        "input": "수신",
+        "name": "이름",
+        "output": "송신",
+        "prerouting": "프리라우팅",
+        "filter": "필터",
+        "raw": "Raw",
+        "defaultAction": "기본 동작",
+        "defaultActionHelp": "어떤 규칙과도 일치하지 않는 패킷에 대한 기본 동작",
+        "defaultLog": "기본 로그",
+        "defaultLogHelp": "기본 동작과 일치하는 패킷에 대한 로깅 활성화",
+        "description": "설명",
+        "descriptionHelp": "이 방화벽 체인에 대한 설명",
+        "disableConntrack": "연결 추적 비활성화",
+        "disableConntrackHelp": "이 체인의 연결 추적 비활성화",
+        "defaultJumpTarget": "기본 점프 대상",
+        "defaultJumpTargetHelp": "일치하는 규칙이 없을 때 점프할 대상 체인",
+        "nameName": "이름",
+        "accept": "수락",
+        "drop": "드롭",
+        "reject": "거부",
+        "return": "반환",
+        "continue": "계속",
+        "jump": "점프",
+        "createName": "이름 생성",
+        "editName": "이름 편집",
+        "confirmDelete": "이름 {name}을(를) 삭제하시겠습니까?",
+        "rulesetLabel": "규칙 집합"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "모드"
+      },
+      "type": {
+        "ethernet": "이더넷",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "프로토콜"
       }
     }
   }

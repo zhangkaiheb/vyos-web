@@ -19,6 +19,53 @@
         "loadFailed": "加载失败",
         "saveFailed": "保存失败"
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "转发",
+        "input": "入站",
+        "name": "名称",
+        "output": "出站",
+        "prerouting": "预路由",
+        "filter": "过滤",
+        "raw": "原始",
+        "defaultAction": "默认动作",
+        "defaultActionHelp": "不匹配任何规则的数据包的默认动作",
+        "defaultLog": "默认日志",
+        "defaultLogHelp": "启用匹配默认动作的数据包日志记录",
+        "description": "描述",
+        "descriptionHelp": "此防火墙链的描述",
+        "disableConntrack": "禁用连接跟踪",
+        "disableConntrackHelp": "禁用此链的连接跟踪",
+        "defaultJumpTarget": "默认跳转目标",
+        "defaultJumpTargetHelp": "没有规则匹配时跳转的目标链",
+        "nameName": "名称",
+        "accept": "接受",
+        "drop": "丢弃",
+        "reject": "拒绝",
+        "return": "返回",
+        "continue": "继续",
+        "jump": "跳转",
+        "createName": "创建名称",
+        "editName": "编辑名称",
+        "confirmDelete": "确定要删除名称 {name} 吗？",
+        "rulesetLabel": "规则集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太网",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "协议"
+      }
     }
   },
   "en": {
@@ -40,6 +87,53 @@
       "errors": {
         "loadFailed": "Load failed",
         "saveFailed": "Save failed"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Forward",
+        "input": "Input",
+        "name": "Name",
+        "output": "Output",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Default Action",
+        "defaultActionHelp": "Default action for packets that do not match any rule",
+        "defaultLog": "Default Log",
+        "defaultLogHelp": "Enable logging for packets matching the default action",
+        "description": "Description",
+        "descriptionHelp": "Description of this firewall chain",
+        "disableConntrack": "Disable Conntrack",
+        "disableConntrackHelp": "Disable connection tracking for this chain",
+        "defaultJumpTarget": "Default Jump Target",
+        "defaultJumpTargetHelp": "Target chain to jump to when no rule matches",
+        "nameName": "Name",
+        "accept": "Accept",
+        "drop": "Drop",
+        "reject": "Reject",
+        "return": "Return",
+        "continue": "Continue",
+        "jump": "Jump",
+        "createName": "Create Name",
+        "editName": "Edit Name",
+        "confirmDelete": "Are you sure you want to delete name {name}?",
+        "rulesetLabel": "Ruleset"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocol"
       }
     }
   },
@@ -63,93 +157,328 @@
         "loadFailed": "Load failed",
         "saveFailed": "Save failed"
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "轉發",
+        "input": "入站",
+        "name": "名稱",
+        "output": "出站",
+        "prerouting": "預路由",
+        "filter": "過濾",
+        "raw": "原始",
+        "defaultAction": "預設動作",
+        "defaultActionHelp": "不符合任何規則的資料封包的預設動作",
+        "defaultLog": "預設日誌",
+        "defaultLogHelp": "啟用符合預設動作的資料封包日誌記錄",
+        "description": "描述",
+        "descriptionHelp": "此防火牆鏈的描述",
+        "disableConntrack": "停用連線追蹤",
+        "disableConntrackHelp": "停用此鏈的連線追蹤",
+        "defaultJumpTarget": "預設跳轉目標",
+        "defaultJumpTargetHelp": "沒有規則符合時跳轉的目標鏈",
+        "nameName": "名稱",
+        "accept": "接受",
+        "drop": "丟棄",
+        "reject": "拒絕",
+        "return": "返回",
+        "continue": "繼續",
+        "jump": "跳轉",
+        "createName": "建立名稱",
+        "editName": "編輯名稱",
+        "confirmDelete": "確定要刪除名稱 {name} 嗎？",
+        "rulesetLabel": "規則集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太網",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "協議"
+      }
     }
   },
   "ru": {
     "vppSflow": {
       "labels": {
-        "headerBytes": "Header Bytes",
-        "interfaces": "Interfaces"
+        "headerBytes": "Байты заголовка",
+        "interfaces": "Интерфейсы"
       },
       "tips": {
-        "headerBytes": "sFlow sampling header bytes, default 128",
-        "interfaces": "List of interfaces with sFlow enabled"
+        "headerBytes": "Байты заголовка выборки sFlow, по умолчанию 128",
+        "interfaces": "Список интерфейсов с включенным sFlow"
       },
       "placeholders": {
-        "interfaces": "One interface name per line"
+        "interfaces": "Одно имя интерфейса на строку"
       },
       "options": {
-        "default": "default"
+        "default": "По умолчанию"
       },
       "errors": {
-        "loadFailed": "Load failed",
-        "saveFailed": "Save failed"
+        "loadFailed": "Ошибка загрузки",
+        "saveFailed": "Ошибка сохранения"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Переадресация",
+        "input": "Входящие",
+        "name": "Имя",
+        "output": "Исходящие",
+        "prerouting": "Премаршрутизация",
+        "filter": "Фильтр",
+        "raw": "Сырой",
+        "defaultAction": "Действие по умолчанию",
+        "defaultActionHelp": "Действие по умолчанию для пакетов, не соответствующих ни одному правилу",
+        "defaultLog": "Журнал по умолчанию",
+        "defaultLogHelp": "Включить ведение журнала для пакетов, соответствующих действию по умолчанию",
+        "description": "Описание",
+        "descriptionHelp": "Описание этой цепочки межсетевого экрана",
+        "disableConntrack": "Отключить отслеживание соединений",
+        "disableConntrackHelp": "Отключить отслеживание соединений для этой цепочки",
+        "defaultJumpTarget": "Цель перехода по умолчанию",
+        "defaultJumpTargetHelp": "Целевая цепочка для перехода при отсутствии совпадений",
+        "nameName": "Имя",
+        "accept": "Принять",
+        "drop": "Отбросить",
+        "reject": "Отклонить",
+        "return": "Вернуть",
+        "continue": "Продолжить",
+        "jump": "Перейти",
+        "createName": "Создать имя",
+        "editName": "Редактировать имя",
+        "confirmDelete": "Вы уверены, что хотите удалить имя {name}?",
+        "rulesetLabel": "Набор правил"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Режим"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Протокол"
       }
     }
   },
   "de": {
     "vppSflow": {
       "labels": {
-        "headerBytes": "Header Bytes",
-        "interfaces": "Interfaces"
+        "headerBytes": "Header-Bytes",
+        "interfaces": "Schnittstellen"
       },
       "tips": {
-        "headerBytes": "sFlow sampling header bytes, default 128",
-        "interfaces": "List of interfaces with sFlow enabled"
+        "headerBytes": "sFlow-Sampling-Header-Bytes, Standard 128",
+        "interfaces": "Liste der Schnittstellen mit aktiviertem sFlow"
       },
       "placeholders": {
-        "interfaces": "One interface name per line"
+        "interfaces": "Ein Schnittstellenname pro Zeile"
       },
       "options": {
-        "default": "default"
+        "default": "Standard"
       },
       "errors": {
-        "loadFailed": "Load failed",
-        "saveFailed": "Save failed"
+        "loadFailed": "Laden fehlgeschlagen",
+        "saveFailed": "Speichern fehlgeschlagen"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Weiterleitung",
+        "input": "Eingehend",
+        "name": "Name",
+        "output": "Ausgehend",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Standardaktion",
+        "defaultActionHelp": "Standardaktion für Pakete, die mit keiner Regel übereinstimmen",
+        "defaultLog": "Standardprotokoll",
+        "defaultLogHelp": "Protokollierung für Pakete aktivieren, die der Standardaktion entsprechen",
+        "description": "Beschreibung",
+        "descriptionHelp": "Beschreibung dieser Firewall-Kette",
+        "disableConntrack": "Verbindungsverfolgung deaktivieren",
+        "disableConntrackHelp": "Verbindungsverfolgung für diese Kette deaktivieren",
+        "defaultJumpTarget": "Standard-Sprungziel",
+        "defaultJumpTargetHelp": "Zielkette zum Sprung bei keiner Übereinstimmung",
+        "nameName": "Name",
+        "accept": "Akzeptieren",
+        "drop": "Verwerfen",
+        "reject": "Zurückweisen",
+        "return": "Zurückkehren",
+        "continue": "Fortsetzen",
+        "jump": "Springen",
+        "createName": "Name erstellen",
+        "editName": "Name bearbeiten",
+        "confirmDelete": "Möchten Sie den Namen {name} wirklich löschen?",
+        "rulesetLabel": "Regelsatz"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Modus"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protokoll"
       }
     }
   },
   "fr": {
     "vppSflow": {
       "labels": {
-        "headerBytes": "Header Bytes",
+        "headerBytes": "Octets d'en-tête",
         "interfaces": "Interfaces"
       },
       "tips": {
-        "headerBytes": "sFlow sampling header bytes, default 128",
-        "interfaces": "List of interfaces with sFlow enabled"
+        "headerBytes": "Octets d'en-tête d'échantillonnage sFlow, par défaut 128",
+        "interfaces": "Liste des interfaces avec sFlow activé"
       },
       "placeholders": {
-        "interfaces": "One interface name per line"
+        "interfaces": "Un nom d'interface par ligne"
       },
       "options": {
-        "default": "default"
+        "default": "Par défaut"
       },
       "errors": {
-        "loadFailed": "Load failed",
-        "saveFailed": "Save failed"
+        "loadFailed": "Échec du chargement",
+        "saveFailed": "Échec de l'enregistrement"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Transfert",
+        "input": "Entrant",
+        "name": "Nom",
+        "output": "Sortant",
+        "prerouting": "Prerouting",
+        "filter": "Filtre",
+        "raw": "Brut",
+        "defaultAction": "Action par défaut",
+        "defaultActionHelp": "Action par défaut pour les paquets ne correspondant à aucune règle",
+        "defaultLog": "Journal par défaut",
+        "defaultLogHelp": "Activer la journalisation pour les paquets correspondant à l'action par défaut",
+        "description": "Description",
+        "descriptionHelp": "Description de cette chaîne de pare-feu",
+        "disableConntrack": "Désactiver le suivi de connexion",
+        "disableConntrackHelp": "Désactiver le suivi de connexion pour cette chaîne",
+        "defaultJumpTarget": "Cible de saut par défaut",
+        "defaultJumpTargetHelp": "Chaîne cible vers laquelle sauter en cas d'absence de correspondance",
+        "nameName": "Nom",
+        "accept": "Accepter",
+        "drop": "Supprimer",
+        "reject": "Rejeter",
+        "return": "Retour",
+        "continue": "Continuer",
+        "jump": "Sauter",
+        "createName": "Créer un nom",
+        "editName": "Modifier le nom",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer le nom {name} ?",
+        "rulesetLabel": "Ensemble de règles"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocole"
       }
     }
   },
   "ko": {
     "vppSflow": {
       "labels": {
-        "headerBytes": "Header Bytes",
-        "interfaces": "Interfaces"
+        "headerBytes": "헤더 바이트",
+        "interfaces": "인터페이스"
       },
       "tips": {
-        "headerBytes": "sFlow sampling header bytes, default 128",
-        "interfaces": "List of interfaces with sFlow enabled"
+        "headerBytes": "sFlow 샘플링 헤더 바이트, 기본값 128",
+        "interfaces": "sFlow가 활성화된 인터페이스 목록"
       },
       "placeholders": {
-        "interfaces": "One interface name per line"
+        "interfaces": "한 줄에 하나의 인터페이스 이름"
       },
       "options": {
-        "default": "default"
+        "default": "기본값"
       },
       "errors": {
-        "loadFailed": "Load failed",
-        "saveFailed": "Save failed"
+        "loadFailed": "로드 실패",
+        "saveFailed": "저장 실패"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "전달",
+        "input": "수신",
+        "name": "이름",
+        "output": "송신",
+        "prerouting": "프리라우팅",
+        "filter": "필터",
+        "raw": "Raw",
+        "defaultAction": "기본 동작",
+        "defaultActionHelp": "어떤 규칙과도 일치하지 않는 패킷에 대한 기본 동작",
+        "defaultLog": "기본 로그",
+        "defaultLogHelp": "기본 동작과 일치하는 패킷에 대한 로깅 활성화",
+        "description": "설명",
+        "descriptionHelp": "이 방화벽 체인에 대한 설명",
+        "disableConntrack": "연결 추적 비활성화",
+        "disableConntrackHelp": "이 체인의 연결 추적 비활성화",
+        "defaultJumpTarget": "기본 점프 대상",
+        "defaultJumpTargetHelp": "일치하는 규칙이 없을 때 점프할 대상 체인",
+        "nameName": "이름",
+        "accept": "수락",
+        "drop": "드롭",
+        "reject": "거부",
+        "return": "반환",
+        "continue": "계속",
+        "jump": "점프",
+        "createName": "이름 생성",
+        "editName": "이름 편집",
+        "confirmDelete": "이름 {name}을(를) 삭제하시겠습니까?",
+        "rulesetLabel": "규칙 집합"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "모드"
+      },
+      "type": {
+        "ethernet": "이더넷",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "프로토콜"
       }
     }
   }

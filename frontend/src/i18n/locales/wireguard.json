@@ -170,6 +170,53 @@
           "2": "强制"
         }
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "转发",
+        "input": "入站",
+        "name": "名称",
+        "output": "出站",
+        "prerouting": "预路由",
+        "filter": "过滤",
+        "raw": "原始",
+        "defaultAction": "默认动作",
+        "defaultActionHelp": "不匹配任何规则的数据包的默认动作",
+        "defaultLog": "默认日志",
+        "defaultLogHelp": "启用匹配默认动作的数据包日志记录",
+        "description": "描述",
+        "descriptionHelp": "此防火墙链的描述",
+        "disableConntrack": "禁用连接跟踪",
+        "disableConntrackHelp": "禁用此链的连接跟踪",
+        "defaultJumpTarget": "默认跳转目标",
+        "defaultJumpTargetHelp": "没有规则匹配时跳转的目标链",
+        "nameName": "名称",
+        "accept": "接受",
+        "drop": "丢弃",
+        "reject": "拒绝",
+        "return": "返回",
+        "continue": "继续",
+        "jump": "跳转",
+        "createName": "创建名称",
+        "editName": "编辑名称",
+        "confirmDelete": "确定要删除名称 {name} 吗？",
+        "rulesetLabel": "规则集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太网",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "协议"
+      }
     }
   },
   "en": {
@@ -342,6 +389,53 @@
           "1": "Enable",
           "2": "Force"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Forward",
+        "input": "Input",
+        "name": "Name",
+        "output": "Output",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Default Action",
+        "defaultActionHelp": "Default action for packets that do not match any rule",
+        "defaultLog": "Default Log",
+        "defaultLogHelp": "Enable logging for packets matching the default action",
+        "description": "Description",
+        "descriptionHelp": "Description of this firewall chain",
+        "disableConntrack": "Disable Conntrack",
+        "disableConntrackHelp": "Disable connection tracking for this chain",
+        "defaultJumpTarget": "Default Jump Target",
+        "defaultJumpTargetHelp": "Target chain to jump to when no rule matches",
+        "nameName": "Name",
+        "accept": "Accept",
+        "drop": "Drop",
+        "reject": "Reject",
+        "return": "Return",
+        "continue": "Continue",
+        "jump": "Jump",
+        "createName": "Create Name",
+        "editName": "Edit Name",
+        "confirmDelete": "Are you sure you want to delete name {name}?",
+        "rulesetLabel": "Ruleset"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocol"
       }
     }
   },
@@ -516,178 +610,272 @@
           "2": "Force"
         }
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "轉發",
+        "input": "入站",
+        "name": "名稱",
+        "output": "出站",
+        "prerouting": "預路由",
+        "filter": "過濾",
+        "raw": "原始",
+        "defaultAction": "預設動作",
+        "defaultActionHelp": "不符合任何規則的資料封包的預設動作",
+        "defaultLog": "預設日誌",
+        "defaultLogHelp": "啟用符合預設動作的資料封包日誌記錄",
+        "description": "描述",
+        "descriptionHelp": "此防火牆鏈的描述",
+        "disableConntrack": "停用連線追蹤",
+        "disableConntrackHelp": "停用此鏈的連線追蹤",
+        "defaultJumpTarget": "預設跳轉目標",
+        "defaultJumpTargetHelp": "沒有規則符合時跳轉的目標鏈",
+        "nameName": "名稱",
+        "accept": "接受",
+        "drop": "丟棄",
+        "reject": "拒絕",
+        "return": "返回",
+        "continue": "繼續",
+        "jump": "跳轉",
+        "createName": "建立名稱",
+        "editName": "編輯名稱",
+        "confirmDelete": "確定要刪除名稱 {name} 嗎？",
+        "rulesetLabel": "規則集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太網",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "協議"
+      }
     }
   },
   "ru": {
     "wireguard": {
       "columns": {
-        "name": "Name",
-        "description": "Description",
-        "port": "Port",
+        "name": "Имя",
+        "description": "Описание",
+        "port": "Порт",
         "mtu": "MTU",
-        "peer_count": "Peer Count",
-        "disable": "Disable",
-        "actions": "Actions"
+        "peer_count": "Количество узлов",
+        "disable": "Отключить",
+        "actions": "Действия"
       },
       "peer_columns": {
-        "name": "Name",
-        "public_key": "Public Key",
-        "address": "Address",
-        "port": "Port",
-        "disable": "Disable",
-        "actions": "Actions"
+        "name": "Имя",
+        "public_key": "Открытый ключ",
+        "address": "Адрес",
+        "port": "Порт",
+        "disable": "Отключить",
+        "actions": "Действия"
       },
       "tabs": {
-        "basic": "Basic",
-        "ipv4": "IPv4 Params",
-        "ipv6": "IPv6 Params",
-        "peer": "Peer",
-        "mirror": "Mirror",
-        "other": "Other",
-        "command": "Command Preview"
+        "basic": "Основные",
+        "ipv4": "Параметры IPv4",
+        "ipv6": "Параметры IPv6",
+        "peer": "Узел",
+        "mirror": "Зеркало",
+        "other": "Другое",
+        "command": "Предварительный просмотр команды"
       },
       "basic": {
-        "name": "Name",
-        "name_placeholder": "Enter WireGuard interface name",
-        "name_help": "WireGuard interface name",
-        "description": "Description",
-        "description_placeholder": "Enter description",
-        "private_key": "Private Key",
-        "private_key_placeholder": "Enter private key",
-        "private_key_help": "WireGuard private key",
-        "port": "Port",
-        "port_help": "Listen port (1-65535)",
-        "fwmark": "Firewall Mark",
-        "fwmark_help": "Firewall mark value (0-4294967295)",
-        "max_dns_retry": "Max DNS Retry",
-        "max_dns_retry_help": "Max DNS retry count (1-15)",
+        "name": "Имя",
+        "name_placeholder": "Введите имя интерфейса WireGuard",
+        "name_help": "Имя интерфейса WireGuard",
+        "description": "Описание",
+        "description_placeholder": "Введите описание",
+        "private_key": "Закрытый ключ",
+        "private_key_placeholder": "Введите закрытый ключ",
+        "private_key_help": "Закрытый ключ WireGuard",
+        "port": "Порт",
+        "port_help": "Порт прослушивания (1-65535)",
+        "fwmark": "Метка брандмауэра",
+        "fwmark_help": "Значение метки брандмауэра (0-4294967295)",
+        "max_dns_retry": "Максимальное количество повторов DNS",
+        "max_dns_retry_help": "Максимальное количество повторов DNS (1-15)",
         "mtu": "MTU",
-        "mtu_help": "MTU value (68-16000)",
-        "per_client_thread": "Per-Client Thread",
-        "per_client_thread_help": "Create separate thread per peer",
-        "disable": "Disable",
-        "disable_help": "Disable this interface"
+        "mtu_help": "Значение MTU (68-16000)",
+        "per_client_thread": "Поток на клиента",
+        "per_client_thread_help": "Создать отдельный поток для каждого пира",
+        "disable": "Отключить",
+        "disable_help": "Отключить этот интерфейс"
       },
       "ip": {
-        "adjust_mss": "IP MSS Adjustment",
-        "adjust_mss_placeholder": "Enter MSS value",
-        "adjust_mss_help": "Adjust TCP MSS value",
-        "arp_cache_timeout": "ARP Cache Timeout",
-        "arp_cache_timeout_help": "ARP cache timeout (seconds)",
-        "disable_arp_filter": "Disable ARP Filter",
-        "disable_arp_filter_help": "Disable ARP filtering",
-        "disable_forwarding": "Disable Forwarding",
-        "disable_forwarding_help": "Disable IP forwarding",
-        "enable_arp_accept": "Enable ARP Accept",
-        "enable_arp_accept_help": "Enable ARP accept",
-        "enable_arp_announce": "Enable ARP Announce",
-        "enable_arp_announce_help": "Enable ARP announce",
-        "enable_arp_ignore": "Enable ARP Ignore",
-        "enable_arp_ignore_help": "Enable ARP ignore",
-        "enable_directed_broadcast": "Enable Directed Broadcast",
-        "enable_directed_broadcast_help": "Enable directed broadcast",
-        "enable_proxy_arp": "Enable Proxy ARP",
-        "enable_proxy_arp_help": "Enable proxy ARP",
-        "proxy_arp_pvlan": "Proxy ARP PVLAN",
-        "proxy_arp_pvlan_help": "Proxy ARP PVLAN",
-        "source_validation": "IP Source Validation",
-        "source_validation_placeholder": "Select source validation",
-        "source_validation_help": "IP source validation"
+        "adjust_mss": "Регулировка IP MSS",
+        "adjust_mss_placeholder": "Введите значение MSS",
+        "adjust_mss_help": "Настроить значение TCP MSS",
+        "arp_cache_timeout": "Тайм-аут ARP кэша",
+        "arp_cache_timeout_help": "Тайм-аут ARP кэша (секунды)",
+        "disable_arp_filter": "Отключить фильтр ARP",
+        "disable_arp_filter_help": "Отключить фильтрацию ARP",
+        "disable_forwarding": "Отключить пересылку",
+        "disable_forwarding_help": "Отключить пересылку IP",
+        "enable_arp_accept": "Включить приём ARP",
+        "enable_arp_accept_help": "Включить приём ARP",
+        "enable_arp_announce": "Включить объявление ARP",
+        "enable_arp_announce_help": "Включить объявление ARP",
+        "enable_arp_ignore": "Включить игнорирование ARP",
+        "enable_arp_ignore_help": "Включить игнорирование ARP",
+        "enable_directed_broadcast": "Включить направленную широковещательную рассылку",
+        "enable_directed_broadcast_help": "Включить направленную широковещательную рассылку",
+        "enable_proxy_arp": "Включить прокси ARP",
+        "enable_proxy_arp_help": "Включить прокси ARP",
+        "proxy_arp_pvlan": "Прокси ARP PVLAN",
+        "proxy_arp_pvlan_help": "Прокси ARP PVLAN",
+        "source_validation": "Проверка источника IP",
+        "source_validation_placeholder": "Выбрать проверку источника",
+        "source_validation_help": "Проверка источника IP"
       },
       "ipv6": {
         "accept_dad": "IPv6 Accept DAD",
-        "accept_dad_help": "IPv6 DAD accept setting",
-        "autoconf": "IPv6 Address Autoconf",
-        "autoconf_help": "Enable IPv6 address autoconfiguration",
-        "eui64": "IPv6 EUI-64 Address",
-        "eui64_placeholder": "Enter EUI-64 address",
-        "eui64_help": "IPv6 EUI-64 address",
-        "no_default_link_local": "Disable Default Link-Local",
-        "no_default_link_local_help": "Disable default link-local address",
-        "adjust_mss": "IPv6 MSS Adjustment",
-        "adjust_mss_placeholder": "Enter MSS value",
-        "adjust_mss_help": "IPv6 MSS adjustment",
-        "base_reachable_time": "IPv6 Base Reachable Time",
-        "base_reachable_time_help": "IPv6 base reachable time (seconds)",
-        "disable_forwarding": "IPv6 Disable Forwarding",
-        "disable_forwarding_help": "IPv6 disable forwarding",
-        "dup_addr_detect_transmits": "IPv6 DAD Transmits",
-        "dup_addr_detect_transmits_help": "IPv6 duplicate address detection transmits",
-        "source_validation": "IPv6 Source Validation",
-        "source_validation_placeholder": "Select source validation",
-        "source_validation_help": "IPv6 source validation"
+        "accept_dad_help": "Настройка принятия DAD IPv6",
+        "autoconf": "Автоконфигурация адреса IPv6",
+        "autoconf_help": "Включить автоконфигурацию адреса IPv6",
+        "eui64": "Адрес EUI-64 IPv6",
+        "eui64_placeholder": "Введите адрес EUI-64",
+        "eui64_help": "Адрес EUI-64 IPv6",
+        "no_default_link_local": "Отключить стандартный Link-Local",
+        "no_default_link_local_help": "Отключить адрес link-local по умолчанию",
+        "adjust_mss": "Корректировка MSS IPv6",
+        "adjust_mss_placeholder": "Введите значение MSS",
+        "adjust_mss_help": "Корректировка MSS IPv6",
+        "base_reachable_time": "Базовое достижимое время IPv6",
+        "base_reachable_time_help": "Базовое достижимое время IPv6 (секунды)",
+        "disable_forwarding": "Отключить пересылку IPv6",
+        "disable_forwarding_help": "Отключить пересылку IPv6",
+        "dup_addr_detect_transmits": "Передачи DAD IPv6",
+        "dup_addr_detect_transmits_help": "Передачи обнаружения дубликатов адресов IPv6",
+        "source_validation": "Проверка источника IPv6",
+        "source_validation_placeholder": "Выбрать проверку источника",
+        "source_validation_help": "Проверка источника IPv6"
       },
       "mirror": {
-        "egress": "Mirror Egress",
-        "egress_help": "Egress traffic mirror interface",
-        "ingress": "Mirror Ingress",
-        "ingress_help": "Ingress traffic mirror interface",
-        "target_placeholder": "Select mirror interface"
+        "egress": "Зеркалирование исходящего трафика",
+        "egress_help": "Интерфейс зеркалирования исходящего трафика",
+        "ingress": "Зеркалирование входящего трафика",
+        "ingress_help": "Интерфейс зеркалирования входящего трафика",
+        "target_placeholder": "Выбрать интерфейс зеркалирования"
       },
       "other": {
-        "redirect": "Redirect",
-        "redirect_help": "Redirect interface",
+        "redirect": "Перенаправление",
+        "redirect_help": "Интерфейс перенаправления",
         "vrf": "VRF",
-        "vrf_placeholder": "Enter VRF",
-        "vrf_help": "VRF name",
-        "target_placeholder": "Select interface"
+        "vrf_placeholder": "Введите VRF",
+        "vrf_help": "Имя VRF",
+        "target_placeholder": "Выбрать интерфейс"
       },
       "peer": {
-        "name": "Name",
-        "name_placeholder": "Enter peer name",
-        "public_key": "Public Key",
-        "public_key_placeholder": "Enter public key",
-        "preshared_key": "Preshared Key",
-        "preshared_key_placeholder": "Enter preshared key",
-        "address": "Address",
-        "address_placeholder": "Enter address",
-        "allowed_ips": "Allowed IPs",
-        "allowed_ips_placeholder": "Enter allowed IPs (one per line)",
-        "allowed_ips_help": "Allowed IP addresses",
-        "host_name": "Host Name",
-        "host_name_help": "FQDN host name",
-        "port": "Port",
-        "persistent_keepalive": "Persistent Keepalive",
-        "persistent_keepalive_help": "Persistent keepalive interval (seconds)",
-        "description": "Description",
-        "description_placeholder": "Enter description",
-        "disable": "Disable",
-        "disable_help": "Disable this peer",
+        "name": "Имя",
+        "name_placeholder": "Введите имя пира",
+        "public_key": "Открытый ключ",
+        "public_key_placeholder": "Введите открытый ключ",
+        "preshared_key": "Общий ключ",
+        "preshared_key_placeholder": "Введите общий ключ",
+        "address": "Адрес",
+        "address_placeholder": "Введите адрес",
+        "allowed_ips": "Разрешенные IP",
+        "allowed_ips_placeholder": "Введите разрешенные IP (один на строку)",
+        "allowed_ips_help": "Разрешенные IP-адреса",
+        "host_name": "Имя хоста",
+        "host_name_help": "Имя хоста FQDN",
+        "port": "Порт",
+        "persistent_keepalive": "Постоянный Keepalive",
+        "persistent_keepalive_help": "Интервал постоянного keepalive (секунды)",
+        "description": "Описание",
+        "description_placeholder": "Введите описание",
+        "disable": "Отключить",
+        "disable_help": "Отключить этот пир",
         "modal": {
-          "edit": "Edit Peer",
-          "create": "Create Peer"
+          "edit": "Редактировать пир",
+          "create": "Создать пира"
         }
       },
       "modal": {
-        "edit": "Edit WireGuard Interface",
-        "create": "Create WireGuard Interface",
-        "confirm_delete": "Confirm Delete"
+        "edit": "Редактировать интерфейс WireGuard",
+        "create": "Создать интерфейс WireGuard",
+        "confirm_delete": "Подтвердить удаление"
       },
       "delete": {
-        "confirm_interface": "Confirm delete selected WireGuard interfaces?",
-        "confirm_peer": "Confirm delete selected peers?"
+        "confirm_interface": "Подтвердить удаление выбранных интерфейсов WireGuard?",
+        "confirm_peer": "Подтвердить удаление выбранных пиров?"
       },
       "command": {
-        "no_config": "# No parameters configured"
+        "no_config": "# Нет настроенных параметров"
       },
       "errors": {
-        "error_message": "Error code: {code}, Error message: {detail}",
-        "name_required": "Please enter WireGuard interface name",
-        "select_for_delete": "Please select interfaces to delete",
-        "peer_name_required": "Please enter peer name",
-        "public_key_required": "Please enter public key"
+        "error_message": "Код ошибки: {code}, Сообщение об ошибке: {detail}",
+        "name_required": "Введите имя интерфейса WireGuard",
+        "select_for_delete": "Выберите интерфейсы для удаления",
+        "peer_name_required": "Введите имя узла",
+        "public_key_required": "Введите открытый ключ"
       },
       "options": {
         "source_validation": {
-          "strict": "Strict",
-          "loose": "Loose",
-          "disable": "Disable"
+          "strict": "Строгий",
+          "loose": "Свободный",
+          "disable": "Отключить"
         },
         "accept_dad": {
-          "0": "Disable",
-          "1": "Enable",
-          "2": "Force"
+          "0": "Отключить",
+          "1": "Включить",
+          "2": "Принудительно"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Переадресация",
+        "input": "Входящие",
+        "name": "Имя",
+        "output": "Исходящие",
+        "prerouting": "Премаршрутизация",
+        "filter": "Фильтр",
+        "raw": "Сырой",
+        "defaultAction": "Действие по умолчанию",
+        "defaultActionHelp": "Действие по умолчанию для пакетов, не соответствующих ни одному правилу",
+        "defaultLog": "Журнал по умолчанию",
+        "defaultLogHelp": "Включить ведение журнала для пакетов, соответствующих действию по умолчанию",
+        "description": "Описание",
+        "descriptionHelp": "Описание этой цепочки межсетевого экрана",
+        "disableConntrack": "Отключить отслеживание соединений",
+        "disableConntrackHelp": "Отключить отслеживание соединений для этой цепочки",
+        "defaultJumpTarget": "Цель перехода по умолчанию",
+        "defaultJumpTargetHelp": "Целевая цепочка для перехода при отсутствии совпадений",
+        "nameName": "Имя",
+        "accept": "Принять",
+        "drop": "Отбросить",
+        "reject": "Отклонить",
+        "return": "Вернуть",
+        "continue": "Продолжить",
+        "jump": "Перейти",
+        "createName": "Создать имя",
+        "editName": "Редактировать имя",
+        "confirmDelete": "Вы уверены, что хотите удалить имя {name}?",
+        "rulesetLabel": "Набор правил"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Режим"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Протокол"
       }
     }
   },
@@ -695,518 +883,659 @@
     "wireguard": {
       "columns": {
         "name": "Name",
-        "description": "Description",
+        "description": "Beschreibung",
         "port": "Port",
         "mtu": "MTU",
-        "peer_count": "Peer Count",
-        "disable": "Disable",
-        "actions": "Actions"
+        "peer_count": "Peer-Anzahl",
+        "disable": "Deaktivieren",
+        "actions": "Aktionen"
       },
       "peer_columns": {
         "name": "Name",
-        "public_key": "Public Key",
-        "address": "Address",
+        "public_key": "Öffentlicher Schlüssel",
+        "address": "Adresse",
         "port": "Port",
-        "disable": "Disable",
-        "actions": "Actions"
+        "disable": "Deaktivieren",
+        "actions": "Aktionen"
       },
       "tabs": {
-        "basic": "Basic",
-        "ipv4": "IPv4 Params",
-        "ipv6": "IPv6 Params",
+        "basic": "Grundlegend",
+        "ipv4": "IPv4-Parameter",
+        "ipv6": "IPv6-Parameter",
         "peer": "Peer",
-        "mirror": "Mirror",
-        "other": "Other",
-        "command": "Command Preview"
+        "mirror": "Spiegel",
+        "other": "Andere",
+        "command": "Befehlsvorschau"
       },
       "basic": {
         "name": "Name",
-        "name_placeholder": "Enter WireGuard interface name",
-        "name_help": "WireGuard interface name",
-        "description": "Description",
-        "description_placeholder": "Enter description",
-        "private_key": "Private Key",
-        "private_key_placeholder": "Enter private key",
-        "private_key_help": "WireGuard private key",
+        "name_placeholder": "WireGuard-Schnittstellenname eingeben",
+        "name_help": "WireGuard-Schnittstellenname",
+        "description": "Beschreibung",
+        "description_placeholder": "Beschreibung eingeben",
+        "private_key": "Privater Schlüssel",
+        "private_key_placeholder": "Privaten Schlüssel eingeben",
+        "private_key_help": "WireGuard-Privatschlüssel",
         "port": "Port",
-        "port_help": "Listen port (1-65535)",
-        "fwmark": "Firewall Mark",
-        "fwmark_help": "Firewall mark value (0-4294967295)",
-        "max_dns_retry": "Max DNS Retry",
-        "max_dns_retry_help": "Max DNS retry count (1-15)",
+        "port_help": "Lauschport (1-65535)",
+        "fwmark": "Firewall-Markierung",
+        "fwmark_help": "Firewall-Markierungswert (0-4294967295)",
+        "max_dns_retry": "Maximale DNS-Wiederholungen",
+        "max_dns_retry_help": "Maximale DNS-Wiederholungsanzahl (1-15)",
         "mtu": "MTU",
-        "mtu_help": "MTU value (68-16000)",
-        "per_client_thread": "Per-Client Thread",
-        "per_client_thread_help": "Create separate thread per peer",
-        "disable": "Disable",
-        "disable_help": "Disable this interface"
+        "mtu_help": "MTU-Wert (68-16000)",
+        "per_client_thread": "Pro-Client-Thread",
+        "per_client_thread_help": "Separaten Thread pro Peer erstellen",
+        "disable": "Deaktivieren",
+        "disable_help": "Diese Schnittstelle deaktivieren"
       },
       "ip": {
-        "adjust_mss": "IP MSS Adjustment",
-        "adjust_mss_placeholder": "Enter MSS value",
-        "adjust_mss_help": "Adjust TCP MSS value",
-        "arp_cache_timeout": "ARP Cache Timeout",
-        "arp_cache_timeout_help": "ARP cache timeout (seconds)",
-        "disable_arp_filter": "Disable ARP Filter",
-        "disable_arp_filter_help": "Disable ARP filtering",
-        "disable_forwarding": "Disable Forwarding",
-        "disable_forwarding_help": "Disable IP forwarding",
-        "enable_arp_accept": "Enable ARP Accept",
-        "enable_arp_accept_help": "Enable ARP accept",
-        "enable_arp_announce": "Enable ARP Announce",
-        "enable_arp_announce_help": "Enable ARP announce",
-        "enable_arp_ignore": "Enable ARP Ignore",
-        "enable_arp_ignore_help": "Enable ARP ignore",
-        "enable_directed_broadcast": "Enable Directed Broadcast",
-        "enable_directed_broadcast_help": "Enable directed broadcast",
-        "enable_proxy_arp": "Enable Proxy ARP",
-        "enable_proxy_arp_help": "Enable proxy ARP",
+        "adjust_mss": "IP-MSS-Anpassung",
+        "adjust_mss_placeholder": "MSS-Wert eingeben",
+        "adjust_mss_help": "TCP MSS-Wert anpassen",
+        "arp_cache_timeout": "ARP-Cache-Timeout",
+        "arp_cache_timeout_help": "ARP-Cache-Timeout (Sekunden)",
+        "disable_arp_filter": "ARP-Filter deaktivieren",
+        "disable_arp_filter_help": "ARP-Filterung deaktivieren",
+        "disable_forwarding": "Weiterleitung deaktivieren",
+        "disable_forwarding_help": "IP-Weiterleitung deaktivieren",
+        "enable_arp_accept": "ARP-Akzeptanz aktivieren",
+        "enable_arp_accept_help": "ARP-Akzeptanz aktivieren",
+        "enable_arp_announce": "ARP-Ankündigung aktivieren",
+        "enable_arp_announce_help": "ARP-Ankündigung aktivieren",
+        "enable_arp_ignore": "ARP-Ignorierung aktivieren",
+        "enable_arp_ignore_help": "ARP-Ignorierung aktivieren",
+        "enable_directed_broadcast": "Gerichteten Broadcast aktivieren",
+        "enable_directed_broadcast_help": "Gerichteten Broadcast aktivieren",
+        "enable_proxy_arp": "Proxy ARP aktivieren",
+        "enable_proxy_arp_help": "Proxy ARP aktivieren",
         "proxy_arp_pvlan": "Proxy ARP PVLAN",
         "proxy_arp_pvlan_help": "Proxy ARP PVLAN",
-        "source_validation": "IP Source Validation",
-        "source_validation_placeholder": "Select source validation",
-        "source_validation_help": "IP source validation"
+        "source_validation": "IP-Quellvalidierung",
+        "source_validation_placeholder": "Quellvalidierung auswählen",
+        "source_validation_help": "IP-Quellvalidierung"
       },
       "ipv6": {
-        "accept_dad": "IPv6 Accept DAD",
-        "accept_dad_help": "IPv6 DAD accept setting",
-        "autoconf": "IPv6 Address Autoconf",
-        "autoconf_help": "Enable IPv6 address autoconfiguration",
-        "eui64": "IPv6 EUI-64 Address",
-        "eui64_placeholder": "Enter EUI-64 address",
-        "eui64_help": "IPv6 EUI-64 address",
-        "no_default_link_local": "Disable Default Link-Local",
-        "no_default_link_local_help": "Disable default link-local address",
-        "adjust_mss": "IPv6 MSS Adjustment",
-        "adjust_mss_placeholder": "Enter MSS value",
-        "adjust_mss_help": "IPv6 MSS adjustment",
-        "base_reachable_time": "IPv6 Base Reachable Time",
-        "base_reachable_time_help": "IPv6 base reachable time (seconds)",
-        "disable_forwarding": "IPv6 Disable Forwarding",
-        "disable_forwarding_help": "IPv6 disable forwarding",
-        "dup_addr_detect_transmits": "IPv6 DAD Transmits",
-        "dup_addr_detect_transmits_help": "IPv6 duplicate address detection transmits",
-        "source_validation": "IPv6 Source Validation",
-        "source_validation_placeholder": "Select source validation",
-        "source_validation_help": "IPv6 source validation"
+        "accept_dad": "IPv6 DAD akzeptieren",
+        "accept_dad_help": "IPv6-DAD-Akzeptiereinstellung",
+        "autoconf": "IPv6-Adress-Autokonfiguration",
+        "autoconf_help": "IPv6-Adressen-Autokonfiguration aktivieren",
+        "eui64": "IPv6-EUI-64-Adresse",
+        "eui64_placeholder": "EUI-64-Adresse eingeben",
+        "eui64_help": "IPv6-EUI-64-Adresse",
+        "no_default_link_local": "Standard-Link-Local deaktivieren",
+        "no_default_link_local_help": "Standard-link-local-Adresse deaktivieren",
+        "adjust_mss": "IPv6-MSS-Anpassung",
+        "adjust_mss_placeholder": "MSS-Wert eingeben",
+        "adjust_mss_help": "IPv6-MSS-Anpassung",
+        "base_reachable_time": "IPv6-Basis-erreichbare-Zeit",
+        "base_reachable_time_help": "IPv6-Basis-erreichbare-Zeit (Sekunden)",
+        "disable_forwarding": "IPv6-Weiterleitung deaktivieren",
+        "disable_forwarding_help": "IPv6-Weiterleitung deaktivieren",
+        "dup_addr_detect_transmits": "IPv6-DAD-Übertragungen",
+        "dup_addr_detect_transmits_help": "IPv6-Duplikatadressenerkennungsübertragungen",
+        "source_validation": "IPv6-Quellvalidierung",
+        "source_validation_placeholder": "Quellvalidierung auswählen",
+        "source_validation_help": "IPv6-Quellvalidierung"
       },
       "mirror": {
-        "egress": "Mirror Egress",
-        "egress_help": "Egress traffic mirror interface",
-        "ingress": "Mirror Ingress",
-        "ingress_help": "Ingress traffic mirror interface",
-        "target_placeholder": "Select mirror interface"
+        "egress": "Ausgangsspiegelung",
+        "egress_help": "Spiegelschnittstelle für Ausgangsverkehr",
+        "ingress": "Eingangsspiegelung",
+        "ingress_help": "Schnittstelle für eingehende Verkehrsspiegelung",
+        "target_placeholder": "Spiegel-Schnittstelle auswählen"
       },
       "other": {
-        "redirect": "Redirect",
-        "redirect_help": "Redirect interface",
+        "redirect": "Umleitung",
+        "redirect_help": "Umleitungs-Schnittstelle",
         "vrf": "VRF",
-        "vrf_placeholder": "Enter VRF",
-        "vrf_help": "VRF name",
-        "target_placeholder": "Select interface"
+        "vrf_placeholder": "VRF eingeben",
+        "vrf_help": "VRF-Name",
+        "target_placeholder": "Schnittstelle auswählen"
       },
       "peer": {
         "name": "Name",
-        "name_placeholder": "Enter peer name",
-        "public_key": "Public Key",
-        "public_key_placeholder": "Enter public key",
-        "preshared_key": "Preshared Key",
-        "preshared_key_placeholder": "Enter preshared key",
-        "address": "Address",
-        "address_placeholder": "Enter address",
-        "allowed_ips": "Allowed IPs",
-        "allowed_ips_placeholder": "Enter allowed IPs (one per line)",
-        "allowed_ips_help": "Allowed IP addresses",
-        "host_name": "Host Name",
-        "host_name_help": "FQDN host name",
+        "name_placeholder": "Peer-Name eingeben",
+        "public_key": "Öffentlicher Schlüssel",
+        "public_key_placeholder": "Öffentlichen Schlüssel eingeben",
+        "preshared_key": "Vorab geteilter Schlüssel",
+        "preshared_key_placeholder": "Gemeinsamen Schlüssel eingeben",
+        "address": "Adresse",
+        "address_placeholder": "Adresse eingeben",
+        "allowed_ips": "Erlaubte IPs",
+        "allowed_ips_placeholder": "Erlaubte IPs eingeben (eine pro Zeile)",
+        "allowed_ips_help": "Erlaubte IP-Adressen",
+        "host_name": "Hostname",
+        "host_name_help": "FQDN-Hostname",
         "port": "Port",
-        "persistent_keepalive": "Persistent Keepalive",
-        "persistent_keepalive_help": "Persistent keepalive interval (seconds)",
-        "description": "Description",
-        "description_placeholder": "Enter description",
-        "disable": "Disable",
-        "disable_help": "Disable this peer",
+        "persistent_keepalive": "Persistenter Keepalive",
+        "persistent_keepalive_help": "Intervall des persistenten Keepalive (Sekunden)",
+        "description": "Beschreibung",
+        "description_placeholder": "Beschreibung eingeben",
+        "disable": "Deaktivieren",
+        "disable_help": "Diesen Peer deaktivieren",
         "modal": {
-          "edit": "Edit Peer",
-          "create": "Create Peer"
+          "edit": "Peer bearbeiten",
+          "create": "Peer erstellen"
         }
       },
       "modal": {
-        "edit": "Edit WireGuard Interface",
-        "create": "Create WireGuard Interface",
-        "confirm_delete": "Confirm Delete"
+        "edit": "WireGuard-Schnittstelle bearbeiten",
+        "create": "WireGuard-Schnittstelle erstellen",
+        "confirm_delete": "Löschen bestätigen"
       },
       "delete": {
-        "confirm_interface": "Confirm delete selected WireGuard interfaces?",
-        "confirm_peer": "Confirm delete selected peers?"
+        "confirm_interface": "Löschen der ausgewählten WireGuard-Schnittstellen bestätigen?",
+        "confirm_peer": "Löschen der ausgewählten Peers bestätigen?"
       },
       "command": {
-        "no_config": "# No parameters configured"
+        "no_config": "# Keine Parameter konfiguriert"
       },
       "errors": {
-        "error_message": "Error code: {code}, Error message: {detail}",
-        "name_required": "Please enter WireGuard interface name",
-        "select_for_delete": "Please select interfaces to delete",
-        "peer_name_required": "Please enter peer name",
-        "public_key_required": "Please enter public key"
+        "error_message": "Fehlercode: {code}, Fehlermeldung: {detail}",
+        "name_required": "Bitte WireGuard-Schnittstellenname eingeben",
+        "select_for_delete": "Bitte wählen Sie Schnittstellen zum Löschen",
+        "peer_name_required": "Bitte Peer-Namen eingeben",
+        "public_key_required": "Bitte öffentlichen Schlüssel eingeben"
       },
       "options": {
         "source_validation": {
-          "strict": "Strict",
-          "loose": "Loose",
-          "disable": "Disable"
+          "strict": "Streng",
+          "loose": "Locker",
+          "disable": "Deaktivieren"
         },
         "accept_dad": {
-          "0": "Disable",
-          "1": "Enable",
-          "2": "Force"
+          "0": "Deaktivieren",
+          "1": "Aktivieren",
+          "2": "Erzwingen"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Weiterleitung",
+        "input": "Eingehend",
+        "name": "Name",
+        "output": "Ausgehend",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Standardaktion",
+        "defaultActionHelp": "Standardaktion für Pakete, die mit keiner Regel übereinstimmen",
+        "defaultLog": "Standardprotokoll",
+        "defaultLogHelp": "Protokollierung für Pakete aktivieren, die der Standardaktion entsprechen",
+        "description": "Beschreibung",
+        "descriptionHelp": "Beschreibung dieser Firewall-Kette",
+        "disableConntrack": "Verbindungsverfolgung deaktivieren",
+        "disableConntrackHelp": "Verbindungsverfolgung für diese Kette deaktivieren",
+        "defaultJumpTarget": "Standard-Sprungziel",
+        "defaultJumpTargetHelp": "Zielkette zum Sprung bei keiner Übereinstimmung",
+        "nameName": "Name",
+        "accept": "Akzeptieren",
+        "drop": "Verwerfen",
+        "reject": "Zurückweisen",
+        "return": "Zurückkehren",
+        "continue": "Fortsetzen",
+        "jump": "Springen",
+        "createName": "Name erstellen",
+        "editName": "Name bearbeiten",
+        "confirmDelete": "Möchten Sie den Namen {name} wirklich löschen?",
+        "rulesetLabel": "Regelsatz"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Modus"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protokoll"
       }
     }
   },
   "fr": {
     "wireguard": {
       "columns": {
-        "name": "Name",
+        "name": "Nom",
         "description": "Description",
         "port": "Port",
         "mtu": "MTU",
-        "peer_count": "Peer Count",
-        "disable": "Disable",
+        "peer_count": "Nombre de pairs",
+        "disable": "Désactiver",
         "actions": "Actions"
       },
       "peer_columns": {
-        "name": "Name",
-        "public_key": "Public Key",
-        "address": "Address",
+        "name": "Nom",
+        "public_key": "Clé publique",
+        "address": "Adresse",
         "port": "Port",
-        "disable": "Disable",
+        "disable": "Désactiver",
         "actions": "Actions"
       },
       "tabs": {
-        "basic": "Basic",
-        "ipv4": "IPv4 Params",
-        "ipv6": "IPv6 Params",
-        "peer": "Peer",
-        "mirror": "Mirror",
-        "other": "Other",
-        "command": "Command Preview"
+        "basic": "Basique",
+        "ipv4": "Paramètres IPv4",
+        "ipv6": "Paramètres IPv6",
+        "peer": "Pair",
+        "mirror": "Miroir",
+        "other": "Autre",
+        "command": "Aperçu de la commande"
       },
       "basic": {
-        "name": "Name",
-        "name_placeholder": "Enter WireGuard interface name",
-        "name_help": "WireGuard interface name",
+        "name": "Nom",
+        "name_placeholder": "Entrez le nom de l'interface WireGuard",
+        "name_help": "Nom de l'interface WireGuard",
         "description": "Description",
-        "description_placeholder": "Enter description",
-        "private_key": "Private Key",
-        "private_key_placeholder": "Enter private key",
-        "private_key_help": "WireGuard private key",
+        "description_placeholder": "Entrez la description",
+        "private_key": "Clé privée",
+        "private_key_placeholder": "Entrez la clé privée",
+        "private_key_help": "Clé privée WireGuard",
         "port": "Port",
-        "port_help": "Listen port (1-65535)",
-        "fwmark": "Firewall Mark",
-        "fwmark_help": "Firewall mark value (0-4294967295)",
-        "max_dns_retry": "Max DNS Retry",
-        "max_dns_retry_help": "Max DNS retry count (1-15)",
+        "port_help": "Port d'écoute (1-65535)",
+        "fwmark": "Marque de pare-feu",
+        "fwmark_help": "Valeur de marque de pare-feu (0-4294967295)",
+        "max_dns_retry": "Tentatives DNS maximales",
+        "max_dns_retry_help": "Nombre maximal de tentatives DNS (1-15)",
         "mtu": "MTU",
-        "mtu_help": "MTU value (68-16000)",
-        "per_client_thread": "Per-Client Thread",
-        "per_client_thread_help": "Create separate thread per peer",
-        "disable": "Disable",
-        "disable_help": "Disable this interface"
+        "mtu_help": "Valeur MTU (68-16000)",
+        "per_client_thread": "Thread par client",
+        "per_client_thread_help": "Créer un thread séparé par pair",
+        "disable": "Désactiver",
+        "disable_help": "Désactiver cette interface"
       },
       "ip": {
-        "adjust_mss": "IP MSS Adjustment",
-        "adjust_mss_placeholder": "Enter MSS value",
-        "adjust_mss_help": "Adjust TCP MSS value",
-        "arp_cache_timeout": "ARP Cache Timeout",
-        "arp_cache_timeout_help": "ARP cache timeout (seconds)",
-        "disable_arp_filter": "Disable ARP Filter",
-        "disable_arp_filter_help": "Disable ARP filtering",
-        "disable_forwarding": "Disable Forwarding",
-        "disable_forwarding_help": "Disable IP forwarding",
-        "enable_arp_accept": "Enable ARP Accept",
-        "enable_arp_accept_help": "Enable ARP accept",
-        "enable_arp_announce": "Enable ARP Announce",
-        "enable_arp_announce_help": "Enable ARP announce",
-        "enable_arp_ignore": "Enable ARP Ignore",
-        "enable_arp_ignore_help": "Enable ARP ignore",
-        "enable_directed_broadcast": "Enable Directed Broadcast",
-        "enable_directed_broadcast_help": "Enable directed broadcast",
-        "enable_proxy_arp": "Enable Proxy ARP",
-        "enable_proxy_arp_help": "Enable proxy ARP",
+        "adjust_mss": "Ajustement IP MSS",
+        "adjust_mss_placeholder": "Entrez la valeur MSS",
+        "adjust_mss_help": "Ajuster la valeur TCP MSS",
+        "arp_cache_timeout": "Délai d'expiration du cache ARP",
+        "arp_cache_timeout_help": "Délai d'expiration du cache ARP (secondes)",
+        "disable_arp_filter": "Désactiver le filtre ARP",
+        "disable_arp_filter_help": "Désactiver le filtrage ARP",
+        "disable_forwarding": "Désactiver le transfert",
+        "disable_forwarding_help": "Désactiver le transfert IP",
+        "enable_arp_accept": "Activer l'acceptation ARP",
+        "enable_arp_accept_help": "Activer l'acceptation ARP",
+        "enable_arp_announce": "Activer l'annonce ARP",
+        "enable_arp_announce_help": "Activer l'annonce ARP",
+        "enable_arp_ignore": "Activer l'ignorance ARP",
+        "enable_arp_ignore_help": "Activer l'ignorance ARP",
+        "enable_directed_broadcast": "Activer la diffusion dirigée",
+        "enable_directed_broadcast_help": "Activer la diffusion dirigée",
+        "enable_proxy_arp": "Activer le proxy ARP",
+        "enable_proxy_arp_help": "Activer le proxy ARP",
         "proxy_arp_pvlan": "Proxy ARP PVLAN",
         "proxy_arp_pvlan_help": "Proxy ARP PVLAN",
-        "source_validation": "IP Source Validation",
-        "source_validation_placeholder": "Select source validation",
-        "source_validation_help": "IP source validation"
+        "source_validation": "Validation de source IP",
+        "source_validation_placeholder": "Sélectionner la validation de la source",
+        "source_validation_help": "Validation de source IP"
       },
       "ipv6": {
-        "accept_dad": "IPv6 Accept DAD",
-        "accept_dad_help": "IPv6 DAD accept setting",
-        "autoconf": "IPv6 Address Autoconf",
-        "autoconf_help": "Enable IPv6 address autoconfiguration",
-        "eui64": "IPv6 EUI-64 Address",
-        "eui64_placeholder": "Enter EUI-64 address",
-        "eui64_help": "IPv6 EUI-64 address",
-        "no_default_link_local": "Disable Default Link-Local",
-        "no_default_link_local_help": "Disable default link-local address",
-        "adjust_mss": "IPv6 MSS Adjustment",
-        "adjust_mss_placeholder": "Enter MSS value",
-        "adjust_mss_help": "IPv6 MSS adjustment",
-        "base_reachable_time": "IPv6 Base Reachable Time",
-        "base_reachable_time_help": "IPv6 base reachable time (seconds)",
-        "disable_forwarding": "IPv6 Disable Forwarding",
-        "disable_forwarding_help": "IPv6 disable forwarding",
-        "dup_addr_detect_transmits": "IPv6 DAD Transmits",
-        "dup_addr_detect_transmits_help": "IPv6 duplicate address detection transmits",
-        "source_validation": "IPv6 Source Validation",
-        "source_validation_placeholder": "Select source validation",
-        "source_validation_help": "IPv6 source validation"
+        "accept_dad": "IPv6 Accepter DAD",
+        "accept_dad_help": "Paramètre d'acceptation DAD IPv6",
+        "autoconf": "Autoconfiguration d'adresse IPv6",
+        "autoconf_help": "Activer l'autoconfiguration d'adresse IPv6",
+        "eui64": "Adresse EUI-64 IPv6",
+        "eui64_placeholder": "Entrez l'adresse EUI-64",
+        "eui64_help": "Adresse EUI-64 IPv6",
+        "no_default_link_local": "Désactiver Link-Local par défaut",
+        "no_default_link_local_help": "Désactiver l'adresse link-local par défaut",
+        "adjust_mss": "Ajustement MSS IPv6",
+        "adjust_mss_placeholder": "Entrez la valeur MSS",
+        "adjust_mss_help": "Ajustement MSS IPv6",
+        "base_reachable_time": "Temps de base atteignable IPv6",
+        "base_reachable_time_help": "Temps de base atteignable IPv6 (secondes)",
+        "disable_forwarding": "Désactiver le transfert IPv6",
+        "disable_forwarding_help": "Désactiver le transfert IPv6",
+        "dup_addr_detect_transmits": "Transmissions DAD IPv6",
+        "dup_addr_detect_transmits_help": "Transmissions de détection d'adresses en double IPv6",
+        "source_validation": "Validation de source IPv6",
+        "source_validation_placeholder": "Sélectionner la validation de la source",
+        "source_validation_help": "Validation de source IPv6"
       },
       "mirror": {
-        "egress": "Mirror Egress",
-        "egress_help": "Egress traffic mirror interface",
-        "ingress": "Mirror Ingress",
-        "ingress_help": "Ingress traffic mirror interface",
-        "target_placeholder": "Select mirror interface"
+        "egress": "Miroir sortant",
+        "egress_help": "Interface de miroir de trafic de sortie",
+        "ingress": "Miroir entrant",
+        "ingress_help": "Interface de miroir de trafic entrant",
+        "target_placeholder": "Sélectionner l'interface miroir"
       },
       "other": {
-        "redirect": "Redirect",
-        "redirect_help": "Redirect interface",
+        "redirect": "Redirection",
+        "redirect_help": "Interface de redirection",
         "vrf": "VRF",
-        "vrf_placeholder": "Enter VRF",
-        "vrf_help": "VRF name",
-        "target_placeholder": "Select interface"
+        "vrf_placeholder": "Entrez VRF",
+        "vrf_help": "Nom VRF",
+        "target_placeholder": "Sélectionner l'interface"
       },
       "peer": {
-        "name": "Name",
-        "name_placeholder": "Enter peer name",
-        "public_key": "Public Key",
-        "public_key_placeholder": "Enter public key",
-        "preshared_key": "Preshared Key",
-        "preshared_key_placeholder": "Enter preshared key",
-        "address": "Address",
-        "address_placeholder": "Enter address",
-        "allowed_ips": "Allowed IPs",
-        "allowed_ips_placeholder": "Enter allowed IPs (one per line)",
-        "allowed_ips_help": "Allowed IP addresses",
-        "host_name": "Host Name",
-        "host_name_help": "FQDN host name",
+        "name": "Nom",
+        "name_placeholder": "Entrez le nom du pair",
+        "public_key": "Clé publique",
+        "public_key_placeholder": "Entrez la clé publique",
+        "preshared_key": "Clé pré-partagée",
+        "preshared_key_placeholder": "Entrez la clé partagée",
+        "address": "Adresse",
+        "address_placeholder": "Entrez l'adresse",
+        "allowed_ips": "IP autorisées",
+        "allowed_ips_placeholder": "Entrez les IP autorisées (une par ligne)",
+        "allowed_ips_help": "Adresses IP autorisées",
+        "host_name": "Nom d'hôte",
+        "host_name_help": "Nom d'hôte FQDN",
         "port": "Port",
-        "persistent_keepalive": "Persistent Keepalive",
-        "persistent_keepalive_help": "Persistent keepalive interval (seconds)",
+        "persistent_keepalive": "Keepalive persistant",
+        "persistent_keepalive_help": "Intervalle de keepalive persistant (secondes)",
         "description": "Description",
-        "description_placeholder": "Enter description",
-        "disable": "Disable",
-        "disable_help": "Disable this peer",
+        "description_placeholder": "Entrez la description",
+        "disable": "Désactiver",
+        "disable_help": "Désactiver ce pair",
         "modal": {
-          "edit": "Edit Peer",
-          "create": "Create Peer"
+          "edit": "Modifier le pair",
+          "create": "Créer un pair"
         }
       },
       "modal": {
-        "edit": "Edit WireGuard Interface",
-        "create": "Create WireGuard Interface",
-        "confirm_delete": "Confirm Delete"
+        "edit": "Modifier l'interface WireGuard",
+        "create": "Créer une interface WireGuard",
+        "confirm_delete": "Confirmer la suppression"
       },
       "delete": {
-        "confirm_interface": "Confirm delete selected WireGuard interfaces?",
-        "confirm_peer": "Confirm delete selected peers?"
+        "confirm_interface": "Confirmer la suppression des interfaces WireGuard sélectionnées?",
+        "confirm_peer": "Confirmer la suppression des pairs sélectionnés?"
       },
       "command": {
-        "no_config": "# No parameters configured"
+        "no_config": "# Aucun paramètre configuré"
       },
       "errors": {
-        "error_message": "Error code: {code}, Error message: {detail}",
-        "name_required": "Please enter WireGuard interface name",
-        "select_for_delete": "Please select interfaces to delete",
-        "peer_name_required": "Please enter peer name",
-        "public_key_required": "Please enter public key"
+        "error_message": "Code d'erreur : {code}, Message d'erreur : {detail}",
+        "name_required": "Veuillez entrer le nom de l'interface WireGuard",
+        "select_for_delete": "Veuillez sélectionner les interfaces à supprimer",
+        "peer_name_required": "Veuillez entrer le nom du pair",
+        "public_key_required": "Veuillez entrer la clé publique"
       },
       "options": {
         "source_validation": {
           "strict": "Strict",
-          "loose": "Loose",
-          "disable": "Disable"
+          "loose": "Lâche",
+          "disable": "Désactiver"
         },
         "accept_dad": {
-          "0": "Disable",
-          "1": "Enable",
-          "2": "Force"
+          "0": "Désactiver",
+          "1": "Activer",
+          "2": "Forcer"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Transfert",
+        "input": "Entrant",
+        "name": "Nom",
+        "output": "Sortant",
+        "prerouting": "Prerouting",
+        "filter": "Filtre",
+        "raw": "Brut",
+        "defaultAction": "Action par défaut",
+        "defaultActionHelp": "Action par défaut pour les paquets ne correspondant à aucune règle",
+        "defaultLog": "Journal par défaut",
+        "defaultLogHelp": "Activer la journalisation pour les paquets correspondant à l'action par défaut",
+        "description": "Description",
+        "descriptionHelp": "Description de cette chaîne de pare-feu",
+        "disableConntrack": "Désactiver le suivi de connexion",
+        "disableConntrackHelp": "Désactiver le suivi de connexion pour cette chaîne",
+        "defaultJumpTarget": "Cible de saut par défaut",
+        "defaultJumpTargetHelp": "Chaîne cible vers laquelle sauter en cas d'absence de correspondance",
+        "nameName": "Nom",
+        "accept": "Accepter",
+        "drop": "Supprimer",
+        "reject": "Rejeter",
+        "return": "Retour",
+        "continue": "Continuer",
+        "jump": "Sauter",
+        "createName": "Créer un nom",
+        "editName": "Modifier le nom",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer le nom {name} ?",
+        "rulesetLabel": "Ensemble de règles"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocole"
       }
     }
   },
   "ko": {
     "wireguard": {
       "columns": {
-        "name": "Name",
-        "description": "Description",
-        "port": "Port",
+        "name": "이름",
+        "description": "설명",
+        "port": "포트",
         "mtu": "MTU",
-        "peer_count": "Peer Count",
-        "disable": "Disable",
-        "actions": "Actions"
+        "peer_count": "피어 수",
+        "disable": "비활성화",
+        "actions": "작업"
       },
       "peer_columns": {
-        "name": "Name",
-        "public_key": "Public Key",
-        "address": "Address",
-        "port": "Port",
-        "disable": "Disable",
-        "actions": "Actions"
+        "name": "이름",
+        "public_key": "공개 키",
+        "address": "주소",
+        "port": "포트",
+        "disable": "비활성화",
+        "actions": "작업"
       },
       "tabs": {
-        "basic": "Basic",
-        "ipv4": "IPv4 Params",
-        "ipv6": "IPv6 Params",
-        "peer": "Peer",
-        "mirror": "Mirror",
-        "other": "Other",
-        "command": "Command Preview"
+        "basic": "기본",
+        "ipv4": "IPv4 매개변수",
+        "ipv6": "IPv6 매개변수",
+        "peer": "피어",
+        "mirror": "미러",
+        "other": "기타",
+        "command": "명령 미리보기"
       },
       "basic": {
-        "name": "Name",
-        "name_placeholder": "Enter WireGuard interface name",
-        "name_help": "WireGuard interface name",
-        "description": "Description",
-        "description_placeholder": "Enter description",
-        "private_key": "Private Key",
-        "private_key_placeholder": "Enter private key",
-        "private_key_help": "WireGuard private key",
-        "port": "Port",
-        "port_help": "Listen port (1-65535)",
-        "fwmark": "Firewall Mark",
-        "fwmark_help": "Firewall mark value (0-4294967295)",
-        "max_dns_retry": "Max DNS Retry",
-        "max_dns_retry_help": "Max DNS retry count (1-15)",
+        "name": "이름",
+        "name_placeholder": "WireGuard 인터페이스 이름 입력",
+        "name_help": "WireGuard 인터페이스 이름",
+        "description": "설명",
+        "description_placeholder": "설명 입력",
+        "private_key": "개인 키",
+        "private_key_placeholder": "개인 키 입력",
+        "private_key_help": "WireGuard 개인 키",
+        "port": "포트",
+        "port_help": "수신 포트(1-65535)",
+        "fwmark": "방화벽 마크",
+        "fwmark_help": "방화벽 마크 값 (0-4294967295)",
+        "max_dns_retry": "최대 DNS 재시도",
+        "max_dns_retry_help": "최대 DNS 재시도 수(1-15)",
         "mtu": "MTU",
-        "mtu_help": "MTU value (68-16000)",
-        "per_client_thread": "Per-Client Thread",
-        "per_client_thread_help": "Create separate thread per peer",
-        "disable": "Disable",
-        "disable_help": "Disable this interface"
+        "mtu_help": "MTU 값(68-16000)",
+        "per_client_thread": "클라이언트당 스레드",
+        "per_client_thread_help": "피어당 별도 스레드 만들기",
+        "disable": "비활성화",
+        "disable_help": "이 인터페이스 비활성화"
       },
       "ip": {
-        "adjust_mss": "IP MSS Adjustment",
-        "adjust_mss_placeholder": "Enter MSS value",
-        "adjust_mss_help": "Adjust TCP MSS value",
-        "arp_cache_timeout": "ARP Cache Timeout",
-        "arp_cache_timeout_help": "ARP cache timeout (seconds)",
-        "disable_arp_filter": "Disable ARP Filter",
-        "disable_arp_filter_help": "Disable ARP filtering",
-        "disable_forwarding": "Disable Forwarding",
-        "disable_forwarding_help": "Disable IP forwarding",
-        "enable_arp_accept": "Enable ARP Accept",
-        "enable_arp_accept_help": "Enable ARP accept",
-        "enable_arp_announce": "Enable ARP Announce",
-        "enable_arp_announce_help": "Enable ARP announce",
-        "enable_arp_ignore": "Enable ARP Ignore",
-        "enable_arp_ignore_help": "Enable ARP ignore",
-        "enable_directed_broadcast": "Enable Directed Broadcast",
-        "enable_directed_broadcast_help": "Enable directed broadcast",
-        "enable_proxy_arp": "Enable Proxy ARP",
-        "enable_proxy_arp_help": "Enable proxy ARP",
-        "proxy_arp_pvlan": "Proxy ARP PVLAN",
-        "proxy_arp_pvlan_help": "Proxy ARP PVLAN",
-        "source_validation": "IP Source Validation",
-        "source_validation_placeholder": "Select source validation",
-        "source_validation_help": "IP source validation"
+        "adjust_mss": "IP MSS 조정",
+        "adjust_mss_placeholder": "MSS 값 입력",
+        "adjust_mss_help": "TCP MSS 값 조정",
+        "arp_cache_timeout": "ARP 캐시 타임아웃",
+        "arp_cache_timeout_help": "ARP 캐시 타임아웃 (초)",
+        "disable_arp_filter": "ARP 필터 비활성화",
+        "disable_arp_filter_help": "ARP 필터링 비활성화",
+        "disable_forwarding": "포워딩 비활성화",
+        "disable_forwarding_help": "IP 포워딩 비활성화",
+        "enable_arp_accept": "ARP 수락 활성화",
+        "enable_arp_accept_help": "ARP 수락 활성화",
+        "enable_arp_announce": "ARP 공지 활성화",
+        "enable_arp_announce_help": "ARP 공지 활성화",
+        "enable_arp_ignore": "ARP 무시 활성화",
+        "enable_arp_ignore_help": "ARP 무시 활성화",
+        "enable_directed_broadcast": "지정 브로드캐스트 활성화",
+        "enable_directed_broadcast_help": "지정 브로드캐스트 활성화",
+        "enable_proxy_arp": "프록시 ARP 활성화",
+        "enable_proxy_arp_help": "프록시 ARP 활성화",
+        "proxy_arp_pvlan": "프록시 ARP PVLAN",
+        "proxy_arp_pvlan_help": "프록시 ARP PVLAN",
+        "source_validation": "IP 소스 유효성 검사",
+        "source_validation_placeholder": "소스 검증 선택",
+        "source_validation_help": "IP 소스 유효성 검사"
       },
       "ipv6": {
-        "accept_dad": "IPv6 Accept DAD",
-        "accept_dad_help": "IPv6 DAD accept setting",
-        "autoconf": "IPv6 Address Autoconf",
-        "autoconf_help": "Enable IPv6 address autoconfiguration",
-        "eui64": "IPv6 EUI-64 Address",
-        "eui64_placeholder": "Enter EUI-64 address",
-        "eui64_help": "IPv6 EUI-64 address",
-        "no_default_link_local": "Disable Default Link-Local",
-        "no_default_link_local_help": "Disable default link-local address",
-        "adjust_mss": "IPv6 MSS Adjustment",
-        "adjust_mss_placeholder": "Enter MSS value",
-        "adjust_mss_help": "IPv6 MSS adjustment",
-        "base_reachable_time": "IPv6 Base Reachable Time",
-        "base_reachable_time_help": "IPv6 base reachable time (seconds)",
-        "disable_forwarding": "IPv6 Disable Forwarding",
-        "disable_forwarding_help": "IPv6 disable forwarding",
-        "dup_addr_detect_transmits": "IPv6 DAD Transmits",
-        "dup_addr_detect_transmits_help": "IPv6 duplicate address detection transmits",
-        "source_validation": "IPv6 Source Validation",
-        "source_validation_placeholder": "Select source validation",
-        "source_validation_help": "IPv6 source validation"
+        "accept_dad": "IPv6 DAD 수락",
+        "accept_dad_help": "IPv6 DAD 수락 설정",
+        "autoconf": "IPv6 주소 자동 구성",
+        "autoconf_help": "IPv6 주소 자동 구성 활성화",
+        "eui64": "IPv6 EUI-64 주소",
+        "eui64_placeholder": "EUI-64 주소 입력",
+        "eui64_help": "IPv6 EUI-64 주소",
+        "no_default_link_local": "기본 Link-Local 비활성화",
+        "no_default_link_local_help": "기본 link-local 주소 비활성화",
+        "adjust_mss": "IPv6 MSS 조정",
+        "adjust_mss_placeholder": "MSS 값 입력",
+        "adjust_mss_help": "IPv6 MSS 조정",
+        "base_reachable_time": "IPv6 기본 도달 가능 시간",
+        "base_reachable_time_help": "IPv6 기본 도달 가능 시간(초)",
+        "disable_forwarding": "IPv6 포워딩 비활성화",
+        "disable_forwarding_help": "IPv6 포워딩 비활성화",
+        "dup_addr_detect_transmits": "IPv6 DAD 전송",
+        "dup_addr_detect_transmits_help": "IPv6 중복 주소 감지 전송",
+        "source_validation": "IPv6 소스 검증",
+        "source_validation_placeholder": "소스 검증 선택",
+        "source_validation_help": "IPv6 소스 검증"
       },
       "mirror": {
-        "egress": "Mirror Egress",
-        "egress_help": "Egress traffic mirror interface",
-        "ingress": "Mirror Ingress",
-        "ingress_help": "Ingress traffic mirror interface",
-        "target_placeholder": "Select mirror interface"
+        "egress": "이그레스 미러",
+        "egress_help": "송신 트래픽 미러링 인터페이스",
+        "ingress": "인그레스 미러",
+        "ingress_help": "인그레스 트래픽 미러 인터페이스",
+        "target_placeholder": "미러 인터페이스 선택"
       },
       "other": {
-        "redirect": "Redirect",
-        "redirect_help": "Redirect interface",
+        "redirect": "리디렉션",
+        "redirect_help": "리디렉션 인터페이스",
         "vrf": "VRF",
-        "vrf_placeholder": "Enter VRF",
-        "vrf_help": "VRF name",
-        "target_placeholder": "Select interface"
+        "vrf_placeholder": "VRF 입력",
+        "vrf_help": "VRF 이름",
+        "target_placeholder": "인터페이스 선택"
       },
       "peer": {
-        "name": "Name",
-        "name_placeholder": "Enter peer name",
-        "public_key": "Public Key",
-        "public_key_placeholder": "Enter public key",
-        "preshared_key": "Preshared Key",
-        "preshared_key_placeholder": "Enter preshared key",
-        "address": "Address",
-        "address_placeholder": "Enter address",
-        "allowed_ips": "Allowed IPs",
-        "allowed_ips_placeholder": "Enter allowed IPs (one per line)",
-        "allowed_ips_help": "Allowed IP addresses",
-        "host_name": "Host Name",
-        "host_name_help": "FQDN host name",
-        "port": "Port",
-        "persistent_keepalive": "Persistent Keepalive",
-        "persistent_keepalive_help": "Persistent keepalive interval (seconds)",
-        "description": "Description",
-        "description_placeholder": "Enter description",
-        "disable": "Disable",
-        "disable_help": "Disable this peer",
+        "name": "이름",
+        "name_placeholder": "피어 이름 입력",
+        "public_key": "공개 키",
+        "public_key_placeholder": "공개 키 입력",
+        "preshared_key": "사전 공유 키",
+        "preshared_key_placeholder": "공유 키 입력",
+        "address": "주소",
+        "address_placeholder": "주소 입력",
+        "allowed_ips": "허용된 IP",
+        "allowed_ips_placeholder": "허용된 IP 입력 (한 줄에 하나씩)",
+        "allowed_ips_help": "허용된 IP 주소",
+        "host_name": "호스트 이름",
+        "host_name_help": "FQDN 호스트 이름",
+        "port": "포트",
+        "persistent_keepalive": "지속적 Keepalive",
+        "persistent_keepalive_help": "지속적 keepalive 간격(초)",
+        "description": "설명",
+        "description_placeholder": "설명 입력",
+        "disable": "비활성화",
+        "disable_help": "이 피어 비활성화",
         "modal": {
-          "edit": "Edit Peer",
-          "create": "Create Peer"
+          "edit": "피어 편집",
+          "create": "피어 만들기"
         }
       },
       "modal": {
-        "edit": "Edit WireGuard Interface",
-        "create": "Create WireGuard Interface",
-        "confirm_delete": "Confirm Delete"
+        "edit": "WireGuard 인터페이스 편집",
+        "create": "WireGuard 인터페이스 만들기",
+        "confirm_delete": "삭제 확인"
       },
       "delete": {
-        "confirm_interface": "Confirm delete selected WireGuard interfaces?",
-        "confirm_peer": "Confirm delete selected peers?"
+        "confirm_interface": "선택한 WireGuard 인터페이스를 삭제하시겠습니까?",
+        "confirm_peer": "선택한 피어를 삭제하시겠습니까?"
       },
       "command": {
-        "no_config": "# No parameters configured"
+        "no_config": "# 매개변수 구성되지 않음"
       },
       "errors": {
-        "error_message": "Error code: {code}, Error message: {detail}",
-        "name_required": "Please enter WireGuard interface name",
-        "select_for_delete": "Please select interfaces to delete",
-        "peer_name_required": "Please enter peer name",
-        "public_key_required": "Please enter public key"
+        "error_message": "오류 코드: {code}, 오류 메시지: {detail}",
+        "name_required": "WireGuard 인터페이스 이름을 입력해 주세요",
+        "select_for_delete": "삭제할 인터페이스를 선택하세요",
+        "peer_name_required": "피어 이름을 입력해 주세요",
+        "public_key_required": "공개 키를 입력해 주세요"
       },
       "options": {
         "source_validation": {
-          "strict": "Strict",
-          "loose": "Loose",
-          "disable": "Disable"
+          "strict": "엄격",
+          "loose": "느슨한",
+          "disable": "비활성화"
         },
         "accept_dad": {
-          "0": "Disable",
-          "1": "Enable",
-          "2": "Force"
+          "0": "비활성화",
+          "1": "활성화",
+          "2": "강제"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "전달",
+        "input": "수신",
+        "name": "이름",
+        "output": "송신",
+        "prerouting": "프리라우팅",
+        "filter": "필터",
+        "raw": "Raw",
+        "defaultAction": "기본 동작",
+        "defaultActionHelp": "어떤 규칙과도 일치하지 않는 패킷에 대한 기본 동작",
+        "defaultLog": "기본 로그",
+        "defaultLogHelp": "기본 동작과 일치하는 패킷에 대한 로깅 활성화",
+        "description": "설명",
+        "descriptionHelp": "이 방화벽 체인에 대한 설명",
+        "disableConntrack": "연결 추적 비활성화",
+        "disableConntrackHelp": "이 체인의 연결 추적 비활성화",
+        "defaultJumpTarget": "기본 점프 대상",
+        "defaultJumpTargetHelp": "일치하는 규칙이 없을 때 점프할 대상 체인",
+        "nameName": "이름",
+        "accept": "수락",
+        "drop": "드롭",
+        "reject": "거부",
+        "return": "반환",
+        "continue": "계속",
+        "jump": "점프",
+        "createName": "이름 생성",
+        "editName": "이름 편집",
+        "confirmDelete": "이름 {name}을(를) 삭제하시겠습니까?",
+        "rulesetLabel": "규칙 집합"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "모드"
+      },
+      "type": {
+        "ethernet": "이더넷",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "프로토콜"
       }
     }
   }

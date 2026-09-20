@@ -117,7 +117,7 @@ export default defineComponent({
       <DraggableModal v-model:visible="modalVisible" :title="editingItem?.id ? $t('app.edit') : $t('app.create')" @confirm="save">
         <ConfigForm v-model="editingItem" :schema="formSchema" :disabled="writeDisabled" />
       </DraggableModal>
-      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemove">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemove">
         <div>{{ $t('config.deleteConfirm') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>

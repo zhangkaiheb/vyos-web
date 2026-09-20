@@ -57,6 +57,53 @@
         "ruleRequired": "请输入规则编号",
         "ruleRange": "规则编号范围 1-32765"
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "转发",
+        "input": "入站",
+        "name": "名称",
+        "output": "出站",
+        "prerouting": "预路由",
+        "filter": "过滤",
+        "raw": "原始",
+        "defaultAction": "默认动作",
+        "defaultActionHelp": "不匹配任何规则的数据包的默认动作",
+        "defaultLog": "默认日志",
+        "defaultLogHelp": "启用匹配默认动作的数据包日志记录",
+        "description": "描述",
+        "descriptionHelp": "此防火墙链的描述",
+        "disableConntrack": "禁用连接跟踪",
+        "disableConntrackHelp": "禁用此链的连接跟踪",
+        "defaultJumpTarget": "默认跳转目标",
+        "defaultJumpTargetHelp": "没有规则匹配时跳转的目标链",
+        "nameName": "名称",
+        "accept": "接受",
+        "drop": "丢弃",
+        "reject": "拒绝",
+        "return": "返回",
+        "continue": "继续",
+        "jump": "跳转",
+        "createName": "创建名称",
+        "editName": "编辑名称",
+        "confirmDelete": "确定要删除名称 {name} 吗？",
+        "rulesetLabel": "规则集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太网",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "协议"
+      }
     }
   },
   "en": {
@@ -116,6 +163,53 @@
       "validation": {
         "ruleRequired": "Please enter rule number",
         "ruleRange": "Rule number range 1-32765"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Forward",
+        "input": "Input",
+        "name": "Name",
+        "output": "Output",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Default Action",
+        "defaultActionHelp": "Default action for packets that do not match any rule",
+        "defaultLog": "Default Log",
+        "defaultLogHelp": "Enable logging for packets matching the default action",
+        "description": "Description",
+        "descriptionHelp": "Description of this firewall chain",
+        "disableConntrack": "Disable Conntrack",
+        "disableConntrackHelp": "Disable connection tracking for this chain",
+        "defaultJumpTarget": "Default Jump Target",
+        "defaultJumpTargetHelp": "Target chain to jump to when no rule matches",
+        "nameName": "Name",
+        "accept": "Accept",
+        "drop": "Drop",
+        "reject": "Reject",
+        "return": "Return",
+        "continue": "Continue",
+        "jump": "Jump",
+        "createName": "Create Name",
+        "editName": "Edit Name",
+        "confirmDelete": "Are you sure you want to delete name {name}?",
+        "rulesetLabel": "Ruleset"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocol"
       }
     }
   },
@@ -177,245 +271,480 @@
         "ruleRequired": "Please enter rule number",
         "ruleRange": "Rule number range 1-32765"
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "轉發",
+        "input": "入站",
+        "name": "名稱",
+        "output": "出站",
+        "prerouting": "預路由",
+        "filter": "過濾",
+        "raw": "原始",
+        "defaultAction": "預設動作",
+        "defaultActionHelp": "不符合任何規則的資料封包的預設動作",
+        "defaultLog": "預設日誌",
+        "defaultLogHelp": "啟用符合預設動作的資料封包日誌記錄",
+        "description": "描述",
+        "descriptionHelp": "此防火牆鏈的描述",
+        "disableConntrack": "停用連線追蹤",
+        "disableConntrackHelp": "停用此鏈的連線追蹤",
+        "defaultJumpTarget": "預設跳轉目標",
+        "defaultJumpTargetHelp": "沒有規則符合時跳轉的目標鏈",
+        "nameName": "名稱",
+        "accept": "接受",
+        "drop": "丟棄",
+        "reject": "拒絕",
+        "return": "返回",
+        "continue": "繼續",
+        "jump": "跳轉",
+        "createName": "建立名稱",
+        "editName": "編輯名稱",
+        "confirmDelete": "確定要刪除名稱 {name} 嗎？",
+        "rulesetLabel": "規則集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太網",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "協議"
+      }
     }
   },
   "ru": {
     "localRoute": {
       "columns": {
-        "rule": "Rule Number",
-        "protocol": "Protocol",
-        "inboundInterface": "Inbound Interface",
-        "source": "Source",
-        "destination": "Destination",
-        "routingTable": "Routing Table"
+        "rule": "Номер правила",
+        "protocol": "Протокол",
+        "inboundInterface": "Входящий интерфейс",
+        "source": "Источник",
+        "destination": "Назначение",
+        "routingTable": "Таблица маршрутизации"
       },
       "schema": {
-        "rule": "Rule Number",
-        "ruleHelp": "Range 1-32765",
-        "protocol": "Protocol",
-        "protocolHelp": "Default all",
-        "fwmarkHelp": "Range 1-2147483647",
-        "inboundInterface": "Inbound Interface",
-        "source": "Source",
-        "destination": "Destination",
-        "address": "Address",
-        "port": "Port",
-        "ipv4AddressPlaceholder": "IP address or prefix, ! to exclude",
-        "ipv4AddressHelp": "Prefix ! to exclude",
-        "ipv6AddressPlaceholder": "IPv6 address or prefix",
-        "ipv6AddressHelp": "IPv6 address or prefix",
-        "portHelp": "Range 1-65535, single port only",
-        "set": "Set",
-        "routingTable": "Routing Table",
-        "routingTablePlaceholder": "1-200 or main",
-        "routingTableHelp": "1-200 or main"
+        "rule": "Номер правила",
+        "ruleHelp": "Диапазон 1-32765",
+        "protocol": "Протокол",
+        "protocolHelp": "Все по умолчанию",
+        "fwmarkHelp": "Диапазон 1-2147483647",
+        "inboundInterface": "Входящий интерфейс",
+        "source": "Источник",
+        "destination": "Назначение",
+        "address": "Адрес",
+        "port": "Порт",
+        "ipv4AddressPlaceholder": "IP-адрес или префикс, ! для исключения",
+        "ipv4AddressHelp": "Префикс ! для исключения",
+        "ipv6AddressPlaceholder": "Адрес или префикс IPv6",
+        "ipv6AddressHelp": "Адрес или префикс IPv6",
+        "portHelp": "Диапазон 1-65535, только один порт",
+        "set": "Установить",
+        "routingTable": "Таблица маршрутизации",
+        "routingTablePlaceholder": "1-200 или main",
+        "routingTableHelp": "1-200 или main"
       },
       "tabs": {
-        "basic": "Basic",
-        "source": "Source/Destination",
-        "set": "Set"
+        "basic": "Основные",
+        "source": "Источник/Назначение",
+        "set": "Установить"
       },
       "protocol": {
-        "allDefault": "all (default)"
+        "allDefault": "все (по умолчанию)"
       },
       "buttons": {
-        "create": "Create",
-        "edit": "Edit",
-        "delete": "Delete",
-        "refresh": "Refresh"
+        "create": "Создать",
+        "edit": "Редактировать",
+        "delete": "Удалить",
+        "refresh": "Обновить"
       },
       "modals": {
-        "createRule": "Create Local Policy Routing Rule",
-        "editRule": "Edit Local Policy Routing Rule",
-        "confirmDelete": "Confirm Delete"
+        "createRule": "Создать правило локальной политики маршрутизации",
+        "editRule": "Редактировать правило локальной политики маршрутизации",
+        "confirmDelete": "Подтвердить удаление"
       },
       "messages": {
-        "selectRow": "Please select a row",
-        "confirmDelete": "Confirm delete the following local policy routing rules?"
+        "selectRow": "Выберите строку",
+        "confirmDelete": "Подтвердить удаление следующих правил локальной политики маршрутизации?"
       },
       "validation": {
-        "ruleRequired": "Please enter rule number",
-        "ruleRange": "Rule number range 1-32765"
+        "ruleRequired": "Введите номер правила",
+        "ruleRange": "Диапазон номеров правил 1-32765"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Переадресация",
+        "input": "Входящие",
+        "name": "Имя",
+        "output": "Исходящие",
+        "prerouting": "Премаршрутизация",
+        "filter": "Фильтр",
+        "raw": "Сырой",
+        "defaultAction": "Действие по умолчанию",
+        "defaultActionHelp": "Действие по умолчанию для пакетов, не соответствующих ни одному правилу",
+        "defaultLog": "Журнал по умолчанию",
+        "defaultLogHelp": "Включить ведение журнала для пакетов, соответствующих действию по умолчанию",
+        "description": "Описание",
+        "descriptionHelp": "Описание этой цепочки межсетевого экрана",
+        "disableConntrack": "Отключить отслеживание соединений",
+        "disableConntrackHelp": "Отключить отслеживание соединений для этой цепочки",
+        "defaultJumpTarget": "Цель перехода по умолчанию",
+        "defaultJumpTargetHelp": "Целевая цепочка для перехода при отсутствии совпадений",
+        "nameName": "Имя",
+        "accept": "Принять",
+        "drop": "Отбросить",
+        "reject": "Отклонить",
+        "return": "Вернуть",
+        "continue": "Продолжить",
+        "jump": "Перейти",
+        "createName": "Создать имя",
+        "editName": "Редактировать имя",
+        "confirmDelete": "Вы уверены, что хотите удалить имя {name}?",
+        "rulesetLabel": "Набор правил"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Режим"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Протокол"
       }
     }
   },
   "de": {
     "localRoute": {
       "columns": {
-        "rule": "Rule Number",
-        "protocol": "Protocol",
-        "inboundInterface": "Inbound Interface",
-        "source": "Source",
-        "destination": "Destination",
-        "routingTable": "Routing Table"
+        "rule": "Regelnummer",
+        "protocol": "Protokoll",
+        "inboundInterface": "Eingehende Schnittstelle",
+        "source": "Quelle",
+        "destination": "Ziel",
+        "routingTable": "Routingtabelle"
       },
       "schema": {
-        "rule": "Rule Number",
-        "ruleHelp": "Range 1-32765",
-        "protocol": "Protocol",
-        "protocolHelp": "Default all",
-        "fwmarkHelp": "Range 1-2147483647",
-        "inboundInterface": "Inbound Interface",
-        "source": "Source",
-        "destination": "Destination",
-        "address": "Address",
+        "rule": "Regelnummer",
+        "ruleHelp": "Bereich 1-32765",
+        "protocol": "Protokoll",
+        "protocolHelp": "Standardmäßig alle",
+        "fwmarkHelp": "Bereich 1-2147483647",
+        "inboundInterface": "Eingehende Schnittstelle",
+        "source": "Quelle",
+        "destination": "Ziel",
+        "address": "Adresse",
         "port": "Port",
-        "ipv4AddressPlaceholder": "IP address or prefix, ! to exclude",
-        "ipv4AddressHelp": "Prefix ! to exclude",
-        "ipv6AddressPlaceholder": "IPv6 address or prefix",
-        "ipv6AddressHelp": "IPv6 address or prefix",
-        "portHelp": "Range 1-65535, single port only",
-        "set": "Set",
-        "routingTable": "Routing Table",
-        "routingTablePlaceholder": "1-200 or main",
-        "routingTableHelp": "1-200 or main"
+        "ipv4AddressPlaceholder": "IP-Adresse oder Präfix, ! zum Ausschließen",
+        "ipv4AddressHelp": "Präfix ! zum Ausschließen",
+        "ipv6AddressPlaceholder": "IPv6-Adresse oder -Präfix",
+        "ipv6AddressHelp": "IPv6-Adresse oder -Präfix",
+        "portHelp": "Bereich 1-65535, nur ein einzelner Port",
+        "set": "Setzen",
+        "routingTable": "Routingtabelle",
+        "routingTablePlaceholder": "1-200 oder main",
+        "routingTableHelp": "1-200 oder main"
       },
       "tabs": {
-        "basic": "Basic",
-        "source": "Source/Destination",
-        "set": "Set"
+        "basic": "Grundlegend",
+        "source": "Quelle/Ziel",
+        "set": "Setzen"
       },
       "protocol": {
-        "allDefault": "all (default)"
+        "allDefault": "alle (Standard)"
       },
       "buttons": {
-        "create": "Create",
-        "edit": "Edit",
-        "delete": "Delete",
-        "refresh": "Refresh"
+        "create": "Erstellen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "refresh": "Aktualisieren"
       },
       "modals": {
-        "createRule": "Create Local Policy Routing Rule",
-        "editRule": "Edit Local Policy Routing Rule",
-        "confirmDelete": "Confirm Delete"
+        "createRule": "Lokale Richtlinienroutenregel erstellen",
+        "editRule": "Lokale Policy-Routing-Regel bearbeiten",
+        "confirmDelete": "Löschen bestätigen"
       },
       "messages": {
-        "selectRow": "Please select a row",
-        "confirmDelete": "Confirm delete the following local policy routing rules?"
+        "selectRow": "Bitte eine Zeile auswählen",
+        "confirmDelete": "Löschen der folgenden lokalen Richtlinienroutenregeln bestätigen?"
       },
       "validation": {
-        "ruleRequired": "Please enter rule number",
-        "ruleRange": "Rule number range 1-32765"
+        "ruleRequired": "Bitte Regelnummer eingeben",
+        "ruleRange": "Bereich der Regelnummern 1-32765"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Weiterleitung",
+        "input": "Eingehend",
+        "name": "Name",
+        "output": "Ausgehend",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Standardaktion",
+        "defaultActionHelp": "Standardaktion für Pakete, die mit keiner Regel übereinstimmen",
+        "defaultLog": "Standardprotokoll",
+        "defaultLogHelp": "Protokollierung für Pakete aktivieren, die der Standardaktion entsprechen",
+        "description": "Beschreibung",
+        "descriptionHelp": "Beschreibung dieser Firewall-Kette",
+        "disableConntrack": "Verbindungsverfolgung deaktivieren",
+        "disableConntrackHelp": "Verbindungsverfolgung für diese Kette deaktivieren",
+        "defaultJumpTarget": "Standard-Sprungziel",
+        "defaultJumpTargetHelp": "Zielkette zum Sprung bei keiner Übereinstimmung",
+        "nameName": "Name",
+        "accept": "Akzeptieren",
+        "drop": "Verwerfen",
+        "reject": "Zurückweisen",
+        "return": "Zurückkehren",
+        "continue": "Fortsetzen",
+        "jump": "Springen",
+        "createName": "Name erstellen",
+        "editName": "Name bearbeiten",
+        "confirmDelete": "Möchten Sie den Namen {name} wirklich löschen?",
+        "rulesetLabel": "Regelsatz"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Modus"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protokoll"
       }
     }
   },
   "fr": {
     "localRoute": {
       "columns": {
-        "rule": "Rule Number",
-        "protocol": "Protocol",
-        "inboundInterface": "Inbound Interface",
+        "rule": "Numéro de règle",
+        "protocol": "Protocole",
+        "inboundInterface": "Interface entrante",
         "source": "Source",
         "destination": "Destination",
-        "routingTable": "Routing Table"
+        "routingTable": "Table de routage"
       },
       "schema": {
-        "rule": "Rule Number",
-        "ruleHelp": "Range 1-32765",
-        "protocol": "Protocol",
-        "protocolHelp": "Default all",
-        "fwmarkHelp": "Range 1-2147483647",
-        "inboundInterface": "Inbound Interface",
+        "rule": "Numéro de règle",
+        "ruleHelp": "Plage 1-32765",
+        "protocol": "Protocole",
+        "protocolHelp": "Tous par défaut",
+        "fwmarkHelp": "Plage 1-2147483647",
+        "inboundInterface": "Interface entrante",
         "source": "Source",
         "destination": "Destination",
-        "address": "Address",
+        "address": "Adresse",
         "port": "Port",
-        "ipv4AddressPlaceholder": "IP address or prefix, ! to exclude",
-        "ipv4AddressHelp": "Prefix ! to exclude",
-        "ipv6AddressPlaceholder": "IPv6 address or prefix",
-        "ipv6AddressHelp": "IPv6 address or prefix",
-        "portHelp": "Range 1-65535, single port only",
-        "set": "Set",
-        "routingTable": "Routing Table",
-        "routingTablePlaceholder": "1-200 or main",
-        "routingTableHelp": "1-200 or main"
+        "ipv4AddressPlaceholder": "Adresse IP ou préfixe, ! pour exclure",
+        "ipv4AddressHelp": "Préfixe ! pour exclure",
+        "ipv6AddressPlaceholder": "Adresse ou préfixe IPv6",
+        "ipv6AddressHelp": "Adresse ou préfixe IPv6",
+        "portHelp": "Plage 1-65535, un seul port uniquement",
+        "set": "Définir",
+        "routingTable": "Table de routage",
+        "routingTablePlaceholder": "1-200 ou main",
+        "routingTableHelp": "1-200 ou main"
       },
       "tabs": {
-        "basic": "Basic",
+        "basic": "Basique",
         "source": "Source/Destination",
-        "set": "Set"
+        "set": "Définir"
       },
       "protocol": {
-        "allDefault": "all (default)"
+        "allDefault": "tous (par défaut)"
       },
       "buttons": {
-        "create": "Create",
-        "edit": "Edit",
-        "delete": "Delete",
-        "refresh": "Refresh"
+        "create": "Créer",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "refresh": "Actualiser"
       },
       "modals": {
-        "createRule": "Create Local Policy Routing Rule",
-        "editRule": "Edit Local Policy Routing Rule",
-        "confirmDelete": "Confirm Delete"
+        "createRule": "Créer une règle de routage de politique locale",
+        "editRule": "Modifier la règle de routage de politique locale",
+        "confirmDelete": "Confirmer la suppression"
       },
       "messages": {
-        "selectRow": "Please select a row",
-        "confirmDelete": "Confirm delete the following local policy routing rules?"
+        "selectRow": "Veuillez sélectionner une ligne",
+        "confirmDelete": "Confirmer la suppression des règles de routage de politique locale suivantes?"
       },
       "validation": {
-        "ruleRequired": "Please enter rule number",
-        "ruleRange": "Rule number range 1-32765"
+        "ruleRequired": "Veuillez entrer le numéro de règle",
+        "ruleRange": "Plage des numéros de règle 1-32765"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Transfert",
+        "input": "Entrant",
+        "name": "Nom",
+        "output": "Sortant",
+        "prerouting": "Prerouting",
+        "filter": "Filtre",
+        "raw": "Brut",
+        "defaultAction": "Action par défaut",
+        "defaultActionHelp": "Action par défaut pour les paquets ne correspondant à aucune règle",
+        "defaultLog": "Journal par défaut",
+        "defaultLogHelp": "Activer la journalisation pour les paquets correspondant à l'action par défaut",
+        "description": "Description",
+        "descriptionHelp": "Description de cette chaîne de pare-feu",
+        "disableConntrack": "Désactiver le suivi de connexion",
+        "disableConntrackHelp": "Désactiver le suivi de connexion pour cette chaîne",
+        "defaultJumpTarget": "Cible de saut par défaut",
+        "defaultJumpTargetHelp": "Chaîne cible vers laquelle sauter en cas d'absence de correspondance",
+        "nameName": "Nom",
+        "accept": "Accepter",
+        "drop": "Supprimer",
+        "reject": "Rejeter",
+        "return": "Retour",
+        "continue": "Continuer",
+        "jump": "Sauter",
+        "createName": "Créer un nom",
+        "editName": "Modifier le nom",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer le nom {name} ?",
+        "rulesetLabel": "Ensemble de règles"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocole"
       }
     }
   },
   "ko": {
     "localRoute": {
       "columns": {
-        "rule": "Rule Number",
-        "protocol": "Protocol",
-        "inboundInterface": "Inbound Interface",
-        "source": "Source",
-        "destination": "Destination",
-        "routingTable": "Routing Table"
+        "rule": "규칙 번호",
+        "protocol": "프로토콜",
+        "inboundInterface": "인바운드 인터페이스",
+        "source": "소스",
+        "destination": "대상",
+        "routingTable": "라우팅 테이블"
       },
       "schema": {
-        "rule": "Rule Number",
-        "ruleHelp": "Range 1-32765",
-        "protocol": "Protocol",
-        "protocolHelp": "Default all",
-        "fwmarkHelp": "Range 1-2147483647",
-        "inboundInterface": "Inbound Interface",
-        "source": "Source",
-        "destination": "Destination",
-        "address": "Address",
-        "port": "Port",
-        "ipv4AddressPlaceholder": "IP address or prefix, ! to exclude",
-        "ipv4AddressHelp": "Prefix ! to exclude",
-        "ipv6AddressPlaceholder": "IPv6 address or prefix",
-        "ipv6AddressHelp": "IPv6 address or prefix",
-        "portHelp": "Range 1-65535, single port only",
-        "set": "Set",
-        "routingTable": "Routing Table",
-        "routingTablePlaceholder": "1-200 or main",
-        "routingTableHelp": "1-200 or main"
+        "rule": "규칙 번호",
+        "ruleHelp": "범위 1-32765",
+        "protocol": "프로토콜",
+        "protocolHelp": "기본값 전체",
+        "fwmarkHelp": "범위 1-2147483647",
+        "inboundInterface": "인바운드 인터페이스",
+        "source": "소스",
+        "destination": "대상",
+        "address": "주소",
+        "port": "포트",
+        "ipv4AddressPlaceholder": "IP 주소 또는 접두사, ! 제외",
+        "ipv4AddressHelp": "제외할 접두사 !",
+        "ipv6AddressPlaceholder": "IPv6 주소 또는 접두사",
+        "ipv6AddressHelp": "IPv6 주소 또는 접두사",
+        "portHelp": "범위 1-65535, 단일 포트만",
+        "set": "설정",
+        "routingTable": "라우팅 테이블",
+        "routingTablePlaceholder": "1-200 또는 main",
+        "routingTableHelp": "1-200 또는 main"
       },
       "tabs": {
-        "basic": "Basic",
-        "source": "Source/Destination",
-        "set": "Set"
+        "basic": "기본",
+        "source": "소스/대상",
+        "set": "설정"
       },
       "protocol": {
-        "allDefault": "all (default)"
+        "allDefault": "전체 (기본값)"
       },
       "buttons": {
-        "create": "Create",
-        "edit": "Edit",
-        "delete": "Delete",
-        "refresh": "Refresh"
+        "create": "생성",
+        "edit": "편집",
+        "delete": "삭제",
+        "refresh": "새로고침"
       },
       "modals": {
-        "createRule": "Create Local Policy Routing Rule",
-        "editRule": "Edit Local Policy Routing Rule",
-        "confirmDelete": "Confirm Delete"
+        "createRule": "로컬 정책 라우팅 규칙 만들기",
+        "editRule": "로컬 정책 라우팅 규칙 편집",
+        "confirmDelete": "삭제 확인"
       },
       "messages": {
-        "selectRow": "Please select a row",
-        "confirmDelete": "Confirm delete the following local policy routing rules?"
+        "selectRow": "행을 선택해 주세요",
+        "confirmDelete": "다음 로컬 정책 라우팅 규칙을 삭제하시겠습니까?"
       },
       "validation": {
-        "ruleRequired": "Please enter rule number",
-        "ruleRange": "Rule number range 1-32765"
+        "ruleRequired": "규칙 번호를 입력해 주세요",
+        "ruleRange": "규칙 번호 범위 1-32765"
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "전달",
+        "input": "수신",
+        "name": "이름",
+        "output": "송신",
+        "prerouting": "프리라우팅",
+        "filter": "필터",
+        "raw": "Raw",
+        "defaultAction": "기본 동작",
+        "defaultActionHelp": "어떤 규칙과도 일치하지 않는 패킷에 대한 기본 동작",
+        "defaultLog": "기본 로그",
+        "defaultLogHelp": "기본 동작과 일치하는 패킷에 대한 로깅 활성화",
+        "description": "설명",
+        "descriptionHelp": "이 방화벽 체인에 대한 설명",
+        "disableConntrack": "연결 추적 비활성화",
+        "disableConntrackHelp": "이 체인의 연결 추적 비활성화",
+        "defaultJumpTarget": "기본 점프 대상",
+        "defaultJumpTargetHelp": "일치하는 규칙이 없을 때 점프할 대상 체인",
+        "nameName": "이름",
+        "accept": "수락",
+        "drop": "드롭",
+        "reject": "거부",
+        "return": "반환",
+        "continue": "계속",
+        "jump": "점프",
+        "createName": "이름 생성",
+        "editName": "이름 편집",
+        "confirmDelete": "이름 {name}을(를) 삭제하시겠습니까?",
+        "rulesetLabel": "규칙 집합"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "모드"
+      },
+      "type": {
+        "ethernet": "이더넷",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "프로토콜"
       }
     }
   }

@@ -281,7 +281,7 @@ export default defineComponent({
           <div class="form-hint">{{ t('configManagementSettings.hints.urlFormats') }}</div>
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="deleteModalVisible" :title="t('configManagementSettings.modals.confirmDelete')" width="400px" @confirm="confirmDeleteLocations">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('configManagementSettings.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteLocations">
         <div>{{ t('configManagementSettings.messages.confirmDeleteLocations') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="url in pendingDeleteUrls" :key="url" style="padding:2px 0;">{{ url }}</div>

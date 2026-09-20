@@ -405,6 +405,53 @@
           "serviceMessage": "确认删除此前端服务？"
         }
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "转发",
+        "input": "入站",
+        "name": "名称",
+        "output": "出站",
+        "prerouting": "预路由",
+        "filter": "过滤",
+        "raw": "原始",
+        "defaultAction": "默认动作",
+        "defaultActionHelp": "不匹配任何规则的数据包的默认动作",
+        "defaultLog": "默认日志",
+        "defaultLogHelp": "启用匹配默认动作的数据包日志记录",
+        "description": "描述",
+        "descriptionHelp": "此防火墙链的描述",
+        "disableConntrack": "禁用连接跟踪",
+        "disableConntrackHelp": "禁用此链的连接跟踪",
+        "defaultJumpTarget": "默认跳转目标",
+        "defaultJumpTargetHelp": "没有规则匹配时跳转的目标链",
+        "nameName": "名称",
+        "accept": "接受",
+        "drop": "丢弃",
+        "reject": "拒绝",
+        "return": "返回",
+        "continue": "继续",
+        "jump": "跳转",
+        "createName": "创建名称",
+        "editName": "编辑名称",
+        "confirmDelete": "确定要删除名称 {name} 吗？",
+        "rulesetLabel": "规则集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太网",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "协议"
+      }
     }
   },
   "en": {
@@ -812,6 +859,53 @@
           "backendMessage": "Confirm delete this backend server?",
           "serviceMessage": "Confirm delete this frontend service?"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Forward",
+        "input": "Input",
+        "name": "Name",
+        "output": "Output",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Default Action",
+        "defaultActionHelp": "Default action for packets that do not match any rule",
+        "defaultLog": "Default Log",
+        "defaultLogHelp": "Enable logging for packets matching the default action",
+        "description": "Description",
+        "descriptionHelp": "Description of this firewall chain",
+        "disableConntrack": "Disable Conntrack",
+        "disableConntrackHelp": "Disable connection tracking for this chain",
+        "defaultJumpTarget": "Default Jump Target",
+        "defaultJumpTargetHelp": "Target chain to jump to when no rule matches",
+        "nameName": "Name",
+        "accept": "Accept",
+        "drop": "Drop",
+        "reject": "Reject",
+        "return": "Return",
+        "continue": "Continue",
+        "jump": "Jump",
+        "createName": "Create Name",
+        "editName": "Edit Name",
+        "confirmDelete": "Are you sure you want to delete name {name}?",
+        "rulesetLabel": "Ruleset"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocol"
       }
     }
   },
@@ -1221,413 +1315,507 @@
           "serviceMessage": "Confirm delete this frontend service?"
         }
       }
+    },
+    "firewall": {
+      "options": {
+        "forward": "轉發",
+        "input": "入站",
+        "name": "名稱",
+        "output": "出站",
+        "prerouting": "預路由",
+        "filter": "過濾",
+        "raw": "原始",
+        "defaultAction": "預設動作",
+        "defaultActionHelp": "不符合任何規則的資料封包的預設動作",
+        "defaultLog": "預設日誌",
+        "defaultLogHelp": "啟用符合預設動作的資料封包日誌記錄",
+        "description": "描述",
+        "descriptionHelp": "此防火牆鏈的描述",
+        "disableConntrack": "停用連線追蹤",
+        "disableConntrackHelp": "停用此鏈的連線追蹤",
+        "defaultJumpTarget": "預設跳轉目標",
+        "defaultJumpTargetHelp": "沒有規則符合時跳轉的目標鏈",
+        "nameName": "名稱",
+        "accept": "接受",
+        "drop": "丟棄",
+        "reject": "拒絕",
+        "return": "返回",
+        "continue": "繼續",
+        "jump": "跳轉",
+        "createName": "建立名稱",
+        "editName": "編輯名稱",
+        "confirmDelete": "確定要刪除名稱 {name} 嗎？",
+        "rulesetLabel": "規則集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太網",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "協議"
+      }
     }
   },
   "ru": {
     "haproxy": {
       "tabs": {
-        "global": "Global",
-        "timeout": "Timeout",
-        "backends": "Backends",
-        "services": "Services"
+        "global": "Глобальный",
+        "timeout": "Тайм-аут",
+        "backends": "Бэкенды",
+        "services": "Службы"
       },
       "common": {
-        "notSet": "Not Set",
-        "yes": "Yes",
-        "exact": "Exact",
-        "begin": "Begin",
-        "end": "End"
+        "notSet": "Не установлено",
+        "yes": "Да",
+        "exact": "Точный",
+        "begin": "Начало",
+        "end": "Конец"
       },
       "columns": {
-        "name": "Name",
-        "description": "Description",
-        "mode": "Mode",
-        "balance": "Balance",
-        "serverCount": "Servers",
-        "actions": "Actions",
-        "address": "Address",
-        "port": "Port",
-        "backup": "Backup",
-        "check": "Check",
-        "checkPort": "Check Port",
-        "proxy": "Proxy",
-        "rule": "Rule",
-        "domainName": "Domain",
-        "urlPath": "URL Path",
-        "setServer": "Set Server",
-        "setRedirect": "Set Redirect",
-        "setBackend": "Set Backend",
-        "listenAddress": "Listen Address",
-        "backend": "Backend"
+        "name": "Имя",
+        "description": "Описание",
+        "mode": "Режим",
+        "balance": "Баланс",
+        "serverCount": "Серверы",
+        "actions": "Действия",
+        "address": "Адрес",
+        "port": "Порт",
+        "backup": "Резервное копирование",
+        "check": "Проверка",
+        "checkPort": "Порт проверки",
+        "proxy": "Прокси",
+        "rule": "Правило",
+        "domainName": "Домен",
+        "urlPath": "Путь URL",
+        "setServer": "Установить сервер",
+        "setRedirect": "Установить перенаправление",
+        "setBackend": "Установить бэкенд",
+        "listenAddress": "Адрес прослушивания",
+        "backend": "Бэкенд"
       },
       "buttons": {
-        "edit": "Edit",
-        "delete": "Delete"
+        "edit": "Редактировать",
+        "delete": "Удалить"
       },
       "messages": {
-        "saveFailed": "Save failed: ",
-        "backendNameRequired": "Please enter backend name",
-        "serverNameRequired": "Please enter server name",
-        "serviceNameRequired": "Please enter service name"
+        "saveFailed": "Ошибка сохранения: ",
+        "backendNameRequired": "Введите имя бэкенда",
+        "serverNameRequired": "Введите имя сервера",
+        "serviceNameRequired": "Введите имя службы"
       },
       "preview": {
-        "noConfig": "No parameters configured"
+        "noConfig": "Параметры не настроены"
       },
       "global": {
         "maxConnections": {
-          "title": "Max Connections",
-          "label": "Max Connections",
-          "help": "Maximum concurrent connections HAProxy can accept (1-2000000)"
+          "title": "Максимальное количество соединений",
+          "label": "Максимальное количество соединений",
+          "help": "Максимальное количество одновременных соединений, которые может принять HAProxy (1-2000000)"
         },
         "tlsVersionMin": {
-          "title": "Minimum TLS Version",
-          "label": "Minimum TLS Version",
-          "help": "Minimum allowed TLS protocol version"
+          "title": "Минимальная версия TLS",
+          "label": "Минимальная версия TLS",
+          "help": "Минимальная разрешенная версия протокола TLS"
         },
         "sslCiphers": {
-          "title": "SSL Ciphers",
-          "label": "SSL Ciphers",
-          "placeholder": "One cipher per line",
-          "help": "List of allowed SSL ciphers (one per line)"
+          "title": "Шифры SSL",
+          "label": "Шифры SSL",
+          "placeholder": "Один шифр на строку",
+          "help": "Список разрешенных шифров SSL (по одному на строку)"
         },
         "loggingFacility": {
-          "title": "Logging Facility",
-          "label": "Logging Facility",
-          "help": "Syslog logging facility"
+          "title": "Объект журналирования",
+          "label": "Объект журналирования",
+          "help": "Объект ведения журнала Syslog"
         },
         "loggingLevel": {
-          "title": "Logging Level",
-          "label": "Logging Level",
-          "help": "Syslog logging level"
+          "title": "Уровень журналирования",
+          "label": "Уровень журналирования",
+          "help": "Уровень ведения журнала Syslog"
         }
       },
       "timeout": {
         "client": {
-          "title": "Client Timeout",
-          "label": "Client Timeout (sec)",
-          "help": "Client inactivity timeout (1-3600 seconds)"
+          "title": "Тайм-аут клиента",
+          "label": "Тайм-аут клиента (сек)",
+          "help": "Тайм-аут неактивности клиента (1-3600 секунд)"
         },
         "connect": {
-          "title": "Connect Timeout",
-          "label": "Connect Timeout (sec)",
-          "help": "Backend connection timeout (1-3600 seconds)"
+          "title": "Тайм-аут подключения",
+          "label": "Тайм-аут подключения (сек)",
+          "help": "Тайм-аут подключения к бэкенду (1-3600 секунд)"
         },
         "server": {
-          "title": "Server Timeout",
-          "label": "Server Timeout (sec)",
-          "help": "Server inactivity timeout (1-3600 seconds)"
+          "title": "Тайм-аут сервера",
+          "label": "Тайм-аут сервера (сек)",
+          "help": "Тайм-аут неактивности сервера (1-3600 секунд)"
         },
         "check": {
-          "title": "Check Timeout",
-          "label": "Check Timeout (sec)",
-          "help": "Health check timeout (1-3600 seconds)"
+          "title": "Тайм-аут проверки",
+          "label": "Тайм-аут проверки (сек)",
+          "help": "Тайм-аут проверки работоспособности (1-3600 секунд)"
         }
       },
       "modal": {
         "backend": {
-          "title": "Backend Server",
+          "title": "Сервер бэкенда",
           "tabs": {
-            "basic": "Basic",
-            "servers": "Servers",
-            "health": "Health Check",
-            "rules": "Rules"
+            "basic": "Основные",
+            "servers": "Серверы",
+            "health": "Проверка работоспособности",
+            "rules": "Правила"
           },
           "basic": {
             "name": {
-              "title": "Name",
-              "label": "Name",
-              "help": "Unique identifier name for the backend"
+              "title": "Имя",
+              "label": "Имя",
+              "help": "Уникальное имя идентификатора для бэкенда"
             },
             "description": {
-              "title": "Description",
-              "label": "Description",
-              "help": "Description of the backend server"
+              "title": "Описание",
+              "label": "Описание",
+              "help": "Описание сервера внутренней части"
             },
             "mode": {
-              "title": "Mode",
-              "label": "Mode",
-              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+              "title": "Режим",
+              "label": "Режим",
+              "help": "Режим HTTP проверяет протокол HTTP, режим TCP пропускает трафик"
             },
             "balance": {
-              "title": "Balance Algorithm",
-              "label": "Balance Algorithm",
+              "title": "Алгоритм балансировки",
+              "label": "Алгоритм балансировки",
               "roundRobin": "Round Robin",
-              "leastConnection": "Least Connection",
-              "sourceAddress": "Source Address Hash",
-              "help": "Algorithm for distributing traffic"
+              "leastConnection": "Наименьшее количество соединений",
+              "sourceAddress": "Хеш адреса источника",
+              "help": "Алгоритм распределения трафика"
             },
             "healthCheck": {
-              "title": "Health Check Type",
-              "label": "Health Check Type",
-              "help": "Protocol used to check server health"
+              "title": "Тип проверки работоспособности",
+              "label": "Тип проверки работоспособности",
+              "help": "Протокол для проверки состояния сервера"
             },
             "loggingFacility": {
-              "title": "Logging Facility",
-              "label": "Logging Facility",
-              "help": "Syslog logging facility for this backend"
+              "title": "Объект журналирования",
+              "label": "Объект журналирования",
+              "help": "Объект ведения журнала Syslog для этого бэкенда"
             },
             "loggingLevel": {
-              "title": "Logging Level",
-              "label": "Logging Level",
-              "help": "Syslog logging level for this backend"
+              "title": "Уровень журналирования",
+              "label": "Уровень журналирования",
+              "help": "Уровень ведения журнала Syslog для этого бэкенда"
             },
             "caCert": {
-              "title": "CA Certificate",
-              "label": "CA Certificate",
-              "placeholder": "CA certificate name",
-              "help": "CA certificate for verifying server certificates"
+              "title": "Сертификат CA",
+              "label": "Сертификат CA",
+              "placeholder": "Имя сертификата CA",
+              "help": "Сертификат CA для проверки сертификатов сервера"
             },
             "sslNoVerify": {
-              "title": "No SSL Verify",
-              "label": "Skip SSL Verification",
-              "help": "Skip server SSL certificate verification"
+              "title": "Без проверки SSL",
+              "label": "Пропустить проверку SSL",
+              "help": "Пропустить проверку SSL-сертификата сервера"
             },
             "timeoutConnect": {
-              "title": "Connect Timeout",
-              "label": "Connect Timeout (sec)",
-              "help": "Timeout for connecting to this backend (1-3600 seconds)"
+              "title": "Тайм-аут подключения",
+              "label": "Тайм-аут подключения (сек)",
+              "help": "Тайм-аут для подключения к этому бэкенду (1-3600 секунд)"
             },
             "timeoutServer": {
-              "title": "Server Timeout",
-              "label": "Server Timeout (sec)",
-              "help": "Server response timeout for this backend (1-3600 seconds)"
+              "title": "Тайм-аут сервера",
+              "label": "Тайм-аут сервера (сек)",
+              "help": "Тайм-аут ответа сервера для этого бэкенда (1-3600 секунд)"
             },
             "timeoutCheck": {
-              "title": "Check Timeout",
-              "label": "Check Timeout (sec)",
-              "help": "Health check timeout for this backend (1-3600 seconds)"
+              "title": "Тайм-аут проверки",
+              "label": "Тайм-аут проверки (сек)",
+              "help": "Тайм-аут проверки работоспособности для этого бэкенда (1-3600 секунд)"
             }
           },
           "health": {
             "checkMethod": {
-              "title": "HTTP Check Method",
-              "label": "HTTP Check Method",
-              "help": "HTTP method used for health checks"
+              "title": "Метод проверки HTTP",
+              "label": "Метод проверки HTTP",
+              "help": "Метод HTTP, используемый для проверок работоспособности"
             },
             "checkUri": {
-              "title": "Check URI",
-              "label": "Check URI",
-              "placeholder": "e.g., /health",
-              "help": "URI path used for health checks"
+              "title": "URI проверки",
+              "label": "URI проверки",
+              "placeholder": "например, /health",
+              "help": "Путь URI для проверки состояния"
             },
             "expectStatus": {
-              "title": "Expected Status",
-              "label": "Expected Status",
-              "placeholder": "e.g., 200",
-              "help": "Expected HTTP response status code"
+              "title": "Ожидаемый статус",
+              "label": "Ожидаемый статус",
+              "placeholder": "например, 200",
+              "help": "Ожидаемый код состояния ответа HTTP"
             },
             "expectString": {
-              "title": "Expected Content",
-              "label": "Expected Content",
-              "help": "String expected to be found in the response"
+              "title": "Ожидаемое содержимое",
+              "label": "Ожидаемое содержимое",
+              "help": "Строка, ожидаемая в ответе"
             }
           }
         },
         "server": {
-          "title": "Server",
+          "title": "Сервер",
           "name": {
-            "label": "Name",
-            "help": "Unique identifier name for the server"
+            "label": "Имя",
+            "help": "Уникальное имя идентификатора для сервера"
           },
           "address": {
-            "label": "Address",
-            "placeholder": "e.g., 192.168.1.100",
-            "help": "Server IP address or hostname"
+            "label": "Адрес",
+            "placeholder": "например, 192.168.1.100",
+            "help": "IP-адрес или имя хоста сервера"
           },
           "port": {
-            "label": "Port",
-            "help": "Server port number (1-65535)"
+            "label": "Порт",
+            "help": "Номер порта сервера (1-65535)"
           },
           "backup": {
-            "label": "Backup Server",
-            "help": "Only used when all primary servers are unavailable"
+            "label": "Резервный сервер",
+            "help": "Используется только когда все основные серверы недоступны"
           },
           "check": {
-            "label": "Enable Health Check",
-            "help": "Perform health checks on this server"
+            "label": "Включить проверку работоспособности",
+            "help": "Выполнять проверки работоспособности на этом сервере"
           },
           "checkPort": {
-            "label": "Check Port",
-            "help": "Port used for health checks (defaults to server port)"
+            "label": "Порт проверки",
+            "help": "Порт для проверки состояния (по умолчанию — порт сервера)"
           },
           "sendProxy": {
-            "label": "Send Proxy Protocol v1",
-            "help": "Send client information using PROXY protocol v1"
+            "label": "Отправлять прокси-протокол v1",
+            "help": "Отправлять информацию о клиенте по протоколу PROXY v1"
           },
           "sendProxyV2": {
-            "label": "Send Proxy Protocol v2",
-            "help": "Send client information using PROXY protocol v2"
+            "label": "Отправлять прокси-протокол v2",
+            "help": "Отправлять информацию о клиенте по протоколу PROXY v2"
           }
         },
         "backendRule": {
-          "title": "Backend Rule",
+          "title": "Правило бэкенда",
           "ruleNumber": {
-            "label": "Rule Number",
-            "help": "Execution order number for the rule"
+            "label": "Номер правила",
+            "help": "Номер порядка выполнения для правила"
           },
           "domainName": {
-            "label": "Domain Name",
-            "placeholder": "One domain per line",
-            "help": "List of domains to match (one per line)"
+            "label": "Доменное имя",
+            "placeholder": "Один домен на строку",
+            "help": "Список доменов для сопоставления (по одному на строку)"
           },
           "urlPathExact": {
-            "label": "Exact URL Path",
-            "placeholder": "One path per line",
-            "help": "URL paths to match exactly (one per line)"
+            "label": "Точный путь URL",
+            "placeholder": "Один путь на строку",
+            "help": "Пути URL для точного сопоставления (по одному на строку)"
           },
           "urlPathBegin": {
-            "label": "URL Path Prefix",
-            "placeholder": "One prefix per line",
-            "help": "URL paths to match by prefix (one per line)"
+            "label": "Префикс пути URL",
+            "placeholder": "Один префикс на строку",
+            "help": "Пути URL для сопоставления по префиксу (по одному на строку)"
           },
           "urlPathEnd": {
-            "label": "URL Path Suffix",
-            "placeholder": "One suffix per line",
-            "help": "URL paths to match by suffix (one per line)"
+            "label": "Суффикс пути URL",
+            "placeholder": "Один суффикс на строку",
+            "help": "Пути URL для сопоставления по суффиксу (по одному на строку)"
           },
           "setServer": {
-            "label": "Set Server",
-            "help": "Server name to forward requests to"
+            "label": "Установить сервер",
+            "help": "Имя сервера для перенаправления запросов"
           },
           "redirectUrl": {
-            "label": "Redirect URL",
-            "help": "URL address to redirect to"
+            "label": "URL перенаправления",
+            "help": "Адрес URL для перенаправления"
           }
         },
         "service": {
-          "title": "Frontend Service",
+          "title": "Сервис фронтенда",
           "tabs": {
-            "basic": "Basic",
+            "basic": "Основные",
             "ssl": "SSL",
-            "rules": "Rules",
-            "compression": "Compression"
+            "rules": "Правила",
+            "compression": "Сжатие"
           },
           "basic": {
             "name": {
-              "title": "Name",
-              "label": "Name",
-              "help": "Unique identifier name for the frontend service"
+              "title": "Имя",
+              "label": "Имя",
+              "help": "Уникальное имя идентификатора для службы фронтенда"
             },
             "description": {
-              "title": "Description",
-              "label": "Description",
-              "help": "Description of the frontend service"
+              "title": "Описание",
+              "label": "Описание",
+              "help": "Описание службы передней части"
             },
             "mode": {
-              "title": "Mode",
-              "label": "Mode",
-              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+              "title": "Режим",
+              "label": "Режим",
+              "help": "Режим HTTP проверяет протокол HTTP, режим TCP пропускает трафик"
             },
             "port": {
-              "title": "Port",
-              "label": "Listen Port",
-              "help": "Port number the service listens on (1-65535)"
+              "title": "Порт",
+              "label": "Порт прослушивания",
+              "help": "Номер порта, который прослушивает служба (1-65535)"
             },
             "listenAddress": {
-              "title": "Listen Address",
-              "label": "Listen Address",
-              "placeholder": "One IP address per line",
-              "help": "IP addresses to listen on (one per line, empty means all addresses)"
+              "title": "Адрес прослушивания",
+              "label": "Адрес прослушивания",
+              "placeholder": "Один IP-адрес на строку",
+              "help": "IP-адреса для прослушивания (по одному на строку, пусто означает все адреса)"
             },
             "acceptProxy": {
-              "title": "Accept Proxy Protocol",
-              "label": "Accept Proxy Protocol",
-              "help": "Accept PROXY protocol to get real client IP"
+              "title": "Принять протокол прокси",
+              "label": "Принять протокол прокси",
+              "help": "Принять протокол PROXY для получения реального IP клиента"
             },
             "backend": {
-              "title": "Associated Backends",
-              "label": "Associated Backends",
-              "placeholder": "One backend name per line",
-              "help": "Associated backend server groups (one per line)"
+              "title": "Связанные бэкенды",
+              "label": "Связанные бэкенды",
+              "placeholder": "Одно имя бэкенда на строку",
+              "help": "Связанные группы серверов бэкенда (по одной на строку)"
             },
             "redirectHttp": {
-              "title": "Redirect HTTP to HTTPS",
-              "label": "Redirect HTTP to HTTPS",
-              "help": "Automatically redirect HTTP requests to HTTPS"
+              "title": "Перенаправить HTTP на HTTPS",
+              "label": "Перенаправить HTTP на HTTPS",
+              "help": "Автоматически перенаправлять HTTP-запросы на HTTPS"
             },
             "inspectDelay": {
-              "title": "TCP Inspect Delay",
-              "label": "TCP Inspect Delay (ms)",
-              "help": "Delay for TCP content inspection (1-65535 milliseconds)"
+              "title": "Задержка инспекции TCP",
+              "label": "Задержка инспекции TCP (мс)",
+              "help": "Задержка для проверки содержимого TCP (1-65535 миллисекунд)"
             },
             "timeoutClient": {
-              "title": "Client Timeout",
-              "label": "Client Timeout (sec)",
-              "help": "Client inactivity timeout (1-3600 seconds)"
+              "title": "Тайм-аут клиента",
+              "label": "Тайм-аут клиента (сек)",
+              "help": "Тайм-аут неактивности клиента (1-3600 секунд)"
             },
             "loggingFacility": {
-              "title": "Logging Facility",
-              "label": "Logging Facility",
-              "help": "Syslog logging facility for this service"
+              "title": "Объект журналирования",
+              "label": "Объект журналирования",
+              "help": "Объект ведения журнала Syslog для этой службы"
             },
             "loggingLevel": {
-              "title": "Logging Level",
-              "label": "Logging Level",
-              "help": "Syslog logging level for this service"
+              "title": "Уровень журналирования",
+              "label": "Уровень журналирования",
+              "help": "Уровень ведения журнала Syslog для этой службы"
             }
           },
           "ssl": {
             "certificate": {
-              "title": "SSL Certificate",
-              "label": "SSL Certificate",
-              "placeholder": "One certificate name per line",
-              "help": "SSL certificates for this service (one per line)"
+              "title": "Сертификат SSL",
+              "label": "Сертификат SSL",
+              "placeholder": "Одно имя сертификата на строку",
+              "help": "Сертификаты SSL для этой службы (по одному на строку)"
             }
           },
           "compression": {
             "algorithm": {
-              "title": "Compression Algorithm",
-              "label": "Compression Algorithm",
-              "help": "HTTP response compression algorithm"
+              "title": "Алгоритм сжатия",
+              "label": "Алгоритм сжатия",
+              "help": "Алгоритм сжатия ответов HTTP"
             },
             "mimeTypes": {
-              "title": "MIME Types",
-              "label": "MIME Types",
-              "placeholder": "One MIME type per line",
-              "help": "MIME types to compress (one per line)"
+              "title": "Типы MIME",
+              "label": "Типы MIME",
+              "placeholder": "Один тип MIME на строку",
+              "help": "Типы MIME для сжатия (по одному на строку)"
             }
           }
         },
         "serviceRule": {
-          "title": "Service Rule",
+          "title": "Правило службы",
           "ruleNumber": {
-            "label": "Rule Number",
-            "help": "Execution order number for the rule"
+            "label": "Номер правила",
+            "help": "Номер порядка выполнения для правила"
           },
           "domainName": {
-            "label": "Domain Name",
-            "placeholder": "One domain per line",
-            "help": "List of domains to match (one per line)"
+            "label": "Доменное имя",
+            "placeholder": "Один домен на строку",
+            "help": "Список доменов для сопоставления (по одному на строку)"
           },
           "urlPathExact": {
-            "label": "Exact URL Path",
-            "placeholder": "One path per line",
-            "help": "URL paths to match exactly (one per line)"
+            "label": "Точный путь URL",
+            "placeholder": "Один путь на строку",
+            "help": "Пути URL для точного сопоставления (по одному на строку)"
           },
           "urlPathBegin": {
-            "label": "URL Path Prefix",
-            "placeholder": "One prefix per line",
-            "help": "URL paths to match by prefix (one per line)"
+            "label": "Префикс пути URL",
+            "placeholder": "Один префикс на строку",
+            "help": "Пути URL для сопоставления по префиксу (по одному на строку)"
           },
           "urlPathEnd": {
-            "label": "URL Path Suffix",
-            "placeholder": "One suffix per line",
-            "help": "URL paths to match by suffix (one per line)"
+            "label": "Суффикс пути URL",
+            "placeholder": "Один суффикс на строку",
+            "help": "Пути URL для сопоставления по суффиксу (по одному на строку)"
           },
           "setBackend": {
-            "label": "Set Backend",
-            "help": "Backend name to forward requests to"
+            "label": "Установить бэкенд",
+            "help": "Имя бэкенда для пересылки запросов"
           },
           "redirectUrl": {
-            "label": "Redirect URL",
-            "help": "URL address to redirect to"
+            "label": "URL перенаправления",
+            "help": "Адрес URL для перенаправления"
           }
         },
         "confirmDelete": {
-          "title": "Confirm Delete",
-          "backendMessage": "Confirm delete this backend server?",
-          "serviceMessage": "Confirm delete this frontend service?"
+          "title": "Подтвердить удаление",
+          "backendMessage": "Подтвердить удаление этого сервера бэкенда?",
+          "serviceMessage": "Подтвердить удаление этого сервиса фронтенда?"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Переадресация",
+        "input": "Входящие",
+        "name": "Имя",
+        "output": "Исходящие",
+        "prerouting": "Премаршрутизация",
+        "filter": "Фильтр",
+        "raw": "Сырой",
+        "defaultAction": "Действие по умолчанию",
+        "defaultActionHelp": "Действие по умолчанию для пакетов, не соответствующих ни одному правилу",
+        "defaultLog": "Журнал по умолчанию",
+        "defaultLogHelp": "Включить ведение журнала для пакетов, соответствующих действию по умолчанию",
+        "description": "Описание",
+        "descriptionHelp": "Описание этой цепочки межсетевого экрана",
+        "disableConntrack": "Отключить отслеживание соединений",
+        "disableConntrackHelp": "Отключить отслеживание соединений для этой цепочки",
+        "defaultJumpTarget": "Цель перехода по умолчанию",
+        "defaultJumpTargetHelp": "Целевая цепочка для перехода при отсутствии совпадений",
+        "nameName": "Имя",
+        "accept": "Принять",
+        "drop": "Отбросить",
+        "reject": "Отклонить",
+        "return": "Вернуть",
+        "continue": "Продолжить",
+        "jump": "Перейти",
+        "createName": "Создать имя",
+        "editName": "Редактировать имя",
+        "confirmDelete": "Вы уверены, что хотите удалить имя {name}?",
+        "rulesetLabel": "Набор правил"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Режим"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Протокол"
       }
     }
   },
@@ -1637,197 +1825,197 @@
         "global": "Global",
         "timeout": "Timeout",
         "backends": "Backends",
-        "services": "Services"
+        "services": "Dienste"
       },
       "common": {
-        "notSet": "Not Set",
-        "yes": "Yes",
-        "exact": "Exact",
-        "begin": "Begin",
-        "end": "End"
+        "notSet": "Nicht festgelegt",
+        "yes": "Ja",
+        "exact": "Genau",
+        "begin": "Beginn",
+        "end": "Ende"
       },
       "columns": {
         "name": "Name",
-        "description": "Description",
-        "mode": "Mode",
+        "description": "Beschreibung",
+        "mode": "Modus",
         "balance": "Balance",
-        "serverCount": "Servers",
-        "actions": "Actions",
-        "address": "Address",
+        "serverCount": "Server",
+        "actions": "Aktionen",
+        "address": "Adresse",
         "port": "Port",
-        "backup": "Backup",
-        "check": "Check",
-        "checkPort": "Check Port",
+        "backup": "Sicherung",
+        "check": "Prüfung",
+        "checkPort": "Prüfport",
         "proxy": "Proxy",
-        "rule": "Rule",
-        "domainName": "Domain",
-        "urlPath": "URL Path",
-        "setServer": "Set Server",
-        "setRedirect": "Set Redirect",
-        "setBackend": "Set Backend",
-        "listenAddress": "Listen Address",
+        "rule": "Regel",
+        "domainName": "Domäne",
+        "urlPath": "URL-Pfad",
+        "setServer": "Server setzen",
+        "setRedirect": "Umleitung setzen",
+        "setBackend": "Backend setzen",
+        "listenAddress": "Listen-Adresse",
         "backend": "Backend"
       },
       "buttons": {
-        "edit": "Edit",
-        "delete": "Delete"
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
       },
       "messages": {
-        "saveFailed": "Save failed: ",
-        "backendNameRequired": "Please enter backend name",
-        "serverNameRequired": "Please enter server name",
-        "serviceNameRequired": "Please enter service name"
+        "saveFailed": "Speichern fehlgeschlagen: ",
+        "backendNameRequired": "Bitte Backend-Namen eingeben",
+        "serverNameRequired": "Bitte Servernamen eingeben",
+        "serviceNameRequired": "Bitte Dienstnamen eingeben"
       },
       "preview": {
-        "noConfig": "No parameters configured"
+        "noConfig": "Keine Parameter konfiguriert"
       },
       "global": {
         "maxConnections": {
-          "title": "Max Connections",
-          "label": "Max Connections",
-          "help": "Maximum concurrent connections HAProxy can accept (1-2000000)"
+          "title": "Maximale Verbindungen",
+          "label": "Maximale Verbindungen",
+          "help": "Maximale gleichzeitige Verbindungen, die HAProxy akzeptieren kann (1-2000000)"
         },
         "tlsVersionMin": {
-          "title": "Minimum TLS Version",
-          "label": "Minimum TLS Version",
-          "help": "Minimum allowed TLS protocol version"
+          "title": "Minimale TLS-Version",
+          "label": "Minimale TLS-Version",
+          "help": "Minimale erlaubte TLS-Protokollversion"
         },
         "sslCiphers": {
-          "title": "SSL Ciphers",
-          "label": "SSL Ciphers",
-          "placeholder": "One cipher per line",
-          "help": "List of allowed SSL ciphers (one per line)"
+          "title": "SSL-Chiffren",
+          "label": "SSL-Chiffren",
+          "placeholder": "Eine Chiffre pro Zeile",
+          "help": "Liste der erlaubten SSL-Chiffren (eine pro Zeile)"
         },
         "loggingFacility": {
-          "title": "Logging Facility",
-          "label": "Logging Facility",
-          "help": "Syslog logging facility"
+          "title": "Protokollierungseinrichtung",
+          "label": "Protokollierungseinrichtung",
+          "help": "Syslog-Protokollierungseinrichtung"
         },
         "loggingLevel": {
-          "title": "Logging Level",
-          "label": "Logging Level",
-          "help": "Syslog logging level"
+          "title": "Protokollierungsebene",
+          "label": "Protokollierungsebene",
+          "help": "Syslog-Protokollierungsstufe"
         }
       },
       "timeout": {
         "client": {
-          "title": "Client Timeout",
-          "label": "Client Timeout (sec)",
-          "help": "Client inactivity timeout (1-3600 seconds)"
+          "title": "Client-Timeout",
+          "label": "Client-Timeout (Sek)",
+          "help": "Client-Inaktivitäts-Timeout (1-3600 Sekunden)"
         },
         "connect": {
-          "title": "Connect Timeout",
-          "label": "Connect Timeout (sec)",
-          "help": "Backend connection timeout (1-3600 seconds)"
+          "title": "Verbindungs-Timeout",
+          "label": "Verbindungs-Timeout (Sek)",
+          "help": "Backend-Verbindungs-Timeout (1-3600 Sekunden)"
         },
         "server": {
-          "title": "Server Timeout",
-          "label": "Server Timeout (sec)",
-          "help": "Server inactivity timeout (1-3600 seconds)"
+          "title": "Server-Timeout",
+          "label": "Server-Timeout (Sek.)",
+          "help": "Server-Inaktivitäts-Timeout (1-3600 Sekunden)"
         },
         "check": {
-          "title": "Check Timeout",
-          "label": "Check Timeout (sec)",
-          "help": "Health check timeout (1-3600 seconds)"
+          "title": "Prüf-Timeout",
+          "label": "Prüf-Timeout (Sek)",
+          "help": "Gesundheitsprüfungszeitüberschreitung (1-3600 Sekunden)"
         }
       },
       "modal": {
         "backend": {
-          "title": "Backend Server",
+          "title": "Backend-Server",
           "tabs": {
-            "basic": "Basic",
-            "servers": "Servers",
-            "health": "Health Check",
-            "rules": "Rules"
+            "basic": "Grundlegend",
+            "servers": "Server",
+            "health": "Gesundheitsprüfung",
+            "rules": "Regeln"
           },
           "basic": {
             "name": {
               "title": "Name",
               "label": "Name",
-              "help": "Unique identifier name for the backend"
+              "help": "Eindeutiger Kennungsname für das Backend"
             },
             "description": {
-              "title": "Description",
-              "label": "Description",
-              "help": "Description of the backend server"
+              "title": "Beschreibung",
+              "label": "Beschreibung",
+              "help": "Beschreibung des Backend-Servers"
             },
             "mode": {
-              "title": "Mode",
-              "label": "Mode",
-              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+              "title": "Modus",
+              "label": "Modus",
+              "help": "HTTP-Modus inspiziert HTTP-Protokoll, TCP-Modus leitet Verkehr durch"
             },
             "balance": {
-              "title": "Balance Algorithm",
-              "label": "Balance Algorithm",
+              "title": "Balance-Algorithmus",
+              "label": "Balance-Algorithmus",
               "roundRobin": "Round Robin",
-              "leastConnection": "Least Connection",
-              "sourceAddress": "Source Address Hash",
-              "help": "Algorithm for distributing traffic"
+              "leastConnection": "Wenigste Verbindungen",
+              "sourceAddress": "Quelladress-Hash",
+              "help": "Algorithmus zur Verkehrsverteilung"
             },
             "healthCheck": {
-              "title": "Health Check Type",
-              "label": "Health Check Type",
-              "help": "Protocol used to check server health"
+              "title": "Gesundheitsprüfungstyp",
+              "label": "Gesundheitsprüfungstyp",
+              "help": "Protokoll zur Überprüfung der Servergesundheit"
             },
             "loggingFacility": {
-              "title": "Logging Facility",
-              "label": "Logging Facility",
-              "help": "Syslog logging facility for this backend"
+              "title": "Protokollierungseinrichtung",
+              "label": "Protokollierungseinrichtung",
+              "help": "Syslog-Protokollierungseinrichtung für dieses Backend"
             },
             "loggingLevel": {
-              "title": "Logging Level",
-              "label": "Logging Level",
-              "help": "Syslog logging level for this backend"
+              "title": "Protokollierungsebene",
+              "label": "Protokollierungsebene",
+              "help": "Syslog-Protokollierungsstufe für dieses Backend"
             },
             "caCert": {
-              "title": "CA Certificate",
-              "label": "CA Certificate",
-              "placeholder": "CA certificate name",
-              "help": "CA certificate for verifying server certificates"
+              "title": "CA-Zertifikat",
+              "label": "CA-Zertifikat",
+              "placeholder": "CA-Zertifikatname",
+              "help": "CA-Zertifikat zur Überprüfung von Serverzertifikaten"
             },
             "sslNoVerify": {
-              "title": "No SSL Verify",
-              "label": "Skip SSL Verification",
-              "help": "Skip server SSL certificate verification"
+              "title": "Keine SSL-Überprüfung",
+              "label": "SSL-Verifizierung überspringen",
+              "help": "Verifizierung des Server-SSL-Zertifikats überspringen"
             },
             "timeoutConnect": {
-              "title": "Connect Timeout",
-              "label": "Connect Timeout (sec)",
-              "help": "Timeout for connecting to this backend (1-3600 seconds)"
+              "title": "Verbindungs-Timeout",
+              "label": "Verbindungs-Timeout (Sek)",
+              "help": "Timeout für die Verbindung zu diesem Backend (1-3600 Sekunden)"
             },
             "timeoutServer": {
-              "title": "Server Timeout",
-              "label": "Server Timeout (sec)",
-              "help": "Server response timeout for this backend (1-3600 seconds)"
+              "title": "Server-Timeout",
+              "label": "Server-Timeout (Sek.)",
+              "help": "Server-Antwort-Timeout für dieses Backend (1-3600 Sekunden)"
             },
             "timeoutCheck": {
-              "title": "Check Timeout",
-              "label": "Check Timeout (sec)",
-              "help": "Health check timeout for this backend (1-3600 seconds)"
+              "title": "Prüf-Timeout",
+              "label": "Prüf-Timeout (Sek)",
+              "help": "Gesundheitsprüfungszeitüberschreitung für dieses Backend (1-3600 Sekunden)"
             }
           },
           "health": {
             "checkMethod": {
-              "title": "HTTP Check Method",
-              "label": "HTTP Check Method",
-              "help": "HTTP method used for health checks"
+              "title": "HTTP-Prüfmethode",
+              "label": "HTTP-Prüfmethode",
+              "help": "HTTP-Methode für Gesundheitsprüfungen"
             },
             "checkUri": {
-              "title": "Check URI",
-              "label": "Check URI",
-              "placeholder": "e.g., /health",
-              "help": "URI path used for health checks"
+              "title": "Prüf-URI",
+              "label": "Prüf-URI",
+              "placeholder": "z.B. /health",
+              "help": "URI-Pfad für Gesundheitsprüfungen"
             },
             "expectStatus": {
-              "title": "Expected Status",
-              "label": "Expected Status",
-              "placeholder": "e.g., 200",
-              "help": "Expected HTTP response status code"
+              "title": "Erwarteter Status",
+              "label": "Erwarteter Status",
+              "placeholder": "z.B. 200",
+              "help": "Erwarteter HTTP-Antwortstatuscode"
             },
             "expectString": {
-              "title": "Expected Content",
-              "label": "Expected Content",
-              "help": "String expected to be found in the response"
+              "title": "Erwarteter Inhalt",
+              "label": "Erwarteter Inhalt",
+              "help": "Zeichenfolge, die in der Antwort erwartet wird"
             }
           }
         },
@@ -1835,207 +2023,254 @@
           "title": "Server",
           "name": {
             "label": "Name",
-            "help": "Unique identifier name for the server"
+            "help": "Eindeutiger Kennungsname für den Server"
           },
           "address": {
-            "label": "Address",
-            "placeholder": "e.g., 192.168.1.100",
-            "help": "Server IP address or hostname"
+            "label": "Adresse",
+            "placeholder": "z.B. 192.168.1.100",
+            "help": "Server-IP-Adresse oder Hostname"
           },
           "port": {
             "label": "Port",
-            "help": "Server port number (1-65535)"
+            "help": "Server-Portnummer (1-65535)"
           },
           "backup": {
-            "label": "Backup Server",
-            "help": "Only used when all primary servers are unavailable"
+            "label": "Backup-Server",
+            "help": "Wird nur verwendet, wenn alle primären Server nicht verfügbar sind"
           },
           "check": {
-            "label": "Enable Health Check",
-            "help": "Perform health checks on this server"
+            "label": "Gesundheitsprüfung aktivieren",
+            "help": "Gesundheitsprüfungen auf diesem Server durchführen"
           },
           "checkPort": {
-            "label": "Check Port",
-            "help": "Port used for health checks (defaults to server port)"
+            "label": "Prüfport",
+            "help": "Port für Gesundheitsprüfungen (standardmäßig Serverport)"
           },
           "sendProxy": {
-            "label": "Send Proxy Protocol v1",
-            "help": "Send client information using PROXY protocol v1"
+            "label": "Proxy-Protokoll v1 senden",
+            "help": "Client-Informationen über PROXY-Protokoll v1 senden"
           },
           "sendProxyV2": {
-            "label": "Send Proxy Protocol v2",
-            "help": "Send client information using PROXY protocol v2"
+            "label": "Proxy-Protokoll v2 senden",
+            "help": "Client-Informationen über PROXY-Protokoll v2 senden"
           }
         },
         "backendRule": {
-          "title": "Backend Rule",
+          "title": "Backend-Regel",
           "ruleNumber": {
-            "label": "Rule Number",
-            "help": "Execution order number for the rule"
+            "label": "Regelnummer",
+            "help": "Ausführungsreihenfolgenummer für die Regel"
           },
           "domainName": {
-            "label": "Domain Name",
-            "placeholder": "One domain per line",
-            "help": "List of domains to match (one per line)"
+            "label": "Domänenname",
+            "placeholder": "Eine Domäne pro Zeile",
+            "help": "Liste der zu vergleichenden Domänen (eine pro Zeile)"
           },
           "urlPathExact": {
-            "label": "Exact URL Path",
-            "placeholder": "One path per line",
-            "help": "URL paths to match exactly (one per line)"
+            "label": "Genauer URL-Pfad",
+            "placeholder": "Ein Pfad pro Zeile",
+            "help": "URL-Pfade zum genauen Abgleich (einer pro Zeile)"
           },
           "urlPathBegin": {
-            "label": "URL Path Prefix",
-            "placeholder": "One prefix per line",
-            "help": "URL paths to match by prefix (one per line)"
+            "label": "URL-Pfad-Präfix",
+            "placeholder": "Ein Präfix pro Zeile",
+            "help": "URL-Pfade zum Abgleich nach Präfix (einer pro Zeile)"
           },
           "urlPathEnd": {
-            "label": "URL Path Suffix",
-            "placeholder": "One suffix per line",
-            "help": "URL paths to match by suffix (one per line)"
+            "label": "URL-Pfad-Suffix",
+            "placeholder": "Ein Suffix pro Zeile",
+            "help": "URL-Pfade zum Abgleich nach Suffix (einer pro Zeile)"
           },
           "setServer": {
-            "label": "Set Server",
-            "help": "Server name to forward requests to"
+            "label": "Server setzen",
+            "help": "Servername zum Weiterleiten von Anfragen"
           },
           "redirectUrl": {
-            "label": "Redirect URL",
-            "help": "URL address to redirect to"
+            "label": "Umleitungs-URL",
+            "help": "URL-Adresse zur Umleitung"
           }
         },
         "service": {
-          "title": "Frontend Service",
+          "title": "Frontend-Dienst",
           "tabs": {
-            "basic": "Basic",
+            "basic": "Grundlegend",
             "ssl": "SSL",
-            "rules": "Rules",
-            "compression": "Compression"
+            "rules": "Regeln",
+            "compression": "Kompression"
           },
           "basic": {
             "name": {
               "title": "Name",
               "label": "Name",
-              "help": "Unique identifier name for the frontend service"
+              "help": "Eindeutiger Kennungsname für den Frontend-Dienst"
             },
             "description": {
-              "title": "Description",
-              "label": "Description",
-              "help": "Description of the frontend service"
+              "title": "Beschreibung",
+              "label": "Beschreibung",
+              "help": "Beschreibung des Frontend-Dienstes"
             },
             "mode": {
-              "title": "Mode",
-              "label": "Mode",
-              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+              "title": "Modus",
+              "label": "Modus",
+              "help": "HTTP-Modus inspiziert HTTP-Protokoll, TCP-Modus leitet Verkehr durch"
             },
             "port": {
               "title": "Port",
-              "label": "Listen Port",
-              "help": "Port number the service listens on (1-65535)"
+              "label": "Lauschport",
+              "help": "Portnummer, auf der der Dienst lauscht (1-65535)"
             },
             "listenAddress": {
-              "title": "Listen Address",
-              "label": "Listen Address",
-              "placeholder": "One IP address per line",
-              "help": "IP addresses to listen on (one per line, empty means all addresses)"
+              "title": "Listen-Adresse",
+              "label": "Listen-Adresse",
+              "placeholder": "Eine IP-Adresse pro Zeile",
+              "help": "IP-Adressen zum Lauschen (eine pro Zeile, leer bedeutet alle Adressen)"
             },
             "acceptProxy": {
-              "title": "Accept Proxy Protocol",
-              "label": "Accept Proxy Protocol",
-              "help": "Accept PROXY protocol to get real client IP"
+              "title": "Proxy-Protokoll akzeptieren",
+              "label": "Proxy-Protokoll akzeptieren",
+              "help": "PROXY-Protokoll akzeptieren, um echte Client-IP zu erhalten"
             },
             "backend": {
-              "title": "Associated Backends",
-              "label": "Associated Backends",
-              "placeholder": "One backend name per line",
-              "help": "Associated backend server groups (one per line)"
+              "title": "Zugehörige Backends",
+              "label": "Zugehörige Backends",
+              "placeholder": "Ein Backend-Name pro Zeile",
+              "help": "Zugehörige Backend-Servergruppen (eine pro Zeile)"
             },
             "redirectHttp": {
-              "title": "Redirect HTTP to HTTPS",
-              "label": "Redirect HTTP to HTTPS",
-              "help": "Automatically redirect HTTP requests to HTTPS"
+              "title": "HTTP auf HTTPS umleiten",
+              "label": "HTTP auf HTTPS umleiten",
+              "help": "HTTP-Anfragen automatisch auf HTTPS umleiten"
             },
             "inspectDelay": {
-              "title": "TCP Inspect Delay",
-              "label": "TCP Inspect Delay (ms)",
-              "help": "Delay for TCP content inspection (1-65535 milliseconds)"
+              "title": "TCP-Inspektionsverzögerung",
+              "label": "TCP-Inspektionsverzögerung (ms)",
+              "help": "Verzögerung für TCP-Inhaltsprüfung (1-65535 Millisekunden)"
             },
             "timeoutClient": {
-              "title": "Client Timeout",
-              "label": "Client Timeout (sec)",
-              "help": "Client inactivity timeout (1-3600 seconds)"
+              "title": "Client-Timeout",
+              "label": "Client-Timeout (Sek)",
+              "help": "Client-Inaktivitäts-Timeout (1-3600 Sekunden)"
             },
             "loggingFacility": {
-              "title": "Logging Facility",
-              "label": "Logging Facility",
-              "help": "Syslog logging facility for this service"
+              "title": "Protokollierungseinrichtung",
+              "label": "Protokollierungseinrichtung",
+              "help": "Syslog-Protokollierungseinrichtung für diesen Dienst"
             },
             "loggingLevel": {
-              "title": "Logging Level",
-              "label": "Logging Level",
-              "help": "Syslog logging level for this service"
+              "title": "Protokollierungsebene",
+              "label": "Protokollierungsebene",
+              "help": "Syslog-Protokollierungsstufe für diesen Dienst"
             }
           },
           "ssl": {
             "certificate": {
-              "title": "SSL Certificate",
-              "label": "SSL Certificate",
-              "placeholder": "One certificate name per line",
-              "help": "SSL certificates for this service (one per line)"
+              "title": "SSL-Zertifikat",
+              "label": "SSL-Zertifikat",
+              "placeholder": "Ein Zertifikatsname pro Zeile",
+              "help": "SSL-Zertifikate für diesen Dienst (einer pro Zeile)"
             }
           },
           "compression": {
             "algorithm": {
-              "title": "Compression Algorithm",
-              "label": "Compression Algorithm",
-              "help": "HTTP response compression algorithm"
+              "title": "Kompressionsalgorithmus",
+              "label": "Kompressionsalgorithmus",
+              "help": "HTTP-Antwort-Komprimierungsalgorithmus"
             },
             "mimeTypes": {
-              "title": "MIME Types",
-              "label": "MIME Types",
-              "placeholder": "One MIME type per line",
-              "help": "MIME types to compress (one per line)"
+              "title": "MIME-Typen",
+              "label": "MIME-Typen",
+              "placeholder": "Ein MIME-Typ pro Zeile",
+              "help": "Zu komprimierende MIME-Typen (einer pro Zeile)"
             }
           }
         },
         "serviceRule": {
-          "title": "Service Rule",
+          "title": "Dienstregel",
           "ruleNumber": {
-            "label": "Rule Number",
-            "help": "Execution order number for the rule"
+            "label": "Regelnummer",
+            "help": "Ausführungsreihenfolgenummer für die Regel"
           },
           "domainName": {
-            "label": "Domain Name",
-            "placeholder": "One domain per line",
-            "help": "List of domains to match (one per line)"
+            "label": "Domänenname",
+            "placeholder": "Eine Domäne pro Zeile",
+            "help": "Liste der zu vergleichenden Domänen (eine pro Zeile)"
           },
           "urlPathExact": {
-            "label": "Exact URL Path",
-            "placeholder": "One path per line",
-            "help": "URL paths to match exactly (one per line)"
+            "label": "Genauer URL-Pfad",
+            "placeholder": "Ein Pfad pro Zeile",
+            "help": "URL-Pfade zum genauen Abgleich (einer pro Zeile)"
           },
           "urlPathBegin": {
-            "label": "URL Path Prefix",
-            "placeholder": "One prefix per line",
-            "help": "URL paths to match by prefix (one per line)"
+            "label": "URL-Pfad-Präfix",
+            "placeholder": "Ein Präfix pro Zeile",
+            "help": "URL-Pfade zum Abgleich nach Präfix (einer pro Zeile)"
           },
           "urlPathEnd": {
-            "label": "URL Path Suffix",
-            "placeholder": "One suffix per line",
-            "help": "URL paths to match by suffix (one per line)"
+            "label": "URL-Pfad-Suffix",
+            "placeholder": "Ein Suffix pro Zeile",
+            "help": "URL-Pfade zum Abgleich nach Suffix (einer pro Zeile)"
           },
           "setBackend": {
-            "label": "Set Backend",
-            "help": "Backend name to forward requests to"
+            "label": "Backend setzen",
+            "help": "Backend-Name zum Weiterleiten von Anfragen"
           },
           "redirectUrl": {
-            "label": "Redirect URL",
-            "help": "URL address to redirect to"
+            "label": "Umleitungs-URL",
+            "help": "URL-Adresse zur Umleitung"
           }
         },
         "confirmDelete": {
-          "title": "Confirm Delete",
-          "backendMessage": "Confirm delete this backend server?",
-          "serviceMessage": "Confirm delete this frontend service?"
+          "title": "Löschen bestätigen",
+          "backendMessage": "Löschen dieses Backend-Servers bestätigen?",
+          "serviceMessage": "Löschen dieses Frontend-Dienstes bestätigen?"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Weiterleitung",
+        "input": "Eingehend",
+        "name": "Name",
+        "output": "Ausgehend",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Standardaktion",
+        "defaultActionHelp": "Standardaktion für Pakete, die mit keiner Regel übereinstimmen",
+        "defaultLog": "Standardprotokoll",
+        "defaultLogHelp": "Protokollierung für Pakete aktivieren, die der Standardaktion entsprechen",
+        "description": "Beschreibung",
+        "descriptionHelp": "Beschreibung dieser Firewall-Kette",
+        "disableConntrack": "Verbindungsverfolgung deaktivieren",
+        "disableConntrackHelp": "Verbindungsverfolgung für diese Kette deaktivieren",
+        "defaultJumpTarget": "Standard-Sprungziel",
+        "defaultJumpTargetHelp": "Zielkette zum Sprung bei keiner Übereinstimmung",
+        "nameName": "Name",
+        "accept": "Akzeptieren",
+        "drop": "Verwerfen",
+        "reject": "Zurückweisen",
+        "return": "Zurückkehren",
+        "continue": "Fortsetzen",
+        "jump": "Springen",
+        "createName": "Name erstellen",
+        "editName": "Name bearbeiten",
+        "confirmDelete": "Möchten Sie den Namen {name} wirklich löschen?",
+        "rulesetLabel": "Regelsatz"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Modus"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protokoll"
       }
     }
   },
@@ -2043,815 +2278,909 @@
     "haproxy": {
       "tabs": {
         "global": "Global",
-        "timeout": "Timeout",
+        "timeout": "Délai d'attente",
         "backends": "Backends",
         "services": "Services"
       },
       "common": {
-        "notSet": "Not Set",
-        "yes": "Yes",
+        "notSet": "Non défini",
+        "yes": "Oui",
         "exact": "Exact",
-        "begin": "Begin",
-        "end": "End"
+        "begin": "Début",
+        "end": "Fin"
       },
       "columns": {
-        "name": "Name",
+        "name": "Nom",
         "description": "Description",
         "mode": "Mode",
-        "balance": "Balance",
-        "serverCount": "Servers",
+        "balance": "Équilibre",
+        "serverCount": "Serveurs",
         "actions": "Actions",
-        "address": "Address",
+        "address": "Adresse",
         "port": "Port",
-        "backup": "Backup",
-        "check": "Check",
-        "checkPort": "Check Port",
+        "backup": "Sauvegarde",
+        "check": "Vérification",
+        "checkPort": "Port de vérification",
         "proxy": "Proxy",
-        "rule": "Rule",
-        "domainName": "Domain",
-        "urlPath": "URL Path",
-        "setServer": "Set Server",
-        "setRedirect": "Set Redirect",
-        "setBackend": "Set Backend",
-        "listenAddress": "Listen Address",
+        "rule": "Règle",
+        "domainName": "Domaine",
+        "urlPath": "Chemin URL",
+        "setServer": "Définir le serveur",
+        "setRedirect": "Définir la redirection",
+        "setBackend": "Définir le backend",
+        "listenAddress": "Adresse d'écoute",
         "backend": "Backend"
       },
       "buttons": {
-        "edit": "Edit",
-        "delete": "Delete"
+        "edit": "Modifier",
+        "delete": "Supprimer"
       },
       "messages": {
-        "saveFailed": "Save failed: ",
-        "backendNameRequired": "Please enter backend name",
-        "serverNameRequired": "Please enter server name",
-        "serviceNameRequired": "Please enter service name"
+        "saveFailed": "Échec de l'enregistrement: ",
+        "backendNameRequired": "Veuillez entrer le nom du backend",
+        "serverNameRequired": "Veuillez entrer le nom du serveur",
+        "serviceNameRequired": "Veuillez entrer le nom du service"
       },
       "preview": {
-        "noConfig": "No parameters configured"
+        "noConfig": "Aucun paramètre configuré"
       },
       "global": {
         "maxConnections": {
-          "title": "Max Connections",
-          "label": "Max Connections",
-          "help": "Maximum concurrent connections HAProxy can accept (1-2000000)"
+          "title": "Connexions maximales",
+          "label": "Connexions maximales",
+          "help": "Connexions simultanées maximales que HAProxy peut accepter (1-2000000)"
         },
         "tlsVersionMin": {
-          "title": "Minimum TLS Version",
-          "label": "Minimum TLS Version",
-          "help": "Minimum allowed TLS protocol version"
+          "title": "Version TLS minimale",
+          "label": "Version TLS minimale",
+          "help": "Version minimale autorisée du protocole TLS"
         },
         "sslCiphers": {
-          "title": "SSL Ciphers",
-          "label": "SSL Ciphers",
-          "placeholder": "One cipher per line",
-          "help": "List of allowed SSL ciphers (one per line)"
+          "title": "Chiffres SSL",
+          "label": "Chiffres SSL",
+          "placeholder": "Un chiffrement par ligne",
+          "help": "Liste des chiffreurs SSL autorisés (un par ligne)"
         },
         "loggingFacility": {
-          "title": "Logging Facility",
-          "label": "Logging Facility",
-          "help": "Syslog logging facility"
+          "title": "Installation de journalisation",
+          "label": "Installation de journalisation",
+          "help": "Installation de journalisation Syslog"
         },
         "loggingLevel": {
-          "title": "Logging Level",
-          "label": "Logging Level",
-          "help": "Syslog logging level"
+          "title": "Niveau de journalisation",
+          "label": "Niveau de journalisation",
+          "help": "Niveau de journalisation Syslog"
         }
       },
       "timeout": {
         "client": {
-          "title": "Client Timeout",
-          "label": "Client Timeout (sec)",
-          "help": "Client inactivity timeout (1-3600 seconds)"
+          "title": "Délai d'expiration client",
+          "label": "Délai d'expiration client (sec)",
+          "help": "Délai d'inactivité du client (1-3600 secondes)"
         },
         "connect": {
-          "title": "Connect Timeout",
-          "label": "Connect Timeout (sec)",
-          "help": "Backend connection timeout (1-3600 seconds)"
+          "title": "Délai d'expiration de connexion",
+          "label": "Délai d'expiration de connexion (sec)",
+          "help": "Délai d'expiration de la connexion backend (1-3600 secondes)"
         },
         "server": {
-          "title": "Server Timeout",
-          "label": "Server Timeout (sec)",
-          "help": "Server inactivity timeout (1-3600 seconds)"
+          "title": "Délai d'attente du serveur",
+          "label": "Délai d'attente du serveur (sec)",
+          "help": "Délai d'inactivité du serveur (1-3600 secondes)"
         },
         "check": {
-          "title": "Check Timeout",
-          "label": "Check Timeout (sec)",
-          "help": "Health check timeout (1-3600 seconds)"
+          "title": "Délai d'expiration de vérification",
+          "label": "Délai d'expiration de vérification (sec)",
+          "help": "Délai d'attente de vérification de santé (1-3600 secondes)"
         }
       },
       "modal": {
         "backend": {
-          "title": "Backend Server",
+          "title": "Serveur backend",
           "tabs": {
-            "basic": "Basic",
-            "servers": "Servers",
-            "health": "Health Check",
-            "rules": "Rules"
+            "basic": "Basique",
+            "servers": "Serveurs",
+            "health": "Vérification de santé",
+            "rules": "Règles"
           },
           "basic": {
             "name": {
-              "title": "Name",
-              "label": "Name",
-              "help": "Unique identifier name for the backend"
+              "title": "Nom",
+              "label": "Nom",
+              "help": "Nom d'identifiant unique pour le backend"
             },
             "description": {
               "title": "Description",
               "label": "Description",
-              "help": "Description of the backend server"
+              "help": "Description du serveur backend"
             },
             "mode": {
               "title": "Mode",
               "label": "Mode",
-              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+              "help": "Le mode HTTP inspecte le protocole HTTP, le mode TCP transmet le trafic"
             },
             "balance": {
-              "title": "Balance Algorithm",
-              "label": "Balance Algorithm",
+              "title": "Algorithme d'équilibrage",
+              "label": "Algorithme d'équilibrage",
               "roundRobin": "Round Robin",
-              "leastConnection": "Least Connection",
-              "sourceAddress": "Source Address Hash",
-              "help": "Algorithm for distributing traffic"
+              "leastConnection": "Moins de connexions",
+              "sourceAddress": "Hachage d'adresse source",
+              "help": "Algorithme pour la distribution du trafic"
             },
             "healthCheck": {
-              "title": "Health Check Type",
-              "label": "Health Check Type",
-              "help": "Protocol used to check server health"
+              "title": "Type de vérification de santé",
+              "label": "Type de vérification de santé",
+              "help": "Protocole utilisé pour vérifier la santé du serveur"
             },
             "loggingFacility": {
-              "title": "Logging Facility",
-              "label": "Logging Facility",
-              "help": "Syslog logging facility for this backend"
+              "title": "Installation de journalisation",
+              "label": "Installation de journalisation",
+              "help": "Installation de journalisation Syslog pour ce backend"
             },
             "loggingLevel": {
-              "title": "Logging Level",
-              "label": "Logging Level",
-              "help": "Syslog logging level for this backend"
+              "title": "Niveau de journalisation",
+              "label": "Niveau de journalisation",
+              "help": "Niveau de journalisation Syslog pour ce backend"
             },
             "caCert": {
-              "title": "CA Certificate",
-              "label": "CA Certificate",
-              "placeholder": "CA certificate name",
-              "help": "CA certificate for verifying server certificates"
+              "title": "Certificat CA",
+              "label": "Certificat CA",
+              "placeholder": "Nom du certificat CA",
+              "help": "Certificat CA pour vérifier les certificats de serveur"
             },
             "sslNoVerify": {
-              "title": "No SSL Verify",
-              "label": "Skip SSL Verification",
-              "help": "Skip server SSL certificate verification"
+              "title": "Pas de vérification SSL",
+              "label": "Ignorer la vérification SSL",
+              "help": "Ignorer la vérification du certificat SSL du serveur"
             },
             "timeoutConnect": {
-              "title": "Connect Timeout",
-              "label": "Connect Timeout (sec)",
-              "help": "Timeout for connecting to this backend (1-3600 seconds)"
+              "title": "Délai d'expiration de connexion",
+              "label": "Délai d'expiration de connexion (sec)",
+              "help": "Délai d'attente pour la connexion à ce backend (1-3600 secondes)"
             },
             "timeoutServer": {
-              "title": "Server Timeout",
-              "label": "Server Timeout (sec)",
-              "help": "Server response timeout for this backend (1-3600 seconds)"
+              "title": "Délai d'attente du serveur",
+              "label": "Délai d'attente du serveur (sec)",
+              "help": "Délai de réponse du serveur pour ce backend (1-3600 secondes)"
             },
             "timeoutCheck": {
-              "title": "Check Timeout",
-              "label": "Check Timeout (sec)",
-              "help": "Health check timeout for this backend (1-3600 seconds)"
+              "title": "Délai d'expiration de vérification",
+              "label": "Délai d'expiration de vérification (sec)",
+              "help": "Délai d'attente de vérification de santé pour ce backend (1-3600 secondes)"
             }
           },
           "health": {
             "checkMethod": {
-              "title": "HTTP Check Method",
-              "label": "HTTP Check Method",
-              "help": "HTTP method used for health checks"
+              "title": "Méthode de vérification HTTP",
+              "label": "Méthode de vérification HTTP",
+              "help": "Méthode HTTP utilisée pour les vérifications de santé"
             },
             "checkUri": {
-              "title": "Check URI",
-              "label": "Check URI",
-              "placeholder": "e.g., /health",
-              "help": "URI path used for health checks"
+              "title": "URI de vérification",
+              "label": "URI de vérification",
+              "placeholder": "par ex. /health",
+              "help": "Chemin URI utilisé pour les vérifications de santé"
             },
             "expectStatus": {
-              "title": "Expected Status",
-              "label": "Expected Status",
-              "placeholder": "e.g., 200",
-              "help": "Expected HTTP response status code"
+              "title": "Statut attendu",
+              "label": "Statut attendu",
+              "placeholder": "par ex. 200",
+              "help": "Code d'état de réponse HTTP attendu"
             },
             "expectString": {
-              "title": "Expected Content",
-              "label": "Expected Content",
-              "help": "String expected to be found in the response"
+              "title": "Contenu attendu",
+              "label": "Contenu attendu",
+              "help": "Chaîne attendue dans la réponse"
             }
           }
         },
         "server": {
-          "title": "Server",
+          "title": "Serveur",
           "name": {
-            "label": "Name",
-            "help": "Unique identifier name for the server"
+            "label": "Nom",
+            "help": "Nom d'identifiant unique pour le serveur"
           },
           "address": {
-            "label": "Address",
-            "placeholder": "e.g., 192.168.1.100",
-            "help": "Server IP address or hostname"
+            "label": "Adresse",
+            "placeholder": "par ex. 192.168.1.100",
+            "help": "Adresse IP ou nom d'hôte du serveur"
           },
           "port": {
             "label": "Port",
-            "help": "Server port number (1-65535)"
+            "help": "Numéro de port du serveur (1-65535)"
           },
           "backup": {
-            "label": "Backup Server",
-            "help": "Only used when all primary servers are unavailable"
+            "label": "Serveur de sauvegarde",
+            "help": "Utilisé uniquement lorsque tous les serveurs principaux sont indisponibles"
           },
           "check": {
-            "label": "Enable Health Check",
-            "help": "Perform health checks on this server"
+            "label": "Activer le contrôle de santé",
+            "help": "Effectuer des vérifications de santé sur ce serveur"
           },
           "checkPort": {
-            "label": "Check Port",
-            "help": "Port used for health checks (defaults to server port)"
+            "label": "Port de vérification",
+            "help": "Port utilisé pour les vérifications de santé (par défaut, port du serveur)"
           },
           "sendProxy": {
-            "label": "Send Proxy Protocol v1",
-            "help": "Send client information using PROXY protocol v1"
+            "label": "Envoyer le protocole proxy v1",
+            "help": "Envoyer les informations client via le protocole PROXY v1"
           },
           "sendProxyV2": {
-            "label": "Send Proxy Protocol v2",
-            "help": "Send client information using PROXY protocol v2"
+            "label": "Envoyer le protocole proxy v2",
+            "help": "Envoyer les informations client via le protocole PROXY v2"
           }
         },
         "backendRule": {
-          "title": "Backend Rule",
+          "title": "Règle de backend",
           "ruleNumber": {
-            "label": "Rule Number",
-            "help": "Execution order number for the rule"
+            "label": "Numéro de règle",
+            "help": "Numéro d'ordre d'exécution pour la règle"
           },
           "domainName": {
-            "label": "Domain Name",
-            "placeholder": "One domain per line",
-            "help": "List of domains to match (one per line)"
+            "label": "Nom de domaine",
+            "placeholder": "Un domaine par ligne",
+            "help": "Liste des domaines à comparer (un par ligne)"
           },
           "urlPathExact": {
-            "label": "Exact URL Path",
-            "placeholder": "One path per line",
-            "help": "URL paths to match exactly (one per line)"
+            "label": "Chemin URL exact",
+            "placeholder": "Un chemin par ligne",
+            "help": "Chemins URL à faire correspondre exactement (un par ligne)"
           },
           "urlPathBegin": {
-            "label": "URL Path Prefix",
-            "placeholder": "One prefix per line",
-            "help": "URL paths to match by prefix (one per line)"
+            "label": "Préfixe de chemin URL",
+            "placeholder": "Un préfixe par ligne",
+            "help": "Chemins URL à faire correspondre par préfixe (un par ligne)"
           },
           "urlPathEnd": {
-            "label": "URL Path Suffix",
-            "placeholder": "One suffix per line",
-            "help": "URL paths to match by suffix (one per line)"
+            "label": "Suffixe de chemin URL",
+            "placeholder": "Un suffixe par ligne",
+            "help": "Chemins URL à faire correspondre par suffixe (un par ligne)"
           },
           "setServer": {
-            "label": "Set Server",
-            "help": "Server name to forward requests to"
+            "label": "Définir le serveur",
+            "help": "Nom du serveur vers lequel transférer les demandes"
           },
           "redirectUrl": {
-            "label": "Redirect URL",
-            "help": "URL address to redirect to"
+            "label": "URL de redirection",
+            "help": "Adresse URL vers laquelle rediriger"
           }
         },
         "service": {
-          "title": "Frontend Service",
+          "title": "Service frontend",
           "tabs": {
-            "basic": "Basic",
+            "basic": "Basique",
             "ssl": "SSL",
-            "rules": "Rules",
+            "rules": "Règles",
             "compression": "Compression"
           },
           "basic": {
             "name": {
-              "title": "Name",
-              "label": "Name",
-              "help": "Unique identifier name for the frontend service"
+              "title": "Nom",
+              "label": "Nom",
+              "help": "Nom d'identifiant unique pour le service frontend"
             },
             "description": {
               "title": "Description",
               "label": "Description",
-              "help": "Description of the frontend service"
+              "help": "Description du service frontend"
             },
             "mode": {
               "title": "Mode",
               "label": "Mode",
-              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+              "help": "Le mode HTTP inspecte le protocole HTTP, le mode TCP transmet le trafic"
             },
             "port": {
               "title": "Port",
-              "label": "Listen Port",
-              "help": "Port number the service listens on (1-65535)"
+              "label": "Port d'écoute",
+              "help": "Numéro de port sur lequel le service écoute (1-65535)"
             },
             "listenAddress": {
-              "title": "Listen Address",
-              "label": "Listen Address",
-              "placeholder": "One IP address per line",
-              "help": "IP addresses to listen on (one per line, empty means all addresses)"
+              "title": "Adresse d'écoute",
+              "label": "Adresse d'écoute",
+              "placeholder": "Une adresse IP par ligne",
+              "help": "Adresses IP à écouter (une par ligne, vide signifie toutes les adresses)"
             },
             "acceptProxy": {
-              "title": "Accept Proxy Protocol",
-              "label": "Accept Proxy Protocol",
-              "help": "Accept PROXY protocol to get real client IP"
+              "title": "Accepter le protocole proxy",
+              "label": "Accepter le protocole proxy",
+              "help": "Accepter le protocole PROXY pour obtenir l'IP réelle du client"
             },
             "backend": {
-              "title": "Associated Backends",
-              "label": "Associated Backends",
-              "placeholder": "One backend name per line",
-              "help": "Associated backend server groups (one per line)"
+              "title": "Backends associés",
+              "label": "Backends associés",
+              "placeholder": "Un nom de backend par ligne",
+              "help": "Groupes de serveurs backend associés (un par ligne)"
             },
             "redirectHttp": {
-              "title": "Redirect HTTP to HTTPS",
-              "label": "Redirect HTTP to HTTPS",
-              "help": "Automatically redirect HTTP requests to HTTPS"
+              "title": "Rediriger HTTP vers HTTPS",
+              "label": "Rediriger HTTP vers HTTPS",
+              "help": "Rediriger automatiquement les requêtes HTTP vers HTTPS"
             },
             "inspectDelay": {
-              "title": "TCP Inspect Delay",
-              "label": "TCP Inspect Delay (ms)",
-              "help": "Delay for TCP content inspection (1-65535 milliseconds)"
+              "title": "Délai d'inspection TCP",
+              "label": "Délai d'inspection TCP (ms)",
+              "help": "Délai pour l'inspection du contenu TCP (1-65535 millisecondes)"
             },
             "timeoutClient": {
-              "title": "Client Timeout",
-              "label": "Client Timeout (sec)",
-              "help": "Client inactivity timeout (1-3600 seconds)"
+              "title": "Délai d'expiration client",
+              "label": "Délai d'expiration client (sec)",
+              "help": "Délai d'inactivité du client (1-3600 secondes)"
             },
             "loggingFacility": {
-              "title": "Logging Facility",
-              "label": "Logging Facility",
-              "help": "Syslog logging facility for this service"
+              "title": "Installation de journalisation",
+              "label": "Installation de journalisation",
+              "help": "Installation de journalisation Syslog pour ce service"
             },
             "loggingLevel": {
-              "title": "Logging Level",
-              "label": "Logging Level",
-              "help": "Syslog logging level for this service"
+              "title": "Niveau de journalisation",
+              "label": "Niveau de journalisation",
+              "help": "Niveau de journalisation Syslog pour ce service"
             }
           },
           "ssl": {
             "certificate": {
-              "title": "SSL Certificate",
-              "label": "SSL Certificate",
-              "placeholder": "One certificate name per line",
-              "help": "SSL certificates for this service (one per line)"
+              "title": "Certificat SSL",
+              "label": "Certificat SSL",
+              "placeholder": "Un nom de certificat par ligne",
+              "help": "Certificats SSL pour ce service (un par ligne)"
             }
           },
           "compression": {
             "algorithm": {
-              "title": "Compression Algorithm",
-              "label": "Compression Algorithm",
-              "help": "HTTP response compression algorithm"
+              "title": "Algorithme de compression",
+              "label": "Algorithme de compression",
+              "help": "Algorithme de compression de réponse HTTP"
             },
             "mimeTypes": {
-              "title": "MIME Types",
-              "label": "MIME Types",
-              "placeholder": "One MIME type per line",
-              "help": "MIME types to compress (one per line)"
+              "title": "Types MIME",
+              "label": "Types MIME",
+              "placeholder": "Un type MIME par ligne",
+              "help": "Types MIME à compresser (un par ligne)"
             }
           }
         },
         "serviceRule": {
-          "title": "Service Rule",
+          "title": "Règle de service",
           "ruleNumber": {
-            "label": "Rule Number",
-            "help": "Execution order number for the rule"
+            "label": "Numéro de règle",
+            "help": "Numéro d'ordre d'exécution pour la règle"
           },
           "domainName": {
-            "label": "Domain Name",
-            "placeholder": "One domain per line",
-            "help": "List of domains to match (one per line)"
+            "label": "Nom de domaine",
+            "placeholder": "Un domaine par ligne",
+            "help": "Liste des domaines à comparer (un par ligne)"
           },
           "urlPathExact": {
-            "label": "Exact URL Path",
-            "placeholder": "One path per line",
-            "help": "URL paths to match exactly (one per line)"
+            "label": "Chemin URL exact",
+            "placeholder": "Un chemin par ligne",
+            "help": "Chemins URL à faire correspondre exactement (un par ligne)"
           },
           "urlPathBegin": {
-            "label": "URL Path Prefix",
-            "placeholder": "One prefix per line",
-            "help": "URL paths to match by prefix (one per line)"
+            "label": "Préfixe de chemin URL",
+            "placeholder": "Un préfixe par ligne",
+            "help": "Chemins URL à faire correspondre par préfixe (un par ligne)"
           },
           "urlPathEnd": {
-            "label": "URL Path Suffix",
-            "placeholder": "One suffix per line",
-            "help": "URL paths to match by suffix (one per line)"
+            "label": "Suffixe de chemin URL",
+            "placeholder": "Un suffixe par ligne",
+            "help": "Chemins URL à faire correspondre par suffixe (un par ligne)"
           },
           "setBackend": {
-            "label": "Set Backend",
-            "help": "Backend name to forward requests to"
+            "label": "Définir le backend",
+            "help": "Nom du backend pour transférer les requêtes"
           },
           "redirectUrl": {
-            "label": "Redirect URL",
-            "help": "URL address to redirect to"
+            "label": "URL de redirection",
+            "help": "Adresse URL vers laquelle rediriger"
           }
         },
         "confirmDelete": {
-          "title": "Confirm Delete",
-          "backendMessage": "Confirm delete this backend server?",
-          "serviceMessage": "Confirm delete this frontend service?"
+          "title": "Confirmer la suppression",
+          "backendMessage": "Confirmer la suppression de ce serveur backend?",
+          "serviceMessage": "Confirmer la suppression de ce service frontend?"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "Transfert",
+        "input": "Entrant",
+        "name": "Nom",
+        "output": "Sortant",
+        "prerouting": "Prerouting",
+        "filter": "Filtre",
+        "raw": "Brut",
+        "defaultAction": "Action par défaut",
+        "defaultActionHelp": "Action par défaut pour les paquets ne correspondant à aucune règle",
+        "defaultLog": "Journal par défaut",
+        "defaultLogHelp": "Activer la journalisation pour les paquets correspondant à l'action par défaut",
+        "description": "Description",
+        "descriptionHelp": "Description de cette chaîne de pare-feu",
+        "disableConntrack": "Désactiver le suivi de connexion",
+        "disableConntrackHelp": "Désactiver le suivi de connexion pour cette chaîne",
+        "defaultJumpTarget": "Cible de saut par défaut",
+        "defaultJumpTargetHelp": "Chaîne cible vers laquelle sauter en cas d'absence de correspondance",
+        "nameName": "Nom",
+        "accept": "Accepter",
+        "drop": "Supprimer",
+        "reject": "Rejeter",
+        "return": "Retour",
+        "continue": "Continuer",
+        "jump": "Sauter",
+        "createName": "Créer un nom",
+        "editName": "Modifier le nom",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer le nom {name} ?",
+        "rulesetLabel": "Ensemble de règles"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocole"
       }
     }
   },
   "ko": {
     "haproxy": {
       "tabs": {
-        "global": "Global",
-        "timeout": "Timeout",
-        "backends": "Backends",
-        "services": "Services"
+        "global": "글로벌",
+        "timeout": "타임아웃",
+        "backends": "백엔드",
+        "services": "서비스"
       },
       "common": {
-        "notSet": "Not Set",
-        "yes": "Yes",
-        "exact": "Exact",
-        "begin": "Begin",
-        "end": "End"
+        "notSet": "설정되지 않음",
+        "yes": "예",
+        "exact": "정확",
+        "begin": "시작",
+        "end": "끝"
       },
       "columns": {
-        "name": "Name",
-        "description": "Description",
-        "mode": "Mode",
-        "balance": "Balance",
-        "serverCount": "Servers",
-        "actions": "Actions",
-        "address": "Address",
-        "port": "Port",
-        "backup": "Backup",
-        "check": "Check",
-        "checkPort": "Check Port",
-        "proxy": "Proxy",
-        "rule": "Rule",
-        "domainName": "Domain",
-        "urlPath": "URL Path",
-        "setServer": "Set Server",
-        "setRedirect": "Set Redirect",
-        "setBackend": "Set Backend",
-        "listenAddress": "Listen Address",
-        "backend": "Backend"
+        "name": "이름",
+        "description": "설명",
+        "mode": "모드",
+        "balance": "균형",
+        "serverCount": "서버",
+        "actions": "작업",
+        "address": "주소",
+        "port": "포트",
+        "backup": "백업",
+        "check": "검사",
+        "checkPort": "검사 포트",
+        "proxy": "프록시",
+        "rule": "규칙",
+        "domainName": "도메인",
+        "urlPath": "URL 경로",
+        "setServer": "서버 설정",
+        "setRedirect": "리디렉션 설정",
+        "setBackend": "백엔드 설정",
+        "listenAddress": "리스닝 주소",
+        "backend": "백엔드"
       },
       "buttons": {
-        "edit": "Edit",
-        "delete": "Delete"
+        "edit": "편집",
+        "delete": "삭제"
       },
       "messages": {
-        "saveFailed": "Save failed: ",
-        "backendNameRequired": "Please enter backend name",
-        "serverNameRequired": "Please enter server name",
-        "serviceNameRequired": "Please enter service name"
+        "saveFailed": "저장 실패: ",
+        "backendNameRequired": "백엔드 이름을 입력해 주세요",
+        "serverNameRequired": "서버 이름을 입력해 주세요",
+        "serviceNameRequired": "서비스 이름을 입력해 주세요"
       },
       "preview": {
-        "noConfig": "No parameters configured"
+        "noConfig": "구성된 매개변수 없음"
       },
       "global": {
         "maxConnections": {
-          "title": "Max Connections",
-          "label": "Max Connections",
-          "help": "Maximum concurrent connections HAProxy can accept (1-2000000)"
+          "title": "최대 연결",
+          "label": "최대 연결",
+          "help": "HAProxy가 수락할 수 있는 최대 동시 연결(1-2000000)"
         },
         "tlsVersionMin": {
-          "title": "Minimum TLS Version",
-          "label": "Minimum TLS Version",
-          "help": "Minimum allowed TLS protocol version"
+          "title": "최소 TLS 버전",
+          "label": "최소 TLS 버전",
+          "help": "허용되는 최소 TLS 프로토콜 버전"
         },
         "sslCiphers": {
-          "title": "SSL Ciphers",
-          "label": "SSL Ciphers",
-          "placeholder": "One cipher per line",
-          "help": "List of allowed SSL ciphers (one per line)"
+          "title": "SSL 암호",
+          "label": "SSL 암호",
+          "placeholder": "한 줄에 하나의 암호",
+          "help": "허용된 SSL 암호 목록(한 줄에 하나씩)"
         },
         "loggingFacility": {
-          "title": "Logging Facility",
-          "label": "Logging Facility",
-          "help": "Syslog logging facility"
+          "title": "로깅 시설",
+          "label": "로깅 시설",
+          "help": "Syslog 로깅 시설"
         },
         "loggingLevel": {
-          "title": "Logging Level",
-          "label": "Logging Level",
-          "help": "Syslog logging level"
+          "title": "로깅 레벨",
+          "label": "로깅 레벨",
+          "help": "Syslog 로깅 수준"
         }
       },
       "timeout": {
         "client": {
-          "title": "Client Timeout",
-          "label": "Client Timeout (sec)",
-          "help": "Client inactivity timeout (1-3600 seconds)"
+          "title": "클라이언트 타임아웃",
+          "label": "클라이언트 타임아웃 (초)",
+          "help": "클라이언트 비활성 타임아웃 (1-3600 초)"
         },
         "connect": {
-          "title": "Connect Timeout",
-          "label": "Connect Timeout (sec)",
-          "help": "Backend connection timeout (1-3600 seconds)"
+          "title": "연결 타임아웃",
+          "label": "연결 타임아웃 (초)",
+          "help": "백엔드 연결 타임아웃 (1-3600 초)"
         },
         "server": {
-          "title": "Server Timeout",
-          "label": "Server Timeout (sec)",
-          "help": "Server inactivity timeout (1-3600 seconds)"
+          "title": "서버 타임아웃",
+          "label": "서버 타임아웃 (초)",
+          "help": "서버 비활성 타임아웃 (1-3600초)"
         },
         "check": {
-          "title": "Check Timeout",
-          "label": "Check Timeout (sec)",
-          "help": "Health check timeout (1-3600 seconds)"
+          "title": "검사 타임아웃",
+          "label": "검사 타임아웃 (초)",
+          "help": "상태 확인 시간 초과 (1-3600초)"
         }
       },
       "modal": {
         "backend": {
-          "title": "Backend Server",
+          "title": "백엔드 서버",
           "tabs": {
-            "basic": "Basic",
-            "servers": "Servers",
-            "health": "Health Check",
-            "rules": "Rules"
+            "basic": "기본",
+            "servers": "서버",
+            "health": "상태 확인",
+            "rules": "규칙"
           },
           "basic": {
             "name": {
-              "title": "Name",
-              "label": "Name",
-              "help": "Unique identifier name for the backend"
+              "title": "이름",
+              "label": "이름",
+              "help": "백엔드의 고유 식별자 이름"
             },
             "description": {
-              "title": "Description",
-              "label": "Description",
-              "help": "Description of the backend server"
+              "title": "설명",
+              "label": "설명",
+              "help": "백엔드 서버 설명"
             },
             "mode": {
-              "title": "Mode",
-              "label": "Mode",
-              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+              "title": "모드",
+              "label": "모드",
+              "help": "HTTP 모드는 HTTP 프로토콜을 검사하고, TCP 모드는 트래픽을 통과시킵니다"
             },
             "balance": {
-              "title": "Balance Algorithm",
-              "label": "Balance Algorithm",
+              "title": "균형 알고리즘",
+              "label": "균형 알고리즘",
               "roundRobin": "Round Robin",
-              "leastConnection": "Least Connection",
-              "sourceAddress": "Source Address Hash",
-              "help": "Algorithm for distributing traffic"
+              "leastConnection": "최소 연결",
+              "sourceAddress": "소스 주소 해시",
+              "help": "트래픽 분산을 위한 알고리즘"
             },
             "healthCheck": {
-              "title": "Health Check Type",
-              "label": "Health Check Type",
-              "help": "Protocol used to check server health"
+              "title": "상태 확인 유형",
+              "label": "상태 확인 유형",
+              "help": "서버 상태 확인에 사용되는 프로토콜"
             },
             "loggingFacility": {
-              "title": "Logging Facility",
-              "label": "Logging Facility",
-              "help": "Syslog logging facility for this backend"
+              "title": "로깅 시설",
+              "label": "로깅 시설",
+              "help": "이 백엔드의 Syslog 로깅 시설"
             },
             "loggingLevel": {
-              "title": "Logging Level",
-              "label": "Logging Level",
-              "help": "Syslog logging level for this backend"
+              "title": "로깅 레벨",
+              "label": "로깅 레벨",
+              "help": "이 백엔드의 Syslog 로깅 수준"
             },
             "caCert": {
-              "title": "CA Certificate",
-              "label": "CA Certificate",
-              "placeholder": "CA certificate name",
-              "help": "CA certificate for verifying server certificates"
+              "title": "CA 인증서",
+              "label": "CA 인증서",
+              "placeholder": "CA 인증서 이름",
+              "help": "서버 인증서 검증을 위한 CA 인증서"
             },
             "sslNoVerify": {
-              "title": "No SSL Verify",
-              "label": "Skip SSL Verification",
-              "help": "Skip server SSL certificate verification"
+              "title": "SSL 확인 없음",
+              "label": "SSL 검증 건너뛰기",
+              "help": "서버 SSL 인증서 검증 건너뛰기"
             },
             "timeoutConnect": {
-              "title": "Connect Timeout",
-              "label": "Connect Timeout (sec)",
-              "help": "Timeout for connecting to this backend (1-3600 seconds)"
+              "title": "연결 타임아웃",
+              "label": "연결 타임아웃 (초)",
+              "help": "이 백엔드 연결 타임아웃 (1-3600초)"
             },
             "timeoutServer": {
-              "title": "Server Timeout",
-              "label": "Server Timeout (sec)",
-              "help": "Server response timeout for this backend (1-3600 seconds)"
+              "title": "서버 타임아웃",
+              "label": "서버 타임아웃 (초)",
+              "help": "이 백엔드의 서버 응답 타임아웃 (1-3600초)"
             },
             "timeoutCheck": {
-              "title": "Check Timeout",
-              "label": "Check Timeout (sec)",
-              "help": "Health check timeout for this backend (1-3600 seconds)"
+              "title": "검사 타임아웃",
+              "label": "검사 타임아웃 (초)",
+              "help": "이 백엔드의 상태 확인 시간 초과 (1-3600초)"
             }
           },
           "health": {
             "checkMethod": {
-              "title": "HTTP Check Method",
-              "label": "HTTP Check Method",
-              "help": "HTTP method used for health checks"
+              "title": "HTTP 검사 방법",
+              "label": "HTTP 검사 방법",
+              "help": "상태 확인에 사용되는 HTTP 방법"
             },
             "checkUri": {
-              "title": "Check URI",
-              "label": "Check URI",
-              "placeholder": "e.g., /health",
-              "help": "URI path used for health checks"
+              "title": "검사 URI",
+              "label": "검사 URI",
+              "placeholder": "예: /health",
+              "help": "상태 확인에 사용되는 URI 경로"
             },
             "expectStatus": {
-              "title": "Expected Status",
-              "label": "Expected Status",
-              "placeholder": "e.g., 200",
-              "help": "Expected HTTP response status code"
+              "title": "예상 상태",
+              "label": "예상 상태",
+              "placeholder": "예: 200",
+              "help": "예상 HTTP 응답 상태 코드"
             },
             "expectString": {
-              "title": "Expected Content",
-              "label": "Expected Content",
-              "help": "String expected to be found in the response"
+              "title": "예상 내용",
+              "label": "예상 내용",
+              "help": "응답에서 찾을 것으로 예상되는 문자열"
             }
           }
         },
         "server": {
-          "title": "Server",
+          "title": "서버",
           "name": {
-            "label": "Name",
-            "help": "Unique identifier name for the server"
+            "label": "이름",
+            "help": "서버의 고유 식별자 이름"
           },
           "address": {
-            "label": "Address",
-            "placeholder": "e.g., 192.168.1.100",
-            "help": "Server IP address or hostname"
+            "label": "주소",
+            "placeholder": "예: 192.168.1.100",
+            "help": "서버 IP 주소 또는 호스트 이름"
           },
           "port": {
-            "label": "Port",
-            "help": "Server port number (1-65535)"
+            "label": "포트",
+            "help": "서버 포트 번호 (1-65535)"
           },
           "backup": {
-            "label": "Backup Server",
-            "help": "Only used when all primary servers are unavailable"
+            "label": "백업 서버",
+            "help": "모든 기본 서버를 사용할 수 없을 때만 사용"
           },
           "check": {
-            "label": "Enable Health Check",
-            "help": "Perform health checks on this server"
+            "label": "상태 확인 활성화",
+            "help": "이 서버에서 상태 확인 수행"
           },
           "checkPort": {
-            "label": "Check Port",
-            "help": "Port used for health checks (defaults to server port)"
+            "label": "검사 포트",
+            "help": "상태 확인에 사용되는 포트 (기본값: 서버 포트)"
           },
           "sendProxy": {
-            "label": "Send Proxy Protocol v1",
-            "help": "Send client information using PROXY protocol v1"
+            "label": "프록시 프로토콜 v1 전송",
+            "help": "PROXY 프로토콜 v1을 사용하여 클라이언트 정보 전송"
           },
           "sendProxyV2": {
-            "label": "Send Proxy Protocol v2",
-            "help": "Send client information using PROXY protocol v2"
+            "label": "프록시 프로토콜 v2 전송",
+            "help": "PROXY 프로토콜 v2를 사용하여 클라이언트 정보 전송"
           }
         },
         "backendRule": {
-          "title": "Backend Rule",
+          "title": "백엔드 규칙",
           "ruleNumber": {
-            "label": "Rule Number",
-            "help": "Execution order number for the rule"
+            "label": "규칙 번호",
+            "help": "규칙의 실행 순서 번호"
           },
           "domainName": {
-            "label": "Domain Name",
-            "placeholder": "One domain per line",
-            "help": "List of domains to match (one per line)"
+            "label": "도메인 이름",
+            "placeholder": "한 줄에 하나의 도메인",
+            "help": "일치시킬 도메인 목록(한 줄에 하나씩)"
           },
           "urlPathExact": {
-            "label": "Exact URL Path",
-            "placeholder": "One path per line",
-            "help": "URL paths to match exactly (one per line)"
+            "label": "정확한 URL 경로",
+            "placeholder": "한 줄에 하나의 경로",
+            "help": "정확히 일치시킬 URL 경로 (한 줄에 하나)"
           },
           "urlPathBegin": {
-            "label": "URL Path Prefix",
-            "placeholder": "One prefix per line",
-            "help": "URL paths to match by prefix (one per line)"
+            "label": "URL 경로 접두사",
+            "placeholder": "한 줄에 하나의 접두사",
+            "help": "접두사로 일치시킬 URL 경로 (한 줄에 하나)"
           },
           "urlPathEnd": {
-            "label": "URL Path Suffix",
-            "placeholder": "One suffix per line",
-            "help": "URL paths to match by suffix (one per line)"
+            "label": "URL 경로 접미사",
+            "placeholder": "한 줄에 하나의 접미사",
+            "help": "접미사로 일치시킬 URL 경로 (한 줄에 하나)"
           },
           "setServer": {
-            "label": "Set Server",
-            "help": "Server name to forward requests to"
+            "label": "서버 설정",
+            "help": "요청을 전달할 서버 이름"
           },
           "redirectUrl": {
-            "label": "Redirect URL",
-            "help": "URL address to redirect to"
+            "label": "리디렉션 URL",
+            "help": "리디렉션할 URL 주소"
           }
         },
         "service": {
-          "title": "Frontend Service",
+          "title": "프론트엔드 서비스",
           "tabs": {
-            "basic": "Basic",
+            "basic": "기본",
             "ssl": "SSL",
-            "rules": "Rules",
-            "compression": "Compression"
+            "rules": "규칙",
+            "compression": "압축"
           },
           "basic": {
             "name": {
-              "title": "Name",
-              "label": "Name",
-              "help": "Unique identifier name for the frontend service"
+              "title": "이름",
+              "label": "이름",
+              "help": "프론트엔드 서비스의 고유 식별자 이름"
             },
             "description": {
-              "title": "Description",
-              "label": "Description",
-              "help": "Description of the frontend service"
+              "title": "설명",
+              "label": "설명",
+              "help": "프론트엔드 서비스 설명"
             },
             "mode": {
-              "title": "Mode",
-              "label": "Mode",
-              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+              "title": "모드",
+              "label": "모드",
+              "help": "HTTP 모드는 HTTP 프로토콜을 검사하고, TCP 모드는 트래픽을 통과시킵니다"
             },
             "port": {
-              "title": "Port",
-              "label": "Listen Port",
-              "help": "Port number the service listens on (1-65535)"
+              "title": "포트",
+              "label": "수신 포트",
+              "help": "서비스가 수신하는 포트 번호 (1-65535)"
             },
             "listenAddress": {
-              "title": "Listen Address",
-              "label": "Listen Address",
-              "placeholder": "One IP address per line",
-              "help": "IP addresses to listen on (one per line, empty means all addresses)"
+              "title": "리스닝 주소",
+              "label": "리스닝 주소",
+              "placeholder": "한 줄에 하나의 IP 주소",
+              "help": "수신할 IP 주소 (한 줄에 하나씩, 비어 있으면 모든 주소)"
             },
             "acceptProxy": {
-              "title": "Accept Proxy Protocol",
-              "label": "Accept Proxy Protocol",
-              "help": "Accept PROXY protocol to get real client IP"
+              "title": "프록시 프로토콜 수락",
+              "label": "프록시 프로토콜 수락",
+              "help": "실제 클라이언트 IP를 얻기 위해 PROXY 프로토콜 수락"
             },
             "backend": {
-              "title": "Associated Backends",
-              "label": "Associated Backends",
-              "placeholder": "One backend name per line",
-              "help": "Associated backend server groups (one per line)"
+              "title": "연결된 백엔드",
+              "label": "연결된 백엔드",
+              "placeholder": "한 줄에 하나의 백엔드 이름",
+              "help": "연결된 백엔드 서버 그룹 (한 줄에 하나씩)"
             },
             "redirectHttp": {
-              "title": "Redirect HTTP to HTTPS",
-              "label": "Redirect HTTP to HTTPS",
-              "help": "Automatically redirect HTTP requests to HTTPS"
+              "title": "HTTP를 HTTPS로 리디렉션",
+              "label": "HTTP를 HTTPS로 리디렉션",
+              "help": "HTTP 요청을 HTTPS로 자동 리디렉션"
             },
             "inspectDelay": {
-              "title": "TCP Inspect Delay",
-              "label": "TCP Inspect Delay (ms)",
-              "help": "Delay for TCP content inspection (1-65535 milliseconds)"
+              "title": "TCP 검사 지연",
+              "label": "TCP 검사 지연 (ms)",
+              "help": "TCP 콘텐츠 검사 지연 (1-65535 밀리초)"
             },
             "timeoutClient": {
-              "title": "Client Timeout",
-              "label": "Client Timeout (sec)",
-              "help": "Client inactivity timeout (1-3600 seconds)"
+              "title": "클라이언트 타임아웃",
+              "label": "클라이언트 타임아웃 (초)",
+              "help": "클라이언트 비활성 타임아웃 (1-3600 초)"
             },
             "loggingFacility": {
-              "title": "Logging Facility",
-              "label": "Logging Facility",
-              "help": "Syslog logging facility for this service"
+              "title": "로깅 시설",
+              "label": "로깅 시설",
+              "help": "이 서비스의 Syslog 로깅 시설"
             },
             "loggingLevel": {
-              "title": "Logging Level",
-              "label": "Logging Level",
-              "help": "Syslog logging level for this service"
+              "title": "로깅 레벨",
+              "label": "로깅 레벨",
+              "help": "이 서비스의 Syslog 로깅 수준"
             }
           },
           "ssl": {
             "certificate": {
-              "title": "SSL Certificate",
-              "label": "SSL Certificate",
-              "placeholder": "One certificate name per line",
-              "help": "SSL certificates for this service (one per line)"
+              "title": "SSL 인증서",
+              "label": "SSL 인증서",
+              "placeholder": "한 줄에 하나의 인증서 이름",
+              "help": "이 서비스의 SSL 인증서 (한 줄에 하나)"
             }
           },
           "compression": {
             "algorithm": {
-              "title": "Compression Algorithm",
-              "label": "Compression Algorithm",
-              "help": "HTTP response compression algorithm"
+              "title": "압축 알고리즘",
+              "label": "압축 알고리즘",
+              "help": "HTTP 응답 압축 알고리즘"
             },
             "mimeTypes": {
-              "title": "MIME Types",
-              "label": "MIME Types",
-              "placeholder": "One MIME type per line",
-              "help": "MIME types to compress (one per line)"
+              "title": "MIME 유형",
+              "label": "MIME 유형",
+              "placeholder": "한 줄에 하나의 MIME 유형",
+              "help": "압축할 MIME 유형(한 줄에 하나씩)"
             }
           }
         },
         "serviceRule": {
-          "title": "Service Rule",
+          "title": "서비스 규칙",
           "ruleNumber": {
-            "label": "Rule Number",
-            "help": "Execution order number for the rule"
+            "label": "규칙 번호",
+            "help": "규칙의 실행 순서 번호"
           },
           "domainName": {
-            "label": "Domain Name",
-            "placeholder": "One domain per line",
-            "help": "List of domains to match (one per line)"
+            "label": "도메인 이름",
+            "placeholder": "한 줄에 하나의 도메인",
+            "help": "일치시킬 도메인 목록(한 줄에 하나씩)"
           },
           "urlPathExact": {
-            "label": "Exact URL Path",
-            "placeholder": "One path per line",
-            "help": "URL paths to match exactly (one per line)"
+            "label": "정확한 URL 경로",
+            "placeholder": "한 줄에 하나의 경로",
+            "help": "정확히 일치시킬 URL 경로 (한 줄에 하나)"
           },
           "urlPathBegin": {
-            "label": "URL Path Prefix",
-            "placeholder": "One prefix per line",
-            "help": "URL paths to match by prefix (one per line)"
+            "label": "URL 경로 접두사",
+            "placeholder": "한 줄에 하나의 접두사",
+            "help": "접두사로 일치시킬 URL 경로 (한 줄에 하나)"
           },
           "urlPathEnd": {
-            "label": "URL Path Suffix",
-            "placeholder": "One suffix per line",
-            "help": "URL paths to match by suffix (one per line)"
+            "label": "URL 경로 접미사",
+            "placeholder": "한 줄에 하나의 접미사",
+            "help": "접미사로 일치시킬 URL 경로 (한 줄에 하나)"
           },
           "setBackend": {
-            "label": "Set Backend",
-            "help": "Backend name to forward requests to"
+            "label": "백엔드 설정",
+            "help": "요청을 전달할 백엔드 이름"
           },
           "redirectUrl": {
-            "label": "Redirect URL",
-            "help": "URL address to redirect to"
+            "label": "리디렉션 URL",
+            "help": "리디렉션할 URL 주소"
           }
         },
         "confirmDelete": {
-          "title": "Confirm Delete",
-          "backendMessage": "Confirm delete this backend server?",
-          "serviceMessage": "Confirm delete this frontend service?"
+          "title": "삭제 확인",
+          "backendMessage": "이 백엔드 서버를 삭제하시겠습니까?",
+          "serviceMessage": "이 프론트엔드 서비스를 삭제하시겠습니까?"
         }
+      }
+    },
+    "firewall": {
+      "options": {
+        "forward": "전달",
+        "input": "수신",
+        "name": "이름",
+        "output": "송신",
+        "prerouting": "프리라우팅",
+        "filter": "필터",
+        "raw": "Raw",
+        "defaultAction": "기본 동작",
+        "defaultActionHelp": "어떤 규칙과도 일치하지 않는 패킷에 대한 기본 동작",
+        "defaultLog": "기본 로그",
+        "defaultLogHelp": "기본 동작과 일치하는 패킷에 대한 로깅 활성화",
+        "description": "설명",
+        "descriptionHelp": "이 방화벽 체인에 대한 설명",
+        "disableConntrack": "연결 추적 비활성화",
+        "disableConntrackHelp": "이 체인의 연결 추적 비활성화",
+        "defaultJumpTarget": "기본 점프 대상",
+        "defaultJumpTargetHelp": "일치하는 규칙이 없을 때 점프할 대상 체인",
+        "nameName": "이름",
+        "accept": "수락",
+        "drop": "드롭",
+        "reject": "거부",
+        "return": "반환",
+        "continue": "계속",
+        "jump": "점프",
+        "createName": "이름 생성",
+        "editName": "이름 편집",
+        "confirmDelete": "이름 {name}을(를) 삭제하시겠습니까?",
+        "rulesetLabel": "규칙 집합"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "모드"
+      },
+      "type": {
+        "ethernet": "이더넷",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "프로토콜"
       }
     }
   }

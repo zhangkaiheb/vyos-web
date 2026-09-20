@@ -49,6 +49,7 @@ export default defineComponent({
       { key: 'name', title: t('firewall.flowtable.name'), type: 'text', required: true, help: t('firewall.flowtable.nameHelp') },
       { key: 'description', title: t('firewall.flowtable.description'), type: 'text', help: t('firewall.flowtable.descriptionHelp') },
       { key: 'offload', title: t('firewall.flowtable.offload'), type: 'select', options: [
+        { value: '', label: '' },
         { value: 'software', label: t('firewall.flowtable.softwareOffload') },
         { value: 'hardware', label: t('firewall.flowtable.hardwareOffload') },
       ], help: t('firewall.flowtable.offloadHelp') },
@@ -62,7 +63,7 @@ export default defineComponent({
         _name: name,
         name,
         description: ft.description || '',
-        offload: ft.offload === 'hardware' ? 'hardware' : 'software',
+        offload: ft.offload || '',
         interfaces: toArray(ft.interface).join(', '),
       }));
     }
@@ -108,7 +109,7 @@ export default defineComponent({
     }
 
     function createFlowtable() {
-      editingFlowtable.value = { name: '', description: '', offload: 'software', interfaces: '' };
+      editingFlowtable.value = { name: '', description: '', offload: '', interfaces: '' };
       showFlowtableModal.value = true;
     }
 

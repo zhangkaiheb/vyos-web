@@ -2010,56 +2010,56 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Delete Confirmation Modals -->
-      <DraggableModal v-model:visible="ikeDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveIke">
+      <DraggableModal v-model:visible="ikeDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveIke">
         <div>{{ t('ipsec.messages.confirmDeleteIke') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteIkeNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="espDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveEsp">
+      <DraggableModal v-model:visible="espDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveEsp">
         <div>{{ t('ipsec.messages.confirmDeleteEsp') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteEspNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="pskDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemovePsk">
+      <DraggableModal v-model:visible="pskDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemovePsk">
         <div>{{ t('ipsec.messages.confirmDeletePsk') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeletePskNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="profileDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveProfile">
+      <DraggableModal v-model:visible="profileDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveProfile">
         <div>{{ t('ipsec.messages.confirmDeleteProfile') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteProfileNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="s2sDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveS2s">
+      <DraggableModal v-model:visible="s2sDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveS2s">
         <div>{{ t('ipsec.messages.confirmDeleteS2s') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteS2sNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="raDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRa">
+      <DraggableModal v-model:visible="raDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveRa">
         <div>{{ t('ipsec.messages.confirmDeleteRa') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteRaNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="poolDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRaPool">
+      <DraggableModal v-model:visible="poolDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveRaPool">
         <div>{{ t('ipsec.messages.confirmDeletePool') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeletePoolNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="radiusDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRaRadiusServer">
+      <DraggableModal v-model:visible="radiusDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveRaRadiusServer">
         <div>{{ t('ipsec.messages.confirmDeleteRadius') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteRadiusNames" :key="name" style="padding:2px 0;">{{ name }}</div>

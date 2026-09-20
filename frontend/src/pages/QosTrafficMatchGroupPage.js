@@ -1104,14 +1104,14 @@ export default defineComponent({
         </TabGroup>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="deleteGroupModalVisible" :title="t('qosMatch.modals.confirmDelete')" width="400px" @confirm="confirmRemoveGroup">
+      <DraggableModal v-model:visible="deleteGroupModalVisible" :title="t('qosMatch.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveGroup">
         <div>{{ t('qosMatch.modals.confirmDeleteGroup') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteGroupName }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="deleteMatchModalVisible" :title="t('qosMatch.modals.confirmDelete')" width="400px" @confirm="confirmRemoveMatch">
+      <DraggableModal v-model:visible="deleteMatchModalVisible" :title="t('qosMatch.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveMatch">
         <div>{{ t('qosMatch.modals.confirmDeleteMatch') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteMatchInfo.matchName }}</div>

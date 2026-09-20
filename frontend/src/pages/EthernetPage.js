@@ -477,7 +477,7 @@ export default defineComponent({
     onMounted(() => { visibilityStore.load(); });
     const COLUMNS = computed(() => [
       { key: 'name', title: t('ethernet.columns.name') },
-      { key: 'type', title: t('ethernet.columns.type'), width: '80px' },
+      { key: 'type', title: t('ethernet.columns.type'), width: '80px', render: (val) => t(`ethernet.type.${val}`) },
       { key: 'mode', title: t('ethernet.columns.mode'), width: '80px' },
       { key: 'address_mode', title: t('ethernet.columns.address_mode') },
       { key: 'ipv4_address', title: t('ethernet.columns.ipv4_address') },

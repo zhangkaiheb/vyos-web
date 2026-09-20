@@ -1038,7 +1038,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- CA Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="caDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveCA">
+      <DraggableModal v-model:visible="caDeleteModalVisible" :title="$t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveCA">
         <div>{{ $t('pki.confirmDeleteCA') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteCaNames" :key="name" style="padding:2px 0;">{{ name }}</div>
@@ -1046,7 +1046,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Certificate Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="certDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveCert">
+      <DraggableModal v-model:visible="certDeleteModalVisible" :title="$t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveCert">
         <div>{{ $t('pki.confirmDeleteCert') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteCertNames" :key="name" style="padding:2px 0;">{{ name }}</div>
@@ -1054,7 +1054,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- DH Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="dhDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveDH">
+      <DraggableModal v-model:visible="dhDeleteModalVisible" :title="$t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveDH">
         <div>{{ $t('pki.confirmDeleteDH') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteDhNames" :key="name" style="padding:2px 0;">{{ name }}</div>
@@ -1062,7 +1062,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Key-pair Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="keypairDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveKeyPair">
+      <DraggableModal v-model:visible="keypairDeleteModalVisible" :title="$t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveKeyPair">
         <div>{{ $t('pki.confirmDeleteKeyPair') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteKeypairNames" :key="name" style="padding:2px 0;">{{ name }}</div>
@@ -1070,7 +1070,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- OpenSSH Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="opensshDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveOpenSSH">
+      <DraggableModal v-model:visible="opensshDeleteModalVisible" :title="$t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveOpenSSH">
         <div>{{ $t('pki.confirmDeleteOpenSSH') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteOpensshNames" :key="name" style="padding:2px 0;">{{ name }}</div>
@@ -1078,7 +1078,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- OpenVPN Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="openvpnDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveOpenVPN">
+      <DraggableModal v-model:visible="openvpnDeleteModalVisible" :title="$t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveOpenVPN">
         <div>{{ $t('pki.confirmDeleteOpenVPN') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteOpenvpnNames" :key="name" style="padding:2px 0;">{{ name }}</div>

@@ -174,6 +174,53 @@
     },
     "msg": {
       "saved": "保存成功"
+    },
+    "firewall": {
+      "options": {
+        "forward": "转发",
+        "input": "入站",
+        "name": "名称",
+        "output": "出站",
+        "prerouting": "预路由",
+        "filter": "过滤",
+        "raw": "原始",
+        "defaultAction": "默认动作",
+        "defaultActionHelp": "不匹配任何规则的数据包的默认动作",
+        "defaultLog": "默认日志",
+        "defaultLogHelp": "启用匹配默认动作的数据包日志记录",
+        "description": "描述",
+        "descriptionHelp": "此防火墙链的描述",
+        "disableConntrack": "禁用连接跟踪",
+        "disableConntrackHelp": "禁用此链的连接跟踪",
+        "defaultJumpTarget": "默认跳转目标",
+        "defaultJumpTargetHelp": "没有规则匹配时跳转的目标链",
+        "nameName": "名称",
+        "accept": "接受",
+        "drop": "丢弃",
+        "reject": "拒绝",
+        "return": "返回",
+        "continue": "继续",
+        "jump": "跳转",
+        "createName": "创建名称",
+        "editName": "编辑名称",
+        "confirmDelete": "确定要删除名称 {name} 吗？",
+        "rulesetLabel": "规则集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太网",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "协议"
+      }
     }
   },
   "en": {
@@ -351,6 +398,53 @@
     },
     "msg": {
       "saved": "Saved successfully"
+    },
+    "firewall": {
+      "options": {
+        "forward": "Forward",
+        "input": "Input",
+        "name": "Name",
+        "output": "Output",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Default Action",
+        "defaultActionHelp": "Default action for packets that do not match any rule",
+        "defaultLog": "Default Log",
+        "defaultLogHelp": "Enable logging for packets matching the default action",
+        "description": "Description",
+        "descriptionHelp": "Description of this firewall chain",
+        "disableConntrack": "Disable Conntrack",
+        "disableConntrackHelp": "Disable connection tracking for this chain",
+        "defaultJumpTarget": "Default Jump Target",
+        "defaultJumpTargetHelp": "Target chain to jump to when no rule matches",
+        "nameName": "Name",
+        "accept": "Accept",
+        "drop": "Drop",
+        "reject": "Reject",
+        "return": "Return",
+        "continue": "Continue",
+        "jump": "Jump",
+        "createName": "Create Name",
+        "editName": "Edit Name",
+        "confirmDelete": "Are you sure you want to delete name {name}?",
+        "rulesetLabel": "Ruleset"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocol"
+      }
     }
   },
   "zh-TW": {
@@ -528,714 +622,949 @@
     },
     "msg": {
       "saved": "Saved successfully"
+    },
+    "firewall": {
+      "options": {
+        "forward": "轉發",
+        "input": "入站",
+        "name": "名稱",
+        "output": "出站",
+        "prerouting": "預路由",
+        "filter": "過濾",
+        "raw": "原始",
+        "defaultAction": "預設動作",
+        "defaultActionHelp": "不符合任何規則的資料封包的預設動作",
+        "defaultLog": "預設日誌",
+        "defaultLogHelp": "啟用符合預設動作的資料封包日誌記錄",
+        "description": "描述",
+        "descriptionHelp": "此防火牆鏈的描述",
+        "disableConntrack": "停用連線追蹤",
+        "disableConntrackHelp": "停用此鏈的連線追蹤",
+        "defaultJumpTarget": "預設跳轉目標",
+        "defaultJumpTargetHelp": "沒有規則符合時跳轉的目標鏈",
+        "nameName": "名稱",
+        "accept": "接受",
+        "drop": "丟棄",
+        "reject": "拒絕",
+        "return": "返回",
+        "continue": "繼續",
+        "jump": "跳轉",
+        "createName": "建立名稱",
+        "editName": "編輯名稱",
+        "confirmDelete": "確定要刪除名稱 {name} 嗎？",
+        "rulesetLabel": "規則集"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "模式"
+      },
+      "type": {
+        "ethernet": "以太網",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "協議"
+      }
     }
   },
   "ru": {
     "tab": {
-      "basic": "Basic",
-      "interfaces": "Interfaces",
-      "redistribute": "Redistribute",
-      "defaultInfo": "Default Info",
-      "passwords": "Passwords",
-      "advanced": "Advanced"
+      "basic": "Основные",
+      "interfaces": "Интерфейсы",
+      "redistribute": "Перераспределение",
+      "defaultInfo": "Информация по умолчанию",
+      "passwords": "Пароли",
+      "advanced": "Дополнительно"
     },
     "col": {
-      "interfaceName": "Interface Name",
-      "metric": "Metric",
-      "networkType": "Network Type",
-      "protocol": "Protocol"
+      "interfaceName": "Имя интерфейса",
+      "metric": "Метрика",
+      "networkType": "Тип сети",
+      "protocol": "Протокол"
     },
     "basic": {
-      "title": "IS-IS Basic Configuration"
+      "title": "Базовая конфигурация IS-IS"
     },
     "form": {
-      "net": "NET (Network Entity Title)",
-      "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
-      "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
-      "level": "Level",
-      "metricStyle": "Metric Style",
-      "dynamicHostname": "Dynamic Hostname",
-      "logAdjacencyChanges": "Log Adjacency Changes",
-      "purgeOriginator": "Purge Originator",
-      "setAttachedBit": "Set Attached Bit",
-      "setOverloadBit": "Set Overload Bit",
-      "lspGenInterval": "LSP Generation Interval",
+      "net": "NET (заголовок сетевой сущности)",
+      "netPlaceholder": "например, 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+      "netTitle": "Адрес NET IS-IS, формат: 8-байтовый ID системы + ID псевдоузла",
+      "level": "Уровень",
+      "metricStyle": "Стиль метрики",
+      "dynamicHostname": "Динамическое имя хоста",
+      "logAdjacencyChanges": "Журналировать изменения соседства",
+      "purgeOriginator": "Очистить инициатор",
+      "setAttachedBit": "Установить присоединённый бит",
+      "setOverloadBit": "Установить бит перегрузки",
+      "lspGenInterval": "Интервал генерации LSP",
       "lspGenIntervalPlaceholder": "1-65535",
-      "lspMtu": "LSP MTU",
-      "lspRefreshInterval": "LSP Refresh Interval",
+      "lspMtu": "MTU LSP",
+      "lspRefreshInterval": "Интервал обновления LSP",
       "lspRefreshIntervalPlaceholder": "1-65535",
-      "maxLspLifetime": "Max LSP Lifetime",
+      "maxLspLifetime": "Максимальное время жизни LSP",
       "maxLspLifetimePlaceholder": "1-65535"
     },
     "defaultInfo": {
-      "title": "Default Information Originate",
-      "always": "Always Originate",
-      "metric": "Metric",
-      "routeMap": "Route Map",
-      "routeMapPlaceholder": "Route map name"
+      "title": "Источник информации по умолчанию",
+      "always": "Всегда инициировать",
+      "metric": "Метрика",
+      "routeMap": "Карта маршрутов",
+      "routeMapPlaceholder": "Имя карты маршрутов"
     },
     "passwords": {
-      "title": "Password Configuration",
-      "areaPassword": "Area Password",
-      "areaPasswordPlaceholder": "Area password",
-      "domainPassword": "Domain Password",
-      "domainPasswordPlaceholder": "Domain password"
+      "title": "Конфигурация пароля",
+      "areaPassword": "Пароль области",
+      "areaPasswordPlaceholder": "Пароль области",
+      "domainPassword": "Пароль домена",
+      "domainPasswordPlaceholder": "Пароль домена"
     },
     "advanced": {
-      "title": "Advanced Options",
-      "hint": "More IS-IS configuration can be done via CLI."
+      "title": "Расширенные опции",
+      "hint": "Дополнительную конфигурацию IS-IS можно выполнить через CLI."
     },
     "modal": {
-      "editInterface": "Edit IS-IS Interface",
-      "addInterface": "Add IS-IS Interface",
-      "interfaceName": "Interface Name",
-      "selectInterface": "Select an interface",
-      "metric": "Metric (0-16777215)",
-      "networkType": "Network Type",
-      "passiveMode": "Passive Mode",
-      "editRedistribute": "Edit Route Redistribution",
-      "addRedistribute": "Add Route Redistribution",
-      "protocol": "Protocol",
-      "routeMap": "Route Map",
-      "routeMapPlaceholder": "Route map name"
+      "editInterface": "Редактировать интерфейс IS-IS",
+      "addInterface": "Добавить интерфейс IS-IS",
+      "interfaceName": "Имя интерфейса",
+      "selectInterface": "Выбрать интерфейс",
+      "metric": "Метрика (0-16777215)",
+      "networkType": "Тип сети",
+      "passiveMode": "Пассивный режим",
+      "editRedistribute": "Редактировать перераспределение маршрутов",
+      "addRedistribute": "Добавить перераспределение маршрутов",
+      "protocol": "Протокол",
+      "routeMap": "Карта маршрутов",
+      "routeMapPlaceholder": "Имя карты маршрутов"
     },
     "delete": {
-      "confirmInterface": "Confirm delete the following interface?",
-      "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+      "confirmInterface": "Подтвердить удаление следующего интерфейса?",
+      "confirmRedistribute": "Подтвердить удаление следующего протокола перераспределения?"
     },
     "error": {
-      "net": "NET format error: ",
-      "lspMtu": "LSP MTU error: ",
-      "interfaceNameRequired": "Interface name is required",
-      "protocolRequired": "Protocol is required"
+      "net": "Ошибка формата NET: ",
+      "lspMtu": "Ошибка MTU LSP: ",
+      "interfaceNameRequired": "Требуется имя интерфейса",
+      "protocolRequired": "Требуется протокол"
     },
     "routing": {
       "isis": {
         "tab": {
-          "basic": "Basic",
-          "interfaces": "Interfaces",
-          "redistribute": "Redistribute",
-          "defaultInfo": "Default Info",
-          "passwords": "Passwords",
-          "advanced": "Advanced"
+          "basic": "Основные",
+          "interfaces": "Интерфейсы",
+          "redistribute": "Перераспределение",
+          "defaultInfo": "Информация по умолчанию",
+          "passwords": "Пароли",
+          "advanced": "Дополнительно"
         },
         "col": {
-          "interfaceName": "Interface Name",
-          "metric": "Metric",
-          "networkType": "Network Type",
-          "protocol": "Protocol"
+          "interfaceName": "Имя интерфейса",
+          "metric": "Метрика",
+          "networkType": "Тип сети",
+          "protocol": "Протокол"
         },
         "basic": {
-          "title": "IS-IS Basic Configuration"
+          "title": "Базовая конфигурация IS-IS"
         },
         "form": {
-          "net": "NET (Network Entity Title)",
-          "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
-          "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
-          "level": "Level",
-          "metricStyle": "Metric Style",
-          "dynamicHostname": "Dynamic Hostname",
-          "logAdjacencyChanges": "Log Adjacency Changes",
-          "purgeOriginator": "Purge Originator",
-          "setAttachedBit": "Set Attached Bit",
-          "setOverloadBit": "Set Overload Bit",
-          "lspGenInterval": "LSP Generation Interval",
+          "net": "NET (заголовок сетевой сущности)",
+          "netPlaceholder": "например, 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+          "netTitle": "Адрес NET IS-IS, формат: 8-байтовый ID системы + ID псевдоузла",
+          "level": "Уровень",
+          "metricStyle": "Стиль метрики",
+          "dynamicHostname": "Динамическое имя хоста",
+          "logAdjacencyChanges": "Журналировать изменения соседства",
+          "purgeOriginator": "Очистить инициатор",
+          "setAttachedBit": "Установить присоединённый бит",
+          "setOverloadBit": "Установить бит перегрузки",
+          "lspGenInterval": "Интервал генерации LSP",
           "lspGenIntervalPlaceholder": "1-65535",
-          "lspMtu": "LSP MTU",
-          "lspRefreshInterval": "LSP Refresh Interval",
+          "lspMtu": "MTU LSP",
+          "lspRefreshInterval": "Интервал обновления LSP",
           "lspRefreshIntervalPlaceholder": "1-65535",
-          "maxLspLifetime": "Max LSP Lifetime",
+          "maxLspLifetime": "Максимальное время жизни LSP",
           "maxLspLifetimePlaceholder": "1-65535"
         },
         "defaultInfo": {
-          "title": "Default Information Originate",
-          "always": "Always Originate",
-          "metric": "Metric",
-          "routeMap": "Route Map",
-          "routeMapPlaceholder": "Route map name"
+          "title": "Источник информации по умолчанию",
+          "always": "Всегда инициировать",
+          "metric": "Метрика",
+          "routeMap": "Карта маршрутов",
+          "routeMapPlaceholder": "Имя карты маршрутов"
         },
         "passwords": {
-          "title": "Password Configuration",
-          "areaPassword": "Area Password",
-          "areaPasswordPlaceholder": "Area password",
-          "domainPassword": "Domain Password",
-          "domainPasswordPlaceholder": "Domain password"
+          "title": "Конфигурация пароля",
+          "areaPassword": "Пароль области",
+          "areaPasswordPlaceholder": "Пароль области",
+          "domainPassword": "Пароль домена",
+          "domainPasswordPlaceholder": "Пароль домена"
         },
         "advanced": {
-          "title": "Advanced Options",
-          "hint": "More IS-IS configuration can be done via CLI."
+          "title": "Расширенные опции",
+          "hint": "Дополнительную конфигурацию IS-IS можно выполнить через CLI."
         },
         "modal": {
-          "editInterface": "Edit IS-IS Interface",
-          "addInterface": "Add IS-IS Interface",
-          "interfaceName": "Interface Name",
-          "selectInterface": "Select an interface",
-          "metric": "Metric (0-16777215)",
-          "networkType": "Network Type",
-          "passiveMode": "Passive Mode",
-          "editRedistribute": "Edit Route Redistribution",
-          "addRedistribute": "Add Route Redistribution",
-          "protocol": "Protocol",
-          "routeMap": "Route Map",
-          "routeMapPlaceholder": "Route map name"
+          "editInterface": "Редактировать интерфейс IS-IS",
+          "addInterface": "Добавить интерфейс IS-IS",
+          "interfaceName": "Имя интерфейса",
+          "selectInterface": "Выбрать интерфейс",
+          "metric": "Метрика (0-16777215)",
+          "networkType": "Тип сети",
+          "passiveMode": "Пассивный режим",
+          "editRedistribute": "Редактировать перераспределение маршрутов",
+          "addRedistribute": "Добавить перераспределение маршрутов",
+          "protocol": "Протокол",
+          "routeMap": "Карта маршрутов",
+          "routeMapPlaceholder": "Имя карты маршрутов"
         },
         "delete": {
-          "confirmInterface": "Confirm delete the following interface?",
-          "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+          "confirmInterface": "Подтвердить удаление следующего интерфейса?",
+          "confirmRedistribute": "Подтвердить удаление следующего протокола перераспределения?"
         },
         "error": {
-          "net": "NET format error: ",
-          "lspMtu": "LSP MTU error: ",
-          "interfaceNameRequired": "Interface name is required",
-          "protocolRequired": "Protocol is required"
+          "net": "Ошибка формата NET: ",
+          "lspMtu": "Ошибка MTU LSP: ",
+          "interfaceNameRequired": "Требуется имя интерфейса",
+          "protocolRequired": "Требуется протокол"
         }
       }
     },
     "validation": {
-      "isisNetFormat": "Invalid NET format, should be 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
-      "isisMetricRange": "Metric must be between 0-16777215",
-      "timerRange": "Value must be within the specified range",
-      "isisLspMtuRange": "LSP MTU must be between 128-4352"
+      "isisNetFormat": "Неверный формат NET, должен быть 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
+      "isisMetricRange": "Метрика должна быть между 0-16777215",
+      "timerRange": "Значение должно быть в указанном диапазоне",
+      "isisLspMtuRange": "MTU LSP должен быть между 128-4352"
     },
     "option": {
-      "default": "Default"
+      "default": "По умолчанию"
     },
     "common": {
-      "confirmDelete": "Confirm Delete"
+      "confirmDelete": "Подтвердить удаление"
     },
     "msg": {
-      "saved": "Saved successfully"
+      "saved": "Успешно сохранено"
+    },
+    "firewall": {
+      "options": {
+        "forward": "Переадресация",
+        "input": "Входящие",
+        "name": "Имя",
+        "output": "Исходящие",
+        "prerouting": "Премаршрутизация",
+        "filter": "Фильтр",
+        "raw": "Сырой",
+        "defaultAction": "Действие по умолчанию",
+        "defaultActionHelp": "Действие по умолчанию для пакетов, не соответствующих ни одному правилу",
+        "defaultLog": "Журнал по умолчанию",
+        "defaultLogHelp": "Включить ведение журнала для пакетов, соответствующих действию по умолчанию",
+        "description": "Описание",
+        "descriptionHelp": "Описание этой цепочки межсетевого экрана",
+        "disableConntrack": "Отключить отслеживание соединений",
+        "disableConntrackHelp": "Отключить отслеживание соединений для этой цепочки",
+        "defaultJumpTarget": "Цель перехода по умолчанию",
+        "defaultJumpTargetHelp": "Целевая цепочка для перехода при отсутствии совпадений",
+        "nameName": "Имя",
+        "accept": "Принять",
+        "drop": "Отбросить",
+        "reject": "Отклонить",
+        "return": "Вернуть",
+        "continue": "Продолжить",
+        "jump": "Перейти",
+        "createName": "Создать имя",
+        "editName": "Редактировать имя",
+        "confirmDelete": "Вы уверены, что хотите удалить имя {name}?",
+        "rulesetLabel": "Набор правил"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Режим"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Протокол"
+      }
     }
   },
   "de": {
     "tab": {
-      "basic": "Basic",
-      "interfaces": "Interfaces",
-      "redistribute": "Redistribute",
-      "defaultInfo": "Default Info",
-      "passwords": "Passwords",
-      "advanced": "Advanced"
+      "basic": "Grundlegend",
+      "interfaces": "Schnittstellen",
+      "redistribute": "Neuverteilung",
+      "defaultInfo": "Standardinformationen",
+      "passwords": "Passwörter",
+      "advanced": "Erweitert"
     },
     "col": {
-      "interfaceName": "Interface Name",
-      "metric": "Metric",
-      "networkType": "Network Type",
-      "protocol": "Protocol"
+      "interfaceName": "Schnittstellenname",
+      "metric": "Metrik",
+      "networkType": "Netzwerktyp",
+      "protocol": "Protokoll"
     },
     "basic": {
-      "title": "IS-IS Basic Configuration"
+      "title": "IS-IS-Grundkonfiguration"
     },
     "form": {
-      "net": "NET (Network Entity Title)",
-      "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
-      "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
-      "level": "Level",
-      "metricStyle": "Metric Style",
-      "dynamicHostname": "Dynamic Hostname",
-      "logAdjacencyChanges": "Log Adjacency Changes",
-      "purgeOriginator": "Purge Originator",
-      "setAttachedBit": "Set Attached Bit",
-      "setOverloadBit": "Set Overload Bit",
-      "lspGenInterval": "LSP Generation Interval",
+      "net": "NET (Netzwerkentitätstitel)",
+      "netPlaceholder": "z.B. 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+      "netTitle": "IS-IS-NET-Adresse, Format: 8-Byte-System-ID + Pseudo-Knoten-ID",
+      "level": "Ebene",
+      "metricStyle": "Metrikstil",
+      "dynamicHostname": "Dynamischer Hostname",
+      "logAdjacencyChanges": "Nachbarschaftsänderungen protokollieren",
+      "purgeOriginator": "Ursprung bereinigen",
+      "setAttachedBit": "Angehängtes Bit setzen",
+      "setOverloadBit": "Überlastbit setzen",
+      "lspGenInterval": "LSP-Generierungsintervall",
       "lspGenIntervalPlaceholder": "1-65535",
-      "lspMtu": "LSP MTU",
-      "lspRefreshInterval": "LSP Refresh Interval",
+      "lspMtu": "LSP-MTU",
+      "lspRefreshInterval": "LSP-Aktualisierungsintervall",
       "lspRefreshIntervalPlaceholder": "1-65535",
-      "maxLspLifetime": "Max LSP Lifetime",
+      "maxLspLifetime": "Maximale LSP-Lebensdauer",
       "maxLspLifetimePlaceholder": "1-65535"
     },
     "defaultInfo": {
-      "title": "Default Information Originate",
-      "always": "Always Originate",
-      "metric": "Metric",
-      "routeMap": "Route Map",
-      "routeMapPlaceholder": "Route map name"
+      "title": "Standardinformationen generieren",
+      "always": "Immer originate",
+      "metric": "Metrik",
+      "routeMap": "Routenkarte",
+      "routeMapPlaceholder": "Name der Routenkarte"
     },
     "passwords": {
-      "title": "Password Configuration",
-      "areaPassword": "Area Password",
-      "areaPasswordPlaceholder": "Area password",
-      "domainPassword": "Domain Password",
-      "domainPasswordPlaceholder": "Domain password"
+      "title": "Passwortkonfiguration",
+      "areaPassword": "Bereichspasswort",
+      "areaPasswordPlaceholder": "Bereichspasswort",
+      "domainPassword": "Domänenpasswort",
+      "domainPasswordPlaceholder": "Domänenpasswort"
     },
     "advanced": {
-      "title": "Advanced Options",
-      "hint": "More IS-IS configuration can be done via CLI."
+      "title": "Erweiterte Optionen",
+      "hint": "Weitere IS-IS-Konfiguration kann über CLI erfolgen."
     },
     "modal": {
-      "editInterface": "Edit IS-IS Interface",
-      "addInterface": "Add IS-IS Interface",
-      "interfaceName": "Interface Name",
-      "selectInterface": "Select an interface",
-      "metric": "Metric (0-16777215)",
-      "networkType": "Network Type",
-      "passiveMode": "Passive Mode",
-      "editRedistribute": "Edit Route Redistribution",
-      "addRedistribute": "Add Route Redistribution",
-      "protocol": "Protocol",
-      "routeMap": "Route Map",
-      "routeMapPlaceholder": "Route map name"
+      "editInterface": "IS-IS-Schnittstelle bearbeiten",
+      "addInterface": "IS-IS-Schnittstelle hinzufügen",
+      "interfaceName": "Schnittstellenname",
+      "selectInterface": "Eine Schnittstelle auswählen",
+      "metric": "Metrik (0-16777215)",
+      "networkType": "Netzwerktyp",
+      "passiveMode": "Passiver Modus",
+      "editRedistribute": "Routen-Neuverteilung bearbeiten",
+      "addRedistribute": "Routen-Neuverteilung hinzufügen",
+      "protocol": "Protokoll",
+      "routeMap": "Routenkarte",
+      "routeMapPlaceholder": "Name der Routenkarte"
     },
     "delete": {
-      "confirmInterface": "Confirm delete the following interface?",
-      "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+      "confirmInterface": "Löschen der folgenden Schnittstelle bestätigen?",
+      "confirmRedistribute": "Löschen des folgenden Neuverteilungsprotokolls bestätigen?"
     },
     "error": {
-      "net": "NET format error: ",
-      "lspMtu": "LSP MTU error: ",
-      "interfaceNameRequired": "Interface name is required",
-      "protocolRequired": "Protocol is required"
+      "net": "NET-Formatfehler: ",
+      "lspMtu": "LSP-MTU-Fehler: ",
+      "interfaceNameRequired": "Schnittstellenname ist erforderlich",
+      "protocolRequired": "Protokoll ist erforderlich"
     },
     "routing": {
       "isis": {
         "tab": {
-          "basic": "Basic",
-          "interfaces": "Interfaces",
-          "redistribute": "Redistribute",
-          "defaultInfo": "Default Info",
-          "passwords": "Passwords",
-          "advanced": "Advanced"
+          "basic": "Grundlegend",
+          "interfaces": "Schnittstellen",
+          "redistribute": "Neuverteilung",
+          "defaultInfo": "Standardinformationen",
+          "passwords": "Passwörter",
+          "advanced": "Erweitert"
         },
         "col": {
-          "interfaceName": "Interface Name",
-          "metric": "Metric",
-          "networkType": "Network Type",
-          "protocol": "Protocol"
+          "interfaceName": "Schnittstellenname",
+          "metric": "Metrik",
+          "networkType": "Netzwerktyp",
+          "protocol": "Protokoll"
         },
         "basic": {
-          "title": "IS-IS Basic Configuration"
+          "title": "IS-IS-Grundkonfiguration"
         },
         "form": {
-          "net": "NET (Network Entity Title)",
-          "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
-          "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
-          "level": "Level",
-          "metricStyle": "Metric Style",
-          "dynamicHostname": "Dynamic Hostname",
-          "logAdjacencyChanges": "Log Adjacency Changes",
-          "purgeOriginator": "Purge Originator",
-          "setAttachedBit": "Set Attached Bit",
-          "setOverloadBit": "Set Overload Bit",
-          "lspGenInterval": "LSP Generation Interval",
+          "net": "NET (Netzwerkentitätstitel)",
+          "netPlaceholder": "z.B. 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+          "netTitle": "IS-IS-NET-Adresse, Format: 8-Byte-System-ID + Pseudo-Knoten-ID",
+          "level": "Ebene",
+          "metricStyle": "Metrikstil",
+          "dynamicHostname": "Dynamischer Hostname",
+          "logAdjacencyChanges": "Nachbarschaftsänderungen protokollieren",
+          "purgeOriginator": "Ursprung bereinigen",
+          "setAttachedBit": "Angehängtes Bit setzen",
+          "setOverloadBit": "Überlastbit setzen",
+          "lspGenInterval": "LSP-Generierungsintervall",
           "lspGenIntervalPlaceholder": "1-65535",
-          "lspMtu": "LSP MTU",
-          "lspRefreshInterval": "LSP Refresh Interval",
+          "lspMtu": "LSP-MTU",
+          "lspRefreshInterval": "LSP-Aktualisierungsintervall",
           "lspRefreshIntervalPlaceholder": "1-65535",
-          "maxLspLifetime": "Max LSP Lifetime",
+          "maxLspLifetime": "Maximale LSP-Lebensdauer",
           "maxLspLifetimePlaceholder": "1-65535"
         },
         "defaultInfo": {
-          "title": "Default Information Originate",
-          "always": "Always Originate",
-          "metric": "Metric",
-          "routeMap": "Route Map",
-          "routeMapPlaceholder": "Route map name"
+          "title": "Standardinformationen generieren",
+          "always": "Immer originate",
+          "metric": "Metrik",
+          "routeMap": "Routenkarte",
+          "routeMapPlaceholder": "Name der Routenkarte"
         },
         "passwords": {
-          "title": "Password Configuration",
-          "areaPassword": "Area Password",
-          "areaPasswordPlaceholder": "Area password",
-          "domainPassword": "Domain Password",
-          "domainPasswordPlaceholder": "Domain password"
+          "title": "Passwortkonfiguration",
+          "areaPassword": "Bereichspasswort",
+          "areaPasswordPlaceholder": "Bereichspasswort",
+          "domainPassword": "Domänenpasswort",
+          "domainPasswordPlaceholder": "Domänenpasswort"
         },
         "advanced": {
-          "title": "Advanced Options",
-          "hint": "More IS-IS configuration can be done via CLI."
+          "title": "Erweiterte Optionen",
+          "hint": "Weitere IS-IS-Konfiguration kann über CLI erfolgen."
         },
         "modal": {
-          "editInterface": "Edit IS-IS Interface",
-          "addInterface": "Add IS-IS Interface",
-          "interfaceName": "Interface Name",
-          "selectInterface": "Select an interface",
-          "metric": "Metric (0-16777215)",
-          "networkType": "Network Type",
-          "passiveMode": "Passive Mode",
-          "editRedistribute": "Edit Route Redistribution",
-          "addRedistribute": "Add Route Redistribution",
-          "protocol": "Protocol",
-          "routeMap": "Route Map",
-          "routeMapPlaceholder": "Route map name"
+          "editInterface": "IS-IS-Schnittstelle bearbeiten",
+          "addInterface": "IS-IS-Schnittstelle hinzufügen",
+          "interfaceName": "Schnittstellenname",
+          "selectInterface": "Eine Schnittstelle auswählen",
+          "metric": "Metrik (0-16777215)",
+          "networkType": "Netzwerktyp",
+          "passiveMode": "Passiver Modus",
+          "editRedistribute": "Routen-Neuverteilung bearbeiten",
+          "addRedistribute": "Routen-Neuverteilung hinzufügen",
+          "protocol": "Protokoll",
+          "routeMap": "Routenkarte",
+          "routeMapPlaceholder": "Name der Routenkarte"
         },
         "delete": {
-          "confirmInterface": "Confirm delete the following interface?",
-          "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+          "confirmInterface": "Löschen der folgenden Schnittstelle bestätigen?",
+          "confirmRedistribute": "Löschen des folgenden Neuverteilungsprotokolls bestätigen?"
         },
         "error": {
-          "net": "NET format error: ",
-          "lspMtu": "LSP MTU error: ",
-          "interfaceNameRequired": "Interface name is required",
-          "protocolRequired": "Protocol is required"
+          "net": "NET-Formatfehler: ",
+          "lspMtu": "LSP-MTU-Fehler: ",
+          "interfaceNameRequired": "Schnittstellenname ist erforderlich",
+          "protocolRequired": "Protokoll ist erforderlich"
         }
       }
     },
     "validation": {
-      "isisNetFormat": "Invalid NET format, should be 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
-      "isisMetricRange": "Metric must be between 0-16777215",
-      "timerRange": "Value must be within the specified range",
-      "isisLspMtuRange": "LSP MTU must be between 128-4352"
+      "isisNetFormat": "Ungültiges NET-Format, sollte 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx sein",
+      "isisMetricRange": "Metrik muss zwischen 0-16777215 liegen",
+      "timerRange": "Wert muss im angegebenen Bereich liegen",
+      "isisLspMtuRange": "LSP-MTU muss zwischen 128-4352 liegen"
     },
     "option": {
-      "default": "Default"
+      "default": "Standard"
     },
     "common": {
-      "confirmDelete": "Confirm Delete"
+      "confirmDelete": "Löschen bestätigen"
     },
     "msg": {
-      "saved": "Saved successfully"
+      "saved": "Erfolgreich gespeichert"
+    },
+    "firewall": {
+      "options": {
+        "forward": "Weiterleitung",
+        "input": "Eingehend",
+        "name": "Name",
+        "output": "Ausgehend",
+        "prerouting": "Prerouting",
+        "filter": "Filter",
+        "raw": "Raw",
+        "defaultAction": "Standardaktion",
+        "defaultActionHelp": "Standardaktion für Pakete, die mit keiner Regel übereinstimmen",
+        "defaultLog": "Standardprotokoll",
+        "defaultLogHelp": "Protokollierung für Pakete aktivieren, die der Standardaktion entsprechen",
+        "description": "Beschreibung",
+        "descriptionHelp": "Beschreibung dieser Firewall-Kette",
+        "disableConntrack": "Verbindungsverfolgung deaktivieren",
+        "disableConntrackHelp": "Verbindungsverfolgung für diese Kette deaktivieren",
+        "defaultJumpTarget": "Standard-Sprungziel",
+        "defaultJumpTargetHelp": "Zielkette zum Sprung bei keiner Übereinstimmung",
+        "nameName": "Name",
+        "accept": "Akzeptieren",
+        "drop": "Verwerfen",
+        "reject": "Zurückweisen",
+        "return": "Zurückkehren",
+        "continue": "Fortsetzen",
+        "jump": "Springen",
+        "createName": "Name erstellen",
+        "editName": "Name bearbeiten",
+        "confirmDelete": "Möchten Sie den Namen {name} wirklich löschen?",
+        "rulesetLabel": "Regelsatz"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Modus"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protokoll"
+      }
     }
   },
   "fr": {
     "tab": {
-      "basic": "Basic",
+      "basic": "Basique",
       "interfaces": "Interfaces",
-      "redistribute": "Redistribute",
-      "defaultInfo": "Default Info",
-      "passwords": "Passwords",
-      "advanced": "Advanced"
+      "redistribute": "Redistribution",
+      "defaultInfo": "Info par défaut",
+      "passwords": "Mots de passe",
+      "advanced": "Avancé"
     },
     "col": {
-      "interfaceName": "Interface Name",
-      "metric": "Metric",
-      "networkType": "Network Type",
-      "protocol": "Protocol"
+      "interfaceName": "Nom de l'interface",
+      "metric": "Métrique",
+      "networkType": "Type de réseau",
+      "protocol": "Protocole"
     },
     "basic": {
-      "title": "IS-IS Basic Configuration"
+      "title": "Configuration de base IS-IS"
     },
     "form": {
-      "net": "NET (Network Entity Title)",
-      "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
-      "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
-      "level": "Level",
-      "metricStyle": "Metric Style",
-      "dynamicHostname": "Dynamic Hostname",
-      "logAdjacencyChanges": "Log Adjacency Changes",
-      "purgeOriginator": "Purge Originator",
-      "setAttachedBit": "Set Attached Bit",
-      "setOverloadBit": "Set Overload Bit",
-      "lspGenInterval": "LSP Generation Interval",
+      "net": "NET (titre d'entité réseau)",
+      "netPlaceholder": "par ex. 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+      "netTitle": "Adresse NET IS-IS, format: ID système 8 octets + ID pseudo-nœud",
+      "level": "Niveau",
+      "metricStyle": "Style de métrique",
+      "dynamicHostname": "Nom d'hôte dynamique",
+      "logAdjacencyChanges": "Journaliser les changements de voisinage",
+      "purgeOriginator": "Purger l'origine",
+      "setAttachedBit": "Définir le bit attaché",
+      "setOverloadBit": "Définir le bit de surcharge",
+      "lspGenInterval": "Intervalle de génération LSP",
       "lspGenIntervalPlaceholder": "1-65535",
-      "lspMtu": "LSP MTU",
-      "lspRefreshInterval": "LSP Refresh Interval",
+      "lspMtu": "MTU LSP",
+      "lspRefreshInterval": "Intervalle de rafraîchissement LSP",
       "lspRefreshIntervalPlaceholder": "1-65535",
-      "maxLspLifetime": "Max LSP Lifetime",
+      "maxLspLifetime": "Durée de vie LSP maximale",
       "maxLspLifetimePlaceholder": "1-65535"
     },
     "defaultInfo": {
-      "title": "Default Information Originate",
-      "always": "Always Originate",
-      "metric": "Metric",
-      "routeMap": "Route Map",
-      "routeMapPlaceholder": "Route map name"
+      "title": "Origine des informations par défaut",
+      "always": "Toujours origine",
+      "metric": "Métrique",
+      "routeMap": "Carte de routes",
+      "routeMapPlaceholder": "Nom de la carte de routes"
     },
     "passwords": {
-      "title": "Password Configuration",
-      "areaPassword": "Area Password",
-      "areaPasswordPlaceholder": "Area password",
-      "domainPassword": "Domain Password",
-      "domainPasswordPlaceholder": "Domain password"
+      "title": "Configuration du mot de passe",
+      "areaPassword": "Mot de passe de zone",
+      "areaPasswordPlaceholder": "Mot de passe de zone",
+      "domainPassword": "Mot de passe du domaine",
+      "domainPasswordPlaceholder": "Mot de passe du domaine"
     },
     "advanced": {
-      "title": "Advanced Options",
-      "hint": "More IS-IS configuration can be done via CLI."
+      "title": "Options avancées",
+      "hint": "Plus de configuration IS-IS peut être effectuée via CLI."
     },
     "modal": {
-      "editInterface": "Edit IS-IS Interface",
-      "addInterface": "Add IS-IS Interface",
-      "interfaceName": "Interface Name",
-      "selectInterface": "Select an interface",
-      "metric": "Metric (0-16777215)",
-      "networkType": "Network Type",
-      "passiveMode": "Passive Mode",
-      "editRedistribute": "Edit Route Redistribution",
-      "addRedistribute": "Add Route Redistribution",
-      "protocol": "Protocol",
-      "routeMap": "Route Map",
-      "routeMapPlaceholder": "Route map name"
+      "editInterface": "Modifier l'interface IS-IS",
+      "addInterface": "Ajouter une interface IS-IS",
+      "interfaceName": "Nom de l'interface",
+      "selectInterface": "Sélectionner une interface",
+      "metric": "Métrique (0-16777215)",
+      "networkType": "Type de réseau",
+      "passiveMode": "Mode passif",
+      "editRedistribute": "Modifier la redistribution des routes",
+      "addRedistribute": "Ajouter une redistribution de routes",
+      "protocol": "Protocole",
+      "routeMap": "Carte de routes",
+      "routeMapPlaceholder": "Nom de la carte de routes"
     },
     "delete": {
-      "confirmInterface": "Confirm delete the following interface?",
-      "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+      "confirmInterface": "Confirmer la suppression de l'interface suivante?",
+      "confirmRedistribute": "Confirmer la suppression du protocole de redistribution suivant?"
     },
     "error": {
-      "net": "NET format error: ",
-      "lspMtu": "LSP MTU error: ",
-      "interfaceNameRequired": "Interface name is required",
-      "protocolRequired": "Protocol is required"
+      "net": "Erreur de format NET: ",
+      "lspMtu": "Erreur MTU LSP: ",
+      "interfaceNameRequired": "Le nom de l'interface est requis",
+      "protocolRequired": "Le protocole est requis"
     },
     "routing": {
       "isis": {
         "tab": {
-          "basic": "Basic",
+          "basic": "Basique",
           "interfaces": "Interfaces",
-          "redistribute": "Redistribute",
-          "defaultInfo": "Default Info",
-          "passwords": "Passwords",
-          "advanced": "Advanced"
+          "redistribute": "Redistribution",
+          "defaultInfo": "Info par défaut",
+          "passwords": "Mots de passe",
+          "advanced": "Avancé"
         },
         "col": {
-          "interfaceName": "Interface Name",
-          "metric": "Metric",
-          "networkType": "Network Type",
-          "protocol": "Protocol"
+          "interfaceName": "Nom de l'interface",
+          "metric": "Métrique",
+          "networkType": "Type de réseau",
+          "protocol": "Protocole"
         },
         "basic": {
-          "title": "IS-IS Basic Configuration"
+          "title": "Configuration de base IS-IS"
         },
         "form": {
-          "net": "NET (Network Entity Title)",
-          "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
-          "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
-          "level": "Level",
-          "metricStyle": "Metric Style",
-          "dynamicHostname": "Dynamic Hostname",
-          "logAdjacencyChanges": "Log Adjacency Changes",
-          "purgeOriginator": "Purge Originator",
-          "setAttachedBit": "Set Attached Bit",
-          "setOverloadBit": "Set Overload Bit",
-          "lspGenInterval": "LSP Generation Interval",
+          "net": "NET (titre d'entité réseau)",
+          "netPlaceholder": "par ex. 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+          "netTitle": "Adresse NET IS-IS, format: ID système 8 octets + ID pseudo-nœud",
+          "level": "Niveau",
+          "metricStyle": "Style de métrique",
+          "dynamicHostname": "Nom d'hôte dynamique",
+          "logAdjacencyChanges": "Journaliser les changements de voisinage",
+          "purgeOriginator": "Purger l'origine",
+          "setAttachedBit": "Définir le bit attaché",
+          "setOverloadBit": "Définir le bit de surcharge",
+          "lspGenInterval": "Intervalle de génération LSP",
           "lspGenIntervalPlaceholder": "1-65535",
-          "lspMtu": "LSP MTU",
-          "lspRefreshInterval": "LSP Refresh Interval",
+          "lspMtu": "MTU LSP",
+          "lspRefreshInterval": "Intervalle de rafraîchissement LSP",
           "lspRefreshIntervalPlaceholder": "1-65535",
-          "maxLspLifetime": "Max LSP Lifetime",
+          "maxLspLifetime": "Durée de vie LSP maximale",
           "maxLspLifetimePlaceholder": "1-65535"
         },
         "defaultInfo": {
-          "title": "Default Information Originate",
-          "always": "Always Originate",
-          "metric": "Metric",
-          "routeMap": "Route Map",
-          "routeMapPlaceholder": "Route map name"
+          "title": "Origine des informations par défaut",
+          "always": "Toujours origine",
+          "metric": "Métrique",
+          "routeMap": "Carte de routes",
+          "routeMapPlaceholder": "Nom de la carte de routes"
         },
         "passwords": {
-          "title": "Password Configuration",
-          "areaPassword": "Area Password",
-          "areaPasswordPlaceholder": "Area password",
-          "domainPassword": "Domain Password",
-          "domainPasswordPlaceholder": "Domain password"
+          "title": "Configuration du mot de passe",
+          "areaPassword": "Mot de passe de zone",
+          "areaPasswordPlaceholder": "Mot de passe de zone",
+          "domainPassword": "Mot de passe du domaine",
+          "domainPasswordPlaceholder": "Mot de passe du domaine"
         },
         "advanced": {
-          "title": "Advanced Options",
-          "hint": "More IS-IS configuration can be done via CLI."
+          "title": "Options avancées",
+          "hint": "Plus de configuration IS-IS peut être effectuée via CLI."
         },
         "modal": {
-          "editInterface": "Edit IS-IS Interface",
-          "addInterface": "Add IS-IS Interface",
-          "interfaceName": "Interface Name",
-          "selectInterface": "Select an interface",
-          "metric": "Metric (0-16777215)",
-          "networkType": "Network Type",
-          "passiveMode": "Passive Mode",
-          "editRedistribute": "Edit Route Redistribution",
-          "addRedistribute": "Add Route Redistribution",
-          "protocol": "Protocol",
-          "routeMap": "Route Map",
-          "routeMapPlaceholder": "Route map name"
+          "editInterface": "Modifier l'interface IS-IS",
+          "addInterface": "Ajouter une interface IS-IS",
+          "interfaceName": "Nom de l'interface",
+          "selectInterface": "Sélectionner une interface",
+          "metric": "Métrique (0-16777215)",
+          "networkType": "Type de réseau",
+          "passiveMode": "Mode passif",
+          "editRedistribute": "Modifier la redistribution des routes",
+          "addRedistribute": "Ajouter une redistribution de routes",
+          "protocol": "Protocole",
+          "routeMap": "Carte de routes",
+          "routeMapPlaceholder": "Nom de la carte de routes"
         },
         "delete": {
-          "confirmInterface": "Confirm delete the following interface?",
-          "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+          "confirmInterface": "Confirmer la suppression de l'interface suivante?",
+          "confirmRedistribute": "Confirmer la suppression du protocole de redistribution suivant?"
         },
         "error": {
-          "net": "NET format error: ",
-          "lspMtu": "LSP MTU error: ",
-          "interfaceNameRequired": "Interface name is required",
-          "protocolRequired": "Protocol is required"
+          "net": "Erreur de format NET: ",
+          "lspMtu": "Erreur MTU LSP: ",
+          "interfaceNameRequired": "Le nom de l'interface est requis",
+          "protocolRequired": "Le protocole est requis"
         }
       }
     },
     "validation": {
-      "isisNetFormat": "Invalid NET format, should be 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
-      "isisMetricRange": "Metric must be between 0-16777215",
-      "timerRange": "Value must be within the specified range",
-      "isisLspMtuRange": "LSP MTU must be between 128-4352"
+      "isisNetFormat": "Format NET invalide, devrait être 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
+      "isisMetricRange": "La métrique doit être comprise entre 0 et 16777215",
+      "timerRange": "La valeur doit être dans la plage spécifiée",
+      "isisLspMtuRange": "MTU LSP doit être compris entre 128-4352"
     },
     "option": {
-      "default": "Default"
+      "default": "Par défaut"
     },
     "common": {
-      "confirmDelete": "Confirm Delete"
+      "confirmDelete": "Confirmer la suppression"
     },
     "msg": {
-      "saved": "Saved successfully"
+      "saved": "Enregistré avec succès"
+    },
+    "firewall": {
+      "options": {
+        "forward": "Transfert",
+        "input": "Entrant",
+        "name": "Nom",
+        "output": "Sortant",
+        "prerouting": "Prerouting",
+        "filter": "Filtre",
+        "raw": "Brut",
+        "defaultAction": "Action par défaut",
+        "defaultActionHelp": "Action par défaut pour les paquets ne correspondant à aucune règle",
+        "defaultLog": "Journal par défaut",
+        "defaultLogHelp": "Activer la journalisation pour les paquets correspondant à l'action par défaut",
+        "description": "Description",
+        "descriptionHelp": "Description de cette chaîne de pare-feu",
+        "disableConntrack": "Désactiver le suivi de connexion",
+        "disableConntrackHelp": "Désactiver le suivi de connexion pour cette chaîne",
+        "defaultJumpTarget": "Cible de saut par défaut",
+        "defaultJumpTargetHelp": "Chaîne cible vers laquelle sauter en cas d'absence de correspondance",
+        "nameName": "Nom",
+        "accept": "Accepter",
+        "drop": "Supprimer",
+        "reject": "Rejeter",
+        "return": "Retour",
+        "continue": "Continuer",
+        "jump": "Sauter",
+        "createName": "Créer un nom",
+        "editName": "Modifier le nom",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer le nom {name} ?",
+        "rulesetLabel": "Ensemble de règles"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "Mode"
+      },
+      "type": {
+        "ethernet": "Ethernet",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "Protocole"
+      }
     }
   },
   "ko": {
     "tab": {
-      "basic": "Basic",
-      "interfaces": "Interfaces",
-      "redistribute": "Redistribute",
-      "defaultInfo": "Default Info",
-      "passwords": "Passwords",
-      "advanced": "Advanced"
+      "basic": "기본",
+      "interfaces": "인터페이스",
+      "redistribute": "재배포",
+      "defaultInfo": "기본 정보",
+      "passwords": "비밀번호",
+      "advanced": "고급"
     },
     "col": {
-      "interfaceName": "Interface Name",
-      "metric": "Metric",
-      "networkType": "Network Type",
-      "protocol": "Protocol"
+      "interfaceName": "인터페이스 이름",
+      "metric": "메트릭",
+      "networkType": "네트워크 유형",
+      "protocol": "프로토콜"
     },
     "basic": {
-      "title": "IS-IS Basic Configuration"
+      "title": "IS-IS 기본 구성"
     },
     "form": {
-      "net": "NET (Network Entity Title)",
-      "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
-      "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
-      "level": "Level",
-      "metricStyle": "Metric Style",
-      "dynamicHostname": "Dynamic Hostname",
-      "logAdjacencyChanges": "Log Adjacency Changes",
-      "purgeOriginator": "Purge Originator",
-      "setAttachedBit": "Set Attached Bit",
-      "setOverloadBit": "Set Overload Bit",
-      "lspGenInterval": "LSP Generation Interval",
+      "net": "NET(네트워크 엔터티 제목)",
+      "netPlaceholder": "예: 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+      "netTitle": "IS-IS NET 주소, 형식: 8바이트 시스템 ID + 의사 노드 ID",
+      "level": "레벨",
+      "metricStyle": "메트릭 스타일",
+      "dynamicHostname": "동적 호스트명",
+      "logAdjacencyChanges": "인접 변경 로그",
+      "purgeOriginator": "원본 제거",
+      "setAttachedBit": "첨부 비트 설정",
+      "setOverloadBit": "과부하 비트 설정",
+      "lspGenInterval": "LSP 생성 간격",
       "lspGenIntervalPlaceholder": "1-65535",
       "lspMtu": "LSP MTU",
-      "lspRefreshInterval": "LSP Refresh Interval",
+      "lspRefreshInterval": "LSP 새로 고침 간격",
       "lspRefreshIntervalPlaceholder": "1-65535",
-      "maxLspLifetime": "Max LSP Lifetime",
+      "maxLspLifetime": "최대 LSP 수명",
       "maxLspLifetimePlaceholder": "1-65535"
     },
     "defaultInfo": {
-      "title": "Default Information Originate",
-      "always": "Always Originate",
-      "metric": "Metric",
-      "routeMap": "Route Map",
-      "routeMapPlaceholder": "Route map name"
+      "title": "기본 정보 originate",
+      "always": "항상 시작",
+      "metric": "메트릭",
+      "routeMap": "경로 맵",
+      "routeMapPlaceholder": "경로 맵 이름"
     },
     "passwords": {
-      "title": "Password Configuration",
-      "areaPassword": "Area Password",
-      "areaPasswordPlaceholder": "Area password",
-      "domainPassword": "Domain Password",
-      "domainPasswordPlaceholder": "Domain password"
+      "title": "비밀번호 구성",
+      "areaPassword": "영역 비밀번호",
+      "areaPasswordPlaceholder": "영역 비밀번호",
+      "domainPassword": "도메인 비밀번호",
+      "domainPasswordPlaceholder": "도메인 비밀번호"
     },
     "advanced": {
-      "title": "Advanced Options",
-      "hint": "More IS-IS configuration can be done via CLI."
+      "title": "고급 옵션",
+      "hint": "추가 IS-IS 구성은 CLI를 통해 수행할 수 있습니다."
     },
     "modal": {
-      "editInterface": "Edit IS-IS Interface",
-      "addInterface": "Add IS-IS Interface",
-      "interfaceName": "Interface Name",
-      "selectInterface": "Select an interface",
-      "metric": "Metric (0-16777215)",
-      "networkType": "Network Type",
-      "passiveMode": "Passive Mode",
-      "editRedistribute": "Edit Route Redistribution",
-      "addRedistribute": "Add Route Redistribution",
-      "protocol": "Protocol",
-      "routeMap": "Route Map",
-      "routeMapPlaceholder": "Route map name"
+      "editInterface": "IS-IS 인터페이스 편집",
+      "addInterface": "IS-IS 인터페이스 추가",
+      "interfaceName": "인터페이스 이름",
+      "selectInterface": "인터페이스 선택",
+      "metric": "메트릭(0-16777215)",
+      "networkType": "네트워크 유형",
+      "passiveMode": "패시브 모드",
+      "editRedistribute": "경로 재분배 편집",
+      "addRedistribute": "라우트 재분배 추가",
+      "protocol": "프로토콜",
+      "routeMap": "경로 맵",
+      "routeMapPlaceholder": "경로 맵 이름"
     },
     "delete": {
-      "confirmInterface": "Confirm delete the following interface?",
-      "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+      "confirmInterface": "다음 인터페이스를 삭제하시겠습니까?",
+      "confirmRedistribute": "다음 재분배 프로토콜을 삭제하시겠습니까?"
     },
     "error": {
-      "net": "NET format error: ",
-      "lspMtu": "LSP MTU error: ",
-      "interfaceNameRequired": "Interface name is required",
-      "protocolRequired": "Protocol is required"
+      "net": "NET 형식 오류: ",
+      "lspMtu": "LSP MTU 오류: ",
+      "interfaceNameRequired": "인터페이스 이름이 필요합니다",
+      "protocolRequired": "프로토콜은 필수입니다"
     },
     "routing": {
       "isis": {
         "tab": {
-          "basic": "Basic",
-          "interfaces": "Interfaces",
-          "redistribute": "Redistribute",
-          "defaultInfo": "Default Info",
-          "passwords": "Passwords",
-          "advanced": "Advanced"
+          "basic": "기본",
+          "interfaces": "인터페이스",
+          "redistribute": "재배포",
+          "defaultInfo": "기본 정보",
+          "passwords": "비밀번호",
+          "advanced": "고급"
         },
         "col": {
-          "interfaceName": "Interface Name",
-          "metric": "Metric",
-          "networkType": "Network Type",
-          "protocol": "Protocol"
+          "interfaceName": "인터페이스 이름",
+          "metric": "메트릭",
+          "networkType": "네트워크 유형",
+          "protocol": "프로토콜"
         },
         "basic": {
-          "title": "IS-IS Basic Configuration"
+          "title": "IS-IS 기본 구성"
         },
         "form": {
-          "net": "NET (Network Entity Title)",
-          "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
-          "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
-          "level": "Level",
-          "metricStyle": "Metric Style",
-          "dynamicHostname": "Dynamic Hostname",
-          "logAdjacencyChanges": "Log Adjacency Changes",
-          "purgeOriginator": "Purge Originator",
-          "setAttachedBit": "Set Attached Bit",
-          "setOverloadBit": "Set Overload Bit",
-          "lspGenInterval": "LSP Generation Interval",
+          "net": "NET(네트워크 엔터티 제목)",
+          "netPlaceholder": "예: 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+          "netTitle": "IS-IS NET 주소, 형식: 8바이트 시스템 ID + 의사 노드 ID",
+          "level": "레벨",
+          "metricStyle": "메트릭 스타일",
+          "dynamicHostname": "동적 호스트명",
+          "logAdjacencyChanges": "인접 변경 로그",
+          "purgeOriginator": "원본 제거",
+          "setAttachedBit": "첨부 비트 설정",
+          "setOverloadBit": "과부하 비트 설정",
+          "lspGenInterval": "LSP 생성 간격",
           "lspGenIntervalPlaceholder": "1-65535",
           "lspMtu": "LSP MTU",
-          "lspRefreshInterval": "LSP Refresh Interval",
+          "lspRefreshInterval": "LSP 새로 고침 간격",
           "lspRefreshIntervalPlaceholder": "1-65535",
-          "maxLspLifetime": "Max LSP Lifetime",
+          "maxLspLifetime": "최대 LSP 수명",
           "maxLspLifetimePlaceholder": "1-65535"
         },
         "defaultInfo": {
-          "title": "Default Information Originate",
-          "always": "Always Originate",
-          "metric": "Metric",
-          "routeMap": "Route Map",
-          "routeMapPlaceholder": "Route map name"
+          "title": "기본 정보 originate",
+          "always": "항상 시작",
+          "metric": "메트릭",
+          "routeMap": "경로 맵",
+          "routeMapPlaceholder": "경로 맵 이름"
         },
         "passwords": {
-          "title": "Password Configuration",
-          "areaPassword": "Area Password",
-          "areaPasswordPlaceholder": "Area password",
-          "domainPassword": "Domain Password",
-          "domainPasswordPlaceholder": "Domain password"
+          "title": "비밀번호 구성",
+          "areaPassword": "영역 비밀번호",
+          "areaPasswordPlaceholder": "영역 비밀번호",
+          "domainPassword": "도메인 비밀번호",
+          "domainPasswordPlaceholder": "도메인 비밀번호"
         },
         "advanced": {
-          "title": "Advanced Options",
-          "hint": "More IS-IS configuration can be done via CLI."
+          "title": "고급 옵션",
+          "hint": "추가 IS-IS 구성은 CLI를 통해 수행할 수 있습니다."
         },
         "modal": {
-          "editInterface": "Edit IS-IS Interface",
-          "addInterface": "Add IS-IS Interface",
-          "interfaceName": "Interface Name",
-          "selectInterface": "Select an interface",
-          "metric": "Metric (0-16777215)",
-          "networkType": "Network Type",
-          "passiveMode": "Passive Mode",
-          "editRedistribute": "Edit Route Redistribution",
-          "addRedistribute": "Add Route Redistribution",
-          "protocol": "Protocol",
-          "routeMap": "Route Map",
-          "routeMapPlaceholder": "Route map name"
+          "editInterface": "IS-IS 인터페이스 편집",
+          "addInterface": "IS-IS 인터페이스 추가",
+          "interfaceName": "인터페이스 이름",
+          "selectInterface": "인터페이스 선택",
+          "metric": "메트릭(0-16777215)",
+          "networkType": "네트워크 유형",
+          "passiveMode": "패시브 모드",
+          "editRedistribute": "경로 재분배 편집",
+          "addRedistribute": "라우트 재분배 추가",
+          "protocol": "프로토콜",
+          "routeMap": "경로 맵",
+          "routeMapPlaceholder": "경로 맵 이름"
         },
         "delete": {
-          "confirmInterface": "Confirm delete the following interface?",
-          "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+          "confirmInterface": "다음 인터페이스를 삭제하시겠습니까?",
+          "confirmRedistribute": "다음 재분배 프로토콜을 삭제하시겠습니까?"
         },
         "error": {
-          "net": "NET format error: ",
-          "lspMtu": "LSP MTU error: ",
-          "interfaceNameRequired": "Interface name is required",
-          "protocolRequired": "Protocol is required"
+          "net": "NET 형식 오류: ",
+          "lspMtu": "LSP MTU 오류: ",
+          "interfaceNameRequired": "인터페이스 이름이 필요합니다",
+          "protocolRequired": "프로토콜은 필수입니다"
         }
       }
     },
     "validation": {
-      "isisNetFormat": "Invalid NET format, should be 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
-      "isisMetricRange": "Metric must be between 0-16777215",
-      "timerRange": "Value must be within the specified range",
-      "isisLspMtuRange": "LSP MTU must be between 128-4352"
+      "isisNetFormat": "잘못된 NET 형식, 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx여야 합니다",
+      "isisMetricRange": "메트릭은 0-16777215 사이여야 합니다",
+      "timerRange": "값은 지정된 범위 내여야 합니다",
+      "isisLspMtuRange": "LSP MTU는 128-4352 사이여야 합니다"
     },
     "option": {
-      "default": "Default"
+      "default": "기본값"
     },
     "common": {
-      "confirmDelete": "Confirm Delete"
+      "confirmDelete": "삭제 확인"
     },
     "msg": {
-      "saved": "Saved successfully"
+      "saved": "성공적으로 저장됨"
+    },
+    "firewall": {
+      "options": {
+        "forward": "전달",
+        "input": "수신",
+        "name": "이름",
+        "output": "송신",
+        "prerouting": "프리라우팅",
+        "filter": "필터",
+        "raw": "Raw",
+        "defaultAction": "기본 동작",
+        "defaultActionHelp": "어떤 규칙과도 일치하지 않는 패킷에 대한 기본 동작",
+        "defaultLog": "기본 로그",
+        "defaultLogHelp": "기본 동작과 일치하는 패킷에 대한 로깅 활성화",
+        "description": "설명",
+        "descriptionHelp": "이 방화벽 체인에 대한 설명",
+        "disableConntrack": "연결 추적 비활성화",
+        "disableConntrackHelp": "이 체인의 연결 추적 비활성화",
+        "defaultJumpTarget": "기본 점프 대상",
+        "defaultJumpTargetHelp": "일치하는 규칙이 없을 때 점프할 대상 체인",
+        "nameName": "이름",
+        "accept": "수락",
+        "drop": "드롭",
+        "reject": "거부",
+        "return": "반환",
+        "continue": "계속",
+        "jump": "점프",
+        "createName": "이름 생성",
+        "editName": "이름 편집",
+        "confirmDelete": "이름 {name}을(를) 삭제하시겠습니까?",
+        "rulesetLabel": "규칙 집합"
+      }
+    },
+    "ethernet": {
+      "columns": {
+        "mode": "모드"
+      },
+      "type": {
+        "ethernet": "이더넷",
+        "vlan": "VLAN",
+        "qinq": "QinQ"
+      }
+    },
+    "interface": {
+      "bridge": {
+        "protocol_label": "프로토콜"
+      }
     }
   }
 }

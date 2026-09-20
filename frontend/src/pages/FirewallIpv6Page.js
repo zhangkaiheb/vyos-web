@@ -540,7 +540,7 @@ export default defineComponent({
           <input class="form-control" v-model="moveTargetId" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('firewall.confirmDelete')" width="400px" @confirm="confirmRemove">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('firewall.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemove">
         <div>{{ $t('firewall.confirmDeleteRule') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>

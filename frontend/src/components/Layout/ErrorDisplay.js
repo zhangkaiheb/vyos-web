@@ -40,6 +40,9 @@ export default defineComponent({
   },
   template: `
     <DraggableModal v-model:visible="visible" :title="t('error.title')" modal-class="error-modal" @confirm="clearError">
+      <template #header-prefix>
+        <span style="margin-right:4px;font-size:16px;color:#FFFF00;">⚠</span>
+      </template>
       <div v-if="err.code" style="margin-bottom:8px;"><strong>{{ t('error.code') }}</strong>{{ err.code }}</div>
       <div v-if="err.message" style="margin-bottom:8px;"><strong>{{ t('error.message') }}</strong>{{ err.message }}</div>
       <div v-if="err.detail" style="margin-bottom:8px;">
@@ -51,6 +54,9 @@ export default defineComponent({
         <strong>{{ t('error.trace') }}</strong>
         <pre style="white-space:pre-wrap;background:#f5f5f5;padding:8px;border:1px solid #ddd;font-size:11px;max-height:200px;overflow:auto;">{{ err.trace }}</pre>
       </div>
+      <template #footer>
+        <ToolbarButton icon="cancel" @click="clearError">{{ t('modal.close') }}</ToolbarButton>
+      </template>
     </DraggableModal>
   `,
   components: { DraggableModal },

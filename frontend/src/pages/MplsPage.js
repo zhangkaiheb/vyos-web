@@ -382,7 +382,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Delete Interface Confirmation Modal -->
-      <DraggableModal v-model:visible="deleteInterfaceModalVisible" :title="t('mpls.modals.confirmDelete')" width="400px" @confirm="confirmDeleteInterface">
+      <DraggableModal v-model:visible="deleteInterfaceModalVisible" :title="t('mpls.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteInterface">
         <div>{{ t('mpls.messages.confirmDeleteInterface') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteInterfaceName }}</div>
@@ -390,7 +390,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Delete LDP Interface Confirmation Modal -->
-      <DraggableModal v-model:visible="deleteLdpInterfaceModalVisible" :title="t('mpls.modals.confirmDelete')" width="400px" @confirm="confirmDeleteLdpInterface">
+      <DraggableModal v-model:visible="deleteLdpInterfaceModalVisible" :title="t('mpls.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteLdpInterface">
         <div>{{ t('mpls.messages.confirmDeleteLdpInterface') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteLdpInterfaceName }}</div>

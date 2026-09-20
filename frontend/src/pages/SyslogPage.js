@@ -285,7 +285,7 @@ export default defineComponent({
           <ToolbarButton icon="save" @click="save" :disabled="saving || loading">{{ saving ? $t('syslog.saving') : $t('syslog.confirm') }}</ToolbarButton>
         </div>
       </div>
-      <DraggableModal v-model:visible="deleteRemoteHostModalVisible" :title="$t('syslog.confirmDelete')" width="400px" @confirm="confirmDeleteRemoteHost">
+      <DraggableModal v-model:visible="deleteRemoteHostModalVisible" :title="$t('syslog.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteRemoteHost">
         <div>{{ $t('syslog.confirmDeleteRemoteHost') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteRemoteHostName }}</div>

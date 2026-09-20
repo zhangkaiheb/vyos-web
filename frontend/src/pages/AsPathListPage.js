@@ -353,13 +353,13 @@ export default defineComponent({
           </template>
         </TabGroup>
       </DraggableModal>
-      <DraggableModal v-model:visible="deleteModalVisible" :title="t('asPathList.title.confirmDelete')" width="400px" @confirm="confirmRemoveList">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('asPathList.title.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveList">
         <div>{{ t('asPathList.message.confirmDeleteList') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ruleDeleteModalVisible" :title="t('asPathList.title.confirmDelete')" width="400px" @confirm="confirmRemoveRule">
+      <DraggableModal v-model:visible="ruleDeleteModalVisible" :title="t('asPathList.title.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveRule">
         <div>{{ t('asPathList.message.confirmDeleteRule') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="num in pendingDeleteRuleNumbers" :key="num" style="padding:2px 0;">{{ num }}</div>

@@ -1,297 +1,181 @@
 import { createRouter as createVueRouter, createWebHistory } from '/src/utils/vue-router-import.js';
 import GenericTablePage from '/src/pages/GenericTablePage.js';
 import GenericConfigPage from '/src/pages/GenericConfigPage.js';
-import RuleTablePage from '/src/pages/RuleTablePage.js';
-import EthernetPage from '/src/pages/EthernetPage.js';
-import MonitorDashboard from '/src/pages/MonitorDashboard.js';
-import MonitorWidget from '/src/pages/MonitorWidget.js';
-import LogPage from '/src/pages/LogPage.js';
-import UserPage from '/src/pages/UserPage.js';
-import ProtocolPage from '/src/pages/ProtocolPage.js';
-import FirewallGlobalOptionsPage from '/src/pages/FirewallGlobalOptionsPage.js';
-import FirewallGroupPage from '/src/pages/FirewallGroupPage.js';
-import FirewallZonePage from '/src/pages/FirewallZonePage.js';
-import FirewallFlowtablePage from '/src/pages/FirewallFlowtablePage.js';
-import SettingsPage from '/src/pages/SettingsPage.js';
-import ToolPage from '/src/pages/ToolPage.js';
-import ImportExportPage from '/src/pages/ImportExportPage.js';
-import WebAppPage from '/src/pages/WebAppPage.js';
+import LoginPage from '/src/pages/LoginPage.js';
 import ShellPage from '/src/pages/ShellPage.js';
-import IpsecPage from '/src/pages/IpsecPage.js';
-import IpsecConnectionsPage from '/src/pages/IpsecConnectionsPage.js';
-import IpsecSaPage from '/src/pages/IpsecSaPage.js';
-import L2tpPage from '/src/pages/L2tpPage.js';
-import PptpPage from '/src/pages/PptpPage.js';
-import SstpPage from '/src/pages/SstpPage.js';
-import DhcpServerPage from '/src/pages/DhcpServerPage.js';
-import DhcpRelayPage from '/src/pages/DhcpRelayPage.js';
-import PptpSessionsPage from '/src/pages/PptpSessionsPage.js';
-import PptpStatisticsPage from '/src/pages/PptpStatisticsPage.js';
-import DhcpLeasesPage from '/src/pages/DhcpLeasesPage.js';
-import DhcpStaticMappingsPage from '/src/pages/DhcpStaticMappingsPage.js';
-import DhcpStatisticsPage from '/src/pages/DhcpStatisticsPage.js';
-import Dhcpv6ServerPage from '/src/pages/Dhcpv6ServerPage.js';
-import Dhcpv6RelayPage from '/src/pages/Dhcpv6RelayPage.js';
-import Dhcpv6LeasesPage from '/src/pages/Dhcpv6LeasesPage.js';
-import Dhcpv6StaticMappingsPage from '/src/pages/Dhcpv6StaticMappingsPage.js';
-import DnsPage from '/src/pages/DnsPage.js';
-import DnsDynamicStatusPage from '/src/pages/DnsDynamicStatusPage.js';
-import DnsForwardingStatisticsPage from '/src/pages/DnsForwardingStatisticsPage.js';
-import NtpPage from '/src/pages/NtpPage.js';
-import NetnsPage from '/src/pages/NetnsPage.js';
-import VrfPage from '/src/pages/VrfPage.js';
-import HighAvailabilityPage from '/src/pages/HighAvailabilityPage.js';
-import SshPage from '/src/pages/SshPage.js';
-import HttpsPage from '/src/pages/HttpsPage.js';
-import LldpPage from '/src/pages/LldpPage.js';
-import IdsDdosPage from '/src/pages/IdsDdosPage.js';
-import SuricataPage from '/src/pages/SuricataPage.js';
-import WebProxyPage from '/src/pages/WebProxyPage.js';
-import SnmpPage from '/src/pages/SnmpPage.js';
-import SshFingerprintsPage from '/src/pages/SshFingerprintsPage.js';
-import ArpPage from '/src/pages/ArpPage.js';
-import RoutePage from '/src/pages/RoutePage.js';
-import ZebraPage from '/src/pages/ZebraPage.js';
-import ActiveConnectionsPage from '/src/pages/ActiveConnectionsPage.js';
-import MemoryCachePage from '/src/pages/MemoryCachePage.js';
-import ProcessMonitorPage from '/src/pages/ProcessMonitorPage.js';
-import InterfaceStatsPage from '/src/pages/InterfaceStatsPage.js';
-import ControlPanelPage from '/src/pages/ControlPanelPage.js';
-import ConfigSyncPage from '/src/pages/ConfigSyncPage.js';
-import ConntrackSyncPage from '/src/pages/ConntrackSyncPage.js';
-import StaticRoutePage from '/src/pages/StaticRoutePage.js';
-import PolicyRoutePage from '/src/pages/PolicyRoutePage.js';
-import LocalRoutePage from '/src/pages/LocalRoutePage.js';
-import AccessListPage from '/src/pages/AccessListPage.js';
-import AccessListv6Page from '/src/pages/AccessListv6Page.js';
-import ConfigManagementPage from '/src/pages/ConfigManagementPage.js';
-import ConfigManagementSettingsPage from '/src/pages/ConfigManagementSettingsPage.js';
-import BgpPage from '/src/pages/BgpPage.js';
-import OspfPage from '/src/pages/OspfPage.js';
-import OspfV3Page from '/src/pages/OspfV3Page.js';
-import IsisPage from '/src/pages/IsisPage.js';
-import RipPage from '/src/pages/RipPage.js';
-import RipNgPage from '/src/pages/RipNgPage.js';
-import PimPage from '/src/pages/PimPage.js';
-import Pim6Page from '/src/pages/Pim6Page.js';
-import BabelPage from '/src/pages/BabelPage.js';
-import BfdPage from '/src/pages/BfdPage.js';
-import FailoverPage from '/src/pages/FailoverPage.js';
-import IgmpProxyPage from '/src/pages/IgmpProxyPage.js';
-import MplsPage from '/src/pages/MplsPage.js';
-import NhrpPage from '/src/pages/NhrpPage.js';
-import RpkiPage from '/src/pages/RpkiPage.js';
-import SegmentRoutingPage from '/src/pages/SegmentRoutingPage.js';
-import AsPathListPage from '/src/pages/AsPathListPage.js';
-import CommunityListPage from '/src/pages/CommunityListPage.js';
-import ExtcommunityListPage from '/src/pages/ExtcommunityListPage.js';
-import LargeCommunityListPage from '/src/pages/LargeCommunityListPage.js';
-import PrefixListPage from '/src/pages/PrefixListPage.js';
-import PrefixList6Page from '/src/pages/PrefixList6Page.js';
-import RouteMapPage from '/src/pages/RouteMapPage.js';
-import PkiPage from '/src/pages/PkiPage.js';
-import PkiToolPage from '/src/pages/PkiToolPage.js';
-import ConntrackPage from '/src/pages/ConntrackPage.js';
-import SourceNatPage from '/src/pages/SourceNatPage.js';
-import DestinationNatPage from '/src/pages/DestinationNatPage.js';
-import StaticNatPage from '/src/pages/StaticNatPage.js';
-import CgnatPage from '/src/pages/CgnatPage.js';
-import Nat64SourcePage from '/src/pages/Nat64SourcePage.js';
-import Nat66DestinationPage from '/src/pages/Nat66DestinationPage.js';
-import Nat66SourcePage from '/src/pages/Nat66SourcePage.js';
-import FirewallIpv6Page from '/src/pages/FirewallIpv6Page.js';
-import QosInterfacePage from '/src/pages/QosInterfacePage.js';
-import QosPolicyPage from '/src/pages/QosPolicyPage.js';
-import QosTrafficMatchGroupPage from '/src/pages/QosTrafficMatchGroupPage.js';
-import TunnelPage from '/src/pages/TunnelPage.js';
-import DummyPage from '/src/pages/DummyPage.js';
-import OpenVpnPage from '/src/pages/OpenVpnPage.js';
-import BondingPage from '/src/pages/BondingPage.js';
-import BridgePage from '/src/pages/BridgePage.js';
-import PPPoEPage from '/src/pages/PPPoEPage.js';
-import WireGuardPage from '/src/pages/WireGuardPage.js';
-import VxlanPage from '/src/pages/VxlanPage.js';
-import LoopbackPage from '/src/pages/LoopbackPage.js';
-import GenevePage from '/src/pages/GenevePage.js';
-import L2tpv3Page from '/src/pages/L2tpv3Page.js';
-import VirtualEthernetPage from '/src/pages/VirtualEthernetPage.js';
-import VtiPage from '/src/pages/VtiPage.js';
-import MacSecPage from '/src/pages/MacSecPage.js';
-import PseudoEthernetPage from '/src/pages/PseudoEthernetPage.js';
-import InputPage from '/src/pages/InputPage.js';
-import WanPage from '/src/pages/WanPage.js';
-import HaproxyPage from '/src/pages/HaproxyPage.js';
-import OpenConnectPage from '/src/pages/OpenConnectPage.js';
-import VppAclPage from '/src/pages/VppAclPage.js';
-import VppInterfacesPage from '/src/pages/VppInterfacesPage.js';
-import VppIpfixPage from '/src/pages/VppIpfixPage.js';
-import VppKernelInterfacesPage from '/src/pages/VppKernelInterfacesPage.js';
-import VppNatPage from '/src/pages/VppNatPage.js';
-import VppNat44Page from '/src/pages/VppNat44Page.js';
-import VppSettingsPage from '/src/pages/VppSettingsPage.js';
-import VppSflowPage from '/src/pages/VppSflowPage.js';
-import ContainerNamePage from '/src/pages/ContainerNamePage.js';
-import ContainerNetworkPage from '/src/pages/ContainerNetworkPage.js';
-import ContainerRegistryPage from '/src/pages/ContainerRegistryPage.js';
-import SystemLoginPage from '/src/pages/SystemLoginPage.js';
-import HostNamePage from '/src/pages/HostNamePage.js';
-import SyslogPage from '/src/pages/SyslogPage.js';
-import TaskSchedulerPage from '/src/pages/TaskSchedulerPage.js';
-import SystemIpPage from '/src/pages/SystemIpPage.js';
-import SystemIpv6Page from '/src/pages/SystemIpv6Page.js';
-import DnsServerPage from '/src/pages/DnsServerPage.js';
 import FeatureVisibilityPage from '/src/pages/FeatureVisibilityPage.js';
 
+// Lazy-loaded page components (imported on demand via dynamic import)
+const lazyPages = {
+  RuleTablePage: () => import('/src/pages/RuleTablePage.js'),
+  FirewallIpv4NameRulePage: () => import('/src/pages/FirewallIpv4NameRulePage.js'),
+  FirewallIpv6NameRulePage: () => import('/src/pages/FirewallIpv6NameRulePage.js'),
+  FirewallBridgeNameRulePage: () => import('/src/pages/FirewallBridgeNameRulePage.js'),
+  EthernetPage: () => import('/src/pages/EthernetPage.js'),
+  MonitorDashboard: () => import('/src/pages/MonitorDashboard.js'),
+  MonitorWidget: () => import('/src/pages/MonitorWidget.js'),
+  LogPage: () => import('/src/pages/LogPage.js'),
+  UserPage: () => import('/src/pages/UserPage.js'),
+  ProtocolPage: () => import('/src/pages/ProtocolPage.js'),
+  FirewallGlobalOptionsPage: () => import('/src/pages/FirewallGlobalOptionsPage.js'),
+  FirewallGroupPage: () => import('/src/pages/FirewallGroupPage.js'),
+  FirewallZonePage: () => import('/src/pages/FirewallZonePage.js'),
+  FirewallFlowtablePage: () => import('/src/pages/FirewallFlowtablePage.js'),
+  SettingsPage: () => import('/src/pages/SettingsPage.js'),
+  ToolPage: () => import('/src/pages/ToolPage.js'),
+  ImportExportPage: () => import('/src/pages/ImportExportPage.js'),
+  WebAppPage: () => import('/src/pages/WebAppPage.js'),
+  IpsecPage: () => import('/src/pages/IpsecPage.js'),
+  IpsecConnectionsPage: () => import('/src/pages/IpsecConnectionsPage.js'),
+  IpsecSaPage: () => import('/src/pages/IpsecSaPage.js'),
+  L2tpPage: () => import('/src/pages/L2tpPage.js'),
+  PptpPage: () => import('/src/pages/PptpPage.js'),
+  SstpPage: () => import('/src/pages/SstpPage.js'),
+  DhcpServerPage: () => import('/src/pages/DhcpServerPage.js'),
+  DhcpRelayPage: () => import('/src/pages/DhcpRelayPage.js'),
+  PptpSessionsPage: () => import('/src/pages/PptpSessionsPage.js'),
+  PptpStatisticsPage: () => import('/src/pages/PptpStatisticsPage.js'),
+  DhcpLeasesPage: () => import('/src/pages/DhcpLeasesPage.js'),
+  DhcpStaticMappingsPage: () => import('/src/pages/DhcpStaticMappingsPage.js'),
+  DhcpStatisticsPage: () => import('/src/pages/DhcpStatisticsPage.js'),
+  Dhcpv6ServerPage: () => import('/src/pages/Dhcpv6ServerPage.js'),
+  Dhcpv6RelayPage: () => import('/src/pages/Dhcpv6RelayPage.js'),
+  Dhcpv6LeasesPage: () => import('/src/pages/Dhcpv6LeasesPage.js'),
+  Dhcpv6StaticMappingsPage: () => import('/src/pages/Dhcpv6StaticMappingsPage.js'),
+  DnsPage: () => import('/src/pages/DnsPage.js'),
+  DnsDynamicStatusPage: () => import('/src/pages/DnsDynamicStatusPage.js'),
+  DnsForwardingStatisticsPage: () => import('/src/pages/DnsForwardingStatisticsPage.js'),
+  NtpPage: () => import('/src/pages/NtpPage.js'),
+  NetnsPage: () => import('/src/pages/NetnsPage.js'),
+  VrfPage: () => import('/src/pages/VrfPage.js'),
+  HighAvailabilityPage: () => import('/src/pages/HighAvailabilityPage.js'),
+  SshPage: () => import('/src/pages/SshPage.js'),
+  HttpsPage: () => import('/src/pages/HttpsPage.js'),
+  LldpPage: () => import('/src/pages/LldpPage.js'),
+  IdsDdosPage: () => import('/src/pages/IdsDdosPage.js'),
+  SuricataPage: () => import('/src/pages/SuricataPage.js'),
+  WebProxyPage: () => import('/src/pages/WebProxyPage.js'),
+  SnmpPage: () => import('/src/pages/SnmpPage.js'),
+  SshFingerprintsPage: () => import('/src/pages/SshFingerprintsPage.js'),
+  ArpPage: () => import('/src/pages/ArpPage.js'),
+  RoutePage: () => import('/src/pages/RoutePage.js'),
+  ZebraPage: () => import('/src/pages/ZebraPage.js'),
+  ActiveConnectionsPage: () => import('/src/pages/ActiveConnectionsPage.js'),
+  MemoryCachePage: () => import('/src/pages/MemoryCachePage.js'),
+  ProcessMonitorPage: () => import('/src/pages/ProcessMonitorPage.js'),
+  InterfaceStatsPage: () => import('/src/pages/InterfaceStatsPage.js'),
+  ControlPanelPage: () => import('/src/pages/ControlPanelPage.js'),
+  ConfigSyncPage: () => import('/src/pages/ConfigSyncPage.js'),
+  ConntrackSyncPage: () => import('/src/pages/ConntrackSyncPage.js'),
+  StaticRoutePage: () => import('/src/pages/StaticRoutePage.js'),
+  PolicyRoutePage: () => import('/src/pages/PolicyRoutePage.js'),
+  LocalRoutePage: () => import('/src/pages/LocalRoutePage.js'),
+  AccessListPage: () => import('/src/pages/AccessListPage.js'),
+  AccessListv6Page: () => import('/src/pages/AccessListv6Page.js'),
+  ConfigManagementPage: () => import('/src/pages/ConfigManagementPage.js'),
+  ConfigManagementSettingsPage: () => import('/src/pages/ConfigManagementSettingsPage.js'),
+  BgpPage: () => import('/src/pages/BgpPage.js'),
+  OspfPage: () => import('/src/pages/OspfPage.js'),
+  OspfV3Page: () => import('/src/pages/OspfV3Page.js'),
+  IsisPage: () => import('/src/pages/IsisPage.js'),
+  RipPage: () => import('/src/pages/RipPage.js'),
+  RipNgPage: () => import('/src/pages/RipNgPage.js'),
+  PimPage: () => import('/src/pages/PimPage.js'),
+  Pim6Page: () => import('/src/pages/Pim6Page.js'),
+  BabelPage: () => import('/src/pages/BabelPage.js'),
+  BfdPage: () => import('/src/pages/BfdPage.js'),
+  FailoverPage: () => import('/src/pages/FailoverPage.js'),
+  IgmpProxyPage: () => import('/src/pages/IgmpProxyPage.js'),
+  MplsPage: () => import('/src/pages/MplsPage.js'),
+  NhrpPage: () => import('/src/pages/NhrpPage.js'),
+  RpkiPage: () => import('/src/pages/RpkiPage.js'),
+  SegmentRoutingPage: () => import('/src/pages/SegmentRoutingPage.js'),
+  AsPathListPage: () => import('/src/pages/AsPathListPage.js'),
+  CommunityListPage: () => import('/src/pages/CommunityListPage.js'),
+  ExtcommunityListPage: () => import('/src/pages/ExtcommunityListPage.js'),
+  LargeCommunityListPage: () => import('/src/pages/LargeCommunityListPage.js'),
+  PrefixListPage: () => import('/src/pages/PrefixListPage.js'),
+  PrefixList6Page: () => import('/src/pages/PrefixList6Page.js'),
+  RouteMapPage: () => import('/src/pages/RouteMapPage.js'),
+  PkiPage: () => import('/src/pages/PkiPage.js'),
+  PkiToolPage: () => import('/src/pages/PkiToolPage.js'),
+  ConntrackPage: () => import('/src/pages/ConntrackPage.js'),
+  SourceNatPage: () => import('/src/pages/SourceNatPage.js'),
+  DestinationNatPage: () => import('/src/pages/DestinationNatPage.js'),
+  StaticNatPage: () => import('/src/pages/StaticNatPage.js'),
+  CgnatPage: () => import('/src/pages/CgnatPage.js'),
+  Nat64SourcePage: () => import('/src/pages/Nat64SourcePage.js'),
+  Nat66DestinationPage: () => import('/src/pages/Nat66DestinationPage.js'),
+  Nat66SourcePage: () => import('/src/pages/Nat66SourcePage.js'),
+  FirewallIpv6Page: () => import('/src/pages/FirewallIpv6Page.js'),
+  FirewallIpv6OptionsPage: () => import('/src/pages/FirewallIpv6OptionsPage.js'),
+  FirewallIpv4OptionsPage: () => import('/src/pages/FirewallIpv4OptionsPage.js'),
+  FirewallBridgeOptionsPage: () => import('/src/pages/FirewallBridgeOptionsPage.js'),
+  QosInterfacePage: () => import('/src/pages/QosInterfacePage.js'),
+  QosPolicyPage: () => import('/src/pages/QosPolicyPage.js'),
+  QosTrafficMatchGroupPage: () => import('/src/pages/QosTrafficMatchGroupPage.js'),
+  TunnelPage: () => import('/src/pages/TunnelPage.js'),
+  DummyPage: () => import('/src/pages/DummyPage.js'),
+  OpenVpnPage: () => import('/src/pages/OpenVpnPage.js'),
+  BondingPage: () => import('/src/pages/BondingPage.js'),
+  BridgePage: () => import('/src/pages/BridgePage.js'),
+  PPPoEPage: () => import('/src/pages/PPPoEPage.js'),
+  WireGuardPage: () => import('/src/pages/WireGuardPage.js'),
+  VxlanPage: () => import('/src/pages/VxlanPage.js'),
+  LoopbackPage: () => import('/src/pages/LoopbackPage.js'),
+  GenevePage: () => import('/src/pages/GenevePage.js'),
+  L2tpv3Page: () => import('/src/pages/L2tpv3Page.js'),
+  VirtualEthernetPage: () => import('/src/pages/VirtualEthernetPage.js'),
+  VtiPage: () => import('/src/pages/VtiPage.js'),
+  MacSecPage: () => import('/src/pages/MacSecPage.js'),
+  PseudoEthernetPage: () => import('/src/pages/PseudoEthernetPage.js'),
+  InputPage: () => import('/src/pages/InputPage.js'),
+  WanPage: () => import('/src/pages/WanPage.js'),
+  HaproxyPage: () => import('/src/pages/HaproxyPage.js'),
+  OpenConnectPage: () => import('/src/pages/OpenConnectPage.js'),
+  VppAclPage: () => import('/src/pages/VppAclPage.js'),
+  VppInterfacesPage: () => import('/src/pages/VppInterfacesPage.js'),
+  VppIpfixPage: () => import('/src/pages/VppIpfixPage.js'),
+  VppKernelInterfacesPage: () => import('/src/pages/VppKernelInterfacesPage.js'),
+  VppNatPage: () => import('/src/pages/VppNatPage.js'),
+  VppNat44Page: () => import('/src/pages/VppNat44Page.js'),
+  VppSettingsPage: () => import('/src/pages/VppSettingsPage.js'),
+  VppSflowPage: () => import('/src/pages/VppSflowPage.js'),
+  ContainerNamePage: () => import('/src/pages/ContainerNamePage.js'),
+  ContainerNetworkPage: () => import('/src/pages/ContainerNetworkPage.js'),
+  ContainerRegistryPage: () => import('/src/pages/ContainerRegistryPage.js'),
+  SystemLoginPage: () => import('/src/pages/SystemLoginPage.js'),
+  HostNamePage: () => import('/src/pages/HostNamePage.js'),
+  SyslogPage: () => import('/src/pages/SyslogPage.js'),
+  TaskSchedulerPage: () => import('/src/pages/TaskSchedulerPage.js'),
+  SystemIpPage: () => import('/src/pages/SystemIpPage.js'),
+  SystemIpv6Page: () => import('/src/pages/SystemIpv6Page.js'),
+  DnsServerPage: () => import('/src/pages/DnsServerPage.js'),
+};
+
+// Component map: static components + lazy-loaded pages
 const componentMap = {
   TablePage: GenericTablePage,
   ConfigPage: GenericConfigPage,
-  RuleTablePage,
-  EthernetPage,
-  MonitorDashboard,
-  MonitorWidget,
-  LogPage,
-  UserPage,
-  ProtocolPage,
-  FirewallGlobalOptionsPage,
-  FirewallGroupPage,
-  FirewallZonePage,
-  FirewallFlowtablePage,
-  SstpPage,
-  SettingsPage,
-  ToolPage,
-  ImportExportPage,
-  WebAppPage,
+  LoginPage,
   ShellPage,
-  IpsecPage,
-  IpsecConnectionsPage,
-  IpsecSaPage,
-  L2tpPage,
-  PptpPage,
-  DhcpServerPage,
-  DhcpRelayPage,
-  PptpSessionsPage,
-  PptpStatisticsPage,
-  DhcpLeasesPage,
-  DhcpStaticMappingsPage,
-  DhcpStatisticsPage,
-  Dhcpv6ServerPage,
-  Dhcpv6RelayPage,
-  Dhcpv6LeasesPage,
-  Dhcpv6StaticMappingsPage,
-  DnsPage,
-  DnsDynamicStatusPage,
-  DnsForwardingStatisticsPage,
-  NtpPage,
-  NetnsPage,
-  VrfPage,
-  HighAvailabilityPage,
-  SshPage,
-  HttpsPage,
-  LldpPage,
-  IdsDdosPage,
-  SuricataPage,
-  WebProxyPage,
-  SnmpPage,
-  SshFingerprintsPage,
-  ArpPage,
-  RoutePage,
-  ZebraPage,
-  ActiveConnectionsPage,
-  MemoryCachePage,
-  ProcessMonitorPage,
-  InterfaceStatsPage,
-  ControlPanelPage,
-  ConfigSyncPage,
-  ConntrackSyncPage,
-  StaticRoutePage,
-  PolicyRoutePage,
-  LocalRoutePage,
-  AccessListPage,
-  AccessListv6Page,
-  ConfigManagementPage,
-  ConfigManagementSettingsPage,
-  BgpPage,
-  OspfPage,
-  OspfV3Page,
-  IsisPage,
-  RipPage,
-  RipNgPage,
-  PimPage,
-  Pim6Page,
-  BabelPage,
-  BfdPage,
-  FailoverPage,
-  IgmpProxyPage,
-  MplsPage,
-  NhrpPage,
-  RpkiPage,
-  SegmentRoutingPage,
-  AsPathListPage,
-  CommunityListPage,
-  ExtcommunityListPage,
-  LargeCommunityListPage,
-  PrefixListPage,
-  PrefixList6Page,
-  RouteMapPage,
-  PkiPage,
-  PkiToolPage,
-  ConntrackPage,
-  SourceNatPage,
-  DestinationNatPage,
-  StaticNatPage,
-  CgnatPage,
-  Nat64SourcePage,
-  Nat66DestinationPage,
-  Nat66SourcePage,
-  FirewallIpv6Page,
-  QosInterfacePage,
-  QosPolicyPage,
-  QosTrafficMatchGroupPage,
-  TunnelPage,
-  DummyPage,
-  OpenVpnPage,
-  BondingPage,
-  BridgePage,
-  PPPoEPage,
-  WireGuardPage,
-  VxlanPage,
-  LoopbackPage,
-  GenevePage,
-  L2tpv3Page,
-  VirtualEthernetPage,
-  VtiPage,
-  MacSecPage,
-  PseudoEthernetPage,
-  InputPage,
-  WanPage,
-  HaproxyPage,
-  OpenConnectPage,
-  VppAclPage,
-  VppInterfacesPage,
-  VppIpfixPage,
-  VppKernelInterfacesPage,
-  VppNatPage,
-  VppNat44Page,
-  VppSettingsPage,
-  VppSflowPage,
-  ContainerNamePage,
-  ContainerNetworkPage,
-  ContainerRegistryPage,
-  SystemLoginPage,
-  HostNamePage,
-  SyslogPage,
-  TaskSchedulerPage,
-  SystemIpPage,
-  SystemIpv6Page,
-  DnsServerPage,
   FeatureVisibilityPage,
 };
+
+function getComponent(componentName) {
+  // First check static components
+  if (componentMap[componentName]) return componentMap[componentName];
+  // Then check lazy-loaded pages
+  if (lazyPages[componentName]) return lazyPages[componentName];
+  // Fallback
+  return GenericConfigPage;
+}
 
 function buildRoutes(menu, parentPath = '') {
   const routes = [];
   for (const item of menu) {
     if (item.route) {
-      const comp = componentMap[item.component] || GenericConfigPage;
+      const comp = getComponent(item.component);
       routes.push({
         path: item.route,
         name: item.route,

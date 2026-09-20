@@ -294,7 +294,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="deleteModalVisible" :title="t('config.confirmDelete')" width="400px" @confirm="confirmRemove">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemove">
         <div>{{ t('nat64.source.confirmDelete') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="id in pendingDeleteNames" :key="id" style="padding:2px 0;">{{ id }}</div>

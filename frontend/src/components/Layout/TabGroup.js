@@ -39,12 +39,12 @@ export default defineComponent({
       )),
       props.headersOnly
         ? null
-        : h('div', { class: 'tab-panels' }, props.tabs.map(tab =>
-            h('div', {
-              class: 'tab-panel',
-              style: { display: active.value === tab.key ? 'block' : 'none' }
-            }, slots[tab.key] ? slots[tab.key]() : [])
-          ))
+        : h('div', { class: 'tab-panels' }, (() => {
+            const tab = props.tabs.find(t => t.key === active.value);
+            return tab && slots[tab.key]
+              ? h('div', { class: 'tab-panel' }, slots[tab.key]())
+              : null;
+          })())
     ]);
   },
 });

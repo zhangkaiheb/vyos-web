@@ -11,18 +11,17 @@ import re
 import subprocess
 import traceback
 
-import vyos.config
-import vyos.configsession
+from services.config_reader_client import read_config as _daemon_read_config
 
 _logger = logging.getLogger('interface_service')
 
 
 def _read_config_subprocess(path_list, effective=True):
-    """Read VyOS config in a subprocess to avoid corrupting ConfigSession state.
+    """Read VyOS config via persistent daemon subprocess.
     
-    vyos.config.Config() corrupts the C library state (libvyatta-cfg) which
-    breaks ConfigSession instances in the same process. Running in a subprocess
-    ensures complete isolation.
+    This is a drop-in replacement for the old subprocess-per-call approach.
+    The persistent daemon holds a Config instance and serves read requests
+    via Unix socket IPC, avoiding the ~10s Config() initialization overhead.
     
     Args:
         path_list: List of config path components (e.g., ['interfaces', 'ethernet'])
@@ -31,36 +30,11 @@ def _read_config_subprocess(path_list, effective=True):
     Returns:
         Dict of config data, or empty dict on error
     """
+    _logger.info(f'[_read_config_subprocess] path={path_list}, effective={effective}')
     try:
-        _logger.info(f'[_read_config_subprocess] START: path={path_list}, effective={effective}')
-        # Build command to read config in subprocess
-        cmd = [
-            'python3', '-c',
-            f"""
-import sys, json
-sys.path.insert(0, '/usr/libexec/vyos')
-import vyos.config
-try:
-    cfg = vyos.config.Config()
-    path = {json.dumps(path_list)}
-    if not path:
-        data = cfg.get_cached_root_dict(effective={effective})
-    else:
-        data = cfg.get_config_dict(path, effective={effective}, get_first_key=True)
-    print(json.dumps(data))
-except Exception as e:
-    print(json.dumps({{'error': str(e)}}), file=sys.stderr)
-    sys.exit(1)
-"""
-        ]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
-        if result.returncode == 0 and result.stdout.strip():
-            data = json.loads(result.stdout.strip())
-            _logger.info(f'[_read_config_subprocess] SUCCESS: got {len(data) if isinstance(data, dict) else "non-dict"} keys')
-            return data
-        else:
-            _logger.warning(f'[_read_config_subprocess] FAILED: rc={result.returncode}, stderr={result.stderr[:200]}')
-            return {}
+        data = _daemon_read_config(path_list, effective)
+        _logger.info(f'[_read_config_subprocess] SUCCESS: got {len(data) if isinstance(data, dict) else "non-dict"} keys')
+        return data
     except Exception as e:
         _logger.error(f'[_read_config_subprocess] EXCEPTION: {e}', exc_info=True)
         return {}
@@ -76,18 +50,69 @@ def _run_op_mode_interfaces(intf_type='ethernet', intf_name=''):
         f"vif=False, vrrp=False, raw=True)))"
     ]
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        # Pass clean environment to avoid SIGSEGV from polluted os.environ
+        clean_env = {
+            'PATH': '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+            'HOME': os.environ.get('HOME', '/root'),
+            'USER': os.environ.get('USER', 'root'),
+        }
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30, env=clean_env)
+        _logger.info(f'[_run_op_mode_interfaces] returncode={result.returncode}, stdout_len={len(result.stdout)}, stderr_len={len(result.stderr)}')
+        if result.stderr:
+            _logger.warning(f'[_run_op_mode_interfaces] stderr: {result.stderr[:500]}')
         if result.returncode == 0 and result.stdout.strip():
             return json.loads(result.stdout.strip())
-    except Exception:
-        traceback.print_exc()
+        else:
+            _logger.error(f'[_run_op_mode_interfaces] Failed: rc={result.returncode}, stdout={result.stdout[:200]}, stderr={result.stderr[:200]}')
+    except Exception as e:
+        _logger.error(f'[_run_op_mode_interfaces] Exception: {e}', exc_info=True)
     return []
+
+
+def _batch_parse_ethtool_speed(ifnames):
+    """Return dict of {ifname: speed_string} for all interfaces in a single subprocess call."""
+    if not ifnames:
+        return {}
+    try:
+        # Use a single Python subprocess to query all interfaces at once
+        names_json = json.dumps(ifnames)
+        cmd = [
+            'python3', '-c',
+            f"""
+import sys, json, subprocess, re
+ifnames = {names_json}
+result = {{}}
+for name in ifnames:
+    try:
+        r = subprocess.run(['/usr/sbin/ethtool', name], capture_output=True, text=True, timeout=5)
+        if r.returncode == 0:
+            m = re.search(r'Speed:\\s*(\\S+)', r.stdout)
+            if m:
+                speed = m.group(1)
+                if speed != 'Unknown!':
+                    result[name] = speed
+    except Exception:
+        pass
+print(json.dumps(result))
+"""
+        ]
+        clean_env = {
+            'PATH': '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+            'HOME': os.environ.get('HOME', '/root'),
+            'USER': os.environ.get('USER', 'root'),
+        }
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=30, env=clean_env)
+        if r.returncode == 0 and r.stdout.strip():
+            return json.loads(r.stdout.strip())
+    except Exception:
+        pass
+    return {}
 
 
 def _parse_ethtool_speed(ifname):
     """Return link speed string from ethtool (e.g. '1000Mb/s') or ''."""
     try:
-        result = subprocess.run(['ethtool', ifname], capture_output=True, text=True, timeout=5)
+        result = subprocess.run(['/usr/sbin/ethtool', ifname], capture_output=True, text=True, timeout=5)
         if result.returncode == 0:
             m = re.search(r'Speed:\s*(\S+)', result.stdout)
             if m:
@@ -223,10 +248,10 @@ def _detect_interface_type(ifname):
     """Classify interface as ethernet, vlan or qinq based on name."""
     dot_count = ifname.count('.')
     if dot_count == 0:
-        return '以太网'
+        return 'ethernet'
     if dot_count == 1:
-        return 'VLAN'
-    return 'QinQ'
+        return 'vlan'
+    return 'qinq'
 
 
 def _get_bridge_members():
@@ -268,6 +293,10 @@ class InterfaceService:
             cfg_data = _get_interface_config(['interfaces', 'ethernet'])
             deleted_ifaces = _get_deleted_ethernet_interfaces(user)
             bridge_members = _get_bridge_members()
+
+            # Batch query ethtool speed for all interfaces at once
+            all_names = [item.get('ifname', '') for item in op_data if item.get('ifname', '')]
+            speed_map = _batch_parse_ethtool_speed(all_names)
             _logger.info(f'[get_ethernet_interfaces] op_data count={len(op_data)}, cfg_data keys={list(cfg_data.keys())}, deleted={deleted_ifaces}, bridge_members={bridge_members}')
 
             rows = []
@@ -316,7 +345,7 @@ class InterfaceService:
                     'ipv6_address': ipv6,
                     'mac': item.get('address') or iface_cfg.get('hw-id') or iface_cfg.get('mac') or '',
                     'mtu': item.get('mtu', ''),
-                    'speed': _parse_ethtool_speed(name),
+                    'speed': speed_map.get(name, ''),
                     'vrf': iface_cfg.get('vrf', ''),
                     'vif': vif,
                     'vif_s': vif_s,

@@ -1,6 +1,9 @@
 import { ref, computed, watch, reactive } from '/src/utils/vue-import.js';
 
-const MODULES = ['common', 'firewall', 'interfaces', 'bridge', 'system', 'systemIp', 'systemIpv6', 'monitor', 'monitorDashboard', 'monitorWidget', 'logs', 'user', 'arp', 'pim', 'pim6', 'wan', 'pseudoEthernet', 'dummy', 'highAvailability', 'bgp', 'routeMap', 'configManagement', 'configManagementSettings', 'policyRoute', 'ipsec', 'ipsecConnections', 'ipsecSa', 'qosMatch', 'qosPolicy', 'qosInterface', 'pptp', 'pptpSessions', 'pptpStatistics', 'vppIpfix', 'vppSflow', 'failover', 'conntrackSync', 'containerRegistry', 'prefixList', 'prefixList6', 'extcommunityList', 'largeCommunityList', 'communityList', 'controlPanel', 'babel', 'asPathList', 'localRoute', 'ospf', 'ospfv3', 'isis', 'taskScheduler', 'configSync', 'input', 'openvpn', 'segmentRouting', 'dhcp', 'dhcpLeases', 'dhcpStatistics', 'dhcprelay', 'dhcpv6', 'dhcpv6Leases', 'dhcpv6relay', 'zebra', 'virtualEthernet', 'importExport', 'dnsServer', 'activeConnections', 'memoryCache', 'webApp', 'dnsForwardingStatistics', 'processMonitor', 'suricata', 'sshFingerprints', 'dnsDynamicStatus', 'haproxy', 'tool', 'rip', 'ripng', 'l2tp', 'l2tpv3', 'geneve', 'pppoe', 'netns', 'settings', 'vrf', 'genericConfig', 'staticRoute', 'wireguard', 'sstp', 'accessList', 'accessListv6', 'bfd', 'cgnat', 'containerName', 'containerNetwork', 'hostName', 'https', 'idsDdos', 'igmpProxy', 'interfaceStats', 'lldp', 'log', 'macSec', 'mpls', 'sourceNat', 'destinationNat', 'staticNat', 'nat66', 'nat64', 'nhrp', 'ntp', 'openConnect', 'pki', 'protocol', 'routing', 'rpki', 'snmp', 'ssh', 'vppAcl', 'vppInterfaces', 'vppNat', 'vppSettings', 'webProxy'];
+// Essential modules needed for login and basic UI (loaded first)
+const ESSENTIAL_MODULES = ['common', 'system', 'user', 'settings', 'firewall'];
+// All modules including optional ones (loaded in background after login)
+const OPTIONAL_MODULES = ['firewall', 'interfaces', 'bridge', 'systemIp', 'systemIpv6', 'monitor', 'monitorDashboard', 'monitorWidget', 'logs', 'arp', 'pim', 'pim6', 'wan', 'pseudoEthernet', 'dummy', 'highAvailability', 'bgp', 'routeMap', 'configManagement', 'configManagementSettings', 'policyRoute', 'ipsec', 'ipsecConnections', 'ipsecSa', 'qosMatch', 'qosPolicy', 'qosInterface', 'pptp', 'pptpSessions', 'pptpStatistics', 'vppIpfix', 'vppSflow', 'failover', 'conntrackSync', 'containerRegistry', 'prefixList', 'prefixList6', 'extcommunityList', 'largeCommunityList', 'communityList', 'controlPanel', 'babel', 'asPathList', 'localRoute', 'ospf', 'ospfv3', 'isis', 'taskScheduler', 'configSync', 'input', 'openvpn', 'segmentRouting', 'dhcp', 'dhcpLeases', 'dhcpStatistics', 'dhcprelay', 'dhcpv6', 'dhcpv6Leases', 'dhcpv6relay', 'zebra', 'virtualEthernet', 'importExport', 'dnsServer', 'activeConnections', 'memoryCache', 'webApp', 'dnsForwardingStatistics', 'processMonitor', 'suricata', 'sshFingerprints', 'dnsDynamicStatus', 'haproxy', 'tool', 'rip', 'ripng', 'l2tp', 'l2tpv3', 'geneve', 'pppoe', 'netns', 'vrf', 'genericConfig', 'staticRoute', 'wireguard', 'sstp', 'accessList', 'accessListv6', 'bfd', 'cgnat', 'containerName', 'containerNetwork', 'hostName', 'https', 'idsDdos', 'igmpProxy', 'interfaceStats', 'lldp', 'log', 'macSec', 'mpls', 'sourceNat', 'destinationNat', 'staticNat', 'nat66', 'nat64', 'nhrp', 'ntp', 'openConnect', 'pki', 'protocol', 'routing', 'rpki', 'snmp', 'ssh', 'vppAcl', 'vppInterfaces', 'vppNat', 'vppSettings', 'webProxy'];
 const LOCALES = ['zh-CN', 'zh-TW', 'en', 'ru', 'de', 'fr', 'ko'];
 
 const localeNames = {
@@ -222,51 +225,78 @@ function deepMerge(target, source) {
   return target;
 }
 
+async function fetchModule(module) {
+  try {
+    const res = await fetch(`/src/i18n/locales/${module}.json?t=${Date.now()}`);
+    if (!res.ok) {
+      console.warn(`[i18n] Failed to load ${module}.json: ${res.status}`);
+      return null;
+    }
+    return await res.json();
+  } catch (e) {
+    console.error(`[i18n] Error loading ${module}.json:`, e);
+    return null;
+  }
+}
+
+function mergeResults(results) {
+  const mergedData = {};
+  for (const data of results) {
+    if (!data) continue;
+    for (const loc of LOCALES) {
+      if (data[loc]) {
+        if (!mergedData[loc]) mergedData[loc] = {};
+        deepMerge(mergedData[loc], data[loc]);
+      }
+    }
+  }
+  for (const loc of LOCALES) {
+    if (mergedData[loc]) {
+      // Build on top of existing loadedMessages (if any) to preserve
+      // keys merged from previous calls (e.g. essential -> optional)
+      const base = loadedMessages[loc]
+        ? JSON.parse(JSON.stringify(loadedMessages[loc]))
+        : JSON.parse(JSON.stringify(defaultMessages[loc] || defaultMessages['en']));
+      deepMerge(base, mergedData[loc]);
+      loadedMessages[loc] = base;
+    }
+  }
+  loadVersion.value++;
+}
+
+// Load essential modules first (for login page)
+export async function loadEssentialLocales() {
+  loadState.value.loading = true;
+  loadState.value.error = '';
+  try {
+    const results = await Promise.all(ESSENTIAL_MODULES.map(fetchModule));
+    mergeResults(results);
+  } catch (e) {
+    loadState.value.error = e.message;
+    console.error('[i18n] loadEssentialLocales failed:', e);
+  } finally {
+    loadState.value.loading = false;
+  }
+}
+
+// Load all remaining modules in background (after login)
+export async function loadOptionalLocales() {
+  try {
+    const results = await Promise.all(OPTIONAL_MODULES.map(fetchModule));
+    mergeResults(results);
+  } catch (e) {
+    console.error('[i18n] loadOptionalLocales failed:', e);
+  }
+}
+
+// Backward compatibility: load all at once
 export async function loadLocales() {
   loadState.value.loading = true;
   loadState.value.error = '';
   try {
-    const results = await Promise.all(MODULES.map(async (module) => {
-      try {
-        const res = await fetch(`/src/i18n/locales/${module}.json?t=${Date.now()}`);
-        if (!res.ok) {
-          console.warn(`[i18n] Failed to load ${module}.json: ${res.status}`);
-          return null;
-        }
-        const data = await res.json();
-        return data;
-      } catch (e) {
-        console.error(`[i18n] Error loading ${module}.json:`, e);
-        return null;
-      }
-    }));
-    
-    // Accumulate all module data for each locale
-    const mergedData = {};
-    let successCount = 0;
-    for (const data of results) {
-      if (!data) continue;
-      successCount++;
-      for (const loc of LOCALES) {
-        if (data[loc]) {
-          if (!mergedData[loc]) mergedData[loc] = {};
-          deepMerge(mergedData[loc], data[loc]);
-        }
-      }
-    }
-    
-    // Merge accumulated data into loadedMessages
-    for (const loc of LOCALES) {
-      if (mergedData[loc]) {
-        // Create a new object to ensure Vue reactivity detects the change
-        const base = JSON.parse(JSON.stringify(defaultMessages[loc] || defaultMessages['en']));
-        deepMerge(base, mergedData[loc]);
-        loadedMessages[loc] = base;
-      }
-    }
-    
-    // Increment version to trigger re-evaluation of message computed
-    loadVersion.value++;
+    const allModules = [...ESSENTIAL_MODULES, ...OPTIONAL_MODULES];
+    const results = await Promise.all(allModules.map(fetchModule));
+    mergeResults(results);
   } catch (e) {
     loadState.value.error = e.message;
     console.error('[i18n] loadLocales failed:', e);

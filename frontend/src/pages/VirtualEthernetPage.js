@@ -449,7 +449,7 @@ export default defineComponent({
           </TabGroup>
         </template>
       </DraggableModal>
-      <DraggableModal v-model:visible="deleteModalVisible" :title="t('veth.modals.confirmDelete')" width="400px" @confirm="confirmRemove">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('veth.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemove">
         <div>{{ t('veth.messages.confirmDelete') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>

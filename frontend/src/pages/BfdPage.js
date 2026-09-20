@@ -352,14 +352,14 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Delete Confirmation Modals -->
-      <DraggableModal v-model:visible="deletePeerModalVisible" :title="t('bfd.modals.confirmDelete')" width="400px" @confirm="confirmDeletePeer">
+      <DraggableModal v-model:visible="deletePeerModalVisible" :title="t('bfd.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeletePeer">
         <div>{{ t('bfd.messages.confirmDeletePeer') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeletePeerNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="deleteProfileModalVisible" :title="t('bfd.modals.confirmDelete')" width="400px" @confirm="confirmDeleteProfile">
+      <DraggableModal v-model:visible="deleteProfileModalVisible" :title="t('bfd.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteProfile">
         <div>{{ t('bfd.messages.confirmDeleteProfile') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteProfileNames" :key="name" style="padding:2px 0;">{{ name }}</div>

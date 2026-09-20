@@ -38,6 +38,8 @@ from services.system_service import SystemService
 from services.interface_service import InterfaceService
 from services.notification_service import NotificationService
 from services.collector import start_collector
+from services.config_reader_client import start_daemon as start_config_daemon
+from services.config_reader_client import stop_daemon as stop_config_daemon
 from utils.response import json_response, sse_response, error_response
 from utils.auth_middleware import AuthMiddleware
 
@@ -48,6 +50,9 @@ start_collector()
 
 class VyOSWebApp:
     def __init__(self):
+        # Start config reader daemon for fast config reads
+        start_config_daemon()
+        
         self.auth_service = AuthService()
         self.config_service = ConfigService()
         self.monitor_service = MonitorService()
@@ -58,6 +63,13 @@ class VyOSWebApp:
         self.notification_service = NotificationService()
         self.auth_middleware = AuthMiddleware(self.auth_service)
         self.routes = self._register_routes()
+    
+    def __del__(self):
+        """Cleanup on app shutdown."""
+        try:
+            stop_config_daemon()
+        except Exception:
+            pass
 
     def _register_routes(self):
         return {
@@ -200,6 +212,29 @@ class VyOSWebApp:
 
         # API routes
         if not path.startswith('/api/'):
+            # Serve static files directly from filesystem
+            if method == 'GET':
+                frontend_dir = os.path.join(BASE_DIR, '..', 'frontend')
+                static_path = os.path.normpath(os.path.join(frontend_dir, path.lstrip('/')))
+                # Security: ensure path is within frontend directory
+                if static_path.startswith(os.path.normpath(frontend_dir)) and os.path.isfile(static_path):
+                    ext = os.path.splitext(static_path)[1].lower()
+                    content_types = {
+                        '.html': 'text/html; charset=utf-8',
+                        '.js': 'application/javascript; charset=utf-8',
+                        '.json': 'application/json; charset=utf-8',
+                        '.css': 'text/css; charset=utf-8',
+                        '.png': 'image/png',
+                        '.jpg': 'image/jpeg',
+                        '.svg': 'image/svg+xml',
+                        '.ico': 'image/x-icon',
+                    }
+                    content_type = content_types.get(ext, 'application/octet-stream')
+                    with open(static_path, 'rb') as f:
+                        content = f.read()
+                    headers = [('Content-Type', content_type)]
+                    start_response('200 OK', headers)
+                    return [content]
             # SPA fallback: serve index.html for all non-API routes
             if method == 'GET':
                 index_path = os.path.join(BASE_DIR, '..', 'frontend', 'index.html')

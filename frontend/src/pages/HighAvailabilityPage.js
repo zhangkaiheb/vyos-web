@@ -1063,7 +1063,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Virtual Server Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="vsDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" width="400px" @confirm="confirmRemoveVS">
+      <DraggableModal v-model:visible="vsDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveVS">
         <div>{{ t('highAvailability.messages.confirmDeleteVS') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteVSNames" :key="name" style="padding:2px 0;">{{ name }}</div>
@@ -1071,7 +1071,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Real Server Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="rsDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRS">
+      <DraggableModal v-model:visible="rsDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveRS">
         <div>{{ t('highAvailability.messages.confirmDeleteRS') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteRSNames" :key="name" style="padding:2px 0;">{{ name }}</div>
@@ -1079,7 +1079,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- VRRP Group Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="vrrpDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" width="400px" @confirm="confirmRemoveVRRPGroup">
+      <DraggableModal v-model:visible="vrrpDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveVRRPGroup">
         <div>{{ t('highAvailability.messages.confirmDeleteVRRP') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteVRRPNames" :key="name" style="padding:2px 0;">{{ name }}</div>
@@ -1087,7 +1087,7 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Sync Group Delete Confirmation Modal -->
-      <DraggableModal v-model:visible="syncDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" width="400px" @confirm="confirmRemoveSyncGroup">
+      <DraggableModal v-model:visible="syncDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemoveSyncGroup">
         <div>{{ t('highAvailability.messages.confirmDeleteSync') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteSyncNames" :key="name" style="padding:2px 0;">{{ name }}</div>

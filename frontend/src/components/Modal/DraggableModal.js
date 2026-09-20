@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, onUnmounted, watch, inject } from '/src/utils/vue-import.js';
+import { defineComponent, ref, onUnmounted, watch, inject } from '/src/utils/vue-import.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
 export default defineComponent({
@@ -10,6 +10,7 @@ export default defineComponent({
     modalClass: { type: String, default: '' },
     hideFooter: { type: Boolean, default: false },
     zIndex: { type: Number, default: null },
+    headerIcon: { type: String, default: '' },
   },
   emits: ['update:visible', 'close', 'confirm'],
   setup(props, { emit }) {
@@ -56,6 +57,12 @@ export default defineComponent({
       window.removeEventListener('mouseup', onMouseUp);
     }
 
+    function onOverlayClick(e) {
+      if (e.target === e.currentTarget) {
+        close();
+      }
+    }
+
     function close() {
       emit('update:visible', false);
       emit('close');
@@ -72,13 +79,15 @@ export default defineComponent({
       document.body.style.userSelect = '';
     });
 
-    return { modalRef, close, confirm, onMouseDown, translate, t };
+    return { modalRef, close, confirm, onMouseDown, onOverlayClick, translate, t };
   },
   components: { ToolbarButton },
   template: `
-    <div v-if="visible" class="modal-overlay" :class="modalClass" :style="zIndex !== null ? { zIndex } : {}">
-      <div ref="modalRef" class="modal-container" :style="{ width, transform: 'translate(' + translate.x + 'px, ' + translate.y + 'px)' }" @mousedown="onMouseDown">
+    <div v-if="visible" class="modal-overlay" :class="modalClass" :style="zIndex !== null ? { zIndex } : {}" @mousedown.stop>
+      <div ref="modalRef" class="modal-container" :style="{ width, transform: 'translate(' + translate.x + 'px, ' + translate.y + 'px)' }" @mousedown="onMouseDown" @click.stop>
         <div class="modal-header">
+          <svg v-if="headerIcon" style="margin-right:4px;width:16px;height:16px;fill:#FF8C00;vertical-align:middle;position:relative;top:1px;" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+          <slot name="header-prefix"></slot>
           <span class="modal-title">{{ title }}</span>
           <button class="modal-close" @click="close">×</button>
         </div>

@@ -356,6 +356,7 @@ export default defineComponent({
     });
 
     async function load() {
+      selected.value = [];
       loading.value = true;
       try {
         const res = await configStore.getConfig(rulePath.value, true);
@@ -616,7 +617,7 @@ export default defineComponent({
           <ToolbarButton icon="import" @click="openImport" :disabled="writeDisabled">{{ $t('firewall.importExcel') }}</ToolbarButton>
         </div>
       </div>
-      <DataTable ref="dataTableRef" :columns="columns" :data="data" :loading="loading" :disabled="writeDisabled"
+      <DataTable ref="dataTableRef" :key="path" :columns="columns" :data="data" :loading="loading" :disabled="writeDisabled"
                  @selection-change="selected = $event" :selectable="true" :externalToolbar="true">
         <template #source="{ row }">
           {{ formatEndpoint(row.source) }}
@@ -640,7 +641,7 @@ export default defineComponent({
       <DraggableModal v-model:visible="modalVisible" :title="editingItem?.id ? $t('firewall.editRule') : $t('firewall.createRule')" width="820px" @confirm="save">
         <TabGroup v-model="activeTab" :tabs="tabs">
           <template v-for="tab in tabs" :key="tab.key" #[tab.key]>
-            <ConfigForm v-model="editingItem" :schema="tabSchemas[tab.key]" :disabled="writeDisabled" :showAdvanced="true" :formKey="'firewall_rule_' + path + '_' + tab.key" :suggestionPath="rulePath" :editMode="!!editingItem?.id" />
+            <ConfigForm v-model="editingItem" :schema="tabSchemas[tab.key]" :disabled="writeDisabled" :showAdvanced="true" :formKey="'firewall_rule_' + path + '_' + tab.key" :suggestionPath="rulePath" :editMode="!!editingItem?.id" :key="'firewall_rule_' + path + '_' + tab.key + '_' + (editingItem?.id || 'new')" />
           </template>
         </TabGroup>
       </DraggableModal>
@@ -684,7 +685,7 @@ export default defineComponent({
         </div>
         <div v-else style="padding:20px;color:#999;text-align:center;">{{ $t('firewall.selectFileToPreview') }}</div>
       </DraggableModal>
-      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemove">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('config.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmRemove">
         <div>{{ $t('msg.confirmDeleteRules') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>

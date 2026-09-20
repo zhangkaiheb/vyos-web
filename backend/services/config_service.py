@@ -19,9 +19,9 @@ import traceback
 from datetime import datetime
 from functools import wraps
 
-import vyos.config
-import vyos.configsession
 from utils.database import get_db_connection
+from services.config_reader_client import read_config as _daemon_read_config
+from services.config_reader_client import reload_config as _daemon_reload_config
 
 _logger = logging.getLogger('config_service')
 
@@ -99,6 +99,7 @@ def _create_config_session(token):
         # Temporarily replace os.environ with the isolated copy
         os.environ = session_environ
         try:
+            import vyos.configsession
             session = vyos.configsession.ConfigSession(session_id, app=APP_NAME)
             # Verify the session is using our isolated copy
             session_env_attr = session._ConfigSession__session_env
@@ -238,11 +239,11 @@ def _list_to_path(path_list):
 
 
 def _read_config_subprocess(path_list, effective=True):
-    """Read VyOS config in a subprocess to avoid corrupting ConfigSession state.
+    """Read VyOS config via persistent daemon subprocess.
     
-    vyos.config.Config() corrupts the C library state (libvyatta-cfg) which
-    breaks ConfigSession instances in the same process. Running in a subprocess
-    ensures complete isolation.
+    This is a drop-in replacement for the old subprocess-per-call approach.
+    The persistent daemon holds a Config instance and serves read requests
+    via Unix socket IPC, avoiding the ~10s Config() initialization overhead.
     
     Args:
         path_list: List of config path components (e.g., ['interfaces', 'ethernet'])
@@ -251,36 +252,11 @@ def _read_config_subprocess(path_list, effective=True):
     Returns:
         Dict of config data, or empty dict on error
     """
+    _logger.info(f'[_read_config_subprocess] path={path_list}, effective={effective}')
     try:
-        _logger.info(f'[_read_config_subprocess] START: path={path_list}, effective={effective}')
-        # Build command to read config in subprocess
-        cmd = [
-            'python3', '-c',
-            f"""
-import sys, json
-sys.path.insert(0, '/usr/libexec/vyos')
-import vyos.config
-try:
-    cfg = vyos.config.Config()
-    path = {json.dumps(path_list)}
-    if not path:
-        data = cfg.get_cached_root_dict(effective={effective})
-    else:
-        data = cfg.get_config_dict(path, effective={effective}, key_mangling=('-', '_'), get_first_key=True, no_tag_node_value_mangle=True)
-    print(json.dumps(data))
-except Exception as e:
-    print(json.dumps({{'error': str(e)}}), file=sys.stderr)
-    sys.exit(1)
-"""
-        ]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
-        if result.returncode == 0 and result.stdout.strip():
-            data = json.loads(result.stdout.strip())
-            _logger.info(f'[_read_config_subprocess] SUCCESS: got {len(data) if isinstance(data, dict) else "non-dict"} keys')
-            return data
-        else:
-            _logger.warning(f'[_read_config_subprocess] FAILED: rc={result.returncode}, stderr={result.stderr[:200]}')
-            return {}
+        data = _daemon_read_config(path_list, effective)
+        _logger.info(f'[_read_config_subprocess] SUCCESS: got {len(data) if isinstance(data, dict) else "non-dict"} keys')
+        return data
     except Exception as e:
         _logger.error(f'[_read_config_subprocess] EXCEPTION: {e}', exc_info=True)
         return {}
@@ -532,19 +508,20 @@ def _handle_config_exception(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except vyos.configsession.ConfigSessionError as e:
-            return _structured_error(
-                'CONFIG_SESSION_ERROR', str(e), str(e),
-                suggestion='请根据 VyOS 命令行返回的报错信息修正配置后重新提交',
-                trace=traceback.format_exc()
-            )
-        except ValueError as e:
-            return _structured_error(
-                'VALIDATION_ERROR', str(e), str(e),
-                suggestion='请检查输入参数格式',
-                trace=traceback.format_exc()
-            )
         except Exception as e:
+            import vyos.configsession as _vcs
+            if isinstance(e, _vcs.ConfigSessionError):
+                return _structured_error(
+                    'CONFIG_SESSION_ERROR', str(e), str(e),
+                    suggestion='请根据 VyOS 命令行返回的报错信息修正配置后重新提交',
+                    trace=traceback.format_exc()
+                )
+            if isinstance(e, ValueError):
+                return _structured_error(
+                    'VALIDATION_ERROR', str(e), str(e),
+                    suggestion='请检查输入参数格式',
+                    trace=traceback.format_exc()
+                )
             traceback.print_exc()
             return _structured_error(
                 'INTERNAL_ERROR', str(e), str(e),
@@ -835,11 +812,13 @@ class ConfigService:
                 _log_action(username, 'set', _list_to_path(path_list), {'value': value})
                 return {'success': True, 'message': '配置已设置'}
 
-            except vyos.configsession.ConfigSessionError as e:
-                if attempt == 0 and self._is_session_expired_error(e):
-                    _logger.warning(f'[set_config] Session expired, invalidating and retrying...')
-                    _invalidate_and_recreate_session(token)
-                    continue
+            except Exception as e:
+                import vyos.configsession as _vcs
+                if isinstance(e, _vcs.ConfigSessionError):
+                    if attempt == 0 and self._is_session_expired_error(e):
+                        _logger.warning(f'[set_config] Session expired, invalidating and retrying...')
+                        _invalidate_and_recreate_session(token)
+                        continue
                 raise
 
         # Should not reach here
@@ -883,6 +862,8 @@ class ConfigService:
         session = _get_config_session(token)
         out = session.commit()
         _log_action(username, 'commit', '', {'output': out})
+        # Reload daemon config after commit
+        _daemon_reload_config()
         return {'success': True, 'message': '配置提交成功', 'output': out}
 
     @_handle_config_exception
@@ -892,6 +873,8 @@ class ConfigService:
         session = _get_config_session(token)
         out = session.commit(comment=comment)
         _log_action(username, 'commit', comment, {'output': out})
+        # Reload daemon config after commit
+        _daemon_reload_config()
         return {'success': True, 'message': '配置提交成功', 'output': out}
 
     @_handle_config_exception
@@ -1497,11 +1480,13 @@ class ConfigService:
                 else:
                     session.set(path, value)
                 return  # Success
-            except vyos.configsession.ConfigSessionError as e:
-                if attempt < max_retries - 1 and self._is_session_expired_error(e) and token:
-                    _logger.warning(f'[_session_set_with_retry] Session expired, recreating (attempt {attempt+1}/{max_retries})...')
-                    session = _invalidate_and_recreate_session(token)
-                    continue
+            except Exception as e:
+                import vyos.configsession as _vcs
+                if isinstance(e, _vcs.ConfigSessionError):
+                    if attempt < max_retries - 1 and self._is_session_expired_error(e) and token:
+                        _logger.warning(f'[_session_set_with_retry] Session expired, recreating (attempt {attempt+1}/{max_retries})...')
+                        session = _invalidate_and_recreate_session(token)
+                        continue
                 raise  # Re-raise if not retryable or max retries reached
 
     @_handle_config_exception
@@ -1817,25 +1802,43 @@ class ConfigService:
             # Interface groups
             elif field == 'group' and parent_key in ('inbound-interface', 'outbound-interface'):
                 suggestions = self._list_config_keys(['firewall', 'group', 'interface-group'])
-            # Firewall groups
-            elif field == 'address-group':
-                if 'ipv6' in path_list:
-                    suggestions = self._list_config_keys(['firewall', 'group', 'ipv6-address-group'])
-                else:
-                    suggestions = self._list_config_keys(['firewall', 'group', 'address-group'])
-            elif field == 'network-group':
-                if 'ipv6' in path_list:
-                    suggestions = self._list_config_keys(['firewall', 'group', 'ipv6-network-group'])
-                else:
-                    suggestions = self._list_config_keys(['firewall', 'group', 'network-group'])
-            elif field == 'port-group':
-                suggestions = self._list_config_keys(['firewall', 'group', 'port-group'])
-            elif field == 'domain-group':
-                suggestions = self._list_config_keys(['firewall', 'group', 'domain-group'])
-            elif field == 'mac-group':
-                suggestions = self._list_config_keys(['firewall', 'group', 'mac-group'])
-            elif field == 'dynamic-address-group':
-                suggestions = self._list_config_keys(['firewall', 'group', 'dynamic-group'])
+            # Firewall groups - direct read via daemon (fast IPC)
+            elif field in ('address-group', 'network-group', 'port-group', 'domain-group', 'mac-group', 'dynamic-address-group'):
+                if field == 'address-group':
+                    if 'add-address-to-group' in path_list:
+                        # Dynamic address groups
+                        data = _read_config_subprocess(['firewall', 'group', 'dynamic-group'], effective=True)
+                        if isinstance(data, dict):
+                            if 'ipv6' in path_list:
+                                ipv6_groups = data.get('ipv6_address_group', {})
+                                suggestions = sorted(ipv6_groups.keys()) if isinstance(ipv6_groups, dict) else []
+                            else:
+                                ipv4_groups = data.get('address_group', {})
+                                suggestions = sorted(ipv4_groups.keys()) if isinstance(ipv4_groups, dict) else []
+                    elif 'ipv6' in path_list:
+                        suggestions = self._list_config_keys(['firewall', 'group', 'ipv6-address-group'])
+                    else:
+                        suggestions = self._list_config_keys(['firewall', 'group', 'address-group'])
+                elif field == 'network-group':
+                    if 'ipv6' in path_list:
+                        suggestions = self._list_config_keys(['firewall', 'group', 'ipv6-network-group'])
+                    else:
+                        suggestions = self._list_config_keys(['firewall', 'group', 'network-group'])
+                elif field == 'port-group':
+                    suggestions = self._list_config_keys(['firewall', 'group', 'port-group'])
+                elif field == 'domain-group':
+                    suggestions = self._list_config_keys(['firewall', 'group', 'domain-group'])
+                elif field == 'mac-group':
+                    suggestions = self._list_config_keys(['firewall', 'group', 'mac-group'])
+                elif field == 'dynamic-address-group':
+                    data = _read_config_subprocess(['firewall', 'group', 'dynamic-group'], effective=True)
+                    if isinstance(data, dict):
+                        if 'ipv6' in path_list:
+                            ipv6_groups = data.get('ipv6_address_group', {})
+                            suggestions = sorted(ipv6_groups.keys()) if isinstance(ipv6_groups, dict) else []
+                        else:
+                            ipv4_groups = data.get('address_group', {})
+                            suggestions = sorted(ipv4_groups.keys()) if isinstance(ipv4_groups, dict) else []
             # Firewall chain targets (jump-target)
             elif field == 'jump-target':
                 suggestions = self._list_firewall_chains(path_list)

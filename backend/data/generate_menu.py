@@ -152,19 +152,24 @@ def main():
                 menu_item('input', '输入规则', 'Input', route='/firewall/ipv4/input', component='RuleTablePage'),
                 menu_item('output', '输出规则', 'Output', route='/firewall/ipv4/output', component='RuleTablePage'),
                 menu_item('prerouting', '预路由规则', 'Prerouting', route='/firewall/ipv4/prerouting', component='RuleTablePage'),
-                menu_item('name', '自定义规则', 'Custom', route='/firewall/ipv4/name', component='RuleTablePage'),
+                menu_item('name', '自定义规则', 'Custom', route='/firewall/ipv4/name', component='FirewallIpv4NameRulePage'),
+                menu_item('options', '选项', 'Options', route='/firewall/ipv4/options', component='FirewallIpv4OptionsPage'),
             ]),
             menu_item('ipv6', 'IPv6防火墙', 'IPv6 Firewall', children=[
                 menu_item('forward', '转发规则', 'Forward', route='/firewall/ipv6/forward', component='RuleTablePage'),
                 menu_item('input', '输入规则', 'Input', route='/firewall/ipv6/input', component='RuleTablePage'),
                 menu_item('output', '输出规则', 'Output', route='/firewall/ipv6/output', component='RuleTablePage'),
                 menu_item('prerouting', '预路由规则', 'Prerouting', route='/firewall/ipv6/prerouting', component='RuleTablePage'),
-                menu_item('name', '自定义规则', 'Custom', route='/firewall/ipv6/name', component='RuleTablePage'),
+                menu_item('name', '自定义规则', 'Custom', route='/firewall/ipv6/name', component='FirewallIpv6NameRulePage'),
+                menu_item('options', '选项', 'Options', route='/firewall/ipv6/options', component='FirewallIpv6OptionsPage'),
             ]),
             menu_item('bridge', '桥接防火墙', 'Bridge Firewall', children=[
                 menu_item('forward', '转发规则', 'Forward', route='/firewall/bridge/forward', component='RuleTablePage'),
                 menu_item('input', '输入规则', 'Input', route='/firewall/bridge/input', component='RuleTablePage'),
                 menu_item('output', '输出规则', 'Output', route='/firewall/bridge/output', component='RuleTablePage'),
+                menu_item('prerouting', '预路由规则', 'Prerouting', route='/firewall/bridge/prerouting', component='RuleTablePage'),
+                menu_item('name', '自定义规则', 'Custom', route='/firewall/bridge/name', component='FirewallBridgeNameRulePage'),
+                menu_item('options', '选项', 'Options', route='/firewall/bridge/options', component='FirewallBridgeOptionsPage'),
             ]),
             menu_item('group', '防火墙组', 'Firewall Group', children=[
                 menu_item('address-group', '地址组', 'Address Group', route='/firewall/group/address-group', component='FirewallGroupPage'),
@@ -180,15 +185,15 @@ def main():
             menu_item('zone', '区域策略', 'Zone Policy', route='/firewall/zone', component='TablePage'),
             menu_item('flowtable', '流表', 'Flowtable', route='/firewall/flowtable', component='TablePage'),
             menu_item('protocol', '协议列表', 'Protocol List', route='/firewall/protocol', component='ProtocolPage'),
-            menu_item('qos', '服务质量', 'QoS', 'ControlOutlined', [
-                menu_item('interface', '接口QoS', 'Interface QoS', route='/qos/interface', component='TablePage'),
-                menu_item('policy', 'QoS策略', 'QoS Policy', route='/qos/policy', component='TablePage'),
-                menu_item('traffic-match-group', '流量匹配组', 'Traffic Match Group', route='/qos/traffic-match-group', component='TablePage'),
-            ]),
-            menu_item('load-balancing', '负载均衡', 'Load Balancing', 'ApartmentOutlined', [
-                menu_item('wan', 'WAN负载均衡', 'WAN LB', route='/load-balancing/wan', component='ConfigPage'),
-                menu_item('reverse-proxy', '反向代理', 'Reverse Proxy', route='/load-balancing/reverse-proxy', component='ConfigPage'),
-            ]),
+        ]),
+        menu_item('qos', '服务质量', 'QoS', 'ControlOutlined', [
+            menu_item('interface', '接口 QoS', 'Interface QoS', route='/qos/interface', component='QosInterfacePage'),
+            menu_item('policy', 'QoS 策略', 'QoS Policy', route='/qos/policy', component='QosPolicyPage'),
+            menu_item('traffic-match-group', '流量匹配组', 'Traffic Match Group', route='/qos/traffic-match-group', component='QosTrafficMatchGroupPage'),
+        ]),
+        menu_item('load-balancing', '负载均衡', 'Load Balancing', 'ApartmentOutlined', [
+            menu_item('wan', 'WAN 负载均衡', 'WAN LB', route='/load-balancing/wan', component='WanPage'),
+            menu_item('haproxy', 'HAProxy', 'HAProxy', route='/load-balancing/haproxy', component='HaproxyPage'),
         ]),
         menu_item('nat', '网络地址转换', 'NAT', 'SwapOutlined', [
             menu_item('source', '源NAT', 'Source NAT', route='/nat/source', component='RuleTablePage'),

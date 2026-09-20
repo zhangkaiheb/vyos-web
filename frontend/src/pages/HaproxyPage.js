@@ -593,14 +593,14 @@ export default defineComponent({
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="deleteBackendModalVisible" :title="t('haproxy.modal.confirmDelete.title')" width="400px" @confirm="confirmDeleteBackend">
+      <DraggableModal v-model:visible="deleteBackendModalVisible" :title="t('haproxy.modal.confirmDelete.title')" header-icon="delete" width="400px" @confirm="confirmDeleteBackend">
         <div>{{ t('haproxy.modal.confirmDelete.backendMessage') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteBackendName }}</div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="deleteServiceModalVisible" :title="t('haproxy.modal.confirmDelete.title')" width="400px" @confirm="confirmDeleteService">
+      <DraggableModal v-model:visible="deleteServiceModalVisible" :title="t('haproxy.modal.confirmDelete.title')" header-icon="delete" width="400px" @confirm="confirmDeleteService">
         <div>{{ t('haproxy.modal.confirmDelete.serviceMessage') }}</div>
         <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
           <div style="padding:2px 0;">{{ pendingDeleteServiceName }}</div>

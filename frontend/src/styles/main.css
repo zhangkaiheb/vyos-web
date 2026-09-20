@@ -1096,7 +1096,6 @@ select {
   align-items: center;
   justify-content: center;
   z-index: 2000;
-  pointer-events: none;
 }
 
 .modal-overlay.on-top {
@@ -1126,7 +1125,7 @@ select {
   color: #fff;
   padding: 10px 16px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   cursor: move;
   user-select: none;
@@ -1134,6 +1133,15 @@ select {
 
 .modal-title {
   font-weight: 500;
+}
+
+.error-modal .modal-header {
+  background: var(--color-primary);
+  justify-content: flex-start;
+}
+
+.error-modal .modal-close {
+  margin-left: auto;
 }
 
 .modal-close {
@@ -1144,6 +1152,7 @@ select {
   padding: 0 4px;
   cursor: pointer;
   line-height: 1;
+  margin-left: auto;
 }
 
 .modal-close:hover {
@@ -2081,7 +2090,7 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 .tab-group {
   border: 1px solid var(--color-border);
   border-radius: 2px;
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 .tab-headers {
