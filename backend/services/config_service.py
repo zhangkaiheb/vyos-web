@@ -156,8 +156,10 @@ def _heartbeat_sessions():
                         # Perform a lightweight operation to keep session alive
                         session.show_config([], format='raw')
                         _logger.debug(f'[Heartbeat] Kept session alive: token={token[:20]}...')
-                except Exception as e:
-                    _logger.warning(f'[Heartbeat] Failed to keep session alive: token={token[:20]}..., error={e}')
+                except Exception:
+                    # Session may have expired; remove stale entry silently
+                    with _TOKEN_SESSIONS_LOCK:
+                        TOKEN_CONFIG_SESSIONS.pop(token, None)
         except Exception as e:
             _logger.error(f'[Heartbeat] Heartbeat loop error: {e}', exc_info=True)
 
@@ -1851,6 +1853,9 @@ class ConfigService:
             # Mark / connection-mark plain text suggestions from current marks
             elif field in ('mark', 'connection-mark'):
                 suggestions = []
+            # VTI bind interface - list VTI tunnel interfaces
+            elif field == 'bind' and parent_key == 'vti':
+                suggestions = [i for i in self._list_interfaces() if i.startswith('vti')]
 
             return {'success': True, 'path': path, 'field': field, 'suggestions': suggestions}
         except Exception as e:
@@ -1867,7 +1872,7 @@ class ConfigService:
                     if not parts:
                         continue
                     name = parts[0]
-                    if name.startswith(('eth', 'br', 'bond', 'lo', 'tun', 'vtun', 'wg', 'ppp', 'pppoe', 'vxlan', 'dum', 'ifb', 'wlan')):
+                    if name.startswith(('eth', 'br', 'bond', 'lo', 'tun', 'vti', 'vtun', 'wg', 'ppp', 'pppoe', 'vxlan', 'dum', 'ifb', 'wlan')):
                         names.add(name)
                 return sorted(names)
         except Exception:

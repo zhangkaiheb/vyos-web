@@ -410,6 +410,7 @@ export default defineComponent({
     const psks = ref([]);
     const interfaces = ref('');
     const availableInterfaces = ref([]);
+    const vtiInterfaces = ref([]);
     const disableUniqreqids = ref(false);
     const options = ref(optionsToForm({}));
     const logConfig = ref(logToForm({}));
@@ -484,18 +485,22 @@ export default defineComponent({
 
     async function loadInterfaces() {
       try {
-        const [ethernetRes, suggestionRes] = await Promise.all([
+        const [ethernetRes, suggestionRes, vtiSuggestionRes] = await Promise.all([
           interfaceApi.ethernet().catch(() => ({ interfaces: [] })),
           configApi.suggestions('vpn ipsec options', 'interface').catch(() => ({ suggestions: [] })),
+          configApi.suggestions('vpn ipsec site-to-site peer pn-example vti', 'bind').catch(() => ({ suggestions: [] })),
         ]);
 
         const ethernetList = (ethernetRes.interfaces || []).map(i => i.name).filter(Boolean);
         const suggestionList = (suggestionRes.suggestions || []).filter(Boolean);
         const merged = [...new Set([...ethernetList, ...suggestionList])].sort();
         availableInterfaces.value = merged;
+
+        vtiInterfaces.value = (vtiSuggestionRes.suggestions || []).filter(Boolean).sort();
       } catch (e) {
         console.error('Failed to load interface list', e);
         availableInterfaces.value = [];
+        vtiInterfaces.value = [];
       }
     }
 
@@ -1533,7 +1538,7 @@ export default defineComponent({
       
       loading, saving, saved, activeTab, tabs, writeDisabled,
       raActiveTab, raTabs,
-      ikeGroups, espGroups, psks, interfaces, availableInterfaces, disableUniqreqids, options, logConfig, profiles,
+      ikeGroups, espGroups, psks, interfaces, availableInterfaces, vtiInterfaces, disableUniqreqids, options, logConfig, profiles,
       siteToSitePeers, protocols, protocolOptions, interfaceOptions, commandPath, remoteAccessConns, remoteAccessPools, remoteAccessDhcp, remoteAccessRadius,
       selectedIke, selectedEsp, selectedPsk, selectedProfile, selectedS2s, selectedRa,
       selectedRaPool, selectedRaRadiusServer,
@@ -1879,8 +1884,8 @@ export default defineComponent({
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelProtocol') }}</label><select class="form-control" v-model="editingTunnel.protocol"><option v-for="o in protocolOptions" :key="o" :value="o">{{ o }}</option></select></div>
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelLocalPort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingTunnel.local_port" :placeholder="t('ipsec.form.tunnelLocalPortPlaceholder')" /></div>
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelRemotePort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingTunnel.remote_port" :placeholder="t('ipsec.form.tunnelRemotePortPlaceholder')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelLocalPrefix') }}</label><textarea class="form-control" v-model="editingTunnel.local_prefix" :placeholder="t('ipsec.form.tunnelLocalPrefixPlaceholder')" rows="2" /></div>
-        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelRemotePrefix') }}</label><textarea class="form-control" v-model="editingTunnel.remote_prefix" :placeholder="t('ipsec.form.tunnelRemotePrefixPlaceholder')" rows="2" /></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelLocalPrefixLabel') }}</label><textarea class="form-control" v-model="editingTunnel.local_prefix" :placeholder="t('ipsec.form.tunnelLocalPrefixPlaceholder')" rows="2" /></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelRemotePrefixLabel') }}</label><textarea class="form-control" v-model="editingTunnel.remote_prefix" :placeholder="t('ipsec.form.tunnelRemotePrefixPlaceholder')" rows="2" /></div>
         <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelDisable') }}</label><input type="checkbox" v-model="editingTunnel.disable" /></div>
       </DraggableModal>
 
@@ -1932,7 +1937,7 @@ export default defineComponent({
             <div class="form-row"><label class="form-label" title="RSA 私钥密码">RSA 密码</label><input class="form-control" type="password" v-model="editingS2s.rsa_passphrase" title="RSA 私钥密码" /></div>
           </template>
           <template #vti>
-            <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiBindTitle')">{{ t('ipsec.form.vtiBind') }}</label><input class="form-control" v-model="editingS2s.vti_bind" :title="t('ipsec.form.vtiBindTitle')" /></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiBindTitle')">{{ t('ipsec.form.vtiBind') }}</label><select class="form-control" v-model="editingS2s.vti_bind" :title="t('ipsec.form.vtiBindTitle')"><option value=""></option><option v-for="v in vtiInterfaces" :key="v" :value="v">{{ v }}</option></select></div>
             <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiEspGroupTitle')">{{ t('ipsec.form.vtiEspGroup') }}</label><select class="form-control" v-model="editingS2s.vti_esp_group" :title="t('ipsec.form.vtiEspGroupTitle')"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
             <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiTsLocalPrefixTitle')">{{ t('ipsec.form.vtiTsLocalPrefix') }}</label><textarea class="form-control" v-model="editingS2s.vti_local_prefix" :placeholder="t('ipsec.form.vtiTsLocalPrefixPlaceholder')" :title="t('ipsec.form.vtiTsLocalPrefixTitle')" /></div>
             <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiTsRemotePrefixTitle')">{{ t('ipsec.form.vtiTsRemotePrefix') }}</label><textarea class="form-control" v-model="editingS2s.vti_remote_prefix" :placeholder="t('ipsec.form.vtiTsRemotePrefixPlaceholder')" :title="t('ipsec.form.vtiTsRemotePrefixTitle')" /></div>

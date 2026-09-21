@@ -71,6 +71,24 @@ function formatEndpoint(ep) {
   return parts.join('') || '';
 }
 
+function getGroupTooltip(ep, groups) {
+  if (!ep || typeof ep !== 'object') return '';
+  const group = ep.group || {};
+  const groupRefs = [];
+  if (group['address-group'] || group.address_group) groupRefs.push(group['address-group'] || group.address_group);
+  if (group['network-group'] || group.network_group) groupRefs.push(group['network-group'] || group.network_group);
+  if (group['port-group'] || group.port_group) groupRefs.push(group['port-group'] || group.port_group);
+  if (group['dynamic-address-group'] || group.dynamic_address_group) groupRefs.push(group['dynamic-address-group'] || group.dynamic_address_group);
+  if (group['domain-group'] || group.domain_group) groupRefs.push(group['domain-group'] || group.domain_group);
+  if (group['mac-group'] || group.mac_group) groupRefs.push(group['mac-group'] || group.mac_group);
+  const tooltips = [];
+  for (const name of groupRefs) {
+    const members = groups[name];
+    if (members) tooltips.push(`${name}: ${members}`);
+  }
+  return tooltips.join('\n');
+}
+
 function formatInterface(iface) {
   if (!iface || typeof iface !== 'object') return '';
   if (iface.name) return iface.name;
@@ -160,16 +178,17 @@ function transformTcpFlagsFromVyOS(flags) {
 function transformDataForForm(data) {
   if (!data || typeof data !== 'object') return data;
   
-  const result = { ...data };
+  const result = {};
   
-  // Convert underscored keys to hyphenated keys for form compatibility
-  if (result.inbound_interface) {
-    result['inbound-interface'] = result.inbound_interface;
-    delete result.inbound_interface;
-  }
-  if (result.outbound_interface) {
-    result['outbound-interface'] = result.outbound_interface;
-    delete result.outbound_interface;
+  for (const key of Object.keys(data)) {
+    // Convert underscored keys to hyphenated keys for form compatibility
+    const newKey = key.replace(/_/g, '-');
+    const val = data[key];
+    if (val && typeof val === 'object' && !Array.isArray(val)) {
+      result[newKey] = transformDataForForm(val);
+    } else {
+      result[newKey] = val;
+    }
   }
   
   if (result.tcp && result.tcp.flags) {
@@ -233,6 +252,19 @@ export default defineComponent({
     const editingOriginalId = ref(null);
     const dataTableRef = ref(null);
     const searchText = ref('');
+    const firewallGroups = ref({});
+
+    const GROUP_CONFIG_PATHS = [
+      'firewall group address-group',
+      'firewall group ipv6-address-group',
+      'firewall group network-group',
+      'firewall group ipv6-network-group',
+      'firewall group port-group',
+      'firewall group domain-group',
+      'firewall group mac-group',
+      'firewall group dynamic-group address-group',
+      'firewall group dynamic-group ipv6-address-group',
+    ];
 
     const ruleSchema = [RULE_NUMBER_FIELD, ...FIREWALL_RULE_SCHEMA];
 
@@ -355,6 +387,28 @@ export default defineComponent({
       }));
     });
 
+    async function loadFirewallGroups() {
+      try {
+        const promises = GROUP_CONFIG_PATHS.map(p =>
+          configStore.getConfig(p, true).then(res => ({ path: p, data: res.data || {} })).catch(() => ({ path: p, data: {} }))
+        );
+        const results = await Promise.all(promises);
+        const groups = {};
+        for (const r of results) {
+          for (const [name, val] of Object.entries(r.data)) {
+            const memberData = val?.address || val?.network || val?.port || val?.mac_address || val?.['mac-address'];
+            if (memberData) {
+              const members = Array.isArray(memberData) ? memberData : Object.keys(memberData);
+              groups[name] = members.join(', ');
+            }
+          }
+        }
+        firewallGroups.value = groups;
+      } catch (e) {
+        // Silently ignore group load errors
+      }
+    }
+
     async function load() {
       selected.value = [];
       loading.value = true;
@@ -372,6 +426,7 @@ export default defineComponent({
         } catch (e) {
           stats.value = [];
         }
+        await loadFirewallGroups();
       } catch (e) {
         showError(e);
       } finally {
@@ -409,6 +464,7 @@ export default defineComponent({
       const row = data.value.find(r => r.id === selected.value[0]) || {};
       editingItem.value = transformDataForForm(JSON.parse(JSON.stringify(row)));
       editingOriginalId.value = row.id || null;
+      activeTab.value = 'basic';
       modalVisible.value = true;
     }
 
@@ -588,13 +644,13 @@ export default defineComponent({
     }
 
     return {t,
-      
+
       data: tableData, loading, columns, modalVisible, moveModalVisible, editingItem, selected, path, writeDisabled, moveOption, moveTargetId, importFile,
       importModalVisible, importPreview, importHeaders, importFileName,
       dataTableRef, searchText, tabs, activeTab, tabSchemas,
       deleteModalVisible, pendingDeleteNames,
       load, create, edit, remove, confirmRemove, save, clearStats, exportExcel, openImport, onImportFileChange, confirmImport, openMove, moveRule, copyRule, ruleSchema,
-      formatEndpoint, formatInterface,
+      formatEndpoint, formatInterface, getGroupTooltip, firewallGroups,
       rulePath,
     };
   },
@@ -620,10 +676,10 @@ export default defineComponent({
       <DataTable ref="dataTableRef" :key="path" :columns="columns" :data="data" :loading="loading" :disabled="writeDisabled"
                  @selection-change="selected = $event" :selectable="true" :externalToolbar="true">
         <template #source="{ row }">
-          {{ formatEndpoint(row.source) }}
+          <span :title="getGroupTooltip(row.source, firewallGroups)">{{ formatEndpoint(row.source) }}</span>
         </template>
         <template #destination="{ row }">
-          {{ formatEndpoint(row.destination) }}
+          <span :title="getGroupTooltip(row.destination, firewallGroups)">{{ formatEndpoint(row.destination) }}</span>
         </template>
         <template #inbound-interface="{ row }">
           {{ formatInterface(row['inbound-interface'] || row.inbound_interface) }}

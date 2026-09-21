@@ -41,9 +41,10 @@ export default defineComponent({
     const suggestionsVersion = ref(0);
     const activeTab = ref('');
 
-    function suggestionKey(path, key) {
-      const prefix = props.suggestionPath ? `${props.suggestionPath}.` : '';
-      return path.length ? `${prefix}${path.join('.')}.${key}` : `${prefix}${key}`;
+    function suggestionKey(path, fieldKey) {
+      // Must match loadSuggestions key format: [suggestionPath, ...path].join(' ') + '.' + fieldKey
+      const allParts = props.suggestionPath ? [props.suggestionPath, ...path] : path;
+      return allParts.join(' ') + '.' + fieldKey;
     }
 
     function getFormObj(path) {
@@ -65,7 +66,7 @@ export default defineComponent({
         const list = res.suggestions || [];
         const staticSuggestions = field.suggestions || [];
         const combined = Array.from(new Set([...staticSuggestions, ...list]));
-        suggestionsCache.value[key] = combined;
+        suggestionsCache.value = Object.assign({}, suggestionsCache.value, { [key]: combined });
         suggestionsVersion.value++;
         // Auto-select first option if field value is empty and noAutoFill is not set
         const formObj = getFormObj(path);
@@ -78,33 +79,11 @@ export default defineComponent({
       }
     }
 
-    // Preload suggestions for dynamic fields on mount
-    // Preload suggestions for dynamic fields on mount
-    // Only preload for the currently visible tab to avoid loading all tabs at once
-    onMounted(async () => {
-      const tasks = [];
-      const collect = (schema, path, formObj) => {
-        for (const field of schema) {
-          if (field.type === 'tab') {
-            // Don't preload tab children - they will be loaded when the tab is activated
-            continue;
-          } else if (field.type === 'group') {
-            collect(field.children || [], [...path, field.key], formObj?.[field.key] || {});
-          } else if (field.dynamic) {
-            tasks.push(loadSuggestions(path, field));
-          }
-        }
-      };
-      collect(props.schema, [], form.value);
-      await Promise.all(tasks);
-    });
-
-    function initForm() {
+    async function initForm() {
       const walk = (schema, model) => {
         const result = {};
         for (const field of schema) {
           if (field.type === 'tab') {
-            // Flatten tab children into the same level; model stays at parent level
             const childResult = walk(field.children || [], model || {});
             Object.assign(result, childResult);
           } else {
@@ -125,7 +104,29 @@ export default defineComponent({
         }
         return result;
       };
-      form.value = walk(props.schema, props.modelValue);
+      // Update form in place to preserve reactive references
+      const newForm = walk(props.schema, props.modelValue);
+      Object.keys(form.value).forEach(k => delete form.value[k]);
+      Object.assign(form.value, newForm);
+      // Preload suggestions after form data is initialized
+      // Must match initForm's tab flattening: tab children are flattened to top level,
+      // so we must skip tab-level keys when building paths
+      const tasks = [];
+      const collect = (schema, path, formObj, skipTopLevel) => {
+        for (const field of schema) {
+          if (field.type === 'tab') {
+            // Tab children are flattened into parent level by initForm
+            collect(field.children || [], path, formObj, true);
+          } else if (field.type === 'group') {
+            const newPath = skipTopLevel ? path : [...path, field.key];
+            collect(field.children || [], newPath, formObj?.[field.key] || {}, false);
+          } else if (field.dynamic) {
+            tasks.push(loadSuggestions(path, field));
+          }
+        }
+      };
+      collect(props.schema, [], form.value, false);
+      await Promise.all(tasks);
     }
 
     const modelValueRef = toRef(props, 'modelValue');
@@ -360,9 +361,9 @@ export default defineComponent({
         const options = dynamicOpts.length > 0 
           ? dynamicOpts.map(o => ({ value: o, label: o }))
           : (field.options || []);
-        // If current value is not in options (e.g. dynamic options not yet loaded), add it as a temp option
         const currentValue = formObj[field.key];
-        if (currentValue && !/^\d+$/.test(currentValue) && !options.find(o => (typeof o === 'object' ? o.value : o) === currentValue)) {
+        // Always ensure current value is in options for edit mode
+        if (currentValue != null && currentValue !== '' && !options.find(o => (typeof o === 'object' ? o.value : o) === currentValue)) {
           options.push({ value: currentValue, label: currentValue });
         }
         children.push(h('select', {
@@ -809,6 +810,10 @@ export default defineComponent({
       return tabNodes;
     }
 
-    return () => h('div', { class: 'config-form' }, renderTabs(props.schema, form.value, [], 0));
+    return () => {
+      // Read suggestionsVersion to establish reactive dependency on cache updates
+      void suggestionsVersion.value;
+      return h('div', { class: 'config-form' }, renderTabs(props.schema, form.value, [], 0));
+    };
   },
 });

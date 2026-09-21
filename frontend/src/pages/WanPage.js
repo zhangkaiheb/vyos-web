@@ -295,10 +295,10 @@ export default defineComponent({
         { key: 'address', title: t('wan.rules.destinationAddress'), type: 'text', placeholder: t('wan.rules.destinationAddressPlaceholder'), help: t('wan.rules.destinationAddressHelp') },
         { key: 'port', title: t('wan.rules.destinationPort'), type: 'text', placeholder: t('wan.rules.destinationPortPlaceholder'), help: t('wan.rules.destinationPortHelp') },
         { key: 'group', title: t('wan.rules.destinationGroup'), type: 'group', children: [
-          { key: 'address-group', title: t('wan.rules.destinationAddressGroup'), type: 'text', placeholder: t('wan.rules.destinationAddressGroupPlaceholder'), help: t('wan.rules.destinationAddressGroupHelp') },
-          { key: 'domain-group', title: t('wan.rules.destinationDomainGroup'), type: 'text', placeholder: t('wan.rules.destinationDomainGroupPlaceholder'), help: t('wan.rules.destinationDomainGroupHelp') },
-          { key: 'network-group', title: t('wan.rules.destinationNetworkGroup'), type: 'text', placeholder: t('wan.rules.destinationNetworkGroupPlaceholder'), help: t('wan.rules.destinationNetworkGroupHelp') },
-          { key: 'port-group', title: t('wan.rules.destinationPortGroup'), type: 'text', placeholder: t('wan.rules.destinationPortGroupPlaceholder'), help: t('wan.rules.destinationPortGroupHelp') },
+          { key: 'address-group', title: t('wan.rules.destinationAddressGroup'), type: 'select', dynamic: true, help: t('wan.rules.destinationAddressGroupHelp') },
+          { key: 'domain-group', title: t('wan.rules.destinationDomainGroup'), type: 'select', dynamic: true, help: t('wan.rules.destinationDomainGroupHelp') },
+          { key: 'network-group', title: t('wan.rules.destinationNetworkGroup'), type: 'select', dynamic: true, help: t('wan.rules.destinationNetworkGroupHelp') },
+          { key: 'port-group', title: t('wan.rules.destinationPortGroup'), type: 'select', dynamic: true, help: t('wan.rules.destinationPortGroupHelp') },
         ]},
       ]},
     ]);
@@ -308,10 +308,10 @@ export default defineComponent({
         { key: 'address', title: t('wan.rules.sourceAddress'), type: 'text', placeholder: t('wan.rules.sourceAddressPlaceholder'), help: t('wan.rules.sourceAddressHelp') },
         { key: 'port', title: t('wan.rules.sourcePort'), type: 'text', placeholder: t('wan.rules.sourcePortPlaceholder'), help: t('wan.rules.sourcePortHelp') },
         { key: 'group', title: t('wan.rules.sourceGroup'), type: 'group', children: [
-          { key: 'address-group', title: t('wan.rules.sourceAddressGroup'), type: 'text', placeholder: t('wan.rules.sourceAddressGroupPlaceholder'), help: t('wan.rules.sourceAddressGroupHelp') },
-          { key: 'domain-group', title: t('wan.rules.sourceDomainGroup'), type: 'text', placeholder: t('wan.rules.sourceDomainGroupPlaceholder'), help: t('wan.rules.sourceDomainGroupHelp') },
-          { key: 'network-group', title: t('wan.rules.sourceNetworkGroup'), type: 'text', placeholder: t('wan.rules.sourceNetworkGroupPlaceholder'), help: t('wan.rules.sourceNetworkGroupHelp') },
-          { key: 'port-group', title: t('wan.rules.sourcePortGroup'), type: 'text', placeholder: t('wan.rules.sourcePortGroupPlaceholder'), help: t('wan.rules.sourcePortGroupHelp') },
+          { key: 'address-group', title: t('wan.rules.sourceAddressGroup'), type: 'select', dynamic: true, help: t('wan.rules.sourceAddressGroupHelp') },
+          { key: 'domain-group', title: t('wan.rules.sourceDomainGroup'), type: 'select', dynamic: true, help: t('wan.rules.sourceDomainGroupHelp') },
+          { key: 'network-group', title: t('wan.rules.sourceNetworkGroup'), type: 'select', dynamic: true, help: t('wan.rules.sourceNetworkGroupHelp') },
+          { key: 'port-group', title: t('wan.rules.sourcePortGroup'), type: 'select', dynamic: true, help: t('wan.rules.sourcePortGroupHelp') },
         ]},
       ]},
     ]);
@@ -648,11 +648,11 @@ export default defineComponent({
           </template>
 
           <template #destination>
-            <ConfigForm :schema="ruleDestSchema" :model="editingRule" />
+            <ConfigForm :schema="ruleDestSchema" :model="editingRule" :suggestionPath="commandPath" />
           </template>
 
           <template #source>
-            <ConfigForm :schema="ruleSourceSchema" :model="editingRule" />
+            <ConfigForm :schema="ruleSourceSchema" :model="editingRule" :suggestionPath="commandPath" />
           </template>
         </TabGroup>
       </DraggableModal>
