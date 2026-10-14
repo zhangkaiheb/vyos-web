@@ -235,18 +235,16 @@ export default defineComponent({
 
     function hintText(field) {
       const parts = [];
-      if (field.help) {
-        // translateField 已经将 field.help 翻译好了（不包含点号的是已翻译文本）
-        // 如果仍包含点号，说明是翻译键未找到翻译，不显示
-        if (typeof field.help === 'string' && !field.help.includes('.')) {
-          parts.push(field.help);
-        }
+      const hasHelp = field.help && typeof field.help === 'string' && !field.help.includes('.');
+      if (hasHelp) {
+        parts.push(field.help);
       }
-      // number 类型根据 min/max 自动生成取值范围提示
+      // number 类型：仅在 help 未包含范围信息时才自动生成取值范围提示
       if (field.type === 'number' && (field.min !== undefined || field.max !== undefined)) {
-        const min = field.min !== undefined ? field.min : '';
-        const max = field.max !== undefined ? field.max : '';
-        parts.push(`取值范围: ${min} - ${max}`);
+        const autoRange = `取值范围: ${field.min !== undefined ? field.min : ''} - ${field.max !== undefined ? field.max : ''}`;
+        if (!hasHelp || !field.help.includes('范围') && !field.help.includes('range') && !field.help.includes('Range')) {
+          parts.push(autoRange);
+        }
       }
       // date/time 类型附加格式提示
       if (field.type === 'date') {
@@ -254,7 +252,12 @@ export default defineComponent({
       } else if (field.type === 'time') {
         parts.push('HH:mm:ss');
       }
-      if (field.default !== undefined) parts.push(`${t('form.defaultValue')}${field.default}`);
+      // default 提示：仅在 help 未包含默认值信息时才显示
+      if (field.default !== undefined) {
+        if (!hasHelp || !field.help.includes('默认') && !field.help.includes('default') && !field.help.includes('Default')) {
+          parts.push(`${t('form.defaultValue')}${field.default}`);
+        }
+      }
       return parts.join('；');
     }
 

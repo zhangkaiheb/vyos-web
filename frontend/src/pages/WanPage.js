@@ -626,6 +626,11 @@ export default defineComponent({
 
       </TabGroup>
 
+      <div v-if="activeTab === 'global'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="loading" @click="saveConfig">
+          {{ loading ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
 
       <!-- Health Check Modal -->
       <DraggableModal v-model:visible="showHealthModal" :title="t('wan.health.modalTitle')" width="600px" @ok="saveHealth">

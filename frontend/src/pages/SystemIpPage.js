@@ -406,7 +406,7 @@ export default defineComponent({
         </template>
       </TabGroup>
 
-      <div v-if="['basic', 'arp', 'multipath', 'nht', 'protocol', 'tcp'].includes(activeTab)" style="text-align:right;padding:16px 0;">
+      <div v-if="['basic', 'arp', 'multipath', 'nht', 'protocol', 'tcp'].includes(activeTab)" style="margin-top:16px;text-align:center;">
         <ToolbarButton icon="save" primary :disabled="saving || loading" @click="save">
           {{ saving ? t('app.loading') : t('app.confirm') }}
         </ToolbarButton>

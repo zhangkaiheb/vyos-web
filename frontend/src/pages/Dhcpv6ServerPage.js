@@ -896,6 +896,12 @@ export default defineComponent({
         </template>
       </TabGroup>
 
+      <div v-if="activeTab === 'basic' || activeTab === 'global'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="showNetworkModal" :title="t('dhcpv6.modals.sharedNetwork')" width="700px" @confirm="saveNetwork" @close="showNetworkModal = false">
         <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.name') }}</label><input class="form-control" v-model="editingNetwork.name" :disabled="!!editingNetwork._name" /></div>
         <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.description') }}</label><input class="form-control" v-model="editingNetwork.description" /></div>

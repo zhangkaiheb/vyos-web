@@ -280,10 +280,8 @@ export default defineComponent({
           </div>
         </template>
       </TabGroup>
-      <div class="toolbar" style="margin-top:16px;">
-        <div class="toolbar-left">
-          <ToolbarButton icon="save" @click="save" :disabled="saving || loading">{{ saving ? $t('syslog.saving') : $t('syslog.confirm') }}</ToolbarButton>
-        </div>
+      <div style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary @click="save" :disabled="saving || loading">{{ saving ? $t('syslog.saving') : $t('syslog.confirm') }}</ToolbarButton>
       </div>
       <DraggableModal v-model:visible="deleteRemoteHostModalVisible" :title="$t('syslog.confirmDelete')" header-icon="delete" width="400px" @confirm="confirmDeleteRemoteHost">
         <div>{{ $t('syslog.confirmDeleteRemoteHost') }}</div>

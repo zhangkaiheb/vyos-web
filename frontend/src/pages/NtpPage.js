@@ -337,6 +337,12 @@ export default defineComponent({
         </template>
       </TabGroup>
 
+      <div v-if="activeTab === 'basic'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="modalVisible" :title="editingIndex >= 0 ? t('ntp.modals.editServer') : t('ntp.modals.addServer')" width="500px" @confirm="saveServer">
         <div class="form-row">
           <label class="form-label">{{ t('ntp.labels.address') }}</label>

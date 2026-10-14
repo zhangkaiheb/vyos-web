@@ -446,6 +446,12 @@ export default defineComponent({
         </template>
       </TabGroup>
 
+      <div v-if="activeTab === 'protocol' || activeTab === 'basic'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="showAddressModal" :title="t('conntrackSync.modals.ignoreAddress')">
         <div class="form-row"><label class="form-label">{{ t('conntrackSync.labels.addressPrefix') }}</label><input class="form-control" v-model="addressEdit.address" :placeholder="t('conntrackSync.placeholders.addressPrefix')" /></div>
         <template #footer>

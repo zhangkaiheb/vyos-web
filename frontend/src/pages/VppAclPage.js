@@ -428,6 +428,10 @@ export default defineComponent({
       </template>
       </TabGroup>
 
+      <div style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary @click="save" :disabled="saving || loading">{{ saving ? t('app.loading') : t('app.confirm') }}</ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="showIpAclModal" :title="editingIpAcl && editingIpAcl._name ? t('vppAcl.editIpAcl') : t('vppAcl.newIpAcl')" @confirm="saveIpAcl" @close="showIpAclModal = false" width="800px">
         <div class="form-row"><label class="form-label">{{ t('vppAcl.name') }}</label><input class="form-control" v-model="editingIpAcl.name" :disabled="editingIpAcl._name" :title="t('vppAcl.aclName')" /></div>
         <div class="form-row"><label class="form-label">{{ t('vppAcl.description') }}</label><input class="form-control" v-model="editingIpAcl.description" :title="t('vppAcl.aclDescription')" /></div>

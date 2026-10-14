@@ -102,19 +102,31 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div class="form-row"><label class="form-label">{{ t('vppSflow.labels.headerBytes') }}</label>
-        <select class="form-control" v-model="config.header_bytes" :title="t('vppSflow.tips.headerBytes')">
-          <option value="64">64</option>
-          <option value="96">96</option>
-          <option value="128">128 ({{ t('vppSflow.options.default') }})</option>
-          <option value="160">160</option>
-          <option value="192">192</option>
-          <option value="224">224</option>
-          <option value="256">256</option>
-        </select>
+      <div class="form-row" style="margin-top:16px;"><label class="form-label">{{ t('vppSflow.labels.headerBytes') }}</label>
+        <div class="form-control">
+          <select v-model="config.header_bytes">
+            <option value="64">64</option>
+            <option value="96">96</option>
+            <option value="128">128 ({{ t('vppSflow.options.default') }})</option>
+            <option value="160">160</option>
+            <option value="192">192</option>
+            <option value="224">224</option>
+            <option value="256">256</option>
+          </select>
+          <div class="form-hint">{{ t('vppSflow.tips.headerBytes') }}</div>
+        </div>
       </div>
-      <div class="form-row"><label class="form-label">{{ t('vppSflow.labels.interfaces') }}</label><textarea class="form-control" v-model="config.interfaces" rows="5" :placeholder="t('vppSflow.placeholders.interfaces')" :title="t('vppSflow.tips.interfaces')" /></div>
+      <div class="form-row">
+        <label class="form-label">{{ t('vppSflow.labels.interfaces') }}</label>
+        <div class="form-control">
+          <textarea v-model="config.interfaces" rows="5" :placeholder="t('vppSflow.placeholders.interfaces')"></textarea>
+          <div class="form-hint">{{ t('vppSflow.tips.interfaces') }}</div>
+        </div>
+      </div>
 
+      <div style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary @click="save" :disabled="saving || loading">{{ saving ? t('app.loading') : t('app.confirm') }}</ToolbarButton>
+      </div>
     </div>
   `,
 });

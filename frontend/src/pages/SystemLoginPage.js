@@ -684,6 +684,12 @@ export default defineComponent({
 
       </TabGroup>
 
+      <div v-if="activeTab === 'basic' || activeTab === 'radius' || activeTab === 'tacacs'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
       <!-- User edit modal -->
       <DraggableModal v-model:visible="showUserModal" :title="editingUser && editingUser._key ? t('system.login.modal.editUser') : t('system.login.modal.addUser')" @confirm="saveUser" @close="showUserModal = false" width="800px">
         <div class="form-row">

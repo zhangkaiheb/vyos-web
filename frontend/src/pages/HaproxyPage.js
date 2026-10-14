@@ -148,6 +148,11 @@ export default defineComponent({
 
       </TabGroup>
 
+      <div v-if="activeTab === 'global' || activeTab === 'timeout'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="loading" @click="saveConfig">
+          {{ loading ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
 
       <!-- Backend server modal -->
       <DraggableModal v-model:visible="showBackendModal" :title="t('haproxy.modal.backend.title')" width="700px" @ok="saveBackend">

@@ -1079,6 +1079,12 @@ export default defineComponent({
         </template>
       </TabGroup>
 
+      <div v-if="activeTab === 'basic' || activeTab === 'auth' || activeTab === 'url-filter'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="modals.listen" :title="titles.listen" @confirm="saveListenAddress">
         <div class="form-row"><label class="form-label">{{ t('webproxy.labels.listenAddress') }}</label><input class="form-control" v-model="editing.listen.address" :placeholder="t('webproxy.placeholders.ipv4Address')" /></div>
         <div class="form-row"><label class="form-label">{{ t('webproxy.labels.port') }}</label><input type="number" min="1" max="65535" class="form-control" v-model="editing.listen.port" :placeholder="t('webproxy.placeholders.leaveEmptyForDefault')" /></div>

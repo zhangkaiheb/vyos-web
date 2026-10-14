@@ -984,6 +984,12 @@ export default defineComponent({
         </template>
       </TabGroup>
 
+      <div v-if="activeTab === 'forwarding' || activeTab === 'dynamic'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="showDomainModal" :title="t('dns.modalTitles.domainForwarding')" width="600px" @confirm="saveDomain" @close="showDomainModal = false">
         <div class="form-row"><label class="form-label">{{ t('dns.fields.domain') }}</label><input class="form-control" v-model="editingDomain.domain" :disabled="!!editingDomain._domain" placeholder="example.com" /></div>
         <div style="margin-top:12px;">

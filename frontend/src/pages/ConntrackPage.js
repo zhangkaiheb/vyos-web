@@ -813,6 +813,19 @@ export default defineComponent({
 
       </TabGroup>
 
+      <div v-if="activeTab === 'basic'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="writeDisabled || loading" @click="saveBasic">{{ loading ? $t('app.loading') : $t('app.confirm') }}</ToolbarButton>
+      </div>
+      <div v-if="activeTab === 'tcp'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="writeDisabled || loading" @click="saveTcp">{{ loading ? $t('app.loading') : $t('app.confirm') }}</ToolbarButton>
+      </div>
+      <div v-if="activeTab === 'log'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="writeDisabled || loading" @click="saveLog">{{ loading ? $t('app.loading') : $t('app.confirm') }}</ToolbarButton>
+      </div>
+      <div v-if="activeTab === 'modules'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="writeDisabled || loading" @click="saveModules">{{ loading ? $t('app.loading') : $t('app.confirm') }}</ToolbarButton>
+      </div>
+
       <!-- Modals -->
       <DraggableModal v-model:visible="ignoreIpv4ModalVisible" :title="$t('conntrack.ignoreRulesIpv4')" width="600px">
         <ConfigForm v-model="editingIgnoreIpv4" :schema="ignoreRuleSchema" :showAdvanced="true" />

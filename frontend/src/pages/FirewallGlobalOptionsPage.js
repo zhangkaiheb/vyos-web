@@ -355,7 +355,7 @@ export default defineComponent({
             <ConfigForm v-model="form" :schema="tab.schema" :disabled="writeDisabled" :formKey="'fw_global_' + tab.key" />
           </template>
         </TabGroup>
-        <div style="text-align:right;padding:16px 0;">
+        <div style="margin-top:16px;text-align:center;">
           <ToolbarButton icon="save" primary :disabled="writeDisabled || saving" @click="save">
             {{ saving ? $t('app.loading') : $t('app.confirm') }}
           </ToolbarButton>

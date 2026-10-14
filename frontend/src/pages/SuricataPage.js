@@ -471,6 +471,12 @@ export default defineComponent({
         </template>
       </TabGroup>
 
+      <div v-if="activeTab === 'basic'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="showAddressModal" :title="addressModalTitle" @confirm="saveAddressGroup" @close="showAddressModal = false">
         <div class="form-row"><label class="form-label">{{ t('suricata.labels.name') }}</label><input class="form-control" v-model="editingAddress.name" :placeholder="t('suricata.placeholders.addressGroupName')" /></div>
         <div class="form-row">

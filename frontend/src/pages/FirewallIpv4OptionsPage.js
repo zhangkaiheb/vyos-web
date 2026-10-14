@@ -348,7 +348,7 @@ export default defineComponent({
       </TabGroup>
 
       <!-- Confirm button for chain tabs -->
-      <div v-if="showConfirmButton" style="text-align:right;padding:16px 0;">
+      <div v-if="showConfirmButton" style="margin-top:16px;text-align:center;">
         <ToolbarButton icon="save" primary :disabled="saving" @click="saveForm">
           {{ saving ? t('app.loading') : t('app.confirm') }}
         </ToolbarButton>

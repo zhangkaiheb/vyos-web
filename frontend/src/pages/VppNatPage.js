@@ -212,10 +212,8 @@ export default defineComponent({
         <div class="form-row"><label class="form-label">UDP</label><input class="form-control" type="number" v-model="config.timeouts.udp" :title="$t('vppNat.udpTimeoutTitle')" /></div>
       </template>
       </TabGroup>
-      <div class="toolbar" style="margin-top:16px;">
-        <div class="toolbar-left">
-          <ToolbarButton icon="save" @click="save" :disabled="saving || loading">{{ saving ? $t('vppNat.saving') : $t('vppNat.confirm') }}</ToolbarButton>
-        </div>
+      <div style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary @click="save" :disabled="saving || loading">{{ saving ? $t('vppNat.saving') : $t('vppNat.confirm') }}</ToolbarButton>
       </div>
 
       <DraggableModal v-model:visible="showRuleModal" :title="editingRule && editingRule._rule_number ? $t('vppNat.editRule') : $t('vppNat.createRule')" @confirm="saveRule" @close="showRuleModal = false">

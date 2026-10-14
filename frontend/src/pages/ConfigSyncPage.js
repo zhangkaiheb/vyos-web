@@ -328,6 +328,12 @@ export default defineComponent({
         </template>
       </TabGroup>
 
+      <div v-if="activeTab === 'basic' || activeTab === 'secondary'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="showModal" :title="modalTitle">
         <div class="form-row"><label class="form-label">{{ t('configSync.label.section') }}</label><select class="form-control" v-model="editing.section" @change="editing.sub = ''"><option value="">{{ t('configSync.placeholder.select') }}</option><option v-for="s in sectionOptions" :key="s" :value="s">{{ s }}</option></select></div>
         <div class="form-row" v-if="subOptions.length"><label class="form-label">{{ t('configSync.label.sub') }}</label><select class="form-control" v-model="editing.sub"><option value="">{{ t('configSync.placeholder.select') }}</option><option v-for="s in subOptions" :key="s" :value="s">{{ s }}</option></select></div>

@@ -455,6 +455,10 @@ export default defineComponent({
       </template>
       </TabGroup>
 
+      <div v-if="activeTab !== 'interface'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary @click="save" :disabled="saving || loading">{{ saving ? t('app.loading') : t('app.confirm') }}</ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="showInterfaceModal" :title="editingInterface && editingInterface._interface ? t('vpp.modal.editInterface') : t('vpp.modal.addInterface')" @confirm="saveInterface" @close="showInterfaceModal = false" width="700px">
         <div class="form-row"><label class="form-label">{{ t('vpp.columns.interface') }}</label><input class="form-control" v-model="editingInterface.interface" :disabled="editingInterface._interface" :placeholder="t('vpp.placeholders.interfaceName')" :title="t('vpp.titles.interfaceName')" /></div>
         <div class="form-row"><label class="form-label">{{ t('vpp.labels.rxMode') }}</label>

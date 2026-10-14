@@ -826,12 +826,12 @@ export default defineComponent({
         <div class="form-row"><label class="form-label">{{ t('dhcp.labels.dynamicDnsUpdate') }}</label><input type="checkbox" v-model="config.dynamic_dns_update" :title="t('dhcp.titles.dynamicDnsUpdate')" /></div>
         <div class="form-row"><label class="form-label">{{ t('dhcp.labels.hostfileUpdate') }}</label><input type="checkbox" v-model="config.hostfile_update" :title="t('dhcp.titles.hostfileUpdate')" /></div>
         <div class="form-row"><label class="form-label">{{ t('dhcp.labels.listenAddress') }}</label>
-          <div style="display:flex;flex-direction:column;gap:4px;">
-            <select class="form-control" @change="appendListenAddress($event.target.value); $event.target.value = ''" :title="t('dhcp.titles.listenAddressSelect')">
+          <div style="display:flex;flex-direction:column;gap:4px;width:100%;">
+            <select class="form-control" style="width:100%;" @change="appendListenAddress($event.target.value); $event.target.value = ''" :title="t('dhcp.titles.listenAddressSelect')">
               <option value="">{{ t('dhcp.placeholders.selectPresetAddress') }}</option>
               <option v-for="addr in listenAddressOptions" :key="addr" :value="addr">{{ addr }}</option>
             </select>
-            <textarea class="form-control" v-model="config.listen_address" rows="3" :placeholder="t('dhcp.placeholders.listenAddress')" :title="t('dhcp.titles.listenAddress')" />
+            <textarea class="form-control" style="width:100%;" v-model="config.listen_address" rows="3" :placeholder="t('dhcp.placeholders.listenAddress')" :title="t('dhcp.titles.listenAddress')" />
           </div>
         </div>
         <div class="form-row"><label class="form-label">{{ t('dhcp.labels.listenInterface') }}</label>
@@ -866,7 +866,13 @@ export default defineComponent({
       </template>
       </TabGroup>
 
-      <DraggableModal v-model:visible="showSharedNetworkModal" :title="t('dhcp.modals.sharedNetwork')" width="780" @confirm="saveSharedNetwork" @close="showSharedNetworkModal = false">
+      <div v-if="activeTab === 'basic' || activeTab === 'ha'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
+      <DraggableModal v-model:visible="showSharedNetworkModal" :title="t('dhcp.modals.sharedNetwork')" width="750px" @confirm="saveSharedNetwork" @close="showSharedNetworkModal = false">
         <TabGroup v-model="sharedNetworkActiveTab" :tabs="[
           { key: 'basic', title: t('dhcp.tabs.basic') },
           { key: 'subnets', title: t('dhcp.tabs.subnets') },

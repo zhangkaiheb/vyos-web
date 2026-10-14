@@ -375,6 +375,10 @@ export default defineComponent({
       </template>
       </TabGroup>
 
+      <div v-if="activeTab === 'interfaces'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary @click="save" :disabled="saving || loading">{{ saving ? t('app.loading') : t('app.confirm') }}</ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="showPoolModal" :title="editingPool && editingPool._name ? t('nat44.modal.editPool') : t('nat44.modal.createPool')" @confirm="savePool" @close="showPoolModal = false" width="700px">
         <div class="form-row"><label class="form-label">{{ t('nat44.form.name') }}</label><input class="form-control" v-model="editingPool.name" :disabled="editingPool._name" :title="t('nat44.form.name')" /></div>
         <div class="form-row"><label class="form-label">{{ t('nat44.form.translationAddresses') }}</label><textarea class="form-control" v-model="editingPool.translation_addresses" rows="3" :placeholder="t('nat44.placeholder.ipv4Range')" :title="t('nat44.form.translationAddresses')" /></div>

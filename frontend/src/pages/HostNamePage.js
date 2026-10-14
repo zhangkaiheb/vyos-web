@@ -143,14 +143,12 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div class="form-row">
+      <div class="form-row" style="margin-top:16px;">
         <label class="form-label" :title="t('hostname.labels.titleTip')">{{ t('hostname.labels.name') }}</label>
         <input class="form-control" v-model="hostName" :placeholder="t('hostname.labels.placeholder')" :disabled="loading" />
       </div>
-      <div class="toolbar" style="margin-top:16px;">
-        <div class="toolbar-left">
-          <ToolbarButton icon="save" primary @click="save" :disabled="saving || loading">{{ saving ? t('hostname.buttons.saving') : t('hostname.buttons.confirm') }}</ToolbarButton>
-        </div>
+      <div style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving || loading" @click="save">{{ saving ? t('hostname.buttons.saving') : t('hostname.buttons.confirm') }}</ToolbarButton>
       </div>
     </div>
   `,

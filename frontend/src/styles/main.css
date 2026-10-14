@@ -2119,6 +2119,11 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   color: #fff;
 }
 
+.tab-panels {
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+}
+
 .tab-panel {
   padding: 16px;
 }

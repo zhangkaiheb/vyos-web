@@ -1783,7 +1783,7 @@ export default defineComponent({
           </TabGroup>
         </template>
       </TabGroup>
-      <div v-if="['interface', 'options', 'log'].includes(activeTab)" style="text-align:right;padding:16px 0;">
+      <div v-if="['interface', 'options', 'log'].includes(activeTab)" style="margin-top:16px;text-align:center;">
         <ToolbarButton icon="save" primary :disabled="writeDisabled || saving" @click="save">
           {{ saving ? t('app.loading') : t('app.confirm') }}
         </ToolbarButton>

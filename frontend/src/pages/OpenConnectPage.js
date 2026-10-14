@@ -526,7 +526,7 @@ export default defineComponent({
       </template>
       </TabGroup>
 
-      <div style="text-align:right;padding:16px 0;">
+      <div style="margin-top:16px;text-align:center;">
         <ToolbarButton icon="save" primary :disabled="saving" @click="save">{{ saving ? t('app.loading') : t('app.confirm') }}</ToolbarButton>
       </div>
 

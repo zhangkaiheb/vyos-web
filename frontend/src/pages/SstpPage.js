@@ -780,6 +780,12 @@ export default defineComponent({
       </template>
       </TabGroup>
 
+      <div style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="showUserModal" :title="editingUser && editingUser._username ? t('sstp.modals.editUser') : t('sstp.modals.createUser')" @confirm="saveUser" @close="showUserModal = false" width="600px">
         <div class="form-row"><label class="form-label">{{ t('sstp.labels.username') }}</label><input class="form-control" v-model="editingUser.username" :disabled="editingUser._username" :title="t('sstp.tips.username')" /></div>
         <div class="form-row"><label class="form-label">{{ t('sstp.labels.password') }}</label><input class="form-control" type="password" v-model="editingUser.password" :title="t('sstp.tips.password')" /></div>

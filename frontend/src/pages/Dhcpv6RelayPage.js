@@ -333,6 +333,12 @@ export default defineComponent({
         </template>
       </TabGroup>
 
+      <div style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="showListenModal" :title="t('dhcpv6relay.modals.listenInterface')" width="420px" @confirm="saveListen" @close="showListenModal = false">
         <div class="form-row">
           <label class="form-label">{{ t('dhcpv6relay.labels.interface') }}</label>

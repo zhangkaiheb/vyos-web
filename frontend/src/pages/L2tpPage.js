@@ -709,6 +709,12 @@ export default defineComponent({
       </template>
       </TabGroup>
 
+      <div v-if="activeTab !== 'pools'" style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary :disabled="saving || loading" @click="save">
+          {{ saving ? t('app.loading') : t('app.confirm') }}
+        </ToolbarButton>
+      </div>
+
       <DraggableModal v-model:visible="showIpPoolModal" :title="t('l2tp.modal.ipv4Pool')" @confirm="saveIpPool" @close="showIpPoolModal = false">
         <div class="form-row"><label class="form-label">{{ t('l2tp.form.name') }}</label><input class="form-control" v-model="editingIpPool.name" :disabled="editingIpPool._name" :title="t('l2tp.form.name')" /></div>
         <div class="form-row"><label class="form-label">{{ t('l2tp.form.nextPool') }}</label><input class="form-control" v-model="editingIpPool.next_pool" :title="t('l2tp.form.nextPool')" /></div>

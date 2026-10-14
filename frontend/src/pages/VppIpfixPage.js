@@ -289,10 +289,8 @@ export default defineComponent({
           </select>
         </div>
       </DraggableModal>
-      <div class="toolbar" style="margin-top:16px;">
-        <div class="toolbar-left">
-          <ToolbarButton icon="save" @click="save" :disabled="saving || loading">{{ saving ? t('vppIpfix.buttons.saving') : t('vppIpfix.buttons.confirm') }}</ToolbarButton>
-        </div>
+      <div style="margin-top:16px;text-align:center;">
+        <ToolbarButton icon="save" primary @click="save" :disabled="saving || loading">{{ saving ? t('vppIpfix.buttons.saving') : t('vppIpfix.buttons.confirm') }}</ToolbarButton>
       </div>
     </div>
   `,
