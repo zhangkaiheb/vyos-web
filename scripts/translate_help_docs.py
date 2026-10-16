@@ -11,8 +11,13 @@ import urllib.request
 DOCS_DIR = '/opt/vyos-web-config/docs'
 EN_DIR = os.path.join(DOCS_DIR, 'en')
 
-API_KEY = 'sk-c14b3519b9c34ed6bf2b200639c5c76f'
+API_KEY = os.environ.get('DASHSCOPE_API_KEY', '')
 API_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions'
+
+if not API_KEY:
+    print('Error: DASHSCOPE_API_KEY environment variable is not set.')
+    print('Usage: DASHSCOPE_API_KEY=sk-xxx python3 translate_help_docs.py')
+    sys.exit(1)
 
 LANGUAGES = {
     'zh': 'Chinese (Simplified)',
